@@ -1,0 +1,10 @@
+max_speed: 1.5
+min_speed: 0.5
+acceleration: 1.2
+max_fuel: 100
+burst_amount: 10
+burst_ticks: 1
+fireball_speed: 5
+cooldown: 40
+consumption: 2
+regeneration: 1

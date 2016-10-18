@@ -1,0 +1,10 @@
+name: Flier
+main: pl.betoncraft.flier.Flier
+description: Speeds up flying players
+authors: [Co0sh]
+version: 0.1.0
+commands:
+  flier:
+    description: Gives you flying items
+    usage: /<command>
+    permission: flier.items
