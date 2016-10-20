@@ -1,10 +1,156 @@
-max_speed: 1.5
-min_speed: 0.5
-acceleration: 1.2
-max_fuel: 100
-burst_amount: 10
-burst_ticks: 1
-fireball_speed: 5
-cooldown: 40
-consumption: 2
-regeneration: 1
+engines:
+  balancedEngine:
+    material: sugar cane
+    name: '&2Balanced Engine'
+    lore:
+    - '&aHold shift to accelerate.'
+    max_speed: 1.75
+    acceleration: 0.025
+    max_fuel: 750
+    consumption: 2
+    regeneration: 1
+    glow_time: 100
+  fastEngine:
+    material: feather
+    name: '&2Fast Engine'
+    lore:
+    - '&aHold shift to accelerate.'
+    max_speed: 2.5
+    acceleration: 0.0175
+    max_fuel: 500
+    consumption: 2
+    regeneration: 1.5
+    glow_time: 100
+  strongEngine:
+    material: wheat
+    name: '&2Strong Engine'
+    lore:
+    - '&aHold shift to accelerate.'
+    max_speed: 1
+    acceleration: 0.05
+    max_fuel: 1500
+    consumption: 2
+    regeneration: 1
+    glow_time: 100
+items:
+  balancedWeapon:
+    material: bone
+    name: '&4Balanced Weapon'
+    lore:
+    - '&cLeft click to shoot.'
+    entity: small fireball
+    slot: 0
+    burst_amount: 25
+    burst_ticks: 1
+    projectile_speed: 5.75
+    cooldown: 35
+    consumable: false
+    only_air: true
+    damage: 900
+    wings_off: true
+    kills_on_ground: false
+    physical_damage: 7.5
+  strongWeapon:
+    material: blaze rod
+    name: '&4Strong Weapon'
+    lore:
+    - '&cLeft click to shoot.'
+    entity: fireball
+    slot: 0
+    burst_amount: 10
+    burst_ticks: 1
+    projectile_speed: 5
+    cooldown: 40
+    consumable: false
+    only_air: true
+    damage: 1200
+    wings_off: true
+    kills_on_ground: true
+    physical_damage: 10
+  fastWeapon:
+    material: stick
+    name: '&4Fast Weapon'
+    lore:
+    - '&cLeft click to shoot.'
+    entity: snowball
+    slot: 0
+    burst_amount: 20
+    burst_ticks: 1
+    projectile_speed: 7.5
+    cooldown: 30
+    consumable: false
+    only_air: true
+    damage: 600
+    wings_off: false
+    kills_on_ground: false
+    physical_damage: 5
+  gun:
+    material: torch
+    name: '&4Gun'
+    lore:
+    - '&cLeft click to shoot.'
+    entity: snowball
+    slot: 2
+    burst_amount: 1
+    burst_ticks: 1
+    projectile_speed: 5
+    cooldown: 5
+    consumable: false
+    only_air: false
+    damage: 600
+    wings_off: false
+    kills_on_ground: false
+    physical_damage: 5
+wings:
+  balancedWings:
+    name: '&3Balanced Wings'
+    lore:
+    - '&bPress space to fly.'
+    health: 2400
+    regeneration: 0.5
+  lightWings:
+    name: '&3Light Wings'
+    lore:
+    - '&bPress space to fly.'
+    health: 1800
+    regeneration: 0.5
+    aerodynamics: 0.0025
+    liftingforce: 0.001
+  heavyWings:
+    name: '&3Heavy Wings'
+    lore:
+    - '&bPress space to fly.'
+    health: 3600
+    regeneration: 0.5
+    weight: 0.002
+    aerodynamics: -0.0025
+classes:
+  balanced:
+    engine: balancedEngine
+    items:
+    - balancedWeapon
+    - gun
+    wings: balancedWings
+  fast:
+    engine: fastEngine
+    items:
+    - fastWeapon
+    - gun
+    wings: lightWings
+  strong:
+    engine: strongEngine
+    items:
+    - strongWeapon
+    - gun
+    wings: heavyWings
+games:
+  default:
+    teams:
+      blue:
+        name: 'Blue'
+        location: -82.5;140;250.5;world
+        color: blue
+      red:
+        name: 'Red'
+        location: -82.5;140;250.5;world
+        color: red
