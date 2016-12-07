@@ -124,4 +124,39 @@ public class Flier extends JavaPlugin implements Listener, CommandExecutor {
 		return instance;
 	}
 
+	/**
+	 * @return the engines
+	 */
+	public Map<String, Engine> getEngines() {
+		return engines;
+	}
+
+	/**
+	 * @return the items
+	 */
+	public Map<String, UsableItem> getItems() {
+		return items;
+	}
+
+	/**
+	 * @return the wings
+	 */
+	public Map<String, Wings> getWings() {
+		return wings;
+	}
+
+	/**
+	 * @return the classes
+	 */
+	public Map<String, PlayerClass> getClasses() {
+		return classes;
+	}
+
+	/**
+	 * @return the games
+	 */
+	public Map<String, Game> getGames() {
+		return games;
+	}
+
 }

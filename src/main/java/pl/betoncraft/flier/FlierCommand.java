@@ -6,6 +6,11 @@
  */
 package pl.betoncraft.flier;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -23,51 +28,209 @@ import pl.betoncraft.flier.api.Team;
  */
 public class FlierCommand implements CommandExecutor {
 	
+	private List<Argument> arguments = new ArrayList<>();
+	
 	public FlierCommand() {
+		
+		// JOIN GAME ARGUMENT
+		arguments.add(new Argument(new String[]{"join", "j"}, "Join a game.", "<game> <team> <class>", new Argument[]{}) {
+			@Override
+			void parse(CommandSender sender, String currentCommand, Iterator<String> it) {
+				if (!(sender instanceof Player)) {
+					sender.sendMessage(ChatColor.DARK_RED + "Must be a player to use this argument!");
+				}
+				Flier f = Flier.getInstance();
+				
+				Game game;
+				if (!it.hasNext()) {
+					displayHelp(sender, currentCommand, this);
+					return;
+				} else {
+					String gameName = it.next();
+					game = f.getGame(gameName);
+					if (game == null) {
+						sender.sendMessage(ChatColor.RED + "No such game: " + ChatColor.DARK_RED + gameName);
+						StringBuilder builder = new StringBuilder();
+						for (String g : f.getGames().keySet()) {
+							builder.append(ChatColor.YELLOW + g + ChatColor.GREEN + ", ");
+						}
+						sender.sendMessage(ChatColor.GREEN + "Available games: "
+								+ builder.toString().trim().substring(0, builder.lastIndexOf(",")));
+						return;
+					}
+				}
+				
+				Team team;
+				if (!it.hasNext()) {
+					displayHelp(sender, currentCommand, this);
+					return;
+				} else {
+					String teamName = it.next();
+					team = game.getTeam(teamName);
+					if (team == null) {
+						sender.sendMessage(ChatColor.RED + "No such team: " + ChatColor.DARK_RED + teamName);
+						StringBuilder builder = new StringBuilder();
+						for (String t : game.getTeams().keySet()) {
+							builder.append(game.getTeam(t).getColor() + t + ChatColor.GREEN + ", ");
+						}
+						sender.sendMessage(ChatColor.GREEN + "Available teams: "
+								+ builder.toString().trim().substring(0, builder.lastIndexOf(",")));
+						return;
+					}
+				}
+				
+				PlayerClass clazz;
+				if (!it.hasNext()) {
+					displayHelp(sender, currentCommand, this);
+					return;
+				} else {
+					String clazzName = it.next();
+					clazz = f.getClass(clazzName);
+					if (clazz == null) {
+						sender.sendMessage(ChatColor.RED + "No such class: " + ChatColor.DARK_RED + clazzName);
+						StringBuilder builder = new StringBuilder();
+						for (String c : f.getClasses().keySet()) {
+							builder.append(ChatColor.AQUA + c + ChatColor.GREEN + ", ");
+						}
+						sender.sendMessage(ChatColor.GREEN + "Available classes: "
+								+ builder.toString().trim().substring(0, builder.lastIndexOf(",")));
+						return;
+					}
+				}
+				
+				game.addPlayer((Player) sender, team, clazz);
+			}
+		});
+		
+		// LEAVE GAME ARGUMENT
+		arguments.add(new Argument(new String[]{"leave", "l"}, "Leave a game.", "<game>", new Argument[]{}) {
+			@Override
+			void parse(CommandSender sender, String currentCommand, Iterator<String> it) {
+				if (!(sender instanceof Player)) {
+					sender.sendMessage(ChatColor.DARK_RED + "Must be a player!");
+				}
+				Flier f = Flier.getInstance();
+				
+				Game game;
+				if (!it.hasNext()) {
+					displayHelp(sender, currentCommand, this);
+					return;
+				} else {
+					String gameName = it.next();
+					game = f.getGame(gameName);
+					if (game == null) {
+						sender.sendMessage(ChatColor.RED + "No such game: " + ChatColor.DARK_RED + gameName);
+						StringBuilder builder = new StringBuilder();
+						for (String g : f.getGames().keySet()) {
+							builder.append(ChatColor.YELLOW + g + ChatColor.GREEN + ", ");
+						}
+						sender.sendMessage(ChatColor.GREEN + "Available games: "
+								+ builder.toString().trim().substring(0, builder.lastIndexOf(",")));
+						return;
+					}
+				}
+				
+				game.removePlayer((Player) sender);
+			}
+		});
+		
+		// RELOAD
+		arguments.add(new Argument(new String[]{"reload"}, "Reload the plugin", "", new Argument[]{}) {
+			@Override
+			void parse(CommandSender sender, String currentCommand, Iterator<String> it) {
+				Flier f = Flier.getInstance();
+				f.onDisable();
+				f.onEnable();
+				sender.sendMessage(ChatColor.DARK_GREEN + "Reloaded!");
+			}
+		});
+		
 		Flier.getInstance().getCommand("flier").setExecutor(this);
 	}
 	
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		if (cmd.getName().equals("flier")) {
-			if (sender instanceof Player) {
-				Player player = (Player) sender;
-				if (args.length < 2) {
-					player.sendMessage(ChatColor.DARK_RED + "/flier join game arguments...");
-					player.sendMessage(ChatColor.DARK_RED + "/flier leave game");
-					return true;
-				} else if (args.length >= 2) {
-					Flier f = Flier.getInstance();
-					Game game = f.getGame(args[1]);
-					if (game == null) {
-						player.sendMessage(ChatColor.DARK_RED + "Game does not exist!");
-						return true;
-					}
-					switch (args[0].toLowerCase()) {
-					case "join":
-						Team team = game.getTeam(args[2]);
-						if (team == null) {
-							player.sendMessage(ChatColor.DARK_RED + "Team does not exist!");
-							return true;
-						}
-						PlayerClass clazz = f.getClass(args[3]);
-						if (clazz == null) {
-							player.sendMessage(ChatColor.DARK_RED + "Class does not exist!");
-							return true;
-						}
-						game.addPlayer(player, team, clazz);
-						break;
-					case "leave":
-						game.removePlayer(player);
-						break;
-					}
-				}
+			Iterator<String> it = Arrays.asList(args).iterator();
+			if (!it.hasNext()) {
+				displayHelp(sender, arguments);
 			} else {
-				sender.sendMessage(ChatColor.DARK_RED + "Must be a player!");
+				manageIterator(sender, label, it, it.next(), arguments);
 			}
 			return true;
 		}
 		return false;
+	}
+	
+	private void manageIterator(CommandSender sender, String currentCommand, Iterator<String> it, String name,
+			List<Argument> arguments) {
+		for (Argument a : arguments) {
+			if (a.aliases().contains(name)) {
+				a.parse(sender, currentCommand + " " + name, it);
+				return;
+			}
+		}
+		displayHelp(sender, arguments);
+	}
+	
+	private void displayHelp(CommandSender sender, String currentCommand, Argument argument) {
+		sender.sendMessage(ChatColor.RED + "Wrong use of a command. Correct syntax:");
+		sender.sendMessage(ChatColor.DARK_GREEN + "/" + currentCommand + " " + argument.help());
+	}
+	
+	private void displayHelp(CommandSender sender, List<Argument> arguments) {
+		sender.sendMessage(ChatColor.RED + "Available arguments:");
+		for (Argument a : arguments) {
+			String aliases;
+			if (a.aliases.size() > 1) {
+				StringBuilder builder = new StringBuilder();
+				for (String alias : a.aliases().subList(1, a.aliases().size())) {
+					builder.append(ChatColor.LIGHT_PURPLE + alias + ChatColor.WHITE + ", ");
+				}
+				aliases = ChatColor.WHITE + "(" + builder.toString().trim().substring(0, builder.lastIndexOf(","))
+						+ ChatColor.WHITE + ")";
+			} else {
+				aliases = "";
+			}
+			sender.sendMessage(ChatColor.YELLOW + "- " + ChatColor.DARK_AQUA + a.name() + " " + aliases
+					+ ChatColor.YELLOW + ": " + ChatColor.GREEN + a.description());
+		}
+	}
+	
+	private abstract class Argument {
+		
+		String name;
+		List<String> aliases;
+		String description;
+		String help;
+		List<Argument> arguments;
+		
+		Argument(String[] aliases, String description, String help, Argument[] arguments) {
+			name = aliases[0];
+			this.aliases = Arrays.asList(aliases);
+			this.description = description;
+			this.help = help;
+			this.arguments = Arrays.asList(arguments);
+		}
+		
+		String name() {
+			return name;
+		}
+		
+		List<String> aliases() {
+			return aliases;
+		}
+		
+		String description() {
+			return description;
+		}
+		
+		String help() {
+			return help;
+		}
+		
+		abstract void parse(CommandSender sender, String currentCommand, Iterator<String> it);
+		
 	}
 
 }

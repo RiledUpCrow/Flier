@@ -6,6 +6,8 @@
  */
 package pl.betoncraft.flier.api;
 
+import java.util.Map;
+
 import org.bukkit.entity.Player;
 
 /**
@@ -47,5 +49,10 @@ public interface Game {
 	 * @return Team with that name
 	 */
 	public Team getTeam(String name);
+	
+	/**
+	 * @return map containing all teams in this game.
+	 */
+	public Map<String, Team> getTeams();
 
 }

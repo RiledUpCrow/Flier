@@ -124,6 +124,11 @@ public class SimpleGame implements Game, Listener {
 	}
 
 	@Override
+	public Map<String, Team> getTeams() {
+		return teams;
+	}
+
+	@Override
 	public void stop() {
 		Set<PlayerData> copy = new HashSet<>(dataMap.values());
 		for (PlayerData data : copy) {
