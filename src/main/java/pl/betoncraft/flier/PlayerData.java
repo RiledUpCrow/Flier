@@ -38,6 +38,7 @@ public class PlayerData {
 	private Player player;
 	private Scoreboard sb;
 	private int customIndex = 0;
+	private PlayerData lastHit = null;
 	
 	private long glowTimer;
 	
@@ -112,6 +113,14 @@ public class PlayerData {
 	
 	public Player getPlayer() {
 		return player;
+	}
+	
+	public void setLastHit(PlayerData player) {
+		this.lastHit = player;
+	}
+	
+	public PlayerData getLastHit() {
+		return lastHit;
 	}
 	
 	public UsableItem getHeldItem() {

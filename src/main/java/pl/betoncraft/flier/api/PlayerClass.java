@@ -32,4 +32,9 @@ public interface PlayerClass {
 	 *         wings
 	 */
 	public Wings getWings();
+
+	/**
+	 * @return the name of this class
+	 */
+	public String getName();
 }

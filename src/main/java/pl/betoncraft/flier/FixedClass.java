@@ -24,11 +24,16 @@ import pl.betoncraft.flier.api.Wings;
  */
 public class FixedClass implements PlayerClass {
 	
+	private String name;
 	private Engine engine;
 	private Map<UsableItem, Integer> items = new HashMap<>();
 	private Wings wings;
 	
 	public FixedClass(ConfigurationSection section) {
+		name = section.getName();
+		char[] chars = name.toCharArray();
+		chars[0] = (chars[0] + "").toUpperCase().charAt(0);
+		name = new String(chars);
 		engine = Flier.getInstance().getEngine(section.getString("engine", "default"));
 		List<String> itemNames = section.getStringList("items");
 		for (String item : itemNames) {
@@ -63,6 +68,11 @@ public class FixedClass implements PlayerClass {
 	@Override
 	public Wings getWings() {
 		return wings;
+	}
+
+	@Override
+	public String getName() {
+		return name;
 	}
 
 }

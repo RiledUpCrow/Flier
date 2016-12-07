@@ -164,8 +164,8 @@ public class SimpleGame implements Game, Listener {
 		return players.get(player.getUniqueId()).getSpawn();
 	}
 	
-	private void score(Team team) {
-		team.setScore(team.getScore() + 1);
+	private void score(Team team, int amount) {
+		team.setScore(team.getScore() + amount);
 		for (PlayerData data : dataMap.values()) {
 			data.updateStatistic(team.getIndex(), team.getName() + ChatColor.WHITE + ": " + team.getScore());
 		}
@@ -190,41 +190,54 @@ public class SimpleGame implements Game, Listener {
 	@EventHandler
 	public void onHit(EntityDamageByEntityEvent event) {
 		PlayerData player = dataMap.get(event.getEntity().getUniqueId());
+		// hit player in Game
 		if (player == null) {
 			return;
 		}
+		// hit by a projectile
 		if (!(event.getDamager() instanceof Projectile)) {
 			return;
 		}
 		Projectile projectile = (Projectile) event.getDamager();
+		// shooter was some player
 		if (!(projectile.getShooter() instanceof Player)) {
 			return;
 		}
 		Player shooterPlayer = (Player) projectile.getShooter();
+		// was not hit by himself
 		if (shooterPlayer.equals(event.getEntity())) {
+			event.setCancelled(true);
 			return;
 		}
 		PlayerData shooter = dataMap.get(shooterPlayer.getUniqueId());
+		// was hit by someone in Game
 		if (shooter == null) {
+			event.setCancelled(true);
 			return;
 		}
 		Damager weapon = Damager.getDamager(projectile);
+		// was hit by a Weapon
 		if (weapon == null) {
+			event.setCancelled(true);
 			return;
 		}
 		DamageResult result = player.damage(weapon);
 		boolean sound = true;
 		switch (result) {
 		case INSTANT_KILL:
+			player.setLastHit(shooter);
 			player.getPlayer().damage(player.getPlayer().getHealth() + 1, shooter.getPlayer());
 			break;
 		case WINGS_OFF:
+			player.setLastHit(shooter);
 			player.takeWingsOff();
 			// no break, we want to damage wings too
 		case WINGS_DAMAGE:
+			player.setLastHit(shooter);
 			player.removeHealth(weapon.getDamage());
 			break;
 		case REGULAR_DAMAGE:
+			player.setLastHit(shooter);
 			player.getPlayer().damage(weapon.getPhysical(), shooter.getPlayer());
 			break;
 		case NOTHING:
@@ -268,10 +281,39 @@ public class SimpleGame implements Game, Listener {
 	
 	@EventHandler
 	public void onDeath(PlayerDeathEvent event) {
-		if (dataMap.containsKey(event.getEntity().getUniqueId())) {
-			score(players.get(event.getEntity().getUniqueId()));
+		PlayerData killed = dataMap.get(event.getEntity().getUniqueId());
+		if (killed != null) {
+			Team killedTeam = players.get(killed.getPlayer().getUniqueId());
+			PlayerClass killedClass = classes.get(killed.getPlayer().getUniqueId());
 			event.getDrops().clear();
+			PlayerData killer = killed.getLastHit();
+			killed.setLastHit(null);
+			if (killer != null) {
+				Team killerTeam = players.get(killer.getPlayer().getUniqueId());
+				PlayerClass killerClass = classes.get(killer.getPlayer().getUniqueId());
+				switch (event.getEntity().getLastDamageCause().getCause()) {
+				case FALL:
+					event.setDeathMessage(formatPlayer(killedTeam, killedClass, killed.getPlayer().getName())
+							+ " was shot down by "
+							+ formatPlayer(killerTeam, killerClass, killer.getPlayer().getName()));
+					break;
+				default:
+					event.setDeathMessage(formatPlayer(killedTeam, killedClass, killed.getPlayer().getName())
+							+ " was killed by "
+							+ formatPlayer(killerTeam, killerClass, killer.getPlayer().getName()));
+					break;
+				}
+				score(killerTeam, 1);
+			} else {
+				event.setDeathMessage(formatPlayer(killedTeam, killedClass, killed.getPlayer().getName())
+						+ " commited suicide");
+				score(killedTeam, -1);
+			}
 		}
+	}
+
+	private String formatPlayer(Team team, PlayerClass clazz, String name) {
+		return team.getColor() + name + ChatColor.WHITE + " (" + ChatColor.AQUA + clazz.getName() + ChatColor.WHITE + ")";
 	}
 	
 	@EventHandler
