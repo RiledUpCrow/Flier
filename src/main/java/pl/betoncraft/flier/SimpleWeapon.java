@@ -13,26 +13,23 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
+import pl.betoncraft.flier.api.Damager;
+import pl.betoncraft.flier.api.Weapon;
+
 /**
- * Represents a simple projectile weapon.
+ * Implementation of a simple, burst shooting weapon.
  *
  * @author Jakub Sapalski
  */
-public class SimpleWeapon implements UsableItem, Damager {
-	
-	private ItemStack weapon;
+public class SimpleWeapon extends DefaultItem implements Weapon {
 	
 	private EntityType entity = EntityType.FIREBALL;
 	private int slot = -1;
@@ -51,21 +48,7 @@ public class SimpleWeapon implements UsableItem, Damager {
 	private final List<UUID> fireBlocker = new LinkedList<>();
 	
 	public SimpleWeapon(ConfigurationSection section) {
-		Material type = Material.matchMaterial(section.getString("material", "FEATHER"));
-		if (type == null) {
-			type = Material.BLAZE_ROD;
-		}
-		String name = ChatColor.translateAlternateColorCodes('&', section.getString("name", ChatColor.RED + "Weapon"));
-		List<String> lore = section.getStringList("lore");
-		for (int i = 0; i < lore.size(); i++) {
-			lore.set(i, ChatColor.translateAlternateColorCodes('&', lore.get(i)));
-		}
-		weapon = new ItemStack(type);
-		ItemMeta weaponMeta = weapon.getItemMeta();
-		weaponMeta.setDisplayName(name);
-		weaponMeta.setLore(lore);
-		weaponMeta.spigot().setUnbreakable(true);
-		weapon.setItemMeta(weaponMeta);
+		super(section);
 		entity = EntityType.valueOf(section.getString("entity", "FIREBALL").toUpperCase().replace(' ', '_'));
 		slot = section.getInt("slot", slot);
 		burstAmount = section.getInt("burst_amount", burstAmount);
@@ -78,6 +61,7 @@ public class SimpleWeapon implements UsableItem, Damager {
 		wingsOff = section.getBoolean("wings_off", wingsOff);
 		killsOnGround = section.getBoolean("kills_on_ground", killsOnGround);
 		physicalDamage = section.getDouble("physical_damage", physicalDamage);
+		weight = section.getDouble("weight", weight);
 	}
 	
 	@Override
@@ -101,11 +85,6 @@ public class SimpleWeapon implements UsableItem, Damager {
 	}
 	
 	@Override
-	public ItemStack getItem() {
-		return weapon.clone();
-	}
-	
-	@Override
 	public boolean isConsumable() {
 		return consumable;
 	}
@@ -121,7 +100,7 @@ public class SimpleWeapon implements UsableItem, Damager {
 	}
 	
 	@Override
-	public void fire(PlayerData data) {
+	public void use(PlayerData data) {
 		if (onlyAir() && !data.isFlying()) {
 			return;
 		}

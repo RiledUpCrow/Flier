@@ -12,18 +12,23 @@ import java.util.Map;
 
 import org.bukkit.configuration.ConfigurationSection;
 
+import pl.betoncraft.flier.api.Engine;
+import pl.betoncraft.flier.api.PlayerClass;
+import pl.betoncraft.flier.api.UsableItem;
+import pl.betoncraft.flier.api.Wings;
+
 /**
- * Represents player's class.
+ * A class with fixed items, loaded from the configuration.
  *
  * @author Jakub Sapalski
  */
-public class Class {
+public class FixedClass implements PlayerClass {
 	
 	private Engine engine;
 	private Map<UsableItem, Integer> items = new HashMap<>();
 	private Wings wings;
 	
-	public Class(ConfigurationSection section) {
+	public FixedClass(ConfigurationSection section) {
 		engine = Flier.getInstance().getEngine(section.getString("engine", "default"));
 		List<String> itemNames = section.getStringList("items");
 		for (String item : itemNames) {
@@ -45,14 +50,17 @@ public class Class {
 		wings = Flier.getInstance().getWings(section.getString("wings", "default"));
 	}
 	
+	@Override
 	public Engine getEngine() {
 		return engine;
 	}
 	
+	@Override
 	public Map<UsableItem, Integer> getItems() {
 		return items;
 	}
 	
+	@Override
 	public Wings getWings() {
 		return wings;
 	}

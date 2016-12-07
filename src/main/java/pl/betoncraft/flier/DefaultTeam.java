@@ -11,12 +11,14 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 
+import pl.betoncraft.flier.api.Team;
+
 /**
- * Represents a team in the game.
+ * A simple team loaded from the configuration.
  *
  * @author Jakub Sapalski
  */
-public class Team {
+public class DefaultTeam implements Team {
 	
 	private int score = 0;
 	private String name;
@@ -24,49 +26,44 @@ public class Team {
 	private int index;
 	private ChatColor color;
 	
-	public Team(ConfigurationSection section, int index) {
+	public DefaultTeam(ConfigurationSection section, int index) {
 		this.index = index;
 		String[] parts = section.getString("location").split(";");
 		spawn = new Location(Bukkit.getWorld(parts[3]),
-				Double.parseDouble(parts[0]), Double.parseDouble(parts[1]), Double.parseDouble(parts[2]));
+				Double.parseDouble(parts[0]), Double.parseDouble(parts[1]), Double.parseDouble(parts[2]),
+				Float.parseFloat(parts[4]), Float.parseFloat(parts[5]));
 		color = ChatColor.valueOf(section.getString("color", "white").toUpperCase().replace(' ', '_'));
 		name = color + ChatColor.translateAlternateColorCodes('&', section.getString("name"));
 	}
 	
+	@Override
 	public int getIndex() {
 		return index;
 	}
 
-	/**
-	 * @return the score
-	 */
+	@Override
 	public int getScore() {
 		return score;
 	}
-	
-	public void setScore(int score) {
-		this.score = score;
-	}
 
-	/**
-	 * @return the name
-	 */
-	public String getName() {
-		return name;
-	}
-
-	/**
-	 * @return the spawn
-	 */
+	@Override
 	public Location getSpawn() {
 		return spawn;
 	}
 
-	/**
-	 * @return the color
-	 */
+	@Override
 	public ChatColor getColor() {
 		return color;
+	}
+	
+	@Override
+	public void setScore(int score) {
+		this.score = score;
+	}
+
+	@Override
+	public String getName() {
+		return name;
 	}
 
 }

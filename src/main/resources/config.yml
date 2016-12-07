@@ -148,9 +148,9 @@ games:
     teams:
       blue:
         name: 'Blue'
-        location: -82.5;140;250.5;world
+        location: -82.5;140;249.5;world;0;0
         color: blue
       red:
         name: 'Red'
-        location: -82.5;140;250.5;world
+        location: -82.5;140;377.5;world;180;0
         color: red

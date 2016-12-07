@@ -22,7 +22,11 @@ import org.bukkit.scoreboard.Score;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.util.Vector;
 
-import pl.betoncraft.flier.Damager.DamageResult;
+import pl.betoncraft.flier.api.Damager;
+import pl.betoncraft.flier.api.Damager.DamageResult;
+import pl.betoncraft.flier.api.Engine;
+import pl.betoncraft.flier.api.UsableItem;
+import pl.betoncraft.flier.api.Wings;
 
 /**
  * Stores data about the player.
@@ -261,41 +265,58 @@ public class PlayerData {
 		setStatistic(index + 1, string);
 	}
 	
+	public double getWeight() {
+		double weight = 0;
+		weight += getEngine().getWeight();
+		weight += getWings().getWeight();
+		for (UsableItem item : getItems().keySet()) {
+			weight += item.getWeight();
+		}
+		return weight;
+	}
+	
 	public void applyFlightModifications() {
 		Vector velocity = getPlayer().getVelocity().clone();
 		double horizontalSpeed = Math.sqrt((velocity.getX() * velocity.getX()) + (velocity.getZ() * velocity.getZ()));
 		double liftingForce = getWings().getLiftingForce() * horizontalSpeed;
-		if (liftingForce != 0) {
-			velocity.add(new Vector(0, 1, 0).multiply(liftingForce));
-		}
-		double weight = getWings().getWeight();
-		if (weight != 0) {
-			velocity.add(new Vector(0, -1, 0).multiply(getWings().getWeight()));
-		}
-		double aerodynamics = -getWings().getAerodynamics();
-		if (aerodynamics != 0) {
-			Vector airResistance = velocity.clone().normalize().multiply(-1);
-			airResistance.multiply(aerodynamics);
-			velocity.add(airResistance);
-		}
+		double weight = getWeight();
+		velocity.add(new Vector(0, 1, 0).multiply(liftingForce - weight));
+		double aerodynamics = getWings().getAerodynamics();
+		Vector airResistance = velocity.clone().multiply(aerodynamics);
+		velocity.add(airResistance);
 		if (!velocity.equals(getPlayer().getVelocity())) {
 			getPlayer().setVelocity(velocity);
 		}
 	}
 	
-	public void launch(double acceleration, double maxSpeed) {
+	public void launch(double minSpeed, double acceleration, double maxSpeed) {
 		Player player = getPlayer();
 		Vector velocity = player.getVelocity();
 		double speed = velocity.length();
+		
 		if (speed > maxSpeed) {
-			return;
+			speed = 0;
+		} else if (speed < minSpeed) {
+			speed = minSpeed;
 		}
 		Vector direction = player.getLocation().getDirection();
-		velocity.add(direction.multiply(acceleration));
-		speed = velocity.length();
-		if (speed > maxSpeed) {
-			velocity.multiply(maxSpeed / speed);
-		}
+		velocity.add(direction.multiply(speed * getEngine().getAcceleration()));
+
+//		// different algorithm
+//		if (speed > maxSpeed) {
+//			return;
+//		}
+//		if (speed < minSpeed) {
+//			Vector direction = player.getLocation().getDirection();
+//			velocity.add(direction.multiply(acceleration));
+//		} else {
+//			velocity.multiply(acceleration + 1);
+//		}
+//		speed = velocity.length();
+//		if (speed > maxSpeed) {
+//			velocity.multiply(maxSpeed / speed);
+//		}
+		
 		player.setVelocity(velocity);
 	}
 	
@@ -307,7 +328,7 @@ public class PlayerData {
 		if (!removeFuel(engine.getConsumption())) {
 			return;
 		}
-		launch(engine.getAcceleration(), engine.getMaxSpeed());
+		launch(engine.getMinSpeed(), engine.getAcceleration(), engine.getMaxSpeed());
 		startGlowing(engine.getGlowTime());
 	}
 	
@@ -332,7 +353,7 @@ public class PlayerData {
 			amount--;
 			getItems().put(item, amount);
 		}
-		item.fire(this);
+		item.use(this);
 	}
 	
 	public void cooldown() {
@@ -382,9 +403,15 @@ public class PlayerData {
 		addHealth(wings.getRegeneration(), wings.getHealth());
 	}
 	
-	public void stop() {
+	public void clear() {
 		getPlayer().setScoreboard(Bukkit.getScoreboardManager().getMainScoreboard());
 		getPlayer().getInventory().clear();
+		getPlayer().setHealth(getPlayer().getMaxHealth());
+		getPlayer().setFoodLevel(20);
+		getPlayer().setExhaustion(20);
+		getPlayer().getActivePotionEffects().clear();
+		getPlayer().getVelocity().zero();
+		getPlayer().setGlowing(false);
 	}
 
 }

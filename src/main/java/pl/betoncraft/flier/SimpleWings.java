@@ -6,68 +6,48 @@
  */
 package pl.betoncraft.flier;
 
-import java.util.List;
-
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
+
+import pl.betoncraft.flier.api.Wings;
 
 /**
- * Represents a custom Elytra.
+ * Simple wings.
  *
  * @author Jakub Sapalski
  */
-public class Wings {
-	
-	private ItemStack wings;
+public class SimpleWings extends DefaultItem implements Wings {
 	
 	private double health = 100;
 	private double regeneration = 1;
-	private double weight = 0;
 	private double aerodynamics = 0;
 	private double liftingForce = 0;
 	
-	public Wings(ConfigurationSection section) {
-		String name = ChatColor.translateAlternateColorCodes('&', section.getString("name", ChatColor.LIGHT_PURPLE + "Wings"));
-		List<String> lore = section.getStringList("lore");
-		for (int i = 0; i < lore.size(); i++) {
-			lore.set(i, ChatColor.translateAlternateColorCodes('&', lore.get(i)));
-		}
-		wings = new ItemStack(Material.ELYTRA);
-		ItemMeta wingsMeta = wings.getItemMeta();
-		wingsMeta.setDisplayName(name);
-		wingsMeta.setLore(lore);
-		wingsMeta.spigot().setUnbreakable(true);
-		wings.setItemMeta(wingsMeta);
+	public SimpleWings(ConfigurationSection section) {
+		super(section);
+		super.item.setType(Material.ELYTRA);
 		health = section.getDouble("health", health);
 		regeneration = section.getDouble("regeneration", regeneration);
 		aerodynamics = section.getDouble("aerodynamics", aerodynamics);
 		liftingForce = section.getDouble("liftingforce", liftingForce);
-		weight = section.getDouble("weight", weight);
 	}
 	
-	public ItemStack getItem() {
-		return wings.clone();
-	}
-	
+	@Override
 	public double getHealth() {
 		return health;
 	}
 
+	@Override
 	public double getRegeneration() {
 		return regeneration;
 	}
 
-	public double getWeight() {
-		return weight;
-	}
-
+	@Override
 	public double getAerodynamics() {
 		return aerodynamics;
 	}
 	
+	@Override
 	public double getLiftingForce() {
 		return liftingForce;
 	}

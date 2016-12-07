@@ -4,27 +4,25 @@
  * To Public License, Version 2, as published by Sam Hocevar. See
  * http://www.wtfpl.net/ for more details.
  */
-package pl.betoncraft.flier;
+package pl.betoncraft.flier.api;
 
 import org.bukkit.inventory.ItemStack;
 
 /**
- * Represents a weapon which can be fired by a player. 
+ * Represents anything with weight.
  *
  * @author Jakub Sapalski
  */
-public interface UsableItem {
+public interface Weight {
 	
+	/**
+	 * @return the ItemStack equal to this item
+	 */
 	public ItemStack getItem();
 	
-	public void fire(PlayerData player);
-
-	public void cooldown(PlayerData player);
-	
-	public boolean isConsumable();
-	
-	public boolean onlyAir();
-	
-	public int slot();
+	/**
+	 * @return weight of an item
+	 */
+	public double getWeight();
 
 }

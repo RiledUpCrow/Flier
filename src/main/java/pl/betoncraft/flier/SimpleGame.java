@@ -15,6 +15,7 @@ import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
@@ -32,28 +33,33 @@ import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import pl.betoncraft.flier.Damager.DamageResult;
+import pl.betoncraft.flier.api.Damager;
+import pl.betoncraft.flier.api.Damager.DamageResult;
+import pl.betoncraft.flier.api.Game;
+import pl.betoncraft.flier.api.PlayerClass;
+import pl.betoncraft.flier.api.Team;
+import pl.betoncraft.flier.api.UsableItem;
 
 /**
- * Represents a game with rules and players.
+ * A simple team deathmatch game with fixed classes.
  *
  * @author Jakub Sapalski
  */
-public class Game implements Listener {
+public class SimpleGame implements Game, Listener {
 	
 	private Map<UUID, PlayerData> dataMap = new HashMap<>();
 	
 	private Map<String, Team> teams = new HashMap<>();
 	
 	private Map<UUID, Team> players = new HashMap<>();
-	private Map<UUID, Class> classes = new HashMap<>();
+	private Map<UUID, PlayerClass> classes = new HashMap<>();
 	
-	public Game(ConfigurationSection section) {
+	public SimpleGame(ConfigurationSection section) {
 		ConfigurationSection teams = section.getConfigurationSection("teams");
 		if (teams != null) {
 			int i = 0;
 			for (String team : teams.getKeys(false)) {
-				this.teams.put(team, new Team(teams.getConfigurationSection(team), i++));
+				this.teams.put(team, new DefaultTeam(teams.getConfigurationSection(team), i++));
 			}
 		}
 		new BukkitRunnable() {
@@ -85,37 +91,44 @@ public class Game implements Listener {
 		Bukkit.getPluginManager().registerEvents(this, Flier.getInstance());
 	}
 	
-	public void addPlayer(Player player, String[] args) {
-		if (args.length != 2) {
-			player.sendMessage(ChatColor.DARK_RED + "First argument needs to be team, second class");
-			return;
-		}
-		String teamName = args[0];
-		String className = args[1];
-		Class c = Flier.getInstance().getClass(className);
-		Team team = teams.get(teamName);
-		if (c == null) {
-			player.sendMessage(ChatColor.DARK_RED + "Class does not exist");
-			return;
-		}
-		if (team == null) {
-			player.sendMessage(ChatColor.DARK_RED + "Team does not exist");
-			return;
-		}
+	@Override
+	public void addPlayer(Player player, Team team, PlayerClass clazz) {
 		PlayerData data = new PlayerData(player);
 		dataMap.put(player.getUniqueId(), data);
 		players.put(player.getUniqueId(), team);
-		classes.put(player.getUniqueId(), c);
-		giveClassItems(c, data);
-		teleportToSpawn(player);
+		classes.put(player.getUniqueId(), clazz);
+		giveClassItems(clazz, data);
+		player.teleport(getSpawnLocation(player));
 		for (int i = 0; i < teams.size(); i++) {
 			data.addStatistic("");
 		}
-		for (Entry<String, Team> e : Game.this.teams.entrySet()) {
+		for (Entry<String, Team> e : SimpleGame.this.teams.entrySet()) {
 			data.updateStatistic(e.getValue().getIndex(), e.getValue().getName() + ChatColor.WHITE + ": " +
 					e.getValue().getScore());
 		}
 		updateColors();
+	}
+	
+	@Override
+	public void removePlayer(Player player) {
+		PlayerData data = dataMap.remove(player.getUniqueId());
+		if (data != null) {
+			data.clear();
+		}
+		player.teleport(player.getLocation().getWorld().getSpawnLocation());
+	}
+
+	@Override
+	public Team getTeam(String name) {
+		return teams.get(name);
+	}
+
+	@Override
+	public void stop() {
+		Set<PlayerData> copy = new HashSet<>(dataMap.values());
+		for (PlayerData data : copy) {
+			removePlayer(data.getPlayer());
+		}
 	}
 
 	private void updateColors() {
@@ -132,26 +145,18 @@ public class Game implements Listener {
 		}
 		return map;
 	}
-	
-	public void removePlayer(Player player) {
-		PlayerData data = dataMap.remove(player.getUniqueId());
-		if (data != null) {
-			data.stop();
-		}
-		player.teleport(player.getLocation().getWorld().getSpawnLocation());
-	}
 
-	private void giveClassItems(Class c, PlayerData data) {
+	private void giveClassItems(PlayerClass clazz, PlayerData data) {
 		data.getPlayer().getInventory().clear();
-		data.setEngine(c.getEngine());
-		for (Entry<UsableItem, Integer> e : c.getItems().entrySet()) {
+		data.setEngine(clazz.getEngine());
+		for (Entry<UsableItem, Integer> e : clazz.getItems().entrySet()) {
 			data.addItem(e.getKey(), e.getValue());
 		}
-		data.setWings(c.getWings());
+		data.setWings(clazz.getWings());
 	}
 	
-	private void teleportToSpawn(Player player) {
-		player.teleport(players.get(player.getUniqueId()).getSpawn());
+	private Location getSpawnLocation(Player player) {
+		return players.get(player.getUniqueId()).getSpawn();
 	}
 	
 	private void score(Team team) {
@@ -277,16 +282,9 @@ public class Game implements Listener {
 		if (data == null) {
 			return;
 		}
-		Class c = classes.get(event.getPlayer().getUniqueId());
+		PlayerClass c = classes.get(event.getPlayer().getUniqueId());
 		giveClassItems(c, data);
-		teleportToSpawn(event.getPlayer());
-	}
-
-	public void stop() {
-		Set<PlayerData> copy = new HashSet<>(dataMap.values());
-		for (PlayerData data : copy) {
-			removePlayer(data.getPlayer());
-		}
+		event.setRespawnLocation(getSpawnLocation(event.getPlayer()));
 	}
 
 }

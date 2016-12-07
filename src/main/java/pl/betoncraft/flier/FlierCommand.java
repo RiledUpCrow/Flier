@@ -6,13 +6,15 @@
  */
 package pl.betoncraft.flier;
 
-import java.util.Arrays;
-
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+
+import pl.betoncraft.flier.api.Game;
+import pl.betoncraft.flier.api.PlayerClass;
+import pl.betoncraft.flier.api.Team;
 
 /**
  * The main command.
@@ -35,14 +37,25 @@ public class FlierCommand implements CommandExecutor {
 					player.sendMessage(ChatColor.DARK_RED + "/flier leave game");
 					return true;
 				} else if (args.length >= 2) {
-					Game game = Flier.getInstance().getGame(args[1]);
+					Flier f = Flier.getInstance();
+					Game game = f.getGame(args[1]);
 					if (game == null) {
 						player.sendMessage(ChatColor.DARK_RED + "Game does not exist!");
 						return true;
 					}
 					switch (args[0].toLowerCase()) {
 					case "join":
-						game.addPlayer(player, Arrays.asList(args).subList(2, args.length).toArray(new String[args.length - 2]));
+						Team team = game.getTeam(args[2]);
+						if (team == null) {
+							player.sendMessage(ChatColor.DARK_RED + "Team does not exist!");
+							return true;
+						}
+						PlayerClass clazz = f.getClass(args[3]);
+						if (clazz == null) {
+							player.sendMessage(ChatColor.DARK_RED + "Class does not exist!");
+							return true;
+						}
+						game.addPlayer(player, team, clazz);
 						break;
 					case "leave":
 						game.removePlayer(player);
