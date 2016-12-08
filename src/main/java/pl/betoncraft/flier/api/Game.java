@@ -7,6 +7,7 @@
 package pl.betoncraft.flier.api;
 
 import java.util.Map;
+import java.util.UUID;
 
 import org.bukkit.entity.Player;
 
@@ -18,16 +19,19 @@ import org.bukkit.entity.Player;
 public interface Game {
 
 	/**
-	 * Adds the player to the game with specified team and class.
+	 * Adds the player to the game.
 	 * 
 	 * @param player
 	 *            player to add
-	 * @param team
-	 *            player's team
-	 * @param clazz
-	 *            player's class
 	 */
-	public void addPlayer(Player player, Team team, PlayerClass clazz);
+	public void addPlayer(Player player);
+	
+	/**
+	 * Returns the map containing players by their UUID.
+	 * 
+	 * @return the map of players
+	 */
+	public Map<UUID, Player> getPlayers();
 
 	/**
 	 * Removes the player from the game.

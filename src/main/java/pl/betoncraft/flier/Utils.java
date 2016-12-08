@@ -6,6 +6,7 @@
  */
 package pl.betoncraft.flier;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 
@@ -33,6 +34,42 @@ public class Utils {
 			altitude++;
 		}
 		return altitude;
+	}
+
+	/**
+	 * Parses the location string.
+	 * 
+	 * @param string
+	 * @return optional location, which will be empty if the format was incorrect
+	 */
+	public static Location parseLocation(String string) {
+		try {
+			String[] parts = string.split(";");
+			if (parts.length == 4) {
+				return new Location(Bukkit.getWorld(parts[3]),
+					Double.parseDouble(parts[0]), Double.parseDouble(parts[1]), Double.parseDouble(parts[2]));
+			} else if (parts.length == 6) {
+				return new Location(Bukkit.getWorld(parts[3]),
+					Double.parseDouble(parts[0]), Double.parseDouble(parts[1]), Double.parseDouble(parts[2]),
+					Float.parseFloat(parts[4]), Float.parseFloat(parts[5]));
+			} else {
+				return null	;
+			}
+		} catch (Exception e) {
+			return null;
+		}
+	}
+
+	/**
+	 * Capitalizes the first letter of the string.
+	 * 
+	 * @param string String to capitalize
+	 * @return the capitalized string
+	 */
+	public static String capitalize(String string) {
+		char[] chars = string.toCharArray();
+		chars[0] = (chars[0] + "").toUpperCase().charAt(0);
+		return new String(chars);
 	}
 
 }

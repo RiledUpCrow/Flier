@@ -6,7 +6,6 @@
  */
 package pl.betoncraft.flier;
 
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
@@ -28,10 +27,7 @@ public class DefaultTeam implements Team {
 	
 	public DefaultTeam(ConfigurationSection section, int index) {
 		this.index = index;
-		String[] parts = section.getString("location").split(";");
-		spawn = new Location(Bukkit.getWorld(parts[3]),
-				Double.parseDouble(parts[0]), Double.parseDouble(parts[1]), Double.parseDouble(parts[2]),
-				Float.parseFloat(parts[4]), Float.parseFloat(parts[5]));
+		spawn = Utils.parseLocation(section.getString("location"));
 		color = ChatColor.valueOf(section.getString("color", "white").toUpperCase().replace(' ', '_'));
 		name = color + ChatColor.translateAlternateColorCodes('&', section.getString("name"));
 	}

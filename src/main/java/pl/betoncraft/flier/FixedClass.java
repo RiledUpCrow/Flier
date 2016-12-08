@@ -30,10 +30,7 @@ public class FixedClass implements PlayerClass {
 	private Wings wings;
 	
 	public FixedClass(ConfigurationSection section) {
-		name = section.getName();
-		char[] chars = name.toCharArray();
-		chars[0] = (chars[0] + "").toUpperCase().charAt(0);
-		name = new String(chars);
+		name = Utils.capitalize(section.getName());
 		engine = Flier.getInstance().getEngine(section.getString("engine", "default"));
 		List<String> itemNames = section.getStringList("items");
 		for (String item : itemNames) {

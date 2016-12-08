@@ -13,6 +13,7 @@ import java.util.Set;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -36,6 +37,7 @@ import pl.betoncraft.flier.api.Wings;
 public class PlayerData {
 	
 	private Player player;
+	private Location returnLoc;
 	private Scoreboard sb;
 	private int customIndex = 0;
 	private PlayerData lastHit = null;
@@ -51,11 +53,16 @@ public class PlayerData {
 	
 	public PlayerData(Player player) {
 		this.player = player;
+		returnLoc = player.getLocation();
 		sb = Bukkit.getScoreboardManager().getNewScoreboard();
 		Objective stats = sb.registerNewObjective("stats", "dummy");
 		stats.setDisplaySlot(DisplaySlot.SIDEBAR);
 		stats.setDisplayName("Stats");
 		player.setScoreboard(sb);
+	}
+
+	public Location getReturnLocation() {
+		return returnLoc;
 	}
 	
 	public Engine getEngine() {
@@ -410,6 +417,10 @@ public class PlayerData {
 			return;
 		}
 		addHealth(wings.getRegeneration(), wings.getHealth());
+	}
+
+	public void clearStats() {
+		customIndex = 0;
 	}
 	
 	public void clear() {

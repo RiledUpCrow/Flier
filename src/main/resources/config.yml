@@ -4,7 +4,7 @@ engines:
     name: '&2Balanced Engine'
     lore:
     - '&aHold shift to accelerate.'
-    max_speed: 1.75
+    max_speed: 1.5
     acceleration: 0.025
     max_fuel: 750
     consumption: 2
@@ -16,11 +16,11 @@ engines:
     lore:
     - '&aHold shift to accelerate.'
     max_speed: 2.5
-    acceleration: 0.0175
+    acceleration: 0.01
     max_fuel: 500
-    consumption: 2
+    consumption: 2.5
     regeneration: 1.5
-    glow_time: 100
+    glow_time: 50
   strongEngine:
     material: wheat
     name: '&2Strong Engine'
@@ -31,7 +31,7 @@ engines:
     max_fuel: 1500
     consumption: 2
     regeneration: 1
-    glow_time: 100
+    glow_time: 200
 items:
   balancedWeapon:
     material: bone
@@ -40,13 +40,13 @@ items:
     - '&cLeft click to shoot.'
     entity: small fireball
     slot: 0
-    burst_amount: 25
+    burst_amount: 15
     burst_ticks: 1
     projectile_speed: 5.75
     cooldown: 35
     consumable: false
     only_air: true
-    damage: 900
+    damage: 601
     wings_off: true
     kills_on_ground: false
     physical_damage: 7.5
@@ -63,7 +63,7 @@ items:
     cooldown: 40
     consumable: false
     only_air: true
-    damage: 1200
+    damage: 2401
     wings_off: true
     kills_on_ground: true
     physical_damage: 10
@@ -76,11 +76,11 @@ items:
     slot: 0
     burst_amount: 20
     burst_ticks: 1
-    projectile_speed: 7.5
-    cooldown: 30
+    projectile_speed: 50
+    cooldown: 25
     consumable: false
     only_air: true
-    damage: 600
+    damage: 901
     wings_off: false
     kills_on_ground: false
     physical_damage: 5
@@ -97,7 +97,7 @@ items:
     cooldown: 5
     consumable: false
     only_air: false
-    damage: 600
+    damage: 1001
     wings_off: false
     kills_on_ground: false
     physical_damage: 5
@@ -154,3 +154,17 @@ games:
         name: 'Red'
         location: -82.5;140;377.5;world;180;0
         color: red
+    lobby:
+      join:
+      - -19;64;334;world
+      spawn: -22.5;64;334.5;world;90;0
+      start: -32;64;334;world
+      leave: -21;64;334;world
+      choice:
+        team:
+          red: -28;64;331;world
+          blue: -26;64;331;world
+        class:
+          fast: -25;64;337;world
+          balanced: -27;64;337;world
+          strong: -29;64;337;world

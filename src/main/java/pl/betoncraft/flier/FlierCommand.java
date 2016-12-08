@@ -18,8 +18,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import pl.betoncraft.flier.api.Game;
-import pl.betoncraft.flier.api.PlayerClass;
-import pl.betoncraft.flier.api.Team;
 
 /**
  * The main command.
@@ -60,45 +58,7 @@ public class FlierCommand implements CommandExecutor {
 					}
 				}
 				
-				Team team;
-				if (!it.hasNext()) {
-					displayHelp(sender, currentCommand, this);
-					return;
-				} else {
-					String teamName = it.next();
-					team = game.getTeam(teamName);
-					if (team == null) {
-						sender.sendMessage(ChatColor.RED + "No such team: " + ChatColor.DARK_RED + teamName);
-						StringBuilder builder = new StringBuilder();
-						for (String t : game.getTeams().keySet()) {
-							builder.append(game.getTeam(t).getColor() + t + ChatColor.GREEN + ", ");
-						}
-						sender.sendMessage(ChatColor.GREEN + "Available teams: "
-								+ builder.toString().trim().substring(0, builder.lastIndexOf(",")));
-						return;
-					}
-				}
-				
-				PlayerClass clazz;
-				if (!it.hasNext()) {
-					displayHelp(sender, currentCommand, this);
-					return;
-				} else {
-					String clazzName = it.next();
-					clazz = f.getClass(clazzName);
-					if (clazz == null) {
-						sender.sendMessage(ChatColor.RED + "No such class: " + ChatColor.DARK_RED + clazzName);
-						StringBuilder builder = new StringBuilder();
-						for (String c : f.getClasses().keySet()) {
-							builder.append(ChatColor.AQUA + c + ChatColor.GREEN + ", ");
-						}
-						sender.sendMessage(ChatColor.GREEN + "Available classes: "
-								+ builder.toString().trim().substring(0, builder.lastIndexOf(",")));
-						return;
-					}
-				}
-				
-				game.addPlayer((Player) sender, team, clazz);
+				game.addPlayer((Player) sender);
 			}
 		});
 		
@@ -110,27 +70,13 @@ public class FlierCommand implements CommandExecutor {
 					sender.sendMessage(ChatColor.DARK_RED + "Must be a player!");
 				}
 				Flier f = Flier.getInstance();
-				
-				Game game;
-				if (!it.hasNext()) {
-					displayHelp(sender, currentCommand, this);
-					return;
-				} else {
-					String gameName = it.next();
-					game = f.getGame(gameName);
-					if (game == null) {
-						sender.sendMessage(ChatColor.RED + "No such game: " + ChatColor.DARK_RED + gameName);
-						StringBuilder builder = new StringBuilder();
-						for (String g : f.getGames().keySet()) {
-							builder.append(ChatColor.YELLOW + g + ChatColor.GREEN + ", ");
-						}
-						sender.sendMessage(ChatColor.GREEN + "Available games: "
-								+ builder.toString().trim().substring(0, builder.lastIndexOf(",")));
+				Player player = (Player) sender;
+				for (Game g : f.getGames().values()) {
+					if (g.getPlayers().containsKey(player.getUniqueId())) {
+						g.removePlayer(player);
 						return;
 					}
 				}
-				
-				game.removePlayer((Player) sender);
 			}
 		});
 		

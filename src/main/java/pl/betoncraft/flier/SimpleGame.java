@@ -15,13 +15,15 @@ import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryInteractEvent;
@@ -32,6 +34,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Vector;
 
 import pl.betoncraft.flier.api.Damager;
 import pl.betoncraft.flier.api.Damager.DamageResult;
@@ -47,12 +50,9 @@ import pl.betoncraft.flier.api.UsableItem;
  */
 public class SimpleGame implements Game, Listener {
 	
-	private Map<UUID, PlayerData> dataMap = new HashMap<>();
-	
+	private Map<UUID, InGamePlayer> dataMap = new HashMap<>();
 	private Map<String, Team> teams = new HashMap<>();
-	
-	private Map<UUID, Team> players = new HashMap<>();
-	private Map<UUID, PlayerClass> classes = new HashMap<>();
+	private SimpleLobby lobby;
 	
 	public SimpleGame(ConfigurationSection section) {
 		ConfigurationSection teams = section.getConfigurationSection("teams");
@@ -62,11 +62,19 @@ public class SimpleGame implements Game, Listener {
 				this.teams.put(team, new DefaultTeam(teams.getConfigurationSection(team), i++));
 			}
 		}
+		ConfigurationSection lobby = section.getConfigurationSection("lobby");
+		if (lobby != null) {
+			this.lobby = new SimpleLobby(lobby, this);
+		}
 		new BukkitRunnable() {
 			int i = 0;
 			@Override
 			public void run() {
-				for (PlayerData data : dataMap.values()) {
+				for (InGamePlayer inGame : dataMap.values()) {
+					if (!inGame.isPlaying) {
+						continue;
+					}
+					PlayerData data = inGame.getData();
 					if (data.isFlying()) {
 						data.applyFlightModifications();
 					}
@@ -92,30 +100,72 @@ public class SimpleGame implements Game, Listener {
 	}
 	
 	@Override
-	public void addPlayer(Player player, Team team, PlayerClass clazz) {
+	public void addPlayer(Player player) {
+		if (dataMap.containsKey(player.getUniqueId())) {
+			return;
+		}
 		PlayerData data = new PlayerData(player);
-		dataMap.put(player.getUniqueId(), data);
-		players.put(player.getUniqueId(), team);
-		classes.put(player.getUniqueId(), clazz);
-		giveClassItems(clazz, data);
-		player.teleport(getSpawnLocation(player));
-		for (int i = 0; i < teams.size(); i++) {
-			data.addStatistic("");
+		InGamePlayer inGame = new InGamePlayer(data);
+		dataMap.put(player.getUniqueId(), inGame);
+		player.teleport(lobby.getSpawn());
+	}
+	
+	public void setTeam(Player player, Team team) {
+		InGamePlayer inGame = dataMap.get(player.getUniqueId());
+		if (inGame != null) {
+			inGame.setTeam(team);
+			inGame.getData().clearStats();
+			Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "title " + player.getName()
+					+ " title {\"text\":\"" + team.getColor() + Utils.capitalize(team.getName()) + "\"}");
+			for (int i = 0; i < teams.size(); i++) {
+				inGame.getData().addStatistic("");
+			}
+			for (Entry<String, Team> e : teams.entrySet()) {
+				inGame.getData().updateStatistic(e.getValue().getIndex(), e.getValue().getName() + ChatColor.WHITE + ": " +
+						e.getValue().getScore());
+			}
+			updateColors();
 		}
-		for (Entry<String, Team> e : SimpleGame.this.teams.entrySet()) {
-			data.updateStatistic(e.getValue().getIndex(), e.getValue().getName() + ChatColor.WHITE + ": " +
-					e.getValue().getScore());
+	}
+	
+	public void setClass(Player player, PlayerClass clazz) {
+		InGamePlayer inGame = dataMap.get(player.getUniqueId());
+		if (inGame != null) {
+			inGame.setClass(clazz);
+			Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "title " + player.getName()
+					+ " title {\"text\":\"" + ChatColor.AQUA + clazz.getName() + "\"}");
+			giveClassItems(clazz, inGame.getData());
 		}
-		updateColors();
+	}
+	
+	public void startPlayer(Player player) {
+		InGamePlayer inGame = dataMap.get(player.getUniqueId());
+		if (inGame != null) {
+			if (inGame.getTeam() == null || inGame.getClazz() == null) {
+				player.sendMessage(ChatColor.RED + "Choose your class and team!");
+			} else {
+				player.teleport(inGame.getTeam().getSpawn());
+				inGame.setPlaying(true);
+			}
+		}
+	}
+	
+	public Map<UUID, Player> getPlayers() {
+		HashMap<UUID, Player> players = new HashMap<>();
+		for (Entry<UUID, InGamePlayer> e : dataMap.entrySet()) {
+			players.put(e.getKey(), e.getValue().getData().getPlayer());
+		}
+		return players;
 	}
 	
 	@Override
 	public void removePlayer(Player player) {
-		PlayerData data = dataMap.remove(player.getUniqueId());
+		InGamePlayer data = dataMap.remove(player.getUniqueId());
 		if (data != null) {
-			data.clear();
+			player.setVelocity(new Vector());
+			data.getData().clear();
+			player.teleport(data.getData().getReturnLocation());
 		}
-		player.teleport(player.getLocation().getWorld().getSpawnLocation());
 	}
 
 	@Override
@@ -130,23 +180,25 @@ public class SimpleGame implements Game, Listener {
 
 	@Override
 	public void stop() {
-		Set<PlayerData> copy = new HashSet<>(dataMap.values());
-		for (PlayerData data : copy) {
-			removePlayer(data.getPlayer());
+		HandlerList.unregisterAll(lobby);
+		HandlerList.unregisterAll(this);
+		Set<InGamePlayer> copy = new HashSet<>(dataMap.values());
+		for (InGamePlayer data : copy) {
+			removePlayer(data.getData().getPlayer());
 		}
 	}
 
 	private void updateColors() {
 		Map<String, ChatColor> colors = getColors();
-		for (PlayerData d : dataMap.values()) {
-			d.setTeamColors(colors);
+		for (InGamePlayer g : dataMap.values()) {
+			g.getData().setTeamColors(colors);
 		}
 	}
 	
 	private Map<String, ChatColor> getColors() {
 		HashMap<String, ChatColor> map = new HashMap<>();
-		for (Entry<UUID, PlayerData> e : dataMap.entrySet()) {
-			map.put(e.getValue().getPlayer().getName(), players.get(e.getKey()).getColor());
+		for (Entry<UUID, InGamePlayer> e : dataMap.entrySet()) {
+			map.put(e.getValue().getData().getPlayer().getName(), dataMap.get(e.getKey()).getTeam().getColor());
 		}
 		return map;
 	}
@@ -160,40 +212,45 @@ public class SimpleGame implements Game, Listener {
 		data.setWings(clazz.getWings());
 	}
 	
-	private Location getSpawnLocation(Player player) {
-		return players.get(player.getUniqueId()).getSpawn();
-	}
-	
 	private void score(Team team, int amount) {
 		team.setScore(team.getScore() + amount);
-		for (PlayerData data : dataMap.values()) {
-			data.updateStatistic(team.getIndex(), team.getName() + ChatColor.WHITE + ": " + team.getScore());
+		for (InGamePlayer data : dataMap.values()) {
+			data.getData().updateStatistic(team.getIndex(), team.getName() + ChatColor.WHITE + ": " + team.getScore());
 		}
 	}
 	
 	@EventHandler
-	public void onClick(PlayerInteractEvent event) {
-		PlayerData data = dataMap.get(event.getPlayer().getUniqueId());
-		if (data != null) {
-			switch (event.getAction()) {
-			case LEFT_CLICK_AIR:
-			case LEFT_CLICK_BLOCK:
-				event.setCancelled(true);
-				data.use();
-				break;
-			default:
-				break;
-			}
+	public void onClic(PlayerInteractEvent event) {
+		InGamePlayer player = dataMap.get(event.getPlayer().getUniqueId());
+		if (player != null) {
+			player.getData().use();
+		}
+	}
+	
+	@EventHandler
+	public void onPlace(BlockPlaceEvent event) {
+		InGamePlayer player = dataMap.get(event.getPlayer().getUniqueId());
+		if (player != null) {
+			event.setCancelled(true);
+		}
+	}
+	
+	@EventHandler
+	public void onBreak(BlockBreakEvent event) {
+		InGamePlayer player = dataMap.get(event.getPlayer().getUniqueId());
+		if (player != null) {
+			event.setCancelled(true);
 		}
 	}
 	
 	@EventHandler
 	public void onHit(EntityDamageByEntityEvent event) {
-		PlayerData player = dataMap.get(event.getEntity().getUniqueId());
+		InGamePlayer player = dataMap.get(event.getEntity().getUniqueId());
 		// hit player in Game
 		if (player == null) {
 			return;
 		}
+		event.setCancelled(true);
 		// hit by a projectile
 		if (!(event.getDamager() instanceof Projectile)) {
 			return;
@@ -206,49 +263,47 @@ public class SimpleGame implements Game, Listener {
 		Player shooterPlayer = (Player) projectile.getShooter();
 		// was not hit by himself
 		if (shooterPlayer.equals(event.getEntity())) {
-			event.setCancelled(true);
 			return;
 		}
-		PlayerData shooter = dataMap.get(shooterPlayer.getUniqueId());
+		InGamePlayer shooter = dataMap.get(shooterPlayer.getUniqueId());
 		// was hit by someone in Game
 		if (shooter == null) {
-			event.setCancelled(true);
 			return;
 		}
 		Damager weapon = Damager.getDamager(projectile);
 		// was hit by a Weapon
 		if (weapon == null) {
-			event.setCancelled(true);
 			return;
 		}
-		DamageResult result = player.damage(weapon);
+		PlayerData playerData = player.getData();
+		PlayerData shooterData = shooter.getData();
+		DamageResult result = playerData.damage(weapon);
 		boolean sound = true;
 		switch (result) {
 		case INSTANT_KILL:
-			player.setLastHit(shooter);
-			player.getPlayer().damage(player.getPlayer().getHealth() + 1, shooter.getPlayer());
+			playerData.setLastHit(shooterData);
+			playerData.getPlayer().damage(playerData.getPlayer().getHealth() + 1, shooterData.getPlayer());
 			break;
 		case WINGS_OFF:
-			player.setLastHit(shooter);
-			player.takeWingsOff();
+			playerData.setLastHit(shooterData);
+			playerData.takeWingsOff();
 			// no break, we want to damage wings too
 		case WINGS_DAMAGE:
-			player.setLastHit(shooter);
-			player.removeHealth(weapon.getDamage());
+			playerData.setLastHit(shooterData);
+			playerData.removeHealth(weapon.getDamage());
 			break;
 		case REGULAR_DAMAGE:
-			player.setLastHit(shooter);
-			player.getPlayer().damage(weapon.getPhysical(), shooter.getPlayer());
+			playerData.setLastHit(shooterData);
+			playerData.getPlayer().damage(weapon.getPhysical(), shooterData.getPlayer());
 			break;
 		case NOTHING:
 			sound = false;
 			break;
 		}
 		if (sound) {
-			shooter.getPlayer().playSound(shooter.getPlayer().getLocation(), Sound.BLOCK_DISPENSER_DISPENSE, 1, 1);
-			player.getPlayer().playSound(player.getPlayer().getLocation(), Sound.ENTITY_VILLAGER_HURT, 1, 1);
+			shooterData.getPlayer().playSound(shooterData.getPlayer().getLocation(), Sound.BLOCK_DISPENSER_DISPENSE, 1, 1);
+			playerData.getPlayer().playSound(playerData.getPlayer().getLocation(), Sound.ENTITY_VILLAGER_HURT, 1, 1);
 		}
-		event.setCancelled(true);
 	}
 	
 	@EventHandler
@@ -273,7 +328,7 @@ public class SimpleGame implements Game, Listener {
 	}
 	
 	@EventHandler
-	public void onInvOpen(InventoryInteractEvent event) {
+	public void onInvInteract(InventoryInteractEvent event) {
 		if (dataMap.containsKey(event.getWhoClicked().getUniqueId())) {
 			event.setCancelled(true);
 		}
@@ -281,31 +336,32 @@ public class SimpleGame implements Game, Listener {
 	
 	@EventHandler
 	public void onDeath(PlayerDeathEvent event) {
-		PlayerData killed = dataMap.get(event.getEntity().getUniqueId());
+		InGamePlayer killed = dataMap.get(event.getEntity().getUniqueId());
 		if (killed != null) {
-			Team killedTeam = players.get(killed.getPlayer().getUniqueId());
-			PlayerClass killedClass = classes.get(killed.getPlayer().getUniqueId());
+			Team killedTeam = killed.getTeam();
+			PlayerClass killedClass = killed.getClazz();
 			event.getDrops().clear();
-			PlayerData killer = killed.getLastHit();
-			killed.setLastHit(null);
+			PlayerData lastHit = killed.getData().getLastHit();
+			InGamePlayer killer = lastHit == null ? null : dataMap.get(lastHit.getPlayer().getUniqueId());
+			killed.getData().setLastHit(null);
 			if (killer != null) {
-				Team killerTeam = players.get(killer.getPlayer().getUniqueId());
-				PlayerClass killerClass = classes.get(killer.getPlayer().getUniqueId());
+				Team killerTeam = killer.getTeam();
+				PlayerClass killerClass = killer.getClazz();
 				switch (event.getEntity().getLastDamageCause().getCause()) {
 				case FALL:
-					event.setDeathMessage(formatPlayer(killedTeam, killedClass, killed.getPlayer().getName())
+					event.setDeathMessage(formatPlayer(killedTeam, killedClass, killed.getData().getPlayer().getName())
 							+ " was shot down by "
-							+ formatPlayer(killerTeam, killerClass, killer.getPlayer().getName()));
+							+ formatPlayer(killerTeam, killerClass, killer.getData().getPlayer().getName()));
 					break;
 				default:
-					event.setDeathMessage(formatPlayer(killedTeam, killedClass, killed.getPlayer().getName())
+					event.setDeathMessage(formatPlayer(killedTeam, killedClass, killed.getData().getPlayer().getName())
 							+ " was killed by "
-							+ formatPlayer(killerTeam, killerClass, killer.getPlayer().getName()));
+							+ formatPlayer(killerTeam, killerClass, killer.getData().getPlayer().getName()));
 					break;
 				}
 				score(killerTeam, 1);
 			} else {
-				event.setDeathMessage(formatPlayer(killedTeam, killedClass, killed.getPlayer().getName())
+				event.setDeathMessage(formatPlayer(killedTeam, killedClass, killed.getData().getPlayer().getName())
 						+ " commited suicide");
 				score(killedTeam, -1);
 			}
@@ -325,13 +381,55 @@ public class SimpleGame implements Game, Listener {
 	
 	@EventHandler
 	public void onRespawn(PlayerRespawnEvent event) {
-		PlayerData data = dataMap.get(event.getPlayer().getUniqueId());
+		InGamePlayer data = dataMap.get(event.getPlayer().getUniqueId());
 		if (data == null) {
 			return;
 		}
-		PlayerClass c = classes.get(event.getPlayer().getUniqueId());
-		giveClassItems(c, data);
-		event.setRespawnLocation(getSpawnLocation(event.getPlayer()));
+		PlayerClass c = data.getClazz();
+		giveClassItems(c, data.getData());
+		event.getPlayer().setVelocity(new Vector());
+		event.setRespawnLocation(lobby.getSpawn());
 	}
+	
+	public class InGamePlayer {
+		
+		private PlayerData data;
+		private PlayerClass clazz;
+		private Team team;
+		private boolean isPlaying;
+		
+		public InGamePlayer(PlayerData data) {
+			this.data = data;
+		}
+
+		public PlayerData getData() {
+			return data;
+		}
+
+		public PlayerClass getClazz() {
+			return clazz;
+		}
+
+		public void setClass(PlayerClass clazz) {
+			this.clazz = clazz;
+		}
+
+		public Team getTeam() {
+			return team;
+		}
+
+		public void setTeam(Team team) {
+			this.team = team;
+		}
+
+		public boolean isPlaying() {
+			return isPlaying;
+		}
+
+		public void setPlaying(boolean isPlaying) {
+			this.isPlaying = isPlaying;
+		}
+	}
+
 
 }
