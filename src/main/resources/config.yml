@@ -1,5 +1,6 @@
 engines:
   balancedEngine:
+    type: simpleEngine
     material: sugar cane
     name: '&2Balanced Engine'
     lore:
@@ -11,6 +12,7 @@ engines:
     regeneration: 1
     glow_time: 100
   fastEngine:
+    type: simpleEngine
     material: feather
     name: '&2Fast Engine'
     lore:
@@ -22,6 +24,7 @@ engines:
     regeneration: 1.5
     glow_time: 50
   strongEngine:
+    type: simpleEngine
     material: wheat
     name: '&2Strong Engine'
     lore:
@@ -34,6 +37,7 @@ engines:
     glow_time: 200
 items:
   balancedWeapon:
+    type: simpleWeapon
     material: bone
     name: '&4Balanced Weapon'
     lore:
@@ -51,6 +55,7 @@ items:
     kills_on_ground: false
     physical_damage: 7.5
   strongWeapon:
+    type: simpleWeapon
     material: blaze rod
     name: '&4Strong Weapon'
     lore:
@@ -68,6 +73,7 @@ items:
     kills_on_ground: true
     physical_damage: 10
   fastWeapon:
+    type: simpleWeapon
     material: stick
     name: '&4Fast Weapon'
     lore:
@@ -85,6 +91,7 @@ items:
     kills_on_ground: false
     physical_damage: 5
   gun:
+    type: simpleWeapon
     material: torch
     name: '&4Gun'
     lore:
@@ -103,12 +110,14 @@ items:
     physical_damage: 5
 wings:
   balancedWings:
+    type: simpleWings
     name: '&3Balanced Wings'
     lore:
     - '&bPress space to fly.'
     health: 2400
     regeneration: 0.5
   lightWings:
+    type: simpleWings
     name: '&3Light Wings'
     lore:
     - '&bPress space to fly.'
@@ -117,6 +126,7 @@ wings:
     aerodynamics: 0.0025
     liftingforce: 0.001
   heavyWings:
+    type: simpleWings
     name: '&3Heavy Wings'
     lore:
     - '&bPress space to fly.'
@@ -126,18 +136,21 @@ wings:
     aerodynamics: -0.0025
 classes:
   balanced:
+    type: fixedClass
     engine: balancedEngine
     items:
     - balancedWeapon
     - gun
     wings: balancedWings
   fast:
+    type: fixedClass
     engine: fastEngine
     items:
     - fastWeapon
     - gun
     wings: lightWings
   strong:
+    type: fixedClass
     engine: strongEngine
     items:
     - strongWeapon
@@ -145,6 +158,7 @@ classes:
     wings: heavyWings
 games:
   default:
+    type: simpleGame
     teams:
       blue:
         name: 'Blue'

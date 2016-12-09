@@ -23,6 +23,12 @@ import pl.betoncraft.flier.api.Wings;
 public class Flier extends JavaPlugin implements Listener, CommandExecutor {
 	
 	private static Flier instance;
+
+	private Map<String, EngineFactory> engineTypes = new HashMap<>();
+	private Map<String, ItemFactory> itemTypes = new HashMap<>();
+	private Map<String, WingFactory> wingTypes = new HashMap<>();
+	private Map<String, ClassFactory> classTypes = new HashMap<>();
+	private Map<String, GameFactory> gameTypes = new HashMap<>();
 	
 	private Map<String, Engine> engines = new HashMap<>();
 	private Map<String, UsableItem> items = new HashMap<>();
@@ -30,40 +36,81 @@ public class Flier extends JavaPlugin implements Listener, CommandExecutor {
 	private Map<String, PlayerClass> classes = new HashMap<>();
 	private Map<String, Game> games = new HashMap<>();
 	
+	public interface EngineFactory {
+		public Engine get(ConfigurationSection settings);
+	}
+	
+	public interface ItemFactory {
+		public UsableItem get(ConfigurationSection settings);
+	}
+	
+	public interface WingFactory {
+		public Wings get(ConfigurationSection settings);
+	}
+	
+	public interface ClassFactory {
+		public PlayerClass get(ConfigurationSection settings);
+	}
+	
+	public interface GameFactory {
+		public Game get(ConfigurationSection settings);
+	}
+	
 	@Override
 	public void onEnable() {
 		instance = this;
 		saveDefaultConfig();
 		new FlierCommand();
-		// TODO dynamic type loading, separate files
+		// register new types
+		registerEngine("simpleEngine", s -> new SimpleEngine(s));
+		registerItem("simpleWeapon", s -> new SimpleWeapon(s));
+		registerWings("simpleWings", s -> new SimpleWings(s));
+		registerClass("fixedClass", s -> new FixedClass(s));
+		registerGame("simpleGame", s -> new SimpleGame(s));
+		// TODO separate files
 		ConfigurationSection engineSection = getConfig().getConfigurationSection("engines");
 		if (engineSection != null) {
 			for (String section : engineSection.getKeys(false)) {
-				engines.put(section, new SimpleEngine(engineSection.getConfigurationSection(section)));
+				ConfigurationSection engine = engineSection.getConfigurationSection(section);
+				String type = engine.getString("type", "simpleEngine");
+				EngineFactory factory = engineTypes.get(type);
+				engines.put(section, factory.get(engine));
 			}
 		}
 		ConfigurationSection itemSection = getConfig().getConfigurationSection("items");
 		if (itemSection != null) {
 			for (String section : itemSection.getKeys(false)) {
-				items.put(section, new SimpleWeapon(itemSection.getConfigurationSection(section)));
+				ConfigurationSection item = itemSection.getConfigurationSection(section);
+				String type = item.getString("type", "simpleWeapon");
+				ItemFactory factory = itemTypes.get(type);
+				items.put(section, factory.get(item));
 			}
 		}
 		ConfigurationSection wingSection = getConfig().getConfigurationSection("wings");
 		if (wingSection != null) {
 			for (String section : wingSection.getKeys(false)) {
-				wings.put(section, new SimpleWings(wingSection.getConfigurationSection(section)));
+				ConfigurationSection wings = wingSection.getConfigurationSection(section);
+				String type = wings.getString("type", "simpleWings");
+				WingFactory factory = wingTypes.get(type);
+				this.wings.put(section, factory.get(wings));
 			}
 		}
 		ConfigurationSection classSection = getConfig().getConfigurationSection("classes");
 		if (classSection != null) {
 			for (String section : classSection.getKeys(false)) {
-				classes.put(section, new FixedClass(classSection.getConfigurationSection(section)));
+				ConfigurationSection clazz = classSection.getConfigurationSection(section);
+				String type = clazz.getString("type", "fixedClass");
+				ClassFactory factory = classTypes.get(type);
+				classes.put(section, factory.get(clazz));
 			}
 		}
 		ConfigurationSection gameSection = getConfig().getConfigurationSection("games");
 		if (gameSection != null) {
 			for (String section : gameSection.getKeys(false)) {
-				games.put(section, new SimpleGame(gameSection.getConfigurationSection(section)));
+				ConfigurationSection game = gameSection.getConfigurationSection(section);
+				String type = game.getString("type", "simpleGame");
+				GameFactory factory = gameTypes.get(type);
+				games.put(section, factory.get(game));
 			}
 		}
 		getLogger().info("Loaded " + engines.size() + " engines, " + items.size() + " items, " + wings.size() +
@@ -75,6 +122,13 @@ public class Flier extends JavaPlugin implements Listener, CommandExecutor {
 		for (Game game : games.values()) {
 			game.stop();
 		}
+	}
+	
+	/**
+	 * @return the instance of the plugin
+	 */
+	public static Flier getInstance() {
+		return instance;
 	}
 	
 	/**
@@ -116,13 +170,6 @@ public class Flier extends JavaPlugin implements Listener, CommandExecutor {
 	public Game getGame(String name) {
 		return games.get(name);
 	}
-	
-	/**
-	 * @return the instance of the plugin
-	 */
-	public static Flier getInstance() {
-		return instance;
-	}
 
 	/**
 	 * @return the engines
@@ -157,6 +204,26 @@ public class Flier extends JavaPlugin implements Listener, CommandExecutor {
 	 */
 	public Map<String, Game> getGames() {
 		return games;
+	}
+	
+	public void registerEngine(String name, EngineFactory factory) {
+		engineTypes.put(name, factory);
+	}
+	
+	public void registerItem(String name, ItemFactory factory) {
+		itemTypes.put(name, factory);
+	}
+	
+	public void registerWings(String name, WingFactory factory) {
+		wingTypes.put(name, factory);
+	}
+	
+	public void registerClass(String name, ClassFactory factory) {
+		classTypes.put(name, factory);
+	}
+	
+	public void registerGame(String name, GameFactory factory) {
+		gameTypes.put(name, factory);
 	}
 
 }
