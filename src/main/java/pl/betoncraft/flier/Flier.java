@@ -64,6 +64,7 @@ public class Flier extends JavaPlugin implements Listener, CommandExecutor {
 		// register new types
 		registerEngine("simpleEngine", s -> new SimpleEngine(s));
 		registerItem("simpleWeapon", s -> new SimpleWeapon(s));
+		registerItem("homingMissile", s -> new HomingMissile(s));
 		registerWings("simpleWings", s -> new SimpleWings(s));
 		registerClass("fixedClass", s -> new FixedClass(s));
 		registerGame("simpleGame", s -> new SimpleGame(s));

@@ -4,6 +4,7 @@ engines:
     material: sugar cane
     name: '&2Balanced Engine'
     lore:
+    - ''
     - '&aHold shift to accelerate.'
     max_speed: 1.5
     acceleration: 0.025
@@ -108,6 +109,25 @@ items:
     wings_off: false
     kills_on_ground: false
     physical_damage: 5
+  rocket:
+    type: homingMissile
+    material: arrow
+    name: '&eRocket'
+    lore:
+    - '&cLeft click to launch.'
+    entity: arrow
+    slot: 3
+    range: 64
+    speed: 3
+    life: 400
+    maneuverability: 1
+    cooldown: 200
+    consumable: true
+    only_air: true
+    damage: 2000
+    wings_off: true
+    kills_on_ground: false
+    physical_damage: 16
 wings:
   balancedWings:
     type: simpleWings
@@ -141,6 +161,7 @@ classes:
     items:
     - balancedWeapon
     - gun
+    - rocket 2
     wings: balancedWings
   fast:
     type: fixedClass
@@ -148,6 +169,7 @@ classes:
     items:
     - fastWeapon
     - gun
+    - rocket 2
     wings: lightWings
   strong:
     type: fixedClass
@@ -155,6 +177,7 @@ classes:
     items:
     - strongWeapon
     - gun
+    - rocket 2
     wings: heavyWings
 games:
   default:

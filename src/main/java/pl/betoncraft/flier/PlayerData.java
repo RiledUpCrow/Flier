@@ -26,6 +26,7 @@ import org.bukkit.util.Vector;
 import pl.betoncraft.flier.api.Damager;
 import pl.betoncraft.flier.api.Damager.DamageResult;
 import pl.betoncraft.flier.api.Engine;
+import pl.betoncraft.flier.api.Game;
 import pl.betoncraft.flier.api.UsableItem;
 import pl.betoncraft.flier.api.Wings;
 
@@ -37,6 +38,7 @@ import pl.betoncraft.flier.api.Wings;
 public class PlayerData {
 	
 	private Player player;
+	private Game game;
 	private Location returnLoc;
 	private Scoreboard sb;
 	private int customIndex = 0;
@@ -51,8 +53,9 @@ public class PlayerData {
 	private Map<UsableItem, Integer> items = new HashMap<>();
 	private Wings wings;
 	
-	public PlayerData(Player player) {
+	public PlayerData(Player player, Game game) {
 		this.player = player;
+		this.game = game;
 		returnLoc = player.getLocation();
 		sb = Bukkit.getScoreboardManager().getNewScoreboard();
 		Objective stats = sb.registerNewObjective("stats", "dummy");
@@ -63,6 +66,10 @@ public class PlayerData {
 
 	public Location getReturnLocation() {
 		return returnLoc;
+	}
+	
+	public Game getGame() {
+		return game;
 	}
 	
 	public Engine getEngine() {
@@ -368,6 +375,12 @@ public class PlayerData {
 		if (item.isConsumable()) {
 			amount--;
 			getItems().put(item, amount);
+			ItemStack stack = getPlayer().getInventory().getItemInMainHand();
+			if (stack.getAmount() == 1) {
+				getPlayer().getInventory().setItemInMainHand(null); 
+			} else {
+				stack.setAmount(stack.getAmount() - 1);
+			}
 		}
 		item.use(this);
 	}

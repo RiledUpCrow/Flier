@@ -104,7 +104,7 @@ public class SimpleGame implements Game, Listener {
 		if (dataMap.containsKey(player.getUniqueId())) {
 			return;
 		}
-		PlayerData data = new PlayerData(player);
+		PlayerData data = new PlayerData(player, this);
 		InGamePlayer inGame = new InGamePlayer(data);
 		dataMap.put(player.getUniqueId(), inGame);
 		player.teleport(lobby.getSpawn());
@@ -227,7 +227,7 @@ public class SimpleGame implements Game, Listener {
 	@EventHandler
 	public void onClic(PlayerInteractEvent event) {
 		InGamePlayer player = dataMap.get(event.getPlayer().getUniqueId());
-		if (player != null) {
+		if (player != null && player.isPlaying()) {
 			player.getData().use();
 		}
 	}
