@@ -40,14 +40,11 @@ public class SimpleWeapon extends DefaultWeapon {
 	}
 	
 	@Override
-	public void use(PlayerData data) {
-		if (onlyAir() && !data.isFlying()) {
-			return;
-		}
+	public boolean use(PlayerData data) {
 		Player player = data.getPlayer();
 		UUID id = player.getUniqueId();
 		if (weaponCooldown.containsKey(id)) {
-			return;
+			return false;
 		}
 		weaponCooldown.put(id, new Date().getTime() + 50*cooldown);
 		new BukkitRunnable() {
@@ -69,6 +66,7 @@ public class SimpleWeapon extends DefaultWeapon {
 				}
 			}
 		}.runTaskTimer(Flier.getInstance(), 0, burstTicks);
+		return true;
 	}
 
 }

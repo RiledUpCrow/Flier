@@ -365,14 +365,14 @@ public class PlayerData {
 	
 	public void use() {
 		UsableItem item = getHeldItem();
-		if (item == null) {
+		if (item == null || (item.onlyAir() && !isFlying())) {
 			return;
 		}
 		int amount = getItems().get(item);
 		if (amount == 0) {
 			return;
 		}
-		if (item.isConsumable()) {
+		if (item.use(this) && item.isConsumable()) {
 			amount--;
 			getItems().put(item, amount);
 			ItemStack stack = getPlayer().getInventory().getItemInMainHand();
@@ -382,7 +382,6 @@ public class PlayerData {
 				stack.setAmount(stack.getAmount() - 1);
 			}
 		}
-		item.use(this);
 	}
 	
 	public void cooldown() {

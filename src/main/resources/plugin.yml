@@ -1,8 +1,8 @@
 name: Flier
 main: pl.betoncraft.flier.Flier
-description: Speeds up flying players
+description: Elytra fighting minigame
 authors: [Co0sh]
-version: 0.1.3
+version: 0.1.4
 commands:
   flier:
     description: Gives you flying items

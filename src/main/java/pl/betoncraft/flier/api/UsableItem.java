@@ -26,8 +26,9 @@ public interface UsableItem extends Weight {
 	 * Uses this item once.
 	 * 
 	 * @param player
+	 * @return if the item was used
 	 */
-	public void use(PlayerData player);
+	public boolean use(PlayerData player);
 
 	/**
 	 * Signals the item to check the cooldown for this player.

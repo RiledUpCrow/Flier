@@ -31,7 +31,7 @@ public class FlierCommand implements CommandExecutor {
 	public FlierCommand() {
 		
 		// JOIN GAME ARGUMENT
-		arguments.add(new Argument(new String[]{"join", "j"}, "Join a game.", "<game> <team> <class>", new Argument[]{}) {
+		arguments.add(new Argument(new String[]{"join", "j"}, "Join a game.", "<game>", new Argument[]{}) {
 			@Override
 			void parse(CommandSender sender, String currentCommand, Iterator<String> it) {
 				if (!(sender instanceof Player)) {

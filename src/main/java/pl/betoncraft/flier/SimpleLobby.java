@@ -17,7 +17,9 @@ import org.bukkit.block.Block;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 
 import pl.betoncraft.flier.api.PlayerClass;
@@ -60,8 +62,11 @@ public class SimpleLobby implements Listener {
 		return spawn;
 	}
 	
-	@EventHandler
+	@EventHandler(priority=EventPriority.HIGH)
 	public void onClick(PlayerInteractEvent event) {
+		if (event.getAction() != Action.LEFT_CLICK_BLOCK) {
+			return;
+		}
 		Player player = event.getPlayer();
 		Block block = event.getClickedBlock();
 		if (block == null) {

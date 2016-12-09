@@ -20,6 +20,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -144,8 +145,13 @@ public class SimpleGame implements Game, Listener {
 			if (inGame.getTeam() == null || inGame.getClazz() == null) {
 				player.sendMessage(ChatColor.RED + "Choose your class and team!");
 			} else {
+				new BukkitRunnable() {
+					@Override
+					public void run() {
+						inGame.setPlaying(true);
+					}
+				}.runTaskLater(Flier.getInstance(), 20);
 				player.teleport(inGame.getTeam().getSpawn());
-				inGame.setPlaying(true);
 			}
 		}
 	}
@@ -224,8 +230,8 @@ public class SimpleGame implements Game, Listener {
 		}
 	}
 	
-	@EventHandler
-	public void onClic(PlayerInteractEvent event) {
+	@EventHandler(priority=EventPriority.LOW)
+	public void onClick(PlayerInteractEvent event) {
 		InGamePlayer player = dataMap.get(event.getPlayer().getUniqueId());
 		if (player != null && player.isPlaying()) {
 			player.getData().use();
@@ -353,6 +359,7 @@ public class SimpleGame implements Game, Listener {
 	public void onDeath(PlayerDeathEvent event) {
 		InGamePlayer killed = dataMap.get(event.getEntity().getUniqueId());
 		if (killed != null) {
+			killed.setPlaying(false);
 			Team killedTeam = killed.getTeam();
 			event.getDrops().clear();
 			PlayerData lastHit = killed.getData().getLastHit();

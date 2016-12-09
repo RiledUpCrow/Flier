@@ -28,10 +28,10 @@ import pl.betoncraft.flier.api.Damager;
 public class HomingMissile extends DefaultWeapon {
 	
 	private EntityType entity = EntityType.ARROW;
-	private int range = 32;
-	private double speed = 4;
-	private int life;
-	private double maneuverability = 0.1;
+	private int range = 64;
+	private double speed = 3;
+	private int life = 400;
+	private double maneuverability = 1;
 	private int radius;
 	private int radiusSqr;
 
@@ -40,21 +40,18 @@ public class HomingMissile extends DefaultWeapon {
 		entity = EntityType.valueOf(section.getString("entity", entity.toString()).toUpperCase().replace(' ', '_'));
 		range = section.getInt("range", range);
 		speed = section.getDouble("speed", speed);
-		life = section.getInt("life", 400);
-		maneuverability = section.getDouble("maneuverability", 0.1);
+		life = section.getInt("life", life);
+		maneuverability = section.getDouble("maneuverability", maneuverability);
 		radius = range / 2;
 		radiusSqr = radius * radius;
 	}
 
 	@Override
-	public void use(PlayerData data) {
-		if (onlyAir() && !data.isFlying()) {
-			return;
-		}
+	public boolean use(PlayerData data) {
 		Player player = data.getPlayer();
 		UUID id = player.getUniqueId();
 		if (weaponCooldown.containsKey(id)) {
-			return;
+			return false;
 		}
 		weaponCooldown.put(id, new Date().getTime() + 50*cooldown);
 		Vector velocity = player.getLocation().getDirection().clone().multiply(speed);
@@ -88,7 +85,7 @@ public class HomingMissile extends DefaultWeapon {
 					}
 				}
 				if (nearest != null) {
-					Vector aim = nearest.getEyeLocation().subtract(missile.getLocation()).toVector().normalize()
+					Vector aim = nearest.getLocation().subtract(missile.getLocation()).toVector().normalize()
 							.multiply(maneuverability);
 					missile.setVelocity(missile.getVelocity().add(aim).normalize().multiply(speed));
 					nearest.playSound(nearest.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1, 1);
@@ -97,6 +94,7 @@ public class HomingMissile extends DefaultWeapon {
 				}
 			}
 		}.runTaskTimer(Flier.getInstance(), 1, 1);
+		return true;
 	}
 
 }
