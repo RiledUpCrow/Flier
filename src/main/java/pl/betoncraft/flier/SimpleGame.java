@@ -166,6 +166,11 @@ public class SimpleGame implements Game, Listener {
 			data.getData().clear();
 			player.teleport(data.getData().getReturnLocation());
 		}
+		if (dataMap.isEmpty()) {
+			for (Team t : teams.values()) {
+				t.setScore(0);
+			}
+		}
 	}
 
 	@Override
@@ -278,11 +283,13 @@ public class SimpleGame implements Game, Listener {
 		PlayerData playerData = player.getData();
 		PlayerData shooterData = shooter.getData();
 		DamageResult result = playerData.damage(weapon);
+		boolean notify = true;
 		boolean sound = true;
 		switch (result) {
 		case INSTANT_KILL:
 			playerData.setLastHit(shooterData);
-			playerData.getPlayer().damage(playerData.getPlayer().getHealth() + 1, shooterData.getPlayer());
+			notify = false;
+			playerData.getPlayer().damage(playerData.getPlayer().getHealth() + 1);
 			break;
 		case WINGS_OFF:
 			playerData.setLastHit(shooterData);
@@ -294,11 +301,19 @@ public class SimpleGame implements Game, Listener {
 			break;
 		case REGULAR_DAMAGE:
 			playerData.setLastHit(shooterData);
-			playerData.getPlayer().damage(weapon.getPhysical(), shooterData.getPlayer());
+			double damage = weapon.getPhysical();
+			if (playerData.getPlayer().getHealth() <= damage) {
+				notify = false;
+			}
+			playerData.getPlayer().damage(damage);
 			break;
 		case NOTHING:
+			notify = false;
 			sound = false;
 			break;
+		}
+		if (notify) {
+			shooterData.getPlayer().sendMessage(ChatColor.YELLOW + "You managed to hit " + formatPlayer(player) + "!");
 		}
 		if (sound) {
 			shooterData.getPlayer().playSound(shooterData.getPlayer().getLocation(), Sound.BLOCK_DISPENSER_DISPENSE, 1, 1);
@@ -339,36 +354,32 @@ public class SimpleGame implements Game, Listener {
 		InGamePlayer killed = dataMap.get(event.getEntity().getUniqueId());
 		if (killed != null) {
 			Team killedTeam = killed.getTeam();
-			PlayerClass killedClass = killed.getClazz();
 			event.getDrops().clear();
 			PlayerData lastHit = killed.getData().getLastHit();
 			InGamePlayer killer = lastHit == null ? null : dataMap.get(lastHit.getPlayer().getUniqueId());
 			killed.getData().setLastHit(null);
 			if (killer != null) {
 				Team killerTeam = killer.getTeam();
-				PlayerClass killerClass = killer.getClazz();
 				switch (event.getEntity().getLastDamageCause().getCause()) {
 				case FALL:
-					event.setDeathMessage(formatPlayer(killedTeam, killedClass, killed.getData().getPlayer().getName())
-							+ " was shot down by "
-							+ formatPlayer(killerTeam, killerClass, killer.getData().getPlayer().getName()));
+					event.setDeathMessage(formatPlayer(killed) + " was shot down by " + formatPlayer(killer) + "!");
 					break;
 				default:
-					event.setDeathMessage(formatPlayer(killedTeam, killedClass, killed.getData().getPlayer().getName())
-							+ " was killed by "
-							+ formatPlayer(killerTeam, killerClass, killer.getData().getPlayer().getName()));
+					event.setDeathMessage(formatPlayer(killed) + " was killed by " + formatPlayer(killer) + "!");
 					break;
 				}
 				score(killerTeam, 1);
 			} else {
-				event.setDeathMessage(formatPlayer(killedTeam, killedClass, killed.getData().getPlayer().getName())
-						+ " commited suicide");
+				event.setDeathMessage(formatPlayer(killed) + " commited suicide...");
 				score(killedTeam, -1);
 			}
 		}
 	}
 
-	private String formatPlayer(Team team, PlayerClass clazz, String name) {
+	private String formatPlayer(InGamePlayer player) {
+		Team team = player.getTeam();
+		PlayerClass clazz = player.getClazz();
+		String name = player.getData().getPlayer().getName();
 		return team.getColor() + name + ChatColor.WHITE + " (" + ChatColor.AQUA + clazz.getName() + ChatColor.WHITE + ")";
 	}
 	
