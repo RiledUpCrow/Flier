@@ -8,6 +8,7 @@ package pl.betoncraft.flier;
 
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.util.Vector;
 
 import pl.betoncraft.flier.api.Wings;
 
@@ -30,6 +31,18 @@ public class SimpleWings extends DefaultItem implements Wings {
 		regeneration = section.getDouble("regeneration", regeneration);
 		aerodynamics = section.getDouble("aerodynamics", aerodynamics);
 		liftingForce = section.getDouble("liftingforce", liftingForce);
+	}
+	
+	@Override
+	public Vector applyFlightModifications(Vector velocity) {
+		double horizontalSpeed = Math.sqrt((velocity.getX() * velocity.getX()) + (velocity.getZ() * velocity.getZ()));
+		double liftingForce = getLiftingForce() * horizontalSpeed;
+		double weight = getWeight();
+		velocity.add(new Vector(0, 1, 0).multiply(liftingForce - weight));
+		double aerodynamics = getAerodynamics();
+		Vector airResistance = velocity.clone().multiply(aerodynamics);
+		velocity.add(airResistance);
+		return velocity;
 	}
 	
 	@Override

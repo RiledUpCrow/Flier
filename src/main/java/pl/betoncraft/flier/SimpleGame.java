@@ -42,7 +42,6 @@ import pl.betoncraft.flier.api.Damager.DamageResult;
 import pl.betoncraft.flier.api.Game;
 import pl.betoncraft.flier.api.PlayerClass;
 import pl.betoncraft.flier.api.Team;
-import pl.betoncraft.flier.api.UsableItem;
 
 /**
  * A simple team deathmatch game with fixed classes.
@@ -51,9 +50,33 @@ import pl.betoncraft.flier.api.UsableItem;
  */
 public class SimpleGame implements Game, Listener {
 	
-	private Map<UUID, InGamePlayer> dataMap = new HashMap<>();
+	private Map<UUID, PlayerData> dataMap = new HashMap<>();
 	private Map<String, Team> teams = new HashMap<>();
 	private SimpleLobby lobby;
+	
+	public class GameHeartBeat extends BukkitRunnable {
+		
+		private int i = 0;
+		private SimpleGame game;
+		
+		public GameHeartBeat(SimpleGame game) {
+			this.game = game;
+			runTaskTimer(Flier.getInstance(), 1, 1);
+		}
+
+		@Override
+		public void run() {
+			game.fastTick();
+			if (i % 4 == 0) {
+				game.slowTick();
+			}
+			i++;
+			if (i > 1000) {
+				i = 0;
+			}
+		}
+
+	}
 	
 	public SimpleGame(ConfigurationSection section) {
 		ConfigurationSection teams = section.getConfigurationSection("teams");
@@ -67,36 +90,7 @@ public class SimpleGame implements Game, Listener {
 		if (lobby != null) {
 			this.lobby = new SimpleLobby(lobby, this);
 		}
-		new BukkitRunnable() {
-			int i = 0;
-			@Override
-			public void run() {
-				for (InGamePlayer inGame : dataMap.values()) {
-					if (!inGame.isPlaying) {
-						continue;
-					}
-					PlayerData data = inGame.getData();
-					if (data.isFlying()) {
-						data.applyFlightModifications();
-					}
-					if (data.isAccelerating()) {
-						data.speedUp();
-					} else {
-						data.regenerateFuel();
-					}
-					data.regenerateWings();
-					data.cooldown();
-					if (i % 4 == 0) {
-						data.stopGlowing();
-						data.updateStats();
-					}
-				}
-				i++;
-				if (i > 1000) {
-					i = 0;
-				}
-			}
-		}.runTaskTimer(Flier.getInstance(), 1, 1);
+		new GameHeartBeat(this);
 		Bukkit.getPluginManager().registerEvents(this, Flier.getInstance());
 	}
 	
@@ -106,23 +100,22 @@ public class SimpleGame implements Game, Listener {
 			return;
 		}
 		PlayerData data = new PlayerData(player, this);
-		InGamePlayer inGame = new InGamePlayer(data);
-		dataMap.put(player.getUniqueId(), inGame);
+		dataMap.put(player.getUniqueId(), data);
 		player.teleport(lobby.getSpawn());
 	}
 	
 	public void setTeam(Player player, Team team) {
-		InGamePlayer inGame = dataMap.get(player.getUniqueId());
-		if (inGame != null) {
-			inGame.setTeam(team);
-			inGame.getData().clearStats();
+		PlayerData data = dataMap.get(player.getUniqueId());
+		if (data != null) {
+			data.setTeam(team);
+			data.clearStats();
 			Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "title " + player.getName()
 					+ " title {\"text\":\"" + team.getColor() + Utils.capitalize(team.getName()) + "\"}");
 			for (int i = 0; i < teams.size(); i++) {
-				inGame.getData().addStatistic("");
+				data.addStatistic("");
 			}
 			for (Entry<String, Team> e : teams.entrySet()) {
-				inGame.getData().updateStatistic(e.getValue().getIndex(), e.getValue().getName() + ChatColor.WHITE + ": " +
+				data.updateStatistic(e.getValue().getIndex(), e.getValue().getName() + ChatColor.WHITE + ": " +
 						e.getValue().getScore());
 			}
 			updateColors();
@@ -130,47 +123,43 @@ public class SimpleGame implements Game, Listener {
 	}
 	
 	public void setClass(Player player, PlayerClass clazz) {
-		InGamePlayer inGame = dataMap.get(player.getUniqueId());
-		if (inGame != null) {
-			inGame.setClass(clazz);
+		PlayerData data = dataMap.get(player.getUniqueId());
+		if (data != null) {
+			data.setClazz(clazz);
 			Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "title " + player.getName()
 					+ " title {\"text\":\"" + ChatColor.AQUA + clazz.getName() + "\"}");
-			giveClassItems(clazz, inGame.getData());
 		}
 	}
 	
 	public void startPlayer(Player player) {
-		InGamePlayer inGame = dataMap.get(player.getUniqueId());
-		if (inGame != null) {
-			if (inGame.getTeam() == null || inGame.getClazz() == null) {
+		PlayerData data = dataMap.get(player.getUniqueId());
+		if (data != null) {
+			if (data.getTeam() == null || data.getClazz() == null) {
 				player.sendMessage(ChatColor.RED + "Choose your class and team!");
 			} else {
 				new BukkitRunnable() {
 					@Override
 					public void run() {
-						inGame.setPlaying(true);
+						data.setPlaying(true);
 					}
 				}.runTaskLater(Flier.getInstance(), 20);
-				player.teleport(inGame.getTeam().getSpawn());
+				player.teleport(data.getTeam().getSpawn());
 			}
 		}
 	}
 	
-	public Map<UUID, Player> getPlayers() {
-		HashMap<UUID, Player> players = new HashMap<>();
-		for (Entry<UUID, InGamePlayer> e : dataMap.entrySet()) {
-			players.put(e.getKey(), e.getValue().getData().getPlayer());
-		}
-		return players;
+	@Override
+	public Map<UUID, PlayerData> getPlayers() {
+		return dataMap;
 	}
 	
 	@Override
 	public void removePlayer(Player player) {
-		InGamePlayer data = dataMap.remove(player.getUniqueId());
+		PlayerData data = dataMap.remove(player.getUniqueId());
 		if (data != null) {
 			player.setVelocity(new Vector());
-			data.getData().clear();
-			player.teleport(data.getData().getReturnLocation());
+			data.clear();
+			player.teleport(data.getReturnLocation());
 		}
 		if (dataMap.isEmpty()) {
 			for (Team t : teams.values()) {
@@ -193,70 +182,88 @@ public class SimpleGame implements Game, Listener {
 	public void stop() {
 		HandlerList.unregisterAll(lobby);
 		HandlerList.unregisterAll(this);
-		Set<InGamePlayer> copy = new HashSet<>(dataMap.values());
-		for (InGamePlayer data : copy) {
-			removePlayer(data.getData().getPlayer());
+		Set<PlayerData> copy = new HashSet<>(dataMap.values());
+		for (PlayerData data : copy) {
+			removePlayer(data.getPlayer());
+		}
+	}
+	
+	public void fastTick() {
+		for (PlayerData data : dataMap.values()) {
+			if (!data.isPlaying()) {
+				continue;
+			}
+			Player player = data.getPlayer();
+			if (data.isFlying()) {
+				player.setVelocity(data.getWings().applyFlightModifications(player.getVelocity()));
+			}
+			if (data.isAccelerating()) {
+				data.speedUp();
+			} else {
+				data.regenerateFuel();
+			}
+			data.regenerateWings();
+			data.cooldown();
+		}
+	}
+	
+	public void slowTick() {
+		for (PlayerData data : dataMap.values()) {
+			if (!data.isPlaying()) {
+				continue;
+			}
+			data.stopGlowing();
+			data.updateStats();
 		}
 	}
 
 	private void updateColors() {
 		Map<String, ChatColor> colors = getColors();
-		for (InGamePlayer g : dataMap.values()) {
-			g.getData().setTeamColors(colors);
+		for (PlayerData g : dataMap.values()) {
+			g.setTeamColors(colors);
 		}
 	}
 	
 	private Map<String, ChatColor> getColors() {
 		HashMap<String, ChatColor> map = new HashMap<>();
-		for (Entry<UUID, InGamePlayer> e : dataMap.entrySet()) {
-			map.put(e.getValue().getData().getPlayer().getName(), dataMap.get(e.getKey()).getTeam().getColor());
+		for (Entry<UUID, PlayerData> e : dataMap.entrySet()) {
+			map.put(e.getValue().getPlayer().getName(), dataMap.get(e.getKey()).getTeam().getColor());
 		}
 		return map;
-	}
-
-	private void giveClassItems(PlayerClass clazz, PlayerData data) {
-		data.getPlayer().getInventory().clear();
-		data.setEngine(clazz.getEngine());
-		for (Entry<UsableItem, Integer> e : clazz.getItems().entrySet()) {
-			data.addItem(e.getKey(), e.getValue());
-		}
-		data.setWings(clazz.getWings());
 	}
 	
 	private void score(Team team, int amount) {
 		team.setScore(team.getScore() + amount);
-		for (InGamePlayer data : dataMap.values()) {
-			data.getData().updateStatistic(team.getIndex(), team.getName() + ChatColor.WHITE + ": " + team.getScore());
+		for (PlayerData data : dataMap.values()) {
+			data.updateStatistic(team.getIndex(), team.getName() + ChatColor.WHITE + ": " + team.getScore());
 		}
 	}
 	
 	@EventHandler(priority=EventPriority.LOW)
 	public void onClick(PlayerInteractEvent event) {
-		InGamePlayer player = dataMap.get(event.getPlayer().getUniqueId());
-		if (player != null && player.isPlaying()) {
-			player.getData().use();
+		PlayerData data = dataMap.get(event.getPlayer().getUniqueId());
+		if (data != null && data.isPlaying()) {
+			data.use();
 		}
 	}
 	
 	@EventHandler
 	public void onPlace(BlockPlaceEvent event) {
-		InGamePlayer player = dataMap.get(event.getPlayer().getUniqueId());
-		if (player != null) {
+		if (dataMap.containsKey(event.getPlayer().getUniqueId())) {
 			event.setCancelled(true);
 		}
 	}
 	
 	@EventHandler
 	public void onBreak(BlockBreakEvent event) {
-		InGamePlayer player = dataMap.get(event.getPlayer().getUniqueId());
-		if (player != null) {
+		if (dataMap.containsKey(event.getPlayer().getUniqueId())) {
 			event.setCancelled(true);
 		}
 	}
 	
 	@EventHandler
 	public void onHit(EntityDamageByEntityEvent event) {
-		InGamePlayer player = dataMap.get(event.getEntity().getUniqueId());
+		PlayerData player = dataMap.get(event.getEntity().getUniqueId());
 		// hit player in Game
 		if (player == null) {
 			return;
@@ -276,7 +283,7 @@ public class SimpleGame implements Game, Listener {
 		if (shooterPlayer.equals(event.getEntity())) {
 			return;
 		}
-		InGamePlayer shooter = dataMap.get(shooterPlayer.getUniqueId());
+		PlayerData shooter = dataMap.get(shooterPlayer.getUniqueId());
 		// was hit by someone in Game
 		if (shooter == null) {
 			return;
@@ -286,32 +293,30 @@ public class SimpleGame implements Game, Listener {
 		if (weapon == null) {
 			return;
 		}
-		PlayerData playerData = player.getData();
-		PlayerData shooterData = shooter.getData();
-		DamageResult result = playerData.damage(weapon);
+		DamageResult result = player.damage(weapon);
 		boolean notify = true;
 		boolean sound = true;
 		switch (result) {
 		case INSTANT_KILL:
-			playerData.setLastHit(shooterData);
+			player.setLastHit(shooter);
 			notify = false;
-			playerData.getPlayer().damage(playerData.getPlayer().getHealth() + 1);
+			player.getPlayer().damage(player.getPlayer().getHealth() + 1);
 			break;
 		case WINGS_OFF:
-			playerData.setLastHit(shooterData);
-			playerData.takeWingsOff();
+			player.setLastHit(shooter);
+			player.takeWingsOff();
 			// no break, we want to damage wings too
 		case WINGS_DAMAGE:
-			playerData.setLastHit(shooterData);
-			playerData.removeHealth(weapon.getDamage());
+			player.setLastHit(shooter);
+			player.removeHealth(weapon.getDamage());
 			break;
 		case REGULAR_DAMAGE:
-			playerData.setLastHit(shooterData);
+			player.setLastHit(shooter);
 			double damage = weapon.getPhysical();
-			if (playerData.getPlayer().getHealth() <= damage) {
+			if (player.getPlayer().getHealth() <= damage) {
 				notify = false;
 			}
-			playerData.getPlayer().damage(damage);
+			player.getPlayer().damage(damage);
 			break;
 		case NOTHING:
 			notify = false;
@@ -319,11 +324,11 @@ public class SimpleGame implements Game, Listener {
 			break;
 		}
 		if (notify) {
-			shooterData.getPlayer().sendMessage(ChatColor.YELLOW + "You managed to hit " + formatPlayer(player) + "!");
+			shooter.getPlayer().sendMessage(ChatColor.YELLOW + "You managed to hit " + Utils.formatPlayer(player) + "!");
 		}
 		if (sound) {
-			shooterData.getPlayer().playSound(shooterData.getPlayer().getLocation(), Sound.BLOCK_DISPENSER_DISPENSE, 1, 1);
-			playerData.getPlayer().playSound(playerData.getPlayer().getLocation(), Sound.ENTITY_VILLAGER_HURT, 1, 1);
+			shooter.getPlayer().playSound(shooter.getPlayer().getLocation(), Sound.BLOCK_DISPENSER_DISPENSE, 1, 1);
+			player.getPlayer().playSound(player.getPlayer().getLocation(), Sound.ENTITY_VILLAGER_HURT, 1, 1);
 		}
 	}
 	
@@ -357,37 +362,30 @@ public class SimpleGame implements Game, Listener {
 	
 	@EventHandler
 	public void onDeath(PlayerDeathEvent event) {
-		InGamePlayer killed = dataMap.get(event.getEntity().getUniqueId());
+		PlayerData killed = dataMap.get(event.getEntity().getUniqueId());
 		if (killed != null) {
 			killed.setPlaying(false);
 			Team killedTeam = killed.getTeam();
 			event.getDrops().clear();
-			PlayerData lastHit = killed.getData().getLastHit();
-			InGamePlayer killer = lastHit == null ? null : dataMap.get(lastHit.getPlayer().getUniqueId());
-			killed.getData().setLastHit(null);
+			PlayerData lastHit = killed.getLastHit();
+			PlayerData killer = lastHit == null ? null : dataMap.get(lastHit.getPlayer().getUniqueId());
+			killed.setLastHit(null);
 			if (killer != null) {
 				Team killerTeam = killer.getTeam();
 				switch (event.getEntity().getLastDamageCause().getCause()) {
 				case FALL:
-					event.setDeathMessage(formatPlayer(killed) + " was shot down by " + formatPlayer(killer) + "!");
+					event.setDeathMessage(Utils.formatPlayer(killed) + " was shot down by " + Utils.formatPlayer(killer) + "!");
 					break;
 				default:
-					event.setDeathMessage(formatPlayer(killed) + " was killed by " + formatPlayer(killer) + "!");
+					event.setDeathMessage(Utils.formatPlayer(killed) + " was killed by " + Utils.formatPlayer(killer) + "!");
 					break;
 				}
 				score(killerTeam, 1);
 			} else {
-				event.setDeathMessage(formatPlayer(killed) + " commited suicide...");
+				event.setDeathMessage(Utils.formatPlayer(killed) + " commited suicide...");
 				score(killedTeam, -1);
 			}
 		}
-	}
-
-	private String formatPlayer(InGamePlayer player) {
-		Team team = player.getTeam();
-		PlayerClass clazz = player.getClazz();
-		String name = player.getData().getPlayer().getName();
-		return team.getColor() + name + ChatColor.WHITE + " (" + ChatColor.AQUA + clazz.getName() + ChatColor.WHITE + ")";
 	}
 	
 	@EventHandler
@@ -399,55 +397,13 @@ public class SimpleGame implements Game, Listener {
 	
 	@EventHandler
 	public void onRespawn(PlayerRespawnEvent event) {
-		InGamePlayer data = dataMap.get(event.getPlayer().getUniqueId());
+		PlayerData data = dataMap.get(event.getPlayer().getUniqueId());
 		if (data == null) {
 			return;
 		}
-		PlayerClass c = data.getClazz();
-		giveClassItems(c, data.getData());
+		data.setClazz(data.getClazz());
 		event.getPlayer().setVelocity(new Vector());
 		event.setRespawnLocation(lobby.getSpawn());
 	}
-	
-	public class InGamePlayer {
-		
-		private PlayerData data;
-		private PlayerClass clazz;
-		private Team team;
-		private boolean isPlaying;
-		
-		public InGamePlayer(PlayerData data) {
-			this.data = data;
-		}
-
-		public PlayerData getData() {
-			return data;
-		}
-
-		public PlayerClass getClazz() {
-			return clazz;
-		}
-
-		public void setClass(PlayerClass clazz) {
-			this.clazz = clazz;
-		}
-
-		public Team getTeam() {
-			return team;
-		}
-
-		public void setTeam(Team team) {
-			this.team = team;
-		}
-
-		public boolean isPlaying() {
-			return isPlaying;
-		}
-
-		public void setPlaying(boolean isPlaying) {
-			this.isPlaying = isPlaying;
-		}
-	}
-
 
 }

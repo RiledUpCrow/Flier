@@ -11,6 +11,8 @@ import java.util.UUID;
 
 import org.bukkit.entity.Player;
 
+import pl.betoncraft.flier.PlayerData;
+
 /**
  * Represents a game.
  *
@@ -31,7 +33,7 @@ public interface Game {
 	 * 
 	 * @return the map of players
 	 */
-	public Map<UUID, Player> getPlayers();
+	public Map<UUID, PlayerData> getPlayers();
 
 	/**
 	 * Removes the player from the game.

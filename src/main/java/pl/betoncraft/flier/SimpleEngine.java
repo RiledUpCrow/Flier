@@ -7,6 +7,7 @@
 package pl.betoncraft.flier;
 
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.util.Vector;
 
 import pl.betoncraft.flier.api.Engine;
 
@@ -34,6 +35,35 @@ public class SimpleEngine extends DefaultItem implements Engine {
 		consumption = section.getDouble("consumption", consumption);
 		regeneration = section.getDouble("regeneration", regeneration);
 		glowTime = section.getInt("glow_time", glowTime);
+	}
+	
+	@Override
+	public Vector launch(Vector velocity, Vector direction) {
+		double speed = velocity.length();
+		
+		if (speed > maxSpeed) {
+			speed = 0;
+		} else if (speed < minSpeed) {
+			speed = minSpeed;
+		}
+		velocity.add(direction.multiply(speed * getAcceleration()));
+
+//		// different algorithm
+//		if (speed > maxSpeed) {
+//			return;
+//		}
+//		if (speed < minSpeed) {
+//			Vector direction = player.getLocation().getDirection();
+//			velocity.add(direction.multiply(acceleration));
+//		} else {
+//			velocity.multiply(acceleration + 1);
+//		}
+//		speed = velocity.length();
+//		if (speed > maxSpeed) {
+//			velocity.multiply(maxSpeed / speed);
+//		}
+		
+		return velocity;
 	}
 
 	@Override

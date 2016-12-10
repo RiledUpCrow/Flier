@@ -7,8 +7,12 @@
 package pl.betoncraft.flier;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
+
+import pl.betoncraft.flier.api.PlayerClass;
+import pl.betoncraft.flier.api.Team;
 
 /**
  * Various static utility methods.
@@ -70,6 +74,21 @@ public class Utils {
 		char[] chars = string.toCharArray();
 		chars[0] = (chars[0] + "").toUpperCase().charAt(0);
 		return new String(chars);
+	}
+
+	
+	/**
+	 * Formats the player name in team's color and appends class name.
+	 * The String ends in white color.
+	 * 
+	 * @param player InGamePlayer object containing player's information
+	 * @return the formatted name
+	 */
+	public static String formatPlayer(PlayerData player) {
+		Team team = player.getTeam();
+		PlayerClass clazz = player.getClazz();
+		String name = player.getPlayer().getName();
+		return team.getColor() + name + ChatColor.WHITE + " (" + ChatColor.AQUA + clazz.getName() + ChatColor.WHITE + ")";
 	}
 
 }

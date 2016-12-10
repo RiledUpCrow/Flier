@@ -7,6 +7,7 @@
 package pl.betoncraft.flier.api;
 
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.Vector;
 
 /**
  * Represents an engine, which speeds players up.
@@ -14,6 +15,16 @@ import org.bukkit.inventory.ItemStack;
  * @author Jakub Sapalski
  */
 public interface Engine extends Weight {
+
+	/**
+	 * Launches the player in the direction he's looking, making modifications
+	 * to his velocity. Use this method to implement your engine's mechanics.
+	 * 
+	 * @param velocity velocity Vector of the player
+	 * @param direction direction Vector where the player is looking
+	 * @return the modified velocity Vector
+	 */
+	public Vector launch(Vector velocity, Vector direction);
 	
 	/**
 	 * @return the engine item

@@ -7,6 +7,7 @@
 package pl.betoncraft.flier.api;
 
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.Vector;
 
 /**
  * Represents wings - elytra item with statistics.
@@ -14,6 +15,15 @@ import org.bukkit.inventory.ItemStack;
  * @author Jakub Sapalski
  */
 public interface Wings extends Weight {
+
+	/**
+	 * Applies modifications to player's velocity vector. Use this method to apply your wings'
+	 * flight model.
+	 * 
+	 * @param velocity player's velocity Vector
+	 * @return the same Vector, modified
+	 */
+	Vector applyFlightModifications(Vector velocity);
 
 	/**
 	 * @return ItemStack equal to these wings

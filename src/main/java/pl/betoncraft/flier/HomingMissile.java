@@ -77,10 +77,10 @@ public class HomingMissile extends DefaultWeapon {
 				Location searchCenter = missile.getLocation().clone().add(direction.multiply(radius));
 				Player nearest = null;
 				double distance = radiusSqr;
-				for (Player p : data.getGame().getPlayers().values()) {
-					double d = p.getLocation().distanceSquared(searchCenter);
+				for (PlayerData p : data.getGame().getPlayers().values()) {
+					double d = p.getPlayer().getLocation().distanceSquared(searchCenter);
 					if (d < distance) {
-						nearest = p;
+						nearest = p.getPlayer();
 						distance = d;
 					}
 				}

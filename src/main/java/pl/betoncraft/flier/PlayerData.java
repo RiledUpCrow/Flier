@@ -6,7 +6,6 @@
  */
 package pl.betoncraft.flier;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -21,12 +20,13 @@ import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Score;
 import org.bukkit.scoreboard.Scoreboard;
-import org.bukkit.util.Vector;
 
 import pl.betoncraft.flier.api.Damager;
 import pl.betoncraft.flier.api.Damager.DamageResult;
 import pl.betoncraft.flier.api.Engine;
 import pl.betoncraft.flier.api.Game;
+import pl.betoncraft.flier.api.PlayerClass;
+import pl.betoncraft.flier.api.Team;
 import pl.betoncraft.flier.api.UsableItem;
 import pl.betoncraft.flier.api.Wings;
 
@@ -39,6 +39,10 @@ public class PlayerData {
 	
 	private Player player;
 	private Game game;
+	private PlayerClass clazz;
+	private Team team;
+	private boolean isPlaying;
+
 	private Location returnLoc;
 	private Scoreboard sb;
 	private int customIndex = 0;
@@ -48,10 +52,6 @@ public class PlayerData {
 	
 	private double fuel;
 	private double health;
-
-	private Engine engine;
-	private Map<UsableItem, Integer> items = new HashMap<>();
-	private Wings wings;
 	
 	public PlayerData(Player player, Game game) {
 		this.player = player;
@@ -63,49 +63,66 @@ public class PlayerData {
 		stats.setDisplayName("Stats");
 		player.setScoreboard(sb);
 	}
-
-	public Location getReturnLocation() {
-		return returnLoc;
-	}
 	
 	public Game getGame() {
 		return game;
 	}
 	
-	public Engine getEngine() {
-		return engine;
+	public PlayerClass getClazz() {
+		return clazz;
 	}
 	
-	public void setEngine(Engine engine) {
-		this.engine = engine;
+	public void setClazz(PlayerClass clazz) {
+		this.clazz = clazz;
+		Engine engine = clazz.getEngine();
+		Wings wings = clazz.getWings();
+		Map<UsableItem, Integer> items = clazz.getItems();
+		getPlayer().getInventory().clear();
 		getPlayer().getInventory().setItemInOffHand(engine.getItem());
 		setFuel(engine.getMaxFuel());
+		getPlayer().getInventory().setChestplate(wings.getItem());
+		setHealth(wings.getHealth());
+		for (Entry<UsableItem, Integer> e : items.entrySet()) {
+			UsableItem item = e.getKey();
+			int amount = e.getValue();
+			int slot = item.slot();
+			getItems().put(item, amount);
+			ItemStack itemStack = item.getItem();
+			itemStack.setAmount(amount);
+			if (slot >= 0) {
+				player.getInventory().setItem(slot, itemStack);
+			} else {
+				getPlayer().getInventory().addItem(itemStack);
+			}
+		}
+	}
+
+	public Team getTeam() {
+		return team;
+	}
+
+	public void setTeam(Team team) {
+		this.team = team;
+	}
+
+	public boolean isPlaying() {
+		return isPlaying;
+	}
+
+	public void setPlaying(boolean isPlaying) {
+		this.isPlaying = isPlaying;
+	}
+	
+	public Engine getEngine() {
+		return clazz.getEngine();
 	}
 	
 	public Map<UsableItem, Integer> getItems() {
-		return items;
-	}
-	
-	public void addItem(UsableItem item, int amount) {
-		int slot = item.slot();
-		getItems().put(item, amount);
-		ItemStack itemStack = item.getItem();
-		itemStack.setAmount(amount);
-		if (slot >= 0) {
-			player.getInventory().setItem(slot, itemStack);
-		} else {
-			getPlayer().getInventory().addItem(itemStack);
-		}
+		return clazz.getItems();
 	}
 	
 	public Wings getWings() {
-		return wings;
-	}
-	
-	public void setWings(Wings wings) {
-		this.wings = wings;
-		getPlayer().getInventory().setChestplate(wings.getItem());
-		setHealth(wings.getHealth());
+		return clazz.getWings();
 	}
 	
 	public Scoreboard getScoreboard() {
@@ -135,6 +152,10 @@ public class PlayerData {
 	
 	public PlayerData getLastHit() {
 		return lastHit;
+	}
+
+	public Location getReturnLocation() {
+		return returnLoc;
 	}
 	
 	public UsableItem getHeldItem() {
@@ -219,15 +240,15 @@ public class PlayerData {
 		return true;
 	}
 	
+	public void startGlowing(int ticks) {
+		getPlayer().setGlowing(true);
+		glowTimer = System.currentTimeMillis() + 50*ticks;
+	}
+	
 	public void stopGlowing() {
 		if (System.currentTimeMillis() >= glowTimer) {
 			getPlayer().setGlowing(false);
 		}
-	}
-	
-	public void startGlowing(int ticks) {
-		getPlayer().setGlowing(true);
-		glowTimer = System.currentTimeMillis() + 50*ticks;
 	}
 	
 	public void setTeamColors(Map<String, ChatColor> map) {
@@ -298,51 +319,6 @@ public class PlayerData {
 		return weight;
 	}
 	
-	public void applyFlightModifications() {
-		Vector velocity = getPlayer().getVelocity().clone();
-		double horizontalSpeed = Math.sqrt((velocity.getX() * velocity.getX()) + (velocity.getZ() * velocity.getZ()));
-		double liftingForce = getWings().getLiftingForce() * horizontalSpeed;
-		double weight = getWeight();
-		velocity.add(new Vector(0, 1, 0).multiply(liftingForce - weight));
-		double aerodynamics = getWings().getAerodynamics();
-		Vector airResistance = velocity.clone().multiply(aerodynamics);
-		velocity.add(airResistance);
-		if (!velocity.equals(getPlayer().getVelocity())) {
-			getPlayer().setVelocity(velocity);
-		}
-	}
-	
-	public void launch(double minSpeed, double acceleration, double maxSpeed) {
-		Player player = getPlayer();
-		Vector velocity = player.getVelocity();
-		double speed = velocity.length();
-		
-		if (speed > maxSpeed) {
-			speed = 0;
-		} else if (speed < minSpeed) {
-			speed = minSpeed;
-		}
-		Vector direction = player.getLocation().getDirection();
-		velocity.add(direction.multiply(speed * getEngine().getAcceleration()));
-
-//		// different algorithm
-//		if (speed > maxSpeed) {
-//			return;
-//		}
-//		if (speed < minSpeed) {
-//			Vector direction = player.getLocation().getDirection();
-//			velocity.add(direction.multiply(acceleration));
-//		} else {
-//			velocity.multiply(acceleration + 1);
-//		}
-//		speed = velocity.length();
-//		if (speed > maxSpeed) {
-//			velocity.multiply(maxSpeed / speed);
-//		}
-		
-		player.setVelocity(velocity);
-	}
-	
 	public void speedUp() {
 		Engine engine = getEngine();
 		if (engine == null) {
@@ -351,7 +327,7 @@ public class PlayerData {
 		if (!removeFuel(engine.getConsumption())) {
 			return;
 		}
-		launch(engine.getMinSpeed(), engine.getAcceleration(), engine.getMaxSpeed());
+		getPlayer().setVelocity(engine.launch(getPlayer().getVelocity(), getPlayer().getLocation().getDirection()));
 		startGlowing(engine.getGlowTime());
 	}
 	
