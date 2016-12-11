@@ -4,7 +4,7 @@
  * To Public License, Version 2, as published by Sam Hocevar. See
  * http://www.wtfpl.net/ for more details.
  */
-package pl.betoncraft.flier;
+package pl.betoncraft.flier.item;
 
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
@@ -13,7 +13,7 @@ import org.bukkit.util.Vector;
 import pl.betoncraft.flier.api.Wings;
 
 /**
- * Simple wings.
+ * Simple wings with scalable lifting force and air resistance.
  *
  * @author Jakub Sapalski
  */

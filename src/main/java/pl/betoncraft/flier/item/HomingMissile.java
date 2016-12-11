@@ -4,7 +4,7 @@
  * To Public License, Version 2, as published by Sam Hocevar. See
  * http://www.wtfpl.net/ for more details.
  */
-package pl.betoncraft.flier;
+package pl.betoncraft.flier.item;
 
 import java.util.Date;
 import java.util.UUID;
@@ -18,7 +18,9 @@ import org.bukkit.entity.Projectile;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
+import pl.betoncraft.flier.Flier;
 import pl.betoncraft.flier.api.Damager;
+import pl.betoncraft.flier.core.PlayerData;
 
 /**
  * A homing missile which targets flying players.

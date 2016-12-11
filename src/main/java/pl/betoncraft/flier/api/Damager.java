@@ -75,6 +75,17 @@ public interface Damager {
 	 * @return whenever the player on ground should be instantly killed
 	 */
 	public boolean killsOnGround();
+	
+	/**
+	 * @return true if this damager should damage players in the same team in
+	 *         case there are teams
+	 */
+	public boolean friendlyFire();
+	
+	/**
+	 * @return true if this damager can damage the player who fired it
+	 */
+	public boolean suicidal();
 
 	/**
 	 * If this weapon does not kill instantly, it can inflict physical damage to

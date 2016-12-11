@@ -4,7 +4,7 @@
  * To Public License, Version 2, as published by Sam Hocevar. See
  * http://www.wtfpl.net/ for more details.
  */
-package pl.betoncraft.flier;
+package pl.betoncraft.flier.item;
 
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.util.Vector;
@@ -12,11 +12,11 @@ import org.bukkit.util.Vector;
 import pl.betoncraft.flier.api.Engine;
 
 /**
- * Simple engine.
+ * Engine which multiplies speed instead of adding a fixed acceleration.
  *
  * @author Jakub Sapalski
  */
-public class SimpleEngine extends DefaultItem implements Engine {
+public class MultiplyingEngine extends DefaultItem implements Engine {
 	
 	private double maxSpeed = 1.5;
 	private double minSpeed = 0.5;
@@ -26,7 +26,7 @@ public class SimpleEngine extends DefaultItem implements Engine {
 	private double regeneration = 1;
 	private int glowTime = 100;
 	
-	public SimpleEngine(ConfigurationSection section) {
+	public MultiplyingEngine(ConfigurationSection section) {
 		super(section);
 		maxSpeed = section.getDouble("max_speed", maxSpeed);
 		minSpeed = section.getDouble("min_speed", minSpeed);

@@ -1,6 +1,6 @@
 engines:
   balancedEngine:
-    type: simpleEngine
+    type: multiplyingEngine
     material: sugar cane
     name: '&2Balanced Engine'
     lore:
@@ -13,7 +13,7 @@ engines:
     regeneration: 1
     glow_time: 100
   fastEngine:
-    type: simpleEngine
+    type: multiplyingEngine
     material: feather
     name: '&2Fast Engine'
     lore:
@@ -25,7 +25,7 @@ engines:
     regeneration: 1.5
     glow_time: 50
   strongEngine:
-    type: simpleEngine
+    type: multiplyingEngine
     material: wheat
     name: '&2Strong Engine'
     lore:
@@ -38,7 +38,7 @@ engines:
     glow_time: 200
 items:
   balancedWeapon:
-    type: simpleWeapon
+    type: machineGun
     material: bone
     name: '&4Balanced Weapon'
     lore:
@@ -56,7 +56,7 @@ items:
     kills_on_ground: false
     physical_damage: 7.5
   strongWeapon:
-    type: simpleWeapon
+    type: machineGun
     material: blaze rod
     name: '&4Strong Weapon'
     lore:
@@ -74,7 +74,7 @@ items:
     kills_on_ground: true
     physical_damage: 10
   fastWeapon:
-    type: simpleWeapon
+    type: machineGun
     material: stick
     name: '&4Fast Weapon'
     lore:
@@ -92,7 +92,7 @@ items:
     kills_on_ground: false
     physical_damage: 5
   gun:
-    type: simpleWeapon
+    type: machineGun
     material: torch
     name: '&4Gun'
     lore:
@@ -118,9 +118,9 @@ items:
     entity: arrow
     slot: 3
     range: 64
-    speed: 3
+    speed: 2.5
     life: 400
-    maneuverability: 1
+    maneuverability: 1.5
     cooldown: 200
     consumable: true
     only_air: true
@@ -154,34 +154,42 @@ wings:
     regeneration: 0.5
     weight: 0.002
     aerodynamics: -0.0025
-classes:
-  balanced:
-    type: fixedClass
-    engine: balancedEngine
-    items:
-    - balancedWeapon
-    - gun
-    - rocket 2
-    wings: balancedWings
-  fast:
-    type: fixedClass
-    engine: fastEngine
-    items:
-    - fastWeapon
-    - gun
-    - rocket 2
-    wings: lightWings
-  strong:
-    type: fixedClass
-    engine: strongEngine
-    items:
-    - strongWeapon
-    - gun
-    - rocket 2
-    wings: heavyWings
+lobbies:
+  default:
+    type: fixedPhysicalLobby
+    join:
+    - -19;64;334;world
+    spawn: -22.5;64;334.5;world;90;0
+    start: -32;64;334;world
+    leave: -21;64;334;world
+    classes:
+      fast: 
+        block: -25;64;337;world
+        engine: balancedEngine
+        items:
+        - balancedWeapon
+        - gun
+        - rocket 2
+        wings: balancedWings
+      balanced:
+        block: -27;64;337;world
+        engine: fastEngine
+        items:
+        - fastWeapon
+        - gun
+        - rocket 2
+        wings: lightWings
+      strong:
+        block: -29;64;337;world
+        engine: strongEngine
+        items:
+        - strongWeapon
+        - gun
+        - rocket 2
+        wings: heavyWings
 games:
   default:
-    type: simpleGame
+    type: teamDeathMatch
     teams:
       blue:
         name: 'Blue'
@@ -191,17 +199,4 @@ games:
         name: 'Red'
         location: -82.5;140;377.5;world;180;0
         color: red
-    lobby:
-      join:
-      - -19;64;334;world
-      spawn: -22.5;64;334.5;world;90;0
-      start: -32;64;334;world
-      leave: -21;64;334;world
-      choice:
-        team:
-          red: -28;64;331;world
-          blue: -26;64;331;world
-        class:
-          fast: -25;64;337;world
-          balanced: -27;64;337;world
-          strong: -29;64;337;world
+    lobby: default

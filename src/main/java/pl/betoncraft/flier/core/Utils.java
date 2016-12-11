@@ -4,7 +4,7 @@
  * To Public License, Version 2, as published by Sam Hocevar. See
  * http://www.wtfpl.net/ for more details.
  */
-package pl.betoncraft.flier;
+package pl.betoncraft.flier.core;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -12,7 +12,6 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 
 import pl.betoncraft.flier.api.PlayerClass;
-import pl.betoncraft.flier.api.Team;
 
 /**
  * Various static utility methods.
@@ -85,10 +84,9 @@ public class Utils {
 	 * @return the formatted name
 	 */
 	public static String formatPlayer(PlayerData player) {
-		Team team = player.getTeam();
 		PlayerClass clazz = player.getClazz();
 		String name = player.getPlayer().getName();
-		return team.getColor() + name + ChatColor.WHITE + " (" + ChatColor.AQUA + clazz.getName() + ChatColor.WHITE + ")";
+		return player.getColor() + name + ChatColor.WHITE + " (" + ChatColor.AQUA + clazz.getName() + ChatColor.WHITE + ")";
 	}
 
 }

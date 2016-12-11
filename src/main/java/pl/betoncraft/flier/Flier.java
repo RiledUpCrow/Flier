@@ -16,9 +16,16 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import pl.betoncraft.flier.api.Engine;
 import pl.betoncraft.flier.api.Game;
-import pl.betoncraft.flier.api.PlayerClass;
+import pl.betoncraft.flier.api.Lobby;
 import pl.betoncraft.flier.api.UsableItem;
 import pl.betoncraft.flier.api.Wings;
+import pl.betoncraft.flier.command.FlierCommand;
+import pl.betoncraft.flier.game.TeamDeathMatch;
+import pl.betoncraft.flier.item.HomingMissile;
+import pl.betoncraft.flier.item.MultiplyingEngine;
+import pl.betoncraft.flier.item.MachineGun;
+import pl.betoncraft.flier.item.SimpleWings;
+import pl.betoncraft.flier.lobby.FixedPhysicalLobby;
 
 public class Flier extends JavaPlugin implements Listener, CommandExecutor {
 	
@@ -27,13 +34,13 @@ public class Flier extends JavaPlugin implements Listener, CommandExecutor {
 	private Map<String, EngineFactory> engineTypes = new HashMap<>();
 	private Map<String, ItemFactory> itemTypes = new HashMap<>();
 	private Map<String, WingFactory> wingTypes = new HashMap<>();
-	private Map<String, ClassFactory> classTypes = new HashMap<>();
+	private Map<String, LobbyFactory> lobbyTypes = new HashMap<>();
 	private Map<String, GameFactory> gameTypes = new HashMap<>();
 	
 	private Map<String, Engine> engines = new HashMap<>();
 	private Map<String, UsableItem> items = new HashMap<>();
 	private Map<String, Wings> wings = new HashMap<>();
-	private Map<String, PlayerClass> classes = new HashMap<>();
+	private Map<String, Lobby> lobbies = new HashMap<>();
 	private Map<String, Game> games = new HashMap<>();
 	
 	public interface EngineFactory {
@@ -48,8 +55,8 @@ public class Flier extends JavaPlugin implements Listener, CommandExecutor {
 		public Wings get(ConfigurationSection settings);
 	}
 	
-	public interface ClassFactory {
-		public PlayerClass get(ConfigurationSection settings);
+	public interface LobbyFactory {
+		public Lobby get(ConfigurationSection settings);
 	}
 	
 	public interface GameFactory {
@@ -62,18 +69,18 @@ public class Flier extends JavaPlugin implements Listener, CommandExecutor {
 		saveDefaultConfig();
 		new FlierCommand();
 		// register new types
-		registerEngine("simpleEngine", s -> new SimpleEngine(s));
-		registerItem("simpleWeapon", s -> new SimpleWeapon(s));
+		registerEngine("multiplyingEngine", s -> new MultiplyingEngine(s));
+		registerItem("machineGun", s -> new MachineGun(s));
 		registerItem("homingMissile", s -> new HomingMissile(s));
 		registerWings("simpleWings", s -> new SimpleWings(s));
-		registerClass("fixedClass", s -> new FixedClass(s));
-		registerGame("simpleGame", s -> new SimpleGame(s));
+		registerLobby("fixedPhysicalLobby", s -> new FixedPhysicalLobby(s));
+		registerGame("teamDeathMatch", s -> new TeamDeathMatch(s));
 		// TODO separate files
 		ConfigurationSection engineSection = getConfig().getConfigurationSection("engines");
 		if (engineSection != null) {
 			for (String section : engineSection.getKeys(false)) {
 				ConfigurationSection engine = engineSection.getConfigurationSection(section);
-				String type = engine.getString("type", "simpleEngine");
+				String type = engine.getString("type", "multiplyingEngine");
 				EngineFactory factory = engineTypes.get(type);
 				engines.put(section, factory.get(engine));
 			}
@@ -82,7 +89,7 @@ public class Flier extends JavaPlugin implements Listener, CommandExecutor {
 		if (itemSection != null) {
 			for (String section : itemSection.getKeys(false)) {
 				ConfigurationSection item = itemSection.getConfigurationSection(section);
-				String type = item.getString("type", "simpleWeapon");
+				String type = item.getString("type", "machineGun");
 				ItemFactory factory = itemTypes.get(type);
 				items.put(section, factory.get(item));
 			}
@@ -96,26 +103,26 @@ public class Flier extends JavaPlugin implements Listener, CommandExecutor {
 				this.wings.put(section, factory.get(wings));
 			}
 		}
-		ConfigurationSection classSection = getConfig().getConfigurationSection("classes");
-		if (classSection != null) {
-			for (String section : classSection.getKeys(false)) {
-				ConfigurationSection clazz = classSection.getConfigurationSection(section);
-				String type = clazz.getString("type", "fixedClass");
-				ClassFactory factory = classTypes.get(type);
-				classes.put(section, factory.get(clazz));
+		ConfigurationSection lobbySection = getConfig().getConfigurationSection("lobbies");
+		if (lobbySection != null) {
+			for (String section : lobbySection.getKeys(false)) {
+				ConfigurationSection lobby = lobbySection.getConfigurationSection(section);
+				String type = lobby.getString("type", "fixedPhysicalLobby");
+				LobbyFactory factory = lobbyTypes.get(type);
+				lobbies.put(section, factory.get(lobby));
 			}
 		}
 		ConfigurationSection gameSection = getConfig().getConfigurationSection("games");
 		if (gameSection != null) {
 			for (String section : gameSection.getKeys(false)) {
 				ConfigurationSection game = gameSection.getConfigurationSection(section);
-				String type = game.getString("type", "simpleGame");
+				String type = game.getString("type", "teamDeathMatch");
 				GameFactory factory = gameTypes.get(type);
 				games.put(section, factory.get(game));
 			}
 		}
 		getLogger().info("Loaded " + engines.size() + " engines, " + items.size() + " items, " + wings.size() +
-				" wings, " + classes.size() + " classes and " + games.size() + " games.");
+				" wings, " + lobbies.size() + " lobbies and " + games.size() + " games.");
 	}
 	
 	@Override
@@ -157,11 +164,11 @@ public class Flier extends JavaPlugin implements Listener, CommandExecutor {
 	}
 	
 	/**
-	 * @param name name of the class
-	 * @return the class
+	 * @param name name of the lobby
+	 * @return the lobby
 	 */
-	public PlayerClass getClass(String name) {
-		return classes.get(name);
+	public Lobby getLobby(String name) {
+		return lobbies.get(name);
 	}
 	
 	/**
@@ -196,8 +203,8 @@ public class Flier extends JavaPlugin implements Listener, CommandExecutor {
 	/**
 	 * @return the classes
 	 */
-	public Map<String, PlayerClass> getClasses() {
-		return classes;
+	public Map<String, Lobby> getLobbies() {
+		return lobbies;
 	}
 
 	/**
@@ -219,8 +226,8 @@ public class Flier extends JavaPlugin implements Listener, CommandExecutor {
 		wingTypes.put(name, factory);
 	}
 	
-	public void registerClass(String name, ClassFactory factory) {
-		classTypes.put(name, factory);
+	public void registerLobby(String name, LobbyFactory factory) {
+		lobbyTypes.put(name, factory);
 	}
 	
 	public void registerGame(String name, GameFactory factory) {

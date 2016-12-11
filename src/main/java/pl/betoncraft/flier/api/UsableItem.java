@@ -8,7 +8,7 @@ package pl.betoncraft.flier.api;
 
 import org.bukkit.inventory.ItemStack;
 
-import pl.betoncraft.flier.PlayerData;
+import pl.betoncraft.flier.core.PlayerData;
 
 /**
  * Represents an item which can be used by the player.

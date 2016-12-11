@@ -4,7 +4,7 @@
  * To Public License, Version 2, as published by Sam Hocevar. See
  * http://www.wtfpl.net/ for more details.
  */
-package pl.betoncraft.flier;
+package pl.betoncraft.flier.item;
 
 import java.util.Date;
 import java.util.UUID;
@@ -17,21 +17,23 @@ import org.bukkit.entity.Projectile;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
+import pl.betoncraft.flier.Flier;
 import pl.betoncraft.flier.api.Damager;
+import pl.betoncraft.flier.core.PlayerData;
 
 /**
- * Implementation of a simple, burst shooting weapon.
+ * Burst shooting weapon with unguided projectiles.
  *
  * @author Jakub Sapalski
  */
-public class SimpleWeapon extends DefaultWeapon {
+public class MachineGun extends DefaultWeapon {
 	
 	private EntityType entity = EntityType.FIREBALL;
 	private int burstAmount = 10;
 	private int burstTicks = 1;
 	private double projectileSpeed = 5;
 	
-	public SimpleWeapon(ConfigurationSection section) {
+	public MachineGun(ConfigurationSection section) {
 		super(section);
 		entity = EntityType.valueOf(section.getString("entity", "FIREBALL").toUpperCase().replace(' ', '_'));
 		burstAmount = section.getInt("burst_amount", burstAmount);
@@ -59,7 +61,7 @@ public class SimpleWeapon extends DefaultWeapon {
 				projectile.setVelocity(velocity);
 				projectile.setShooter(player);
 				projectile.setGravity(false);
-				Damager.saveDamager(projectile, SimpleWeapon.this);
+				Damager.saveDamager(projectile, MachineGun.this);
 				counter --;
 				if (counter <= 0) {
 					cancel();
@@ -68,5 +70,6 @@ public class SimpleWeapon extends DefaultWeapon {
 		}.runTaskTimer(Flier.getInstance(), 0, burstTicks);
 		return true;
 	}
+
 
 }

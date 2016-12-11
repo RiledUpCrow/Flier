@@ -4,7 +4,7 @@
  * To Public License, Version 2, as published by Sam Hocevar. See
  * http://www.wtfpl.net/ for more details.
  */
-package pl.betoncraft.flier;
+package pl.betoncraft.flier.core;
 
 import java.util.Map;
 import java.util.Map.Entry;
@@ -26,7 +26,6 @@ import pl.betoncraft.flier.api.Damager.DamageResult;
 import pl.betoncraft.flier.api.Engine;
 import pl.betoncraft.flier.api.Game;
 import pl.betoncraft.flier.api.PlayerClass;
-import pl.betoncraft.flier.api.Team;
 import pl.betoncraft.flier.api.UsableItem;
 import pl.betoncraft.flier.api.Wings;
 
@@ -40,13 +39,13 @@ public class PlayerData {
 	private Player player;
 	private Game game;
 	private PlayerClass clazz;
-	private Team team;
 	private boolean isPlaying;
 
 	private Location returnLoc;
 	private Scoreboard sb;
 	private int customIndex = 0;
 	private PlayerData lastHit = null;
+	private ChatColor color;
 	
 	private long glowTimer;
 	
@@ -62,6 +61,31 @@ public class PlayerData {
 		stats.setDisplaySlot(DisplaySlot.SIDEBAR);
 		stats.setDisplayName("Stats");
 		player.setScoreboard(sb);
+	}
+	
+	public void fastTick() {
+		if (!isPlaying()) {
+			return;
+		}
+		Player player = getPlayer();
+		if (isFlying()) {
+			player.setVelocity(getWings().applyFlightModifications(player.getVelocity()));
+		}
+		if (isAccelerating()) {
+			speedUp();
+		} else {
+			regenerateFuel();
+		}
+		regenerateWings();
+		cooldown();
+	}
+	
+	public void slowTick() {
+		if (!isPlaying()) {
+			return;
+		}
+		stopGlowing();
+		updateStats();
 	}
 	
 	public Game getGame() {
@@ -95,14 +119,6 @@ public class PlayerData {
 				getPlayer().getInventory().addItem(itemStack);
 			}
 		}
-	}
-
-	public Team getTeam() {
-		return team;
-	}
-
-	public void setTeam(Team team) {
-		this.team = team;
 	}
 
 	public boolean isPlaying() {
@@ -251,7 +267,8 @@ public class PlayerData {
 		}
 	}
 	
-	public void setTeamColors(Map<String, ChatColor> map) {
+	public void updateColors() {
+		Map<String, ChatColor> map = game.getColors();
 		for (Entry<String, ChatColor> e : map.entrySet()) {
 			String player = e.getKey();
 			ChatColor color = e.getValue();
@@ -263,6 +280,14 @@ public class PlayerData {
 			team.addEntry(player.toString());
 			team.setPrefix(ChatColor.COLOR_CHAR + "" + color.getChar());
 		}
+	}
+	
+	public ChatColor getColor() {
+		return color;
+	}
+	
+	public void setColor(ChatColor color) {
+		this.color = color;
 	}
 	
 	public void updateStats() {
