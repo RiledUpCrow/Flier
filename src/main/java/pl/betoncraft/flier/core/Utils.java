@@ -10,6 +10,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.util.Vector;
 
 import pl.betoncraft.flier.api.PlayerClass;
 
@@ -87,6 +88,54 @@ public class Utils {
 		PlayerClass clazz = player.getClazz();
 		String name = player.getPlayer().getName();
 		return player.getColor() + name + ChatColor.WHITE + " (" + ChatColor.AQUA + clazz.getName() + ChatColor.WHITE + ")";
+	}
+	
+	public static class ImmutableVector {
+		private final double x, y, z;
+		private Double length;
+		public ImmutableVector(double x, double y, double z) {
+			this.x = x;
+			this.y = y;
+			this.z = z;
+		}
+		public static ImmutableVector fromVector(Vector vec) {
+			return new ImmutableVector(vec.getX(), vec.getY(), vec.getZ());
+		}
+		public double getX() {
+			return x;
+		}
+		public double getY() {
+			return y;
+		}
+		public double getZ() {
+			return z;
+		}
+		public ImmutableVector add(ImmutableVector vec) {
+			return new ImmutableVector(x + vec.x, y + vec.y, z + vec.z);
+		}
+		public ImmutableVector subtract(ImmutableVector vec) {
+			return new ImmutableVector(x - vec.x, y - vec.y, z - vec.z);
+		}
+		public ImmutableVector multiply(double m) {
+			return new ImmutableVector(x*m, y*m, z*m);
+		}
+		public double length() {
+			if (length == null) {
+				length = Math.sqrt(x*x + y*y + z*z);
+			}
+			return length;
+		}
+		public ImmutableVector normalize() {
+			length();
+			return new ImmutableVector(x / length, y / length, z / length);
+		}
+		public Vector toVector() {
+			return new Vector(x, y, z);
+		}
+		@Override
+		public String toString() {
+			return String.format("[%.3f,%.3f,%.3f]", x, y, z);
+		}
 	}
 
 }

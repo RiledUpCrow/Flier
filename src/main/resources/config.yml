@@ -117,9 +117,10 @@ items:
     - '&cLeft click to launch.'
     entity: arrow
     slot: 3
-    range: 64
+    search_range: 64
+    search_radius: 0.2
     speed: 2.5
-    life: 400
+    lifetime: 400
     maneuverability: 1.5
     cooldown: 200
     consumable: true
@@ -165,20 +166,20 @@ lobbies:
     classes:
       fast: 
         block: -25;64;337;world
-        engine: balancedEngine
-        items:
-        - balancedWeapon
-        - gun
-        - rocket 2
-        wings: balancedWings
-      balanced:
-        block: -27;64;337;world
         engine: fastEngine
         items:
         - fastWeapon
         - gun
         - rocket 2
         wings: lightWings
+      balanced:
+        block: -27;64;337;world
+        engine: balancedEngine
+        items:
+        - balancedWeapon
+        - gun
+        - rocket 2
+        wings: balancedWings
       strong:
         block: -29;64;337;world
         engine: strongEngine

@@ -21,6 +21,7 @@ import org.bukkit.util.Vector;
 import pl.betoncraft.flier.Flier;
 import pl.betoncraft.flier.api.Damager;
 import pl.betoncraft.flier.core.PlayerData;
+import pl.betoncraft.flier.core.Utils.ImmutableVector;
 
 /**
  * A homing missile which targets flying players.
@@ -30,9 +31,10 @@ import pl.betoncraft.flier.core.PlayerData;
 public class HomingMissile extends DefaultWeapon {
 	
 	private EntityType entity = EntityType.ARROW;
-	private int range = 64;
+	private int searchRange = 64;
+	private double searchRadius = 0.2;
 	private double speed = 3;
-	private int life = 400;
+	private int lifetime = 400;
 	private double maneuverability = 1;
 	private int radius;
 	private int radiusSqr;
@@ -40,11 +42,12 @@ public class HomingMissile extends DefaultWeapon {
 	public HomingMissile(ConfigurationSection section) {
 		super(section);
 		entity = EntityType.valueOf(section.getString("entity", entity.toString()).toUpperCase().replace(' ', '_'));
-		range = section.getInt("range", range);
+		searchRange = section.getInt("search_range", searchRange);
+		searchRadius = section.getDouble("search_radius", searchRadius);
 		speed = section.getDouble("speed", speed);
-		life = section.getInt("life", life);
+		lifetime = section.getInt("lifetime", lifetime);
 		maneuverability = section.getDouble("maneuverability", maneuverability);
-		radius = range / 2;
+		radius = searchRange / 2;
 		radiusSqr = radius * radius;
 	}
 
@@ -66,34 +69,70 @@ public class HomingMissile extends DefaultWeapon {
 		missile.setGravity(false);
 		Damager.saveDamager(missile, HomingMissile.this);
 		new BukkitRunnable() {
-			Location lastLoc;;
+			int i = 0;
+			Location lastLoc;
+			Player nearest;
+			boolean foundTarget = false;
+			ImmutableVector vec = null;
 			@Override
 			public void run() {
-				if (missile.isDead() || !missile.isValid() || missile.getTicksLived() >= life
-						|| (lastLoc != null && missile.getLocation().distanceSquared(lastLoc) < 1)) {
+				if (missile.isDead() || !missile.isValid() || missile.getTicksLived() >= lifetime) {
 					cancel();
 					missile.remove();
+					return;
+				}
+				if (lastLoc != null && missile.getLocation().distanceSquared(lastLoc) == 0) {
+					i++;
+					if (i > 5) {
+						cancel();
+						missile.remove();
+						return;
+					}
+				} else {
+					i = 0;
 				}
 				lastLoc = missile.getLocation();
-				Vector direction = missile.getVelocity().normalize();
-				Location searchCenter = missile.getLocation().clone().add(direction.multiply(radius));
-				Player nearest = null;
+				if (vec == null) {
+					vec = ImmutableVector.fromVector(missile.getVelocity()).normalize().multiply(speed);
+				}
+				ImmutableVector direction = vec.normalize();
+				Location searchCenter = missile.getLocation().clone().add(direction.multiply(radius).toVector());
+				Player n = null;
 				double distance = radiusSqr;
 				for (PlayerData p : data.getGame().getPlayers().values()) {
+					if (nearest != null && p.getPlayer().equals(nearest)) {
+						n = p.getPlayer();
+						break;
+					}
 					double d = p.getPlayer().getLocation().distanceSquared(searchCenter);
 					if (d < distance) {
-						nearest = p.getPlayer();
+						n = p.getPlayer();
 						distance = d;
 					}
 				}
+				nearest = n;
+				ImmutableVector newVec;
 				if (nearest != null) {
-					Vector aim = nearest.getLocation().subtract(missile.getLocation()).toVector().normalize()
-							.multiply(maneuverability);
-					missile.setVelocity(missile.getVelocity().add(aim).normalize().multiply(speed));
-					nearest.playSound(nearest.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1, 1);
+					foundTarget = true;
+					Location loc = nearest.getLocation().toVector().midpoint(nearest.getEyeLocation().toVector()).toLocation(nearest.getWorld());
+					Vector v = loc.subtract(missile.getLocation()).toVector().add(nearest.getVelocity());
+					ImmutableVector aim = ImmutableVector.fromVector(v).normalize().multiply(maneuverability);
+					newVec = direction.add(aim).normalize().multiply(speed);
+					int d = (int) nearest.getLocation().distance(missile.getLocation());
+					double f = 4 * d / searchRange;
+					int j = (int) f;
+					j = j == 0 ? 1 : j;
+					if (missile.getTicksLived() % j == 0) {
+						nearest.playSound(nearest.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1, 1);
+					}
+				} else if (foundTarget) {
+					ImmutableVector d = new ImmutableVector(direction.getZ(), -direction.getY(), -direction.getX()).multiply(searchRadius);
+					newVec = direction.add(d).normalize().multiply(speed);
 				} else {
-					missile.setVelocity(missile.getVelocity().normalize().multiply(speed));
+					newVec = direction.multiply(speed);
 				}
+				vec = newVec;
+				missile.setVelocity(newVec.toVector());
 			}
 		}.runTaskTimer(Flier.getInstance(), 1, 1);
 		return true;

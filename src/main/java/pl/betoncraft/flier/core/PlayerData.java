@@ -110,7 +110,6 @@ public class PlayerData {
 			UsableItem item = e.getKey();
 			int amount = e.getValue();
 			int slot = item.slot();
-			getItems().put(item, amount);
 			ItemStack itemStack = item.getItem();
 			itemStack.setAmount(amount);
 			if (slot >= 0) {
@@ -369,13 +368,7 @@ public class PlayerData {
 		if (item == null || (item.onlyAir() && !isFlying())) {
 			return;
 		}
-		int amount = getItems().get(item);
-		if (amount == 0) {
-			return;
-		}
 		if (item.use(this) && item.isConsumable()) {
-			amount--;
-			getItems().put(item, amount);
 			ItemStack stack = getPlayer().getInventory().getItemInMainHand();
 			if (stack.getAmount() == 1) {
 				getPlayer().getInventory().setItemInMainHand(null); 

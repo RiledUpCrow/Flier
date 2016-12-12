@@ -85,21 +85,25 @@ public abstract class DefaultGame implements Listener, Game {
 			return;
 		}
 		Projectile projectile = (Projectile) event.getDamager();
+		projectile.remove();
 		// shooter was some player
 		if (!(projectile.getShooter() instanceof Player)) {
 			return;
 		}
 		Player shooterPlayer = (Player) projectile.getShooter();
-		// was not hit by himself
-		if (shooterPlayer.equals(event.getEntity())) {
-			return;
-		}
 		PlayerData shooter = getPlayers().get(shooterPlayer.getUniqueId());
 		// was hit by someone in Game
 		if (shooter == null) {
 			return;
 		}
 		Damager weapon = Damager.getDamager(projectile);
+		// was hit by himself
+		if (shooterPlayer.equals(event.getEntity())) {
+			// ignore if you can's commit suicide with this weapon
+			if (!weapon.suicidal()) {
+				return;
+			}
+		}
 		// was hit by a Weapon
 		if (weapon == null) {
 			return;
