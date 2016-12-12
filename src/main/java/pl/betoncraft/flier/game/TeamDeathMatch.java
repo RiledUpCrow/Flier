@@ -221,15 +221,14 @@ public class TeamDeathMatch extends DefaultGame {
 	
 	private SimpleTeam chooseTeam() {
 		SimpleTeam rarest = null;
-		Integer lowest = teams.size();
 		HashMap<SimpleTeam, Integer> map = new HashMap<>();
 		for (SimpleTeam team : teams.values()) {
-			Integer amount = map.get(team);
-			if (amount == null) {
-				amount = 0;
-			}
-			map.put(team, ++amount);
+			map.put(team, 0);
 		}
+		for (SimpleTeam team : players.values()) {
+			map.put(team, map.get(team) + 1);
+		}
+		Integer lowest = teams.size();
 		for (Entry<SimpleTeam, Integer> e : map.entrySet()) {
 			if (e.getValue() < lowest) {
 				rarest = e.getKey();
