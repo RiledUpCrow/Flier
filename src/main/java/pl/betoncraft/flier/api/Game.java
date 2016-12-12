@@ -10,7 +10,6 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.bukkit.ChatColor;
-import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 import pl.betoncraft.flier.core.PlayerData;
@@ -59,22 +58,6 @@ public interface Game {
 	 * @return the map of players
 	 */
 	public Map<UUID, PlayerData> getPlayers();
-	
-	/**
-	 * Handles one player killing another one.
-	 * In case of suicide killer is null.
-	 * 
-	 * @param killer the player who killed another
-	 * @param killed the player who was killed
-	 */
-	public void handleKill(PlayerData killer, PlayerData killed);
-	
-	/**
-	 * Returns a respawn location for the player.
-	 * 
-	 * @param respawned the player who needs respawning
-	 */
-	public Location respawnLocation(PlayerData respawned);
 
 	/**
 	 * This method will be called once the game is forced to end.

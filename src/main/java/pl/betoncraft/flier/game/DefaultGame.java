@@ -7,6 +7,7 @@
 package pl.betoncraft.flier.game;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -63,6 +64,22 @@ public abstract class DefaultGame implements Listener, Game {
 			}
 		}
 	}
+	
+	/**
+	 * Handles one player killing another one.
+	 * In case of suicide killer is null.
+	 * 
+	 * @param killer the player who killed another
+	 * @param killed the player who was killed
+	 */
+	public abstract void handleKill(PlayerData killer, PlayerData killed);
+	
+	/**
+	 * Returns a respawn location for the player.
+	 * 
+	 * @param respawned the player who needs respawning
+	 */
+	public abstract Location respawnLocation(PlayerData respawned);
 	
 	@EventHandler(priority=EventPriority.LOW)
 	public void onClick(PlayerInteractEvent event) {
