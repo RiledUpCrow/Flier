@@ -67,7 +67,6 @@ public class Flier extends JavaPlugin implements Listener, CommandExecutor {
 	public void onEnable() {
 		
 		// TODO NPE in notepad
-		// TODO fireball rocket hit twice
 		
 		instance = this;
 		saveDefaultConfig();

@@ -58,6 +58,17 @@ public interface Game {
 	 * @return the map of players
 	 */
 	public Map<UUID, PlayerData> getPlayers();
+	
+	/**
+	 * Returns the Attitude of one player towards another. The game should
+	 * tell if these players are enemies or friends, so other components
+	 * can behave accordingly.
+	 * 
+	 * @param toThisOne
+	 * @param ofThisOne
+	 * @return
+	 */
+	public Attitude getAttitude(PlayerData toThisOne, PlayerData ofThisOne);
 
 	/**
 	 * This method will be called once the game is forced to end.
@@ -72,5 +83,9 @@ public interface Game {
 	 * @return the map with colors assigned to player names
 	 */
 	public Map<String, ChatColor> getColors();
+	
+	public enum Attitude {
+		FRIENDLY, NEUTRAL, HOSTILE
+	}
 
 }

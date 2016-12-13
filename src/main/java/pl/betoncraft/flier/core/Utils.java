@@ -117,7 +117,11 @@ public class Utils {
 			return new ImmutableVector(x - vec.x, y - vec.y, z - vec.z);
 		}
 		public ImmutableVector multiply(double m) {
-			return new ImmutableVector(x*m, y*m, z*m);
+			ImmutableVector result = new ImmutableVector(x*m, y*m, z*m);
+			if (length != null) {
+				result.length = length * m;
+			}
+			return result;
 		}
 		public double length() {
 			if (length == null) {
@@ -126,8 +130,9 @@ public class Utils {
 			return length;
 		}
 		public ImmutableVector normalize() {
-			length();
-			return new ImmutableVector(x / length, y / length, z / length);
+			ImmutableVector result = new ImmutableVector(x / length(), y / length(), z / length());
+			result.length = 1.0;
+			return result;
 		}
 		public Vector toVector() {
 			return new Vector(x, y, z);

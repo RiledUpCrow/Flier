@@ -189,9 +189,24 @@ public class TeamDeathMatch extends DefaultGame {
 	public Map<String, ChatColor> getColors() {
 		HashMap<String, ChatColor> map = new HashMap<>();
 		for (Entry<UUID, PlayerData> e : dataMap.entrySet()) {
-			map.put(e.getValue().getPlayer().getName(), getTeam(dataMap.get(e.getKey())).getColor());
+			SimpleTeam team = getTeam(dataMap.get(e.getKey()));
+			if (team != null) {
+				map.put(e.getValue().getPlayer().getName(), team.getColor());
+			}
 		}
 		return map;
+	}
+	
+	@Override
+	public Attitude getAttitude(PlayerData toThisOne, PlayerData ofThisOne) {
+		if (!toThisOne.isPlaying()) {
+			return Attitude.NEUTRAL;
+		}
+		if (getTeam(toThisOne).equals(getTeam(ofThisOne))) {
+			return Attitude.FRIENDLY;
+		} else {
+			return Attitude.HOSTILE;
+		}
 	}
 	
 	private  SimpleTeam getTeam(PlayerData data) {
