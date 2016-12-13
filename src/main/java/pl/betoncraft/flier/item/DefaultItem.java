@@ -14,14 +14,14 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import pl.betoncraft.flier.api.Weight;
+import pl.betoncraft.flier.api.Item;
 
 /**
  * A base class for items saved in the configuration sections.
  *
  * @author Jakub Sapalski
  */
-public abstract class DefaultItem implements Weight {
+public abstract class DefaultItem implements Item {
 	
 	protected ItemStack item;
 	protected double weight;

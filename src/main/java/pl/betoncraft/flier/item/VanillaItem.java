@@ -4,25 +4,19 @@
  * To Public License, Version 2, as published by Sam Hocevar. See
  * http://www.wtfpl.net/ for more details.
  */
-package pl.betoncraft.flier.api;
+package pl.betoncraft.flier.item;
 
-import org.bukkit.inventory.ItemStack;
+import org.bukkit.configuration.ConfigurationSection;
 
 /**
- * Represents anything with weight.
+ * A simple item without any additional mechanics.
  *
  * @author Jakub Sapalski
  */
-public interface Weight {
-	
-	/**
-	 * @return the ItemStack equal to this item
-	 */
-	public ItemStack getItem();
-	
-	/**
-	 * @return weight of an item
-	 */
-	public double getWeight();
+public class VanillaItem extends DefaultItem {
+
+	public VanillaItem(ConfigurationSection section) {
+		super(section);
+	}
 
 }

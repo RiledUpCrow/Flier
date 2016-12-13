@@ -28,6 +28,7 @@ import pl.betoncraft.flier.api.Game;
 import pl.betoncraft.flier.api.PlayerClass;
 import pl.betoncraft.flier.api.UsableItem;
 import pl.betoncraft.flier.api.Wings;
+import pl.betoncraft.flier.core.Utils.ImmutableVector;
 
 /**
  * Stores data about the player.
@@ -69,7 +70,7 @@ public class PlayerData {
 		}
 		Player player = getPlayer();
 		if (isFlying()) {
-			player.setVelocity(getWings().applyFlightModifications(player.getVelocity()));
+			player.setVelocity(getWings().applyFlightModifications(this).toVector());
 		}
 		if (isAccelerating()) {
 			speedUp();
@@ -87,7 +88,7 @@ public class PlayerData {
 		stopGlowing();
 		updateStats();
 	}
-	
+
 	public Game getGame() {
 		return game;
 	}
@@ -351,7 +352,8 @@ public class PlayerData {
 		if (!removeFuel(engine.getConsumption())) {
 			return;
 		}
-		getPlayer().setVelocity(engine.launch(getPlayer().getVelocity(), getPlayer().getLocation().getDirection()));
+		getPlayer().setVelocity(engine.launch(ImmutableVector.fromVector(getPlayer().getVelocity()),
+				ImmutableVector.fromVector(getPlayer().getLocation().getDirection())).toVector());
 		startGlowing(engine.getGlowTime());
 	}
 	

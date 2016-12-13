@@ -6,15 +6,15 @@
  */
 package pl.betoncraft.flier.api;
 
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.util.Vector;
+import pl.betoncraft.flier.core.PlayerData;
+import pl.betoncraft.flier.core.Utils.ImmutableVector;
 
 /**
  * Represents wings - elytra item with statistics.
  *
  * @author Jakub Sapalski
  */
-public interface Wings extends Weight {
+public interface Wings extends Item {
 
 	/**
 	 * Applies modifications to player's velocity vector. Use this method to apply your wings'
@@ -23,12 +23,7 @@ public interface Wings extends Weight {
 	 * @param velocity player's velocity Vector
 	 * @return the same Vector, modified
 	 */
-	Vector applyFlightModifications(Vector velocity);
-
-	/**
-	 * @return ItemStack equal to these wings
-	 */
-	public ItemStack getItem();
+	public ImmutableVector applyFlightModifications(PlayerData data);
 
 	/**
 	 * @return maximum health of the wings
@@ -39,16 +34,5 @@ public interface Wings extends Weight {
 	 * @return the regeneration rate of the wings
 	 */
 	public double getRegeneration();
-
-	/**
-	 * @return property describing how well the wings deal with air resistance
-	 */
-	public double getAerodynamics();
-
-	/**
-	 * @return property describing how much lifting force these wings generate
-	 *         when flying at speed
-	 */
-	public double getLiftingForce();
 
 }

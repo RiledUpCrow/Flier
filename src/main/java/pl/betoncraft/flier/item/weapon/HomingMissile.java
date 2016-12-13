@@ -4,7 +4,7 @@
  * To Public License, Version 2, as published by Sam Hocevar. See
  * http://www.wtfpl.net/ for more details.
  */
-package pl.betoncraft.flier.item;
+package pl.betoncraft.flier.item.weapon;
 
 import java.util.Date;
 import java.util.UUID;

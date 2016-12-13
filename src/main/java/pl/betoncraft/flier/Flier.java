@@ -21,10 +21,10 @@ import pl.betoncraft.flier.api.UsableItem;
 import pl.betoncraft.flier.api.Wings;
 import pl.betoncraft.flier.command.FlierCommand;
 import pl.betoncraft.flier.game.TeamDeathMatch;
-import pl.betoncraft.flier.item.HomingMissile;
-import pl.betoncraft.flier.item.MultiplyingEngine;
-import pl.betoncraft.flier.item.MachineGun;
-import pl.betoncraft.flier.item.SimpleWings;
+import pl.betoncraft.flier.item.engine.MultiplyingEngine;
+import pl.betoncraft.flier.item.weapon.HomingMissile;
+import pl.betoncraft.flier.item.weapon.MachineGun;
+import pl.betoncraft.flier.item.wings.SimpleWings;
 import pl.betoncraft.flier.lobby.FixedPhysicalLobby;
 
 public class Flier extends JavaPlugin implements Listener, CommandExecutor {

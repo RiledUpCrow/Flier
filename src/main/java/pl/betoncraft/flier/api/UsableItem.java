@@ -15,7 +15,7 @@ import pl.betoncraft.flier.core.PlayerData;
  *
  * @author Jakub Sapalski
  */
-public interface UsableItem extends Weight {
+public interface UsableItem extends Item {
 
 	/**
 	 * @return the ItemStack equal to this item

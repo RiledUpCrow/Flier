@@ -6,15 +6,14 @@
  */
 package pl.betoncraft.flier.api;
 
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.util.Vector;
+import pl.betoncraft.flier.core.Utils.ImmutableVector;
 
 /**
  * Represents an engine, which speeds players up.
  *
  * @author Jakub Sapalski
  */
-public interface Engine extends Weight {
+public interface Engine extends Item {
 
 	/**
 	 * Launches the player in the direction he's looking, making modifications
@@ -24,27 +23,7 @@ public interface Engine extends Weight {
 	 * @param direction direction Vector where the player is looking
 	 * @return the modified velocity Vector
 	 */
-	public Vector launch(Vector velocity, Vector direction);
-	
-	/**
-	 * @return the engine item
-	 */
-	public ItemStack getItem();
-
-	/**
-	 * @return the maximum acceleration speed
-	 */
-	public double getMaxSpeed();
-
-	/**
-	 * @return the minimum speed for multiplication accelerator
-	 */
-	public double getMinSpeed();
-
-	/**
-	 * @return the acceleration multiplier per flight tick
-	 */
-	public double getAcceleration();
+	public ImmutableVector launch(ImmutableVector velocity, ImmutableVector direction);
 
 	/**
 	 * @return the maximum amount of stored fuel
