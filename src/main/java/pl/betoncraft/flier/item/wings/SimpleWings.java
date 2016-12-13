@@ -34,10 +34,9 @@ public class SimpleWings extends DefaultWings {
 		double horizontalSpeed = Math.sqrt((velocity.getX() * velocity.getX()) + (velocity.getZ() * velocity.getZ()));
 		double length = (liftingForce * horizontalSpeed) - data.getWeight();
 		length = length >= maxLift ? maxLift : length;
-		velocity.add(new ImmutableVector(0, length, 0));
+		velocity = velocity.add(new ImmutableVector(0, length, 0));
 		ImmutableVector airResistance = velocity.multiply(aerodynamics);
-		velocity.add(airResistance);
-		return velocity;
+		return velocity.add(airResistance);
 	}
 
 }

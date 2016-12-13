@@ -36,8 +36,7 @@ public class MultiplyingEngine extends DefaultEngine {
 		} else if (speed < minSpeed) {
 			speed = minSpeed;
 		}
-		velocity.add(direction.multiply(speed * acceleration));
-		return velocity;
+		return velocity.add(direction.multiply(speed * acceleration));
 	}
 
 }

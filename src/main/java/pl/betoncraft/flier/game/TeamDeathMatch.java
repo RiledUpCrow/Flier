@@ -51,7 +51,7 @@ public class TeamDeathMatch extends DefaultGame {
 		String lobbyName = section.getString("lobby");
 		lobby = Flier.getInstance().getLobby(lobbyName);
 		lobby.setGame(this);
-		new GameHeartBeat();
+		new GameHeartBeat(this);
 		Bukkit.getPluginManager().registerEvents(this, Flier.getInstance());
 	}
 	
@@ -95,6 +95,38 @@ public class TeamDeathMatch extends DefaultGame {
 		}
 
 	}
+	
+	@Override
+	public void fastTick() {
+		// nothing
+	};
+	
+	@Override
+	public void slowTick() {
+		// update compass targets to nearest hostiles
+		for (PlayerData data : dataMap.values()) {
+			if (data.isPlaying()) {
+				PlayerData nearest = null;
+				double distance = 0;
+				for (PlayerData d : dataMap.values()) {
+					if (getAttitude(d, data) == Attitude.HOSTILE) {
+						double dist = data.getPlayer().getLocation().distanceSquared(d.getPlayer().getLocation());
+						if (distance == 0 || dist < distance) {
+							distance = dist;
+							nearest = d;
+						}
+					}
+				}
+				if (nearest != null) {
+					data.getPlayer().setCompassTarget(nearest.getPlayer().getLocation());
+				} else {
+					data.getPlayer().setCompassTarget(getTeam(data).getSpawn());
+				}
+			} else {
+				data.getPlayer().setCompassTarget(lobby.getSpawn());
+			}
+		}
+	};
 	
 	@Override
 	public void addPlayer(Player player) {

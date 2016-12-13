@@ -45,16 +45,22 @@ public abstract class DefaultGame implements Listener, Game {
 	public class GameHeartBeat extends BukkitRunnable {
 		
 		private int i = 0;
+		private DefaultGame game;
 		
-		public GameHeartBeat() {
+		public GameHeartBeat(DefaultGame game) {
+			this.game = game;
 			runTaskTimer(Flier.getInstance(), 1, 1);
 		}
 
 		@Override
 		public void run() {
+			game.fastTick();
 			for (PlayerData data : getPlayers().values()) {
 				data.fastTick();
-				if (i % 4 == 0) {
+			}
+			if (i % 4 == 0) {
+				game.slowTick();
+				for (PlayerData data : getPlayers().values()) {
 					data.slowTick();
 				}
 			}
@@ -74,6 +80,16 @@ public abstract class DefaultGame implements Listener, Game {
 	 */
 	public abstract void handleKill(PlayerData killer, PlayerData killed);
 	
+	/**
+	 * The game should do game-specific stuff in a fast tick here.
+	 */
+	public abstract void fastTick();;
+
+	/**
+	 * The game should do game-specific stuff in a slow tick here.
+	 */
+	public abstract void slowTick();
+
 	/**
 	 * Returns a respawn location for the player.
 	 * 
