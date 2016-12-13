@@ -25,6 +25,7 @@ import pl.betoncraft.flier.api.Damager;
 import pl.betoncraft.flier.api.Damager.DamageResult;
 import pl.betoncraft.flier.api.Engine;
 import pl.betoncraft.flier.api.Game;
+import pl.betoncraft.flier.api.Item;
 import pl.betoncraft.flier.api.PlayerClass;
 import pl.betoncraft.flier.api.UsableItem;
 import pl.betoncraft.flier.api.Wings;
@@ -101,14 +102,14 @@ public class PlayerData {
 		this.clazz = clazz;
 		Engine engine = clazz.getEngine();
 		Wings wings = clazz.getWings();
-		Map<UsableItem, Integer> items = clazz.getItems();
+		Map<Item, Integer> items = clazz.getItems();
 		getPlayer().getInventory().clear();
 		getPlayer().getInventory().setItemInOffHand(engine.getItem());
 		setFuel(engine.getMaxFuel());
 		getPlayer().getInventory().setChestplate(wings.getItem());
 		setHealth(wings.getHealth());
-		for (Entry<UsableItem, Integer> e : items.entrySet()) {
-			UsableItem item = e.getKey();
+		for (Entry<Item, Integer> e : items.entrySet()) {
+			Item item = e.getKey();
 			int amount = e.getValue();
 			int slot = item.slot();
 			ItemStack itemStack = item.getItem();
@@ -133,7 +134,7 @@ public class PlayerData {
 		return clazz.getEngine();
 	}
 	
-	public Map<UsableItem, Integer> getItems() {
+	public Map<Item, Integer> getItems() {
 		return clazz.getItems();
 	}
 	
@@ -174,12 +175,12 @@ public class PlayerData {
 		return returnLoc;
 	}
 	
-	public UsableItem getHeldItem() {
+	public Item getHeldItem() {
 		ItemStack item = getPlayer().getInventory().getItemInMainHand();
 		if (item == null) {
 			return null;
 		}
-		for (UsableItem i : getItems().keySet()) {
+		for (Item i : getItems().keySet()) {
 			if (i.getItem().isSimilar(item)) {
 				return i;
 			}
@@ -338,7 +339,7 @@ public class PlayerData {
 		double weight = 0;
 		weight += getEngine().getWeight();
 		weight += getWings().getWeight();
-		for (UsableItem item : getItems().keySet()) {
+		for (Item item : getItems().keySet()) {
 			weight += item.getWeight();
 		}
 		return weight;
@@ -366,23 +367,28 @@ public class PlayerData {
 	}
 	
 	public void use() {
-		UsableItem item = getHeldItem();
-		if (item == null || (item.onlyAir() && !isFlying())) {
-			return;
-		}
-		if (item.use(this) && item.isConsumable()) {
-			ItemStack stack = getPlayer().getInventory().getItemInMainHand();
-			if (stack.getAmount() == 1) {
-				getPlayer().getInventory().setItemInMainHand(null); 
-			} else {
-				stack.setAmount(stack.getAmount() - 1);
+		Item i = getHeldItem();
+		if (i instanceof UsableItem) {
+			UsableItem item = (UsableItem) i;
+			if (item == null || (item.onlyAir() && !isFlying())) {
+				return;
+			}
+			if (item.use(this) && item.isConsumable()) {
+				ItemStack stack = getPlayer().getInventory().getItemInMainHand();
+				if (stack.getAmount() == 1) {
+					getPlayer().getInventory().setItemInMainHand(null); 
+				} else {
+					stack.setAmount(stack.getAmount() - 1);
+				}
 			}
 		}
 	}
 	
 	public void cooldown() {
-		for (UsableItem item : getItems().keySet()) {
-			item.cooldown(this);
+		for (Item item : getItems().keySet()) {
+			if (item instanceof UsableItem) {
+				((UsableItem) item).cooldown(this);
+			}
 		}
 	}
 	

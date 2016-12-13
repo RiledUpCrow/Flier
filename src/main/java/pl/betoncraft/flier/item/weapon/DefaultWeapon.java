@@ -6,28 +6,18 @@
  */
 package pl.betoncraft.flier.item.weapon;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
-
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.entity.Player;
 
 import pl.betoncraft.flier.api.Weapon;
-import pl.betoncraft.flier.core.PlayerData;
-import pl.betoncraft.flier.item.DefaultItem;
+import pl.betoncraft.flier.item.DefaultUsableItem;
 
 /**
  * A default Weapon implementation.
  *
  * @author Jakub Sapalski
  */
-public abstract class DefaultWeapon extends DefaultItem implements Weapon {
+public abstract class DefaultWeapon extends DefaultUsableItem implements Weapon {
 
-	protected int cooldown = 40;
-	protected int slot = -1;
-	protected boolean consumable = false;
-	protected boolean onlyAir = false;
 	protected boolean suicidal = false;
 	protected boolean friendlyFire = true;
 
@@ -35,22 +25,15 @@ public abstract class DefaultWeapon extends DefaultItem implements Weapon {
 	protected boolean wingsOff = true;
 	protected boolean killsOnGround = true;
 	protected double physicalDamage = 5;
-
-	protected final Map<UUID, Long> weaponCooldown = new HashMap<>();
 	
 	public DefaultWeapon(ConfigurationSection section) {
 		super(section);
-		slot = section.getInt("slot", slot);
-		cooldown = section.getInt("cooldown", cooldown);
-		consumable = section.getBoolean("consumable", consumable);
-		onlyAir = section.getBoolean("only_air", onlyAir);
 		suicidal = section.getBoolean("suicidal", suicidal);
 		friendlyFire = section.getBoolean("friendly_fire", friendlyFire);
 		damage = section.getDouble("damage", damage);
 		wingsOff = section.getBoolean("wings_off", wingsOff);
 		killsOnGround = section.getBoolean("kills_on_ground", killsOnGround);
 		physicalDamage = section.getDouble("physical_damage", physicalDamage);
-		weight = section.getDouble("weight", weight);
 	}
 	
 	@Override
@@ -74,16 +57,6 @@ public abstract class DefaultWeapon extends DefaultItem implements Weapon {
 	}
 	
 	@Override
-	public boolean isConsumable() {
-		return consumable;
-	}
-	
-	@Override
-	public boolean onlyAir() {
-		return onlyAir;
-	}
-	
-	@Override
 	public boolean friendlyFire() {
 		return friendlyFire;
 	}
@@ -91,20 +64,6 @@ public abstract class DefaultWeapon extends DefaultItem implements Weapon {
 	@Override
 	public boolean suicidal() {
 		return suicidal;
-	}
-	
-	@Override
-	public int slot() {
-		return slot;
-	}
-	
-	@Override
-	public void cooldown(PlayerData data) {
-		Player player = data.getPlayer();
-		Long cooldown = weaponCooldown.get(player.getUniqueId());
-		if (cooldown != null && System.currentTimeMillis() >= cooldown) {
-			weaponCooldown.remove(player.getUniqueId());
-		}
 	}
 
 }

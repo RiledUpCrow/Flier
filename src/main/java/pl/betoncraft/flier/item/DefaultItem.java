@@ -25,6 +25,7 @@ public abstract class DefaultItem implements Item {
 	
 	protected ItemStack item;
 	protected double weight;
+	protected int slot;
 	
 	public DefaultItem(ConfigurationSection section) {
 		Material type = Material.matchMaterial(section.getString("material", "FEATHER"));
@@ -43,6 +44,7 @@ public abstract class DefaultItem implements Item {
 		meta.spigot().setUnbreakable(true);
 		item.setItemMeta(meta);
 		weight = section.getDouble("weight", weight);
+		slot = section.getInt("slot", slot);
 	}
 	
 	@Override
@@ -53,6 +55,11 @@ public abstract class DefaultItem implements Item {
 	@Override
 	public double getWeight() {
 		return weight;
+	}
+	
+	@Override
+	public int slot() {
+		return slot;
 	}
 
 }

@@ -25,7 +25,7 @@ public interface PlayerClass {
 	 * @return map of items and their amounts; the map can be empty if the class
 	 *         doesn't have any items
 	 */
-	public Map<UsableItem, Integer> getItems();
+	public Map<Item, Integer> getItems();
 
 	/**
 	 * @return wings stored in this class or null if the class doesn't have any

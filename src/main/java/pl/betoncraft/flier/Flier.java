@@ -16,8 +16,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import pl.betoncraft.flier.api.Engine;
 import pl.betoncraft.flier.api.Game;
+import pl.betoncraft.flier.api.Item;
 import pl.betoncraft.flier.api.Lobby;
-import pl.betoncraft.flier.api.UsableItem;
 import pl.betoncraft.flier.api.Wings;
 import pl.betoncraft.flier.command.FlierCommand;
 import pl.betoncraft.flier.game.TeamDeathMatch;
@@ -39,7 +39,7 @@ public class Flier extends JavaPlugin implements Listener, CommandExecutor {
 	private Map<String, GameFactory> gameTypes = new HashMap<>();
 	
 	private Map<String, Engine> engines = new HashMap<>();
-	private Map<String, UsableItem> items = new HashMap<>();
+	private Map<String, Item> items = new HashMap<>();
 	private Map<String, Wings> wings = new HashMap<>();
 	private Map<String, Lobby> lobbies = new HashMap<>();
 	private Map<String, Game> games = new HashMap<>();
@@ -49,7 +49,7 @@ public class Flier extends JavaPlugin implements Listener, CommandExecutor {
 	}
 	
 	public interface ItemFactory {
-		public UsableItem get(ConfigurationSection settings);
+		public Item get(ConfigurationSection settings);
 	}
 	
 	public interface WingFactory {
@@ -156,7 +156,7 @@ public class Flier extends JavaPlugin implements Listener, CommandExecutor {
 	 * @param name name of the item
 	 * @return the item
 	 */
-	public UsableItem getItem(String name) {
+	public Item getItem(String name) {
 		return items.get(name);
 	}
 	
@@ -194,7 +194,7 @@ public class Flier extends JavaPlugin implements Listener, CommandExecutor {
 	/**
 	 * @return the items
 	 */
-	public Map<String, UsableItem> getItems() {
+	public Map<String, Item> getItems() {
 		return items;
 	}
 

@@ -26,9 +26,9 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import pl.betoncraft.flier.Flier;
 import pl.betoncraft.flier.api.Engine;
 import pl.betoncraft.flier.api.Game;
+import pl.betoncraft.flier.api.Item;
 import pl.betoncraft.flier.api.Lobby;
 import pl.betoncraft.flier.api.PlayerClass;
-import pl.betoncraft.flier.api.UsableItem;
 import pl.betoncraft.flier.api.Wings;
 import pl.betoncraft.flier.core.Utils;
 
@@ -63,7 +63,7 @@ public class FixedPhysicalLobby implements Lobby, Listener {
 		
 		private String name;
 		private Engine engine;
-		private Map<UsableItem, Integer> items = new HashMap<>();
+		private Map<Item, Integer> items = new HashMap<>();
 		private Wings wings;
 		
 		public FixedClass(ConfigurationSection section) {
@@ -81,7 +81,7 @@ public class FixedPhysicalLobby implements Lobby, Listener {
 				if (amount <= 0) {
 					amount = 1;
 				}
-				UsableItem ui = Flier.getInstance().getItem(item);
+				Item ui = Flier.getInstance().getItem(item);
 				if (ui != null) {
 					items.put(ui, amount);
 				} else {}
@@ -95,7 +95,7 @@ public class FixedPhysicalLobby implements Lobby, Listener {
 		}
 		
 		@Override
-		public Map<UsableItem, Integer> getItems() {
+		public Map<Item, Integer> getItems() {
 			return items;
 		}
 		

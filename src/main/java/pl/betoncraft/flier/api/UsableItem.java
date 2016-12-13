@@ -6,8 +6,6 @@
  */
 package pl.betoncraft.flier.api;
 
-import org.bukkit.inventory.ItemStack;
-
 import pl.betoncraft.flier.core.PlayerData;
 
 /**
@@ -16,11 +14,6 @@ import pl.betoncraft.flier.core.PlayerData;
  * @author Jakub Sapalski
  */
 public interface UsableItem extends Item {
-
-	/**
-	 * @return the ItemStack equal to this item
-	 */
-	public ItemStack getItem();
 
 	/**
 	 * Uses this item once.
@@ -46,10 +39,5 @@ public interface UsableItem extends Item {
 	 * @return whenever this item is only usable while gliding
 	 */
 	public boolean onlyAir();
-
-	/**
-	 * @return the slot in which this item is to be placed
-	 */
-	public int slot();
 
 }

@@ -25,4 +25,9 @@ public interface Item {
 	 */
 	public double getWeight();
 
+	/**
+	 * @return the slot in which this item is to be placed
+	 */
+	public int slot();
+
 }
