@@ -143,7 +143,8 @@ public class HomingMissile extends DefaultWeapon {
 					int j = (int) (4.0 * nearest.getLocation().distance(missile.getLocation()) / searchRange);
 					j = j <= 0 ? 1 : j;
 					if (missile.getTicksLived() % j == 0) {
-						nearest.playSound(nearest.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1, 1);
+						Vector soundLoc = missile.getLocation().subtract(nearest.getLocation()).toVector().normalize().multiply(10);
+						nearest.playSound(nearest.getLocation().add(soundLoc), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1, 1);
 					}
 				} else if (foundTarget) {
 					// target was lost, fly in circles
