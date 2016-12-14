@@ -8,7 +8,7 @@ package pl.betoncraft.flier.item.wings;
 
 import org.bukkit.configuration.ConfigurationSection;
 
-import pl.betoncraft.flier.core.PlayerData;
+import pl.betoncraft.flier.api.InGamePlayer;
 import pl.betoncraft.flier.core.Utils.ImmutableVector;
 
 /**
@@ -29,7 +29,7 @@ public class SimpleWings extends DefaultWings {
 	}
 	
 	@Override
-	public ImmutableVector applyFlightModifications(PlayerData data) {
+	public ImmutableVector applyFlightModifications(InGamePlayer data) {
 		ImmutableVector velocity = ImmutableVector.fromVector(data.getPlayer().getVelocity());
 		double horizontalSpeed = Math.sqrt((velocity.getX() * velocity.getX()) + (velocity.getZ() * velocity.getZ()));
 		double length = (liftingForce * horizontalSpeed) - data.getWeight();

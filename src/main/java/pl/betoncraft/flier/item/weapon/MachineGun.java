@@ -16,7 +16,7 @@ import org.bukkit.util.Vector;
 
 import pl.betoncraft.flier.Flier;
 import pl.betoncraft.flier.api.Damager;
-import pl.betoncraft.flier.core.PlayerData;
+import pl.betoncraft.flier.api.InGamePlayer;
 
 /**
  * Burst shooting weapon with unguided projectiles.
@@ -39,7 +39,7 @@ public class MachineGun extends DefaultWeapon {
 	}
 	
 	@Override
-	public boolean use(PlayerData data) {
+	public boolean use(InGamePlayer data) {
 		Player player = data.getPlayer();
 		new BukkitRunnable() {
 			int counter = burstAmount;

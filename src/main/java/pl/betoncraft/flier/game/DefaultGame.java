@@ -6,9 +6,7 @@
  */
 package pl.betoncraft.flier.game;
 
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
-import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
@@ -30,10 +28,9 @@ import org.bukkit.util.Vector;
 
 import pl.betoncraft.flier.Flier;
 import pl.betoncraft.flier.api.Damager;
-import pl.betoncraft.flier.api.Damager.DamageResult;
-import pl.betoncraft.flier.core.PlayerData;
-import pl.betoncraft.flier.core.Utils;
 import pl.betoncraft.flier.api.Game;
+import pl.betoncraft.flier.api.InGamePlayer;
+import pl.betoncraft.flier.core.Utils;
 
 /**
  * Basic rules of a game.
@@ -55,12 +52,12 @@ public abstract class DefaultGame implements Listener, Game {
 		@Override
 		public void run() {
 			game.fastTick();
-			for (PlayerData data : getPlayers().values()) {
+			for (InGamePlayer data : getPlayers().values()) {
 				data.fastTick();
 			}
 			if (i % 4 == 0) {
 				game.slowTick();
-				for (PlayerData data : getPlayers().values()) {
+				for (InGamePlayer data : getPlayers().values()) {
 					data.slowTick();
 				}
 			}
@@ -78,7 +75,7 @@ public abstract class DefaultGame implements Listener, Game {
 	 * @param killer the player who killed another
 	 * @param killed the player who was killed
 	 */
-	public abstract void handleKill(PlayerData killer, PlayerData killed);
+	public abstract void handleKill(InGamePlayer killer, InGamePlayer killed);
 	
 	/**
 	 * The game should do game-specific stuff in a fast tick here.
@@ -95,11 +92,11 @@ public abstract class DefaultGame implements Listener, Game {
 	 * 
 	 * @param respawned the player who needs respawning
 	 */
-	public abstract Location respawnLocation(PlayerData respawned);
+	public abstract Location respawnLocation(InGamePlayer respawned);
 	
 	@EventHandler(priority=EventPriority.LOW)
 	public void onClick(PlayerInteractEvent event) {
-		PlayerData data = getPlayers().get(event.getPlayer().getUniqueId());
+		InGamePlayer data = getPlayers().get(event.getPlayer().getUniqueId());
 		if (data != null && data.isPlaying()) {
 			data.use();
 		}
@@ -107,7 +104,7 @@ public abstract class DefaultGame implements Listener, Game {
 	
 	@EventHandler
 	public void onHit(EntityDamageByEntityEvent event) {
-		PlayerData player = getPlayers().get(event.getEntity().getUniqueId());
+		InGamePlayer player = getPlayers().get(event.getEntity().getUniqueId());
 		// hit player in Game
 		if (player == null) {
 			return;
@@ -124,65 +121,21 @@ public abstract class DefaultGame implements Listener, Game {
 			return;
 		}
 		Player shooterPlayer = (Player) projectile.getShooter();
-		PlayerData shooter = getPlayers().get(shooterPlayer.getUniqueId());
+		InGamePlayer shooter = getPlayers().get(shooterPlayer.getUniqueId());
 		// was hit by someone in Game
 		if (shooter == null) {
 			return;
 		}
 		Damager weapon = Damager.getDamager(projectile);
-		// was hit by himself
-		if (shooterPlayer.equals(event.getEntity())) {
-			// ignore if you can's commit suicide with this weapon
-			if (!weapon.suicidal()) {
-				return;
-			}
-		}
-		// was hit by a Weapon
 		if (weapon == null) {
 			return;
 		}
-		DamageResult result = player.damage(weapon);
-		boolean notify = true;
-		boolean sound = true;
-		switch (result) {
-		case INSTANT_KILL:
-			player.setLastHit(shooter);
-			notify = false;
-			player.getPlayer().damage(player.getPlayer().getHealth() + 1);
-			break;
-		case WINGS_OFF:
-			player.setLastHit(shooter);
-			player.takeWingsOff();
-			// no break, we want to damage wings too
-		case WINGS_DAMAGE:
-			player.setLastHit(shooter);
-			player.removeHealth(weapon.getDamage());
-			break;
-		case REGULAR_DAMAGE:
-			player.setLastHit(shooter);
-			double damage = weapon.getPhysical();
-			if (player.getPlayer().getHealth() <= damage) {
-				notify = false;
-			}
-			player.getPlayer().damage(damage);
-			break;
-		case NOTHING:
-			notify = false;
-			sound = false;
-			break;
-		}
-		if (notify) {
-			shooter.getPlayer().sendMessage(ChatColor.YELLOW + "You managed to hit " + Utils.formatPlayer(player) + "!");
-		}
-		if (sound) {
-			shooter.getPlayer().playSound(shooter.getPlayer().getLocation(), Sound.BLOCK_DISPENSER_DISPENSE, 1, 1);
-			player.getPlayer().playSound(player.getPlayer().getLocation(), Sound.ENTITY_VILLAGER_HURT, 1, 1);
-		}
+		player.damage(shooter, weapon);
 	}
 	
 	@EventHandler
 	public void onRespawn(PlayerRespawnEvent event) {
-		PlayerData data = getPlayers().get(event.getPlayer().getUniqueId());
+		InGamePlayer data = getPlayers().get(event.getPlayer().getUniqueId());
 		if (data == null) {
 			return;
 		}
@@ -193,13 +146,13 @@ public abstract class DefaultGame implements Listener, Game {
 	
 	@EventHandler
 	public void onDeath(PlayerDeathEvent event) {
-		PlayerData killed = getPlayers().get(event.getEntity().getUniqueId());
+		InGamePlayer killed = getPlayers().get(event.getEntity().getUniqueId());
 		if (killed != null) {
 			killed.setPlaying(false);
 			event.getDrops().clear();
-			PlayerData lastHit = killed.getLastHit();
-			PlayerData killer = lastHit == null ? null : getPlayers().get(lastHit.getPlayer().getUniqueId());
-			killed.setLastHit(null);
+			InGamePlayer lastHit = killed.getAttacker();
+			InGamePlayer killer = lastHit == null ? null : getPlayers().get(lastHit.getPlayer().getUniqueId());
+			killed.setAttacker(null);
 			if (killer != null) {
 				switch (event.getEntity().getLastDamageCause().getCause()) {
 				case FALL:

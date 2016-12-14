@@ -6,8 +6,6 @@
  */
 package pl.betoncraft.flier.api;
 
-import pl.betoncraft.flier.core.PlayerData;
-
 /**
  * Represents an item which can be used by the player.
  *
@@ -21,7 +19,7 @@ public interface UsableItem extends Item {
 	 * @param player
 	 * @return if the item was used
 	 */
-	public boolean use(PlayerData player);
+	public boolean use(InGamePlayer player);
 
 	/**
 	 * Checks cooldown for this player. If it's true,
@@ -29,7 +27,7 @@ public interface UsableItem extends Item {
 	 * 
 	 * @param player
 	 */
-	public boolean cooldown(PlayerData player);
+	public boolean cooldown(InGamePlayer player);
 
 	/**
 	 * @return whenever this item should be consumed on use

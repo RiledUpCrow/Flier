@@ -18,7 +18,7 @@ import org.bukkit.util.Vector;
 import pl.betoncraft.flier.Flier;
 import pl.betoncraft.flier.api.Damager;
 import pl.betoncraft.flier.api.Game.Attitude;
-import pl.betoncraft.flier.core.PlayerData;
+import pl.betoncraft.flier.api.InGamePlayer;
 import pl.betoncraft.flier.core.Utils.ImmutableVector;
 
 /**
@@ -50,7 +50,7 @@ public class HomingMissile extends DefaultWeapon {
 	}
 
 	@Override
-	public boolean use(PlayerData data) {
+	public boolean use(InGamePlayer data) {
 		Player player = data.getPlayer();
 		Vector velocity = player.getLocation().getDirection().clone().multiply(speed);
 		Vector pointer = player.getLocation().getDirection().clone().multiply(player.getVelocity().length() * 3);
@@ -98,7 +98,7 @@ public class HomingMissile extends DefaultWeapon {
 				// find a target in the area
 				Player target = null;
 				double distance = radiusSqr;
-				for (PlayerData p : data.getGame().getPlayers().values()) {
+				for (InGamePlayer p : data.getGame().getPlayers().values()) {
 					// skip the player if he shouldn't be targeted
 					Attitude attitude = data.getGame().getAttitude(p, data);
 					if (attitude == Attitude.NEUTRAL) {

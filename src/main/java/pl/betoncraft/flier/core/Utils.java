@@ -12,6 +12,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.util.Vector;
 
+import pl.betoncraft.flier.api.InGamePlayer;
 import pl.betoncraft.flier.api.PlayerClass;
 
 /**
@@ -84,7 +85,7 @@ public class Utils {
 	 * @param player InGamePlayer object containing player's information
 	 * @return the formatted name
 	 */
-	public static String formatPlayer(PlayerData player) {
+	public static String formatPlayer(InGamePlayer player) {
 		PlayerClass clazz = player.getClazz();
 		String name = player.getPlayer().getName();
 		return player.getColor() + name + ChatColor.WHITE + " (" + ChatColor.AQUA + clazz.getName() + ChatColor.WHITE + ")";

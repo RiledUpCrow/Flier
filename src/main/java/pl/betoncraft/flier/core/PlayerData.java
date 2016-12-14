@@ -13,18 +13,19 @@ import java.util.Set;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
-import org.bukkit.entity.Entity;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Score;
 import org.bukkit.scoreboard.Scoreboard;
+import org.bukkit.util.Vector;
 
 import pl.betoncraft.flier.api.Damager;
-import pl.betoncraft.flier.api.Damager.DamageResult;
 import pl.betoncraft.flier.api.Engine;
 import pl.betoncraft.flier.api.Game;
+import pl.betoncraft.flier.api.InGamePlayer;
 import pl.betoncraft.flier.api.Item;
 import pl.betoncraft.flier.api.PlayerClass;
 import pl.betoncraft.flier.api.UsableItem;
@@ -36,7 +37,7 @@ import pl.betoncraft.flier.core.Utils.ImmutableVector;
  *
  * @author Jakub Sapalski
  */
-public class PlayerData {
+public class PlayerData implements InGamePlayer {
 	
 	private Player player;
 	private Game game;
@@ -46,7 +47,7 @@ public class PlayerData {
 	private Location returnLoc;
 	private Scoreboard sb;
 	private int customIndex = 0;
-	private PlayerData lastHit = null;
+	private InGamePlayer lastHit = null;
 	private ChatColor color;
 	
 	private long glowTimer;
@@ -65,13 +66,14 @@ public class PlayerData {
 		player.setScoreboard(sb);
 	}
 	
+	@Override
 	public void fastTick() {
 		if (!isPlaying()) {
 			return;
 		}
 		Player player = getPlayer();
 		if (isFlying()) {
-			player.setVelocity(getWings().applyFlightModifications(this).toVector());
+			player.setVelocity(clazz.getWings().applyFlightModifications(this).toVector());
 		}
 		if (isAccelerating()) {
 			speedUp();
@@ -81,6 +83,7 @@ public class PlayerData {
 		regenerateWings();
 	}
 	
+	@Override
 	public void slowTick() {
 		if (!isPlaying()) {
 			return;
@@ -88,15 +91,111 @@ public class PlayerData {
 		stopGlowing();
 		updateStats();
 	}
+	
+	@Override
+	public void use() {
+		Item i = getHeldItem();
+		if (i instanceof UsableItem) {
+			UsableItem item = (UsableItem) i;
+			if (item == null || (item.onlyAir() && !isFlying()) || !item.cooldown(this)) {
+				return;
+			}
+			if (item.use(this) && item.isConsumable()) {
+				ItemStack stack = getPlayer().getInventory().getItemInMainHand();
+				if (stack.getAmount() == 1) {
+					getPlayer().getInventory().setItemInMainHand(null); 
+				} else {
+					stack.setAmount(stack.getAmount() - 1);
+				}
+			}
+		}
+	}
+	
+	@Override
+	public void damage(InGamePlayer attacker, Damager damager) {
+		Player shooter = attacker.getPlayer();
+		// was hit by himself
+		if (shooter.equals(player)) {
+			// ignore if you can's commit suicide with this weapon
+			if (!damager.suicidal()) {
+				return;
+			}
+		}
+		boolean notify = true;
+		boolean sound = true;
+		if (isFlying()) {
+			if (damager.wingsOff()) {
+				setAttacker(attacker);
+				takeWingsOff();
+				setAttacker(attacker);
+				removeHealth(damager.getDamage());
+			} else {
+				setAttacker(attacker);
+				removeHealth(damager.getDamage());
+			}
+		} else if (Utils.getAltitude(getPlayer().getLocation(), 4) != 4) {
+			if (damager.killsOnGround()) {
+				setAttacker(attacker);
+				notify = false;
+				getPlayer().damage(player.getHealth() + 1);
+			} else {
+				setAttacker(attacker);
+				double damage = damager.getPhysical();
+				if (player.getPlayer().getHealth() <= damage) {
+					notify = false;
+				}
+				player.getPlayer().damage(damage);
+			}
+		} else {
+			notify = false;
+			sound = false;
+		}
+		if (notify) {
+			shooter.sendMessage(ChatColor.YELLOW + "You managed to hit " + Utils.formatPlayer(this) + "!");
+		}
+		if (sound) {
+			shooter.playSound(shooter.getLocation(), Sound.BLOCK_DISPENSER_DISPENSE, 1, 1);
+			player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_HURT, 1, 1);
+		}
+	}
 
+	@Override
 	public Game getGame() {
 		return game;
 	}
 	
+	@Override
+	public Player getPlayer() {
+		return player;
+	}
+	
+	@Override
+	public double getWeight() {
+		double weight = 0;
+		weight += clazz.getEngine().getWeight();
+		weight += clazz.getWings().getWeight();
+		for (Item item : clazz.getItems().keySet()) {
+			weight += item.getWeight();
+		}
+		return weight;
+	}
+
+	@Override
+	public boolean isPlaying() {
+		return isPlaying;
+	}
+
+	@Override
+	public void setPlaying(boolean isPlaying) {
+		this.isPlaying = isPlaying;
+	}
+	
+	@Override
 	public PlayerClass getClazz() {
 		return clazz;
 	}
 	
+	@Override
 	public void setClazz(PlayerClass clazz) {
 		this.clazz = clazz;
 		Engine engine = clazz.getEngine();
@@ -104,9 +203,9 @@ public class PlayerData {
 		Map<Item, Integer> items = clazz.getItems();
 		getPlayer().getInventory().clear();
 		getPlayer().getInventory().setItemInOffHand(engine.getItem());
-		setFuel(engine.getMaxFuel());
+		fuel = engine.getMaxFuel();
 		getPlayer().getInventory().setChestplate(wings.getItem());
-		setHealth(wings.getHealth());
+		health = wings.getHealth();
 		for (Entry<Item, Integer> e : items.entrySet()) {
 			Item item = e.getKey();
 			int amount = e.getValue();
@@ -120,153 +219,106 @@ public class PlayerData {
 			}
 		}
 	}
-
-	public boolean isPlaying() {
-		return isPlaying;
-	}
-
-	public void setPlaying(boolean isPlaying) {
-		this.isPlaying = isPlaying;
-	}
 	
-	public Engine getEngine() {
-		return clazz.getEngine();
-	}
-	
-	public Map<Item, Integer> getItems() {
-		return clazz.getItems();
-	}
-	
-	public Wings getWings() {
-		return clazz.getWings();
-	}
-	
-	public Scoreboard getScoreboard() {
-		return sb;
-	}
-	
-	public boolean isAccelerating() {
-		Player player = getPlayer();
-		return player.isGliding() && player.isSneaking();
-	}
-	
-	public boolean isFlying() {
-		return getPlayer().isGliding();
-	}
-	
-	public boolean isOnGround() {
-		return ((Entity) getPlayer()).isOnGround();
-	}
-	
-	public Player getPlayer() {
-		return player;
-	}
-	
-	public void setLastHit(PlayerData player) {
-		this.lastHit = player;
-	}
-	
-	public PlayerData getLastHit() {
+	@Override
+	public InGamePlayer getAttacker() {
 		return lastHit;
 	}
+	
+	@Override
+	public void setAttacker(InGamePlayer player) {
+		this.lastHit = player;
+	}
 
-	public Location getReturnLocation() {
-		return returnLoc;
-	}
-	
-	public Item getHeldItem() {
-		ItemStack item = getPlayer().getInventory().getItemInMainHand();
-		if (item == null) {
-			return null;
-		}
-		for (Item i : getItems().keySet()) {
-			if (i.getItem().isSimilar(item)) {
-				return i;
-			}
-		}
-		return null; 
-	}
-	
+	@Override
 	public double getFuel() {
 		return fuel;
 	}
 	
-	public void setFuel(double fuel) {
-		this.fuel = fuel;
-	}
-	
-	public boolean addFuel(double amount, double max) {
-		double fuel = getFuel();
+	@Override
+	public boolean addFuel(double amount) {
+		double max = clazz.getEngine().getMaxFuel();
 		if (fuel >= max) {
 			return false;
 		}
 		if (fuel + amount > max) {
-			setFuel(max);
+			fuel = max;
 		} else {
-			setFuel(fuel + amount);
+			fuel += amount;
 		}
 		return true;
 	}
 	
+	@Override
 	public boolean removeFuel(double amount) {
-		double fuel = getFuel();
 		if (fuel <= 0) {
 			return false;
 		}
 		if (fuel < amount) {
-			setFuel(0);
+			fuel = 0;
 		} else {
-			setFuel(fuel - amount);
+			fuel -= amount;
 		}
 		return true;
 	}
-	
+
+	@Override
 	public double getHealth() {
 		return health;
 	}
 	
-	public void setHealth(double health) {
-		this.health = health;
-	}
-	
-	public boolean addHealth(double amount, double max) {
-		double health = getHealth();
+	@Override
+	public boolean addHealth(double amount) {
+		double max = clazz.getWings().getHealth();
 		if (health >= max) {
 			return false;
 		}
 		if (health + amount > max) {
-			setHealth(max);
+			health = max;
 		} else {
-			setHealth(health + amount);
+			health += amount;
 		}
 		return true;
 	}
 	
+	@Override
 	public boolean removeHealth(double amount) {
-		double health = getHealth();
 		if (health <= 0) {
 			return false;
 		}
 		if (health < amount) {
-			setHealth(0);
+			health = 0;
 			destroyWings();
 		} else {
-			setHealth(health - amount);
+			health -= amount;
 		}
 		return true;
 	}
 	
-	public void startGlowing(int ticks) {
-		getPlayer().setGlowing(true);
-		glowTimer = System.currentTimeMillis() + 50*ticks;
+	@Override
+	public ChatColor getColor() {
+		return color;
 	}
 	
-	public void stopGlowing() {
-		if (System.currentTimeMillis() >= glowTimer) {
-			getPlayer().setGlowing(false);
-		}
+	@Override
+	public void setColor(ChatColor color) {
+		this.color = color;
 	}
 	
+	@Override
+	public void clear() {
+		player.setScoreboard(Bukkit.getScoreboardManager().getMainScoreboard());
+		player.getInventory().clear();
+		player.setHealth(player.getMaxHealth());
+		player.setFoodLevel(40);
+		player.setExhaustion(0);
+		player.getActivePotionEffects().clear();
+		player.setGlowing(false);
+		player.setVelocity(new Vector());
+		player.teleport(returnLoc);
+	}
+	
+	@Override
 	public void updateColors() {
 		Map<String, ChatColor> map = game.getColors();
 		for (Entry<String, ChatColor> e : map.entrySet()) {
@@ -282,17 +334,105 @@ public class PlayerData {
 		}
 	}
 	
-	public ChatColor getColor() {
-		return color;
+	@Override
+	public void addStatistic(String string) {
+		customIndex++;
+		setStatistic(customIndex, string);
+		updateStats();
 	}
 	
-	public void setColor(ChatColor color) {
-		this.color = color;
+	@Override
+	public void updateStatistic(int index, String string) {
+		if (index >= customIndex) {
+			throw new IndexOutOfBoundsException("Index: " + index + ", Size: " + customIndex);
+		}
+		setStatistic(index + 1, string);
+	}
+
+	@Override
+	public void clearStats() {
+		customIndex = 0;
 	}
 	
-	public void updateStats() {
-		double f = getEngine() == null ? 0 : 100 * fuel / getEngine().getMaxFuel();
-		double h = getWings() == null ? 0 : 100 * health / getWings().getHealth();
+	private boolean isAccelerating() {
+		return player.isGliding() && player.isSneaking();
+	}
+	
+	private boolean isFlying() {
+		return player.isGliding();
+	}
+	
+	private Item getHeldItem() {
+		ItemStack item = player.getInventory().getItemInMainHand();
+		if (item == null) {
+			return null;
+		}
+		for (Item i : clazz.getItems().keySet()) {
+			if (i.getItem().isSimilar(item)) {
+				return i;
+			}
+		}
+		return null; 
+	}
+	
+	private void startGlowing(int ticks) {
+		player.setGlowing(true);
+		glowTimer = System.currentTimeMillis() + 50*ticks;
+	}
+	
+	private void stopGlowing() {
+		if (System.currentTimeMillis() >= glowTimer) {
+			getPlayer().setGlowing(false);
+		}
+	}
+	
+	private void speedUp() {
+		Engine engine = clazz.getEngine();
+		if (engine == null) {
+			return;
+		}
+		if (!removeFuel(engine.getConsumption())) {
+			return;
+		}
+		getPlayer().setVelocity(engine.launch(ImmutableVector.fromVector(getPlayer().getVelocity()),
+				ImmutableVector.fromVector(getPlayer().getLocation().getDirection())).toVector());
+		startGlowing(engine.getGlowTime());
+	}
+	
+	private void regenerateFuel() {
+		Engine engine = clazz.getEngine();
+		if (engine == null) {
+			return;
+		}
+		addFuel(engine.getRegeneration());
+	}
+	
+	private void regenerateWings() {
+		Wings wings = clazz.getWings();
+		if (wings == null) {
+			return;
+		}
+		addHealth(wings.getRegeneration());
+	}
+	
+	private void takeWingsOff() {
+		Player player = getPlayer();
+		ItemStack elytra = player.getInventory().getChestplate();
+		if (elytra != null) {
+			player.getInventory().setChestplate(null);
+			player.getInventory().setItem(1, elytra);
+		}
+	}
+	
+	private void destroyWings() {
+		Player player = getPlayer();
+		player.getInventory().setChestplate(null);
+		player.getInventory().setItem(1, null);
+	}
+	
+	private void updateStats() {
+		double f = clazz.getEngine() == null ? 0 : 100 * fuel / clazz.getEngine().getMaxFuel();
+		double h = clazz.getWings() == null ? 0 : 100 * health / clazz.getWings().getHealth();
 		double s = getPlayer().getVelocity().length() * 10;
 		if (s < 1) {
 			s = 0;
@@ -319,132 +459,6 @@ public class PlayerData {
 		}
 		Score newScore = sb.getObjective(DisplaySlot.SIDEBAR).getScore(string);
 		newScore.setScore(index);
-	}
-	
-	public void addStatistic(String string) {
-		customIndex++;
-		setStatistic(customIndex, string);
-		updateStats();
-	}
-	
-	public void updateStatistic(int index, String string) {
-		if (index >= customIndex) {
-			throw new IndexOutOfBoundsException("Index: " + index + ", Size: " + customIndex);
-		}
-		setStatistic(index + 1, string);
-	}
-	
-	public double getWeight() {
-		double weight = 0;
-		weight += getEngine().getWeight();
-		weight += getWings().getWeight();
-		for (Item item : getItems().keySet()) {
-			weight += item.getWeight();
-		}
-		return weight;
-	}
-	
-	public void speedUp() {
-		Engine engine = getEngine();
-		if (engine == null) {
-			return;
-		}
-		if (!removeFuel(engine.getConsumption())) {
-			return;
-		}
-		getPlayer().setVelocity(engine.launch(ImmutableVector.fromVector(getPlayer().getVelocity()),
-				ImmutableVector.fromVector(getPlayer().getLocation().getDirection())).toVector());
-		startGlowing(engine.getGlowTime());
-	}
-	
-	public void regenerateFuel() {
-		Engine engine = getEngine();
-		if (engine == null) {
-			return;
-		}
-		addFuel(engine.getRegeneration(), engine.getMaxFuel());
-	}
-	
-	public void use() {
-		Item i = getHeldItem();
-		if (i instanceof UsableItem) {
-			UsableItem item = (UsableItem) i;
-			if (item == null || (item.onlyAir() && !isFlying()) || !item.cooldown(this)) {
-				return;
-			}
-			if (item.use(this) && item.isConsumable()) {
-				ItemStack stack = getPlayer().getInventory().getItemInMainHand();
-				if (stack.getAmount() == 1) {
-					getPlayer().getInventory().setItemInMainHand(null); 
-				} else {
-					stack.setAmount(stack.getAmount() - 1);
-				}
-			}
-		}
-	}
-	
-	public void cooldown() {
-		for (Item item : getItems().keySet()) {
-			if (item instanceof UsableItem) {
-				((UsableItem) item).cooldown(this);
-			}
-		}
-	}
-	
-	public DamageResult damage(Damager damager) {
-		if (isFlying()) {
-			if (damager.wingsOff()) {
-				return DamageResult.WINGS_OFF;
-			} else {
-				return DamageResult.WINGS_DAMAGE;
-			}
-		} else if (Utils.getAltitude(getPlayer().getLocation(), 4) != 4) {
-			if (damager.killsOnGround()) {
-				return DamageResult.INSTANT_KILL;
-			} else {
-				return DamageResult.REGULAR_DAMAGE;
-			}
-		} else {
-			return DamageResult.NOTHING;
-		}
-	}
-	
-	public void takeWingsOff() {
-		Player player = getPlayer();
-		ItemStack elytra = player.getInventory().getChestplate();
-		if (elytra != null) {
-			player.getInventory().setChestplate(null);
-			player.getInventory().setItem(1, elytra);
-		}
-	}
-	
-	public void destroyWings() {
-		Player player = getPlayer();
-		player.getInventory().setChestplate(null);
-		player.getInventory().setItem(1, null);
-	}
-	
-	public void regenerateWings() {
-		Wings wings = getWings();
-		if (wings == null) {
-			return;
-		}
-		addHealth(wings.getRegeneration(), wings.getHealth());
-	}
-
-	public void clearStats() {
-		customIndex = 0;
-	}
-	
-	public void clear() {
-		getPlayer().setScoreboard(Bukkit.getScoreboardManager().getMainScoreboard());
-		getPlayer().getInventory().clear();
-		getPlayer().setHealth(getPlayer().getMaxHealth());
-		getPlayer().setFoodLevel(20);
-		getPlayer().setExhaustion(20);
-		getPlayer().getActivePotionEffects().clear();
-		getPlayer().getVelocity().zero();
-		getPlayer().setGlowing(false);
 	}
 
 }

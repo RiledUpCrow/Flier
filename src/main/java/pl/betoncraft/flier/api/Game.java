@@ -12,8 +12,6 @@ import java.util.UUID;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
-import pl.betoncraft.flier.core.PlayerData;
-
 /**
  * Represents a game.
  *
@@ -57,7 +55,7 @@ public interface Game {
 	 * 
 	 * @return the map of players
 	 */
-	public Map<UUID, PlayerData> getPlayers();
+	public Map<UUID, InGamePlayer> getPlayers();
 	
 	/**
 	 * Returns the Attitude of one player towards another. The game should
@@ -68,7 +66,7 @@ public interface Game {
 	 * @param ofThisOne
 	 * @return
 	 */
-	public Attitude getAttitude(PlayerData toThisOne, PlayerData ofThisOne);
+	public Attitude getAttitude(InGamePlayer toThisOne, InGamePlayer ofThisOne);
 
 	/**
 	 * This method will be called once the game is forced to end.

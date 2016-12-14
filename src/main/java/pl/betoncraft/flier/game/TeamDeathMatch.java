@@ -20,9 +20,9 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.Vector;
 
 import pl.betoncraft.flier.Flier;
+import pl.betoncraft.flier.api.InGamePlayer;
 import pl.betoncraft.flier.api.Lobby;
 import pl.betoncraft.flier.api.PlayerClass;
 import pl.betoncraft.flier.core.PlayerData;
@@ -35,7 +35,7 @@ import pl.betoncraft.flier.core.Utils;
  */
 public class TeamDeathMatch extends DefaultGame {
 	
-	private Map<UUID, PlayerData> dataMap = new HashMap<>();
+	private Map<UUID, InGamePlayer> dataMap = new HashMap<>();
 	private Map<String, SimpleTeam> teams = new HashMap<>();
 	private Map<UUID, SimpleTeam> players = new HashMap<>();
 	private Lobby lobby;
@@ -104,11 +104,11 @@ public class TeamDeathMatch extends DefaultGame {
 	@Override
 	public void slowTick() {
 		// update compass targets to nearest hostiles
-		for (PlayerData data : dataMap.values()) {
+		for (InGamePlayer data : dataMap.values()) {
 			if (data.isPlaying()) {
-				PlayerData nearest = null;
+				InGamePlayer nearest = null;
 				double distance = 0;
-				for (PlayerData d : dataMap.values()) {
+				for (InGamePlayer d : dataMap.values()) {
 					if (getAttitude(d, data) == Attitude.HOSTILE) {
 						double dist = data.getPlayer().getLocation().distanceSquared(d.getPlayer().getLocation());
 						if (distance == 0 || dist < distance) {
@@ -133,19 +133,17 @@ public class TeamDeathMatch extends DefaultGame {
 		if (dataMap.containsKey(player.getUniqueId())) {
 			return;
 		}
-		PlayerData data = new PlayerData(player, this);
+		InGamePlayer data = new PlayerData(player, this);
 		dataMap.put(player.getUniqueId(), data);
 		player.teleport(lobby.getSpawn());
 	}
 	
 	@Override
 	public void removePlayer(Player player) {
-		PlayerData data = dataMap.remove(player.getUniqueId());
+		InGamePlayer data = dataMap.remove(player.getUniqueId());
 		if (data != null) {
 			players.remove(player.getUniqueId());
-			player.setVelocity(new Vector());
 			data.clear();
-			player.teleport(data.getReturnLocation());
 		}
 		if (dataMap.isEmpty()) {
 			for (SimpleTeam t : teams.values()) {
@@ -156,7 +154,7 @@ public class TeamDeathMatch extends DefaultGame {
 	
 	@Override
 	public void setClass(Player player, PlayerClass clazz) {
-		PlayerData data = dataMap.get(player.getUniqueId());
+		InGamePlayer data = dataMap.get(player.getUniqueId());
 		if (data != null) {
 			data.setClazz(clazz);
 			Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "title " + player.getName()
@@ -165,7 +163,7 @@ public class TeamDeathMatch extends DefaultGame {
 	}
 	
 	@Override
-	public Map<UUID, PlayerData> getPlayers() {
+	public Map<UUID, InGamePlayer> getPlayers() {
 		return dataMap;
 	}
 
@@ -173,15 +171,15 @@ public class TeamDeathMatch extends DefaultGame {
 	public void stop() {
 		lobby.stop();
 		HandlerList.unregisterAll(this);
-		Set<PlayerData> copy = new HashSet<>(dataMap.values());
-		for (PlayerData data : copy) {
+		Set<InGamePlayer> copy = new HashSet<>(dataMap.values());
+		for (InGamePlayer data : copy) {
 			removePlayer(data.getPlayer());
 		}
 	}
 	
 	@Override
 	public void startPlayer(Player player) {
-		PlayerData data = dataMap.get(player.getUniqueId());
+		InGamePlayer data = dataMap.get(player.getUniqueId());
 		if (data != null) {
 			if (data.getClazz() == null) {
 				player.sendMessage(ChatColor.RED + "Choose your class!");
@@ -202,7 +200,7 @@ public class TeamDeathMatch extends DefaultGame {
 	}
 
 	@Override
-	public void handleKill(PlayerData killer, PlayerData killed) {
+	public void handleKill(InGamePlayer killer, InGamePlayer killed) {
 		if (killer == null) {
 			score(getTeam(killed), -1);
 		} else if (getTeam(killer).equals(getTeam(killed))) {
@@ -213,14 +211,14 @@ public class TeamDeathMatch extends DefaultGame {
 	}
 
 	@Override
-	public Location respawnLocation(PlayerData respawned) {
+	public Location respawnLocation(InGamePlayer respawned) {
 		return lobby.getSpawn();
 	}
 	
 	@Override
 	public Map<String, ChatColor> getColors() {
 		HashMap<String, ChatColor> map = new HashMap<>();
-		for (Entry<UUID, PlayerData> e : dataMap.entrySet()) {
+		for (Entry<UUID, InGamePlayer> e : dataMap.entrySet()) {
 			SimpleTeam team = getTeam(dataMap.get(e.getKey()));
 			if (team != null) {
 				map.put(e.getValue().getPlayer().getName(), team.getColor());
@@ -230,7 +228,7 @@ public class TeamDeathMatch extends DefaultGame {
 	}
 	
 	@Override
-	public Attitude getAttitude(PlayerData toThisOne, PlayerData ofThisOne) {
+	public Attitude getAttitude(InGamePlayer toThisOne, InGamePlayer ofThisOne) {
 		if (!toThisOne.isPlaying()) {
 			return Attitude.NEUTRAL;
 		}
@@ -241,12 +239,12 @@ public class TeamDeathMatch extends DefaultGame {
 		}
 	}
 	
-	private  SimpleTeam getTeam(PlayerData data) {
+	private  SimpleTeam getTeam(InGamePlayer data) {
 		return players.get(data.getPlayer().getUniqueId());
 	}
 	
 	private void setTeam(Player player, SimpleTeam team) {
-		PlayerData data = dataMap.get(player.getUniqueId());
+		InGamePlayer data = dataMap.get(player.getUniqueId());
 		if (data != null) {
 			players.put(player.getUniqueId(), team);
 			data.setColor(team.getColor());
@@ -260,7 +258,7 @@ public class TeamDeathMatch extends DefaultGame {
 				data.updateStatistic(e.getValue().getIndex(), e.getValue().getName() + ChatColor.WHITE + ": " +
 						e.getValue().getScore());
 			}
-			for (PlayerData g : dataMap.values()) {
+			for (InGamePlayer g : dataMap.values()) {
 				g.updateColors();
 			}
 		}
@@ -287,7 +285,7 @@ public class TeamDeathMatch extends DefaultGame {
 	
 	private void score(SimpleTeam team, int amount) {
 		team.setScore(team.getScore() + amount);
-		for (PlayerData data : dataMap.values()) {
+		for (InGamePlayer data : dataMap.values()) {
 			data.updateStatistic(team.getIndex(), team.getName() + ChatColor.WHITE + ": " + team.getScore());
 		}
 	}

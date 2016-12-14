@@ -6,7 +6,6 @@
  */
 package pl.betoncraft.flier.api;
 
-import pl.betoncraft.flier.core.PlayerData;
 import pl.betoncraft.flier.core.Utils.ImmutableVector;
 
 /**
@@ -23,7 +22,7 @@ public interface Wings extends Item {
 	 * @param velocity player's velocity Vector
 	 * @return the same Vector, modified
 	 */
-	public ImmutableVector applyFlightModifications(PlayerData data);
+	public ImmutableVector applyFlightModifications(InGamePlayer data);
 
 	/**
 	 * @return maximum health of the wings

@@ -12,8 +12,8 @@ import java.util.UUID;
 
 import org.bukkit.configuration.ConfigurationSection;
 
+import pl.betoncraft.flier.api.InGamePlayer;
 import pl.betoncraft.flier.api.UsableItem;
-import pl.betoncraft.flier.core.PlayerData;
 
 /**
  * Default implementation of UsableItem.
@@ -36,7 +36,7 @@ public abstract class DefaultUsableItem extends DefaultItem implements UsableIte
 	}
 	
 	@Override
-	public boolean cooldown(PlayerData data) {
+	public boolean cooldown(InGamePlayer data) {
 		UUID player = data.getPlayer().getUniqueId();
 		Long c = cooldownData.get(player);
 		if (c == null || System.currentTimeMillis() >= c) {
