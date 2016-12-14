@@ -11,7 +11,6 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.entity.Player;
 
 import pl.betoncraft.flier.api.UsableItem;
 import pl.betoncraft.flier.core.PlayerData;
@@ -27,7 +26,7 @@ public abstract class DefaultUsableItem extends DefaultItem implements UsableIte
 	protected boolean consumable = false;
 	protected boolean onlyAir = false;
 
-	protected final Map<UUID, Long> weaponCooldown = new HashMap<>();
+	protected final Map<UUID, Long> cooldownData = new HashMap<>();
 
 	public DefaultUsableItem(ConfigurationSection section) {
 		super(section);
@@ -37,11 +36,14 @@ public abstract class DefaultUsableItem extends DefaultItem implements UsableIte
 	}
 	
 	@Override
-	public void cooldown(PlayerData data) {
-		Player player = data.getPlayer();
-		Long cooldown = weaponCooldown.get(player.getUniqueId());
-		if (cooldown != null && System.currentTimeMillis() >= cooldown) {
-			weaponCooldown.remove(player.getUniqueId());
+	public boolean cooldown(PlayerData data) {
+		UUID player = data.getPlayer().getUniqueId();
+		Long c = cooldownData.get(player);
+		if (c == null || System.currentTimeMillis() >= c) {
+			cooldownData.put(player, System.currentTimeMillis() + 50*cooldown);
+			return true;
+		} else {
+			return false;
 		}
 	}
 	

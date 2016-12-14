@@ -79,7 +79,6 @@ public class PlayerData {
 			regenerateFuel();
 		}
 		regenerateWings();
-		cooldown();
 	}
 	
 	public void slowTick() {
@@ -370,7 +369,7 @@ public class PlayerData {
 		Item i = getHeldItem();
 		if (i instanceof UsableItem) {
 			UsableItem item = (UsableItem) i;
-			if (item == null || (item.onlyAir() && !isFlying())) {
+			if (item == null || (item.onlyAir() && !isFlying()) || !item.cooldown(this)) {
 				return;
 			}
 			if (item.use(this) && item.isConsumable()) {

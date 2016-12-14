@@ -6,9 +6,6 @@
  */
 package pl.betoncraft.flier.item.weapon;
 
-import java.util.Date;
-import java.util.UUID;
-
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.EntityType;
@@ -44,11 +41,6 @@ public class MachineGun extends DefaultWeapon {
 	@Override
 	public boolean use(PlayerData data) {
 		Player player = data.getPlayer();
-		UUID id = player.getUniqueId();
-		if (weaponCooldown.containsKey(id)) {
-			return false;
-		}
-		weaponCooldown.put(id, new Date().getTime() + 50*cooldown);
 		new BukkitRunnable() {
 			int counter = burstAmount;
 			@Override

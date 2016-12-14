@@ -24,11 +24,12 @@ public interface UsableItem extends Item {
 	public boolean use(PlayerData player);
 
 	/**
-	 * Signals the item to check the cooldown for this player.
+	 * Checks cooldown for this player. If it's true,
+	 * it should start another cooldown.
 	 * 
 	 * @param player
 	 */
-	public void cooldown(PlayerData player);
+	public boolean cooldown(PlayerData player);
 
 	/**
 	 * @return whenever this item should be consumed on use

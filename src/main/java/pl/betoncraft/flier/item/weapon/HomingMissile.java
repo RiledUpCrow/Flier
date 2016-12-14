@@ -6,9 +6,6 @@
  */
 package pl.betoncraft.flier.item.weapon;
 
-import java.util.Date;
-import java.util.UUID;
-
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.configuration.ConfigurationSection;
@@ -55,11 +52,6 @@ public class HomingMissile extends DefaultWeapon {
 	@Override
 	public boolean use(PlayerData data) {
 		Player player = data.getPlayer();
-		UUID id = player.getUniqueId();
-		if (weaponCooldown.containsKey(id)) {
-			return false;
-		}
-		weaponCooldown.put(id, new Date().getTime() + 50*cooldown);
 		Vector velocity = player.getLocation().getDirection().clone().multiply(speed);
 		Vector pointer = player.getLocation().getDirection().clone().multiply(player.getVelocity().length() * 3);
 		Location launch = player.getEyeLocation().clone().add(pointer);
