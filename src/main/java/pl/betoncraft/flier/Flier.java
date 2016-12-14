@@ -21,6 +21,7 @@ import pl.betoncraft.flier.api.Lobby;
 import pl.betoncraft.flier.api.Wings;
 import pl.betoncraft.flier.command.FlierCommand;
 import pl.betoncraft.flier.game.TeamDeathMatch;
+import pl.betoncraft.flier.item.Launcher;
 import pl.betoncraft.flier.item.VanillaItem;
 import pl.betoncraft.flier.item.engine.MultiplyingEngine;
 import pl.betoncraft.flier.item.weapon.HomingMissile;
@@ -76,6 +77,7 @@ public class Flier extends JavaPlugin implements Listener, CommandExecutor {
 		registerEngine("multiplyingEngine", s -> new MultiplyingEngine(s));
 		registerItem("machineGun", s -> new MachineGun(s));
 		registerItem("homingMissile", s -> new HomingMissile(s));
+		registerItem("launcher", s -> new Launcher(s));
 		registerItem("vanillaItem", s -> new VanillaItem(s));
 		registerWings("simpleWings", s -> new SimpleWings(s));
 		registerLobby("fixedPhysicalLobby", s -> new FixedPhysicalLobby(s));
