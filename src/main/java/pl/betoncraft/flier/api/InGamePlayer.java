@@ -6,6 +6,9 @@
  */
 package pl.betoncraft.flier.api;
 
+import java.util.List;
+import java.util.Map;
+
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
@@ -152,15 +155,21 @@ public interface InGamePlayer {
 	public void setColor(ChatColor color);
 	
 	/**
+	 * Update Scoreboard teams with these players' colors.
+	 * 
+	 * @param map map containing player names with their colors
+	 */
+	public void updateColors(Map<String, ChatColor> map);
+	
+	/**
+	 * @return a mutable list of SidebarLines this player has.
+	 */
+	public List<SidebarLine> getLines();
+	
+	/**
 	 * Moves the player out of the game, clears and restores everything
 	 * related to him.
 	 */
 	public void clear();
-	
-	// TODO improve these methods
-	public void updateColors();
-	public void addStatistic(String string);
-	public void updateStatistic(int index, String string);
-	public void clearStats();
 
 }

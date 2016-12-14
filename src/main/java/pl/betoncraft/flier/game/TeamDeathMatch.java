@@ -25,6 +25,7 @@ import pl.betoncraft.flier.Flier;
 import pl.betoncraft.flier.api.InGamePlayer;
 import pl.betoncraft.flier.api.Lobby;
 import pl.betoncraft.flier.api.PlayerClass;
+import pl.betoncraft.flier.api.SidebarLine;
 import pl.betoncraft.flier.core.PlayerData;
 import pl.betoncraft.flier.core.Utils;
 
@@ -37,15 +38,17 @@ public class TeamDeathMatch extends DefaultGame {
 	
 	private Map<UUID, InGamePlayer> dataMap = new HashMap<>();
 	private Map<String, SimpleTeam> teams = new HashMap<>();
+	private Map<String, TeamLine> lines = new HashMap<>();
 	private Map<UUID, SimpleTeam> players = new HashMap<>();
 	private Lobby lobby;
 	
 	public TeamDeathMatch(ConfigurationSection section) {
 		ConfigurationSection teams = section.getConfigurationSection("teams");
 		if (teams != null) {
-			int i = 0;
-			for (String team : teams.getKeys(false)) {
-				this.teams.put(team, new SimpleTeam(teams.getConfigurationSection(team), i++));
+			for (String t : teams.getKeys(false)) {
+				SimpleTeam team = new SimpleTeam(teams.getConfigurationSection(t));
+				this.teams.put(t, team);
+				this.lines.put(t, new TeamLine(team));
 			}
 		}
 		String lobbyName = section.getString("lobby");
@@ -60,18 +63,12 @@ public class TeamDeathMatch extends DefaultGame {
 		private int score = 0;
 		private String name;
 		private Location spawn;
-		private int index;
 		private ChatColor color;
 		
-		public SimpleTeam(ConfigurationSection section, int index) {
-			this.index = index;
+		public SimpleTeam(ConfigurationSection section) {
 			spawn = Utils.parseLocation(section.getString("location"));
 			color = ChatColor.valueOf(section.getString("color", "white").toUpperCase().replace(' ', '_'));
-			name = color + ChatColor.translateAlternateColorCodes('&', section.getString("name"));
-		}
-		
-		public int getIndex() {
-			return index;
+			name = ChatColor.translateAlternateColorCodes('&', section.getString("name"));
 		}
 
 		public int getScore() {
@@ -93,7 +90,27 @@ public class TeamDeathMatch extends DefaultGame {
 		public String getName() {
 			return name;
 		}
+	}
+	
+	private class TeamLine implements SidebarLine {
+		
+		private SimpleTeam team;
+		private int lastValue = 0;
+		private String lastString;
+		
+		public TeamLine(SimpleTeam team) {
+			this.team = team;
+		}
 
+		@Override
+		public String getText() {
+			int a = team.getScore();
+			if (lastString == null || a != lastValue) {
+				lastString = team.getColor() + team.getName() + ChatColor.WHITE + ": " + a;
+				lastValue = a;
+			}
+			return lastString;
+		}
 	}
 	
 	@Override
@@ -135,6 +152,7 @@ public class TeamDeathMatch extends DefaultGame {
 		}
 		InGamePlayer data = new PlayerData(player, this);
 		dataMap.put(player.getUniqueId(), data);
+		data.getLines().addAll(lines.values());
 		player.teleport(lobby.getSpawn());
 	}
 	
@@ -248,18 +266,11 @@ public class TeamDeathMatch extends DefaultGame {
 		if (data != null) {
 			players.put(player.getUniqueId(), team);
 			data.setColor(team.getColor());
-			data.clearStats();
 			Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "title " + player.getName()
 					+ " title {\"text\":\"" + team.getColor() + Utils.capitalize(team.getName()) + "\"}");
-			for (int i = 0; i < teams.size(); i++) {
-				data.addStatistic("");
-			}
-			for (Entry<String, SimpleTeam> e : teams.entrySet()) {
-				data.updateStatistic(e.getValue().getIndex(), e.getValue().getName() + ChatColor.WHITE + ": " +
-						e.getValue().getScore());
-			}
+			Map<String, ChatColor> colors = getColors();
 			for (InGamePlayer g : dataMap.values()) {
-				g.updateColors();
+				g.updateColors(colors);
 			}
 		}
 	}
@@ -285,9 +296,6 @@ public class TeamDeathMatch extends DefaultGame {
 	
 	private void score(SimpleTeam team, int amount) {
 		team.setScore(team.getScore() + amount);
-		for (InGamePlayer data : dataMap.values()) {
-			data.updateStatistic(team.getIndex(), team.getName() + ChatColor.WHITE + ": " + team.getScore());
-		}
 	}
 
 }

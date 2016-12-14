@@ -97,7 +97,7 @@ public abstract class DefaultGame implements Listener, Game {
 	@EventHandler(priority=EventPriority.LOW)
 	public void onClick(PlayerInteractEvent event) {
 		InGamePlayer data = getPlayers().get(event.getPlayer().getUniqueId());
-		if (data != null && data.isPlaying()) {
+		if (data != null) {
 			data.use();
 		}
 	}

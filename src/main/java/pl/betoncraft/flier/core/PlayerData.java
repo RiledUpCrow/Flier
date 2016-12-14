@@ -6,6 +6,8 @@
  */
 package pl.betoncraft.flier.core;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -22,15 +24,22 @@ import org.bukkit.scoreboard.Score;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.util.Vector;
 
+import com.google.common.collect.Lists;
+
 import pl.betoncraft.flier.api.Damager;
 import pl.betoncraft.flier.api.Engine;
 import pl.betoncraft.flier.api.Game;
 import pl.betoncraft.flier.api.InGamePlayer;
 import pl.betoncraft.flier.api.Item;
 import pl.betoncraft.flier.api.PlayerClass;
+import pl.betoncraft.flier.api.SidebarLine;
 import pl.betoncraft.flier.api.UsableItem;
 import pl.betoncraft.flier.api.Wings;
 import pl.betoncraft.flier.core.Utils.ImmutableVector;
+import pl.betoncraft.flier.sidebar.Altitude;
+import pl.betoncraft.flier.sidebar.Fuel;
+import pl.betoncraft.flier.sidebar.Health;
+import pl.betoncraft.flier.sidebar.Speed;
 
 /**
  * Stores data about the player.
@@ -46,7 +55,7 @@ public class PlayerData implements InGamePlayer {
 
 	private Location returnLoc;
 	private Scoreboard sb;
-	private int customIndex = 0;
+	private List<SidebarLine> lines = new LinkedList<>();
 	private InGamePlayer lastHit = null;
 	private ChatColor color;
 	
@@ -64,6 +73,10 @@ public class PlayerData implements InGamePlayer {
 		stats.setDisplaySlot(DisplaySlot.SIDEBAR);
 		stats.setDisplayName("Stats");
 		player.setScoreboard(sb);
+		lines.add(new Fuel(this));
+		lines.add(new Health(this));
+		lines.add(new Speed(this));
+		lines.add(new Altitude(this));
 	}
 	
 	@Override
@@ -94,6 +107,9 @@ public class PlayerData implements InGamePlayer {
 	
 	@Override
 	public void use() {
+		if (!isPlaying()) {
+			return;
+		}
 		Item i = getHeldItem();
 		if (i instanceof UsableItem) {
 			UsableItem item = (UsableItem) i;
@@ -113,6 +129,9 @@ public class PlayerData implements InGamePlayer {
 	
 	@Override
 	public void damage(InGamePlayer attacker, Damager damager) {
+		if (!isPlaying()) {
+			return;
+		}
 		Player shooter = attacker.getPlayer();
 		// was hit by himself
 		if (shooter.equals(player)) {
@@ -306,21 +325,7 @@ public class PlayerData implements InGamePlayer {
 	}
 	
 	@Override
-	public void clear() {
-		player.setScoreboard(Bukkit.getScoreboardManager().getMainScoreboard());
-		player.getInventory().clear();
-		player.setHealth(player.getMaxHealth());
-		player.setFoodLevel(40);
-		player.setExhaustion(0);
-		player.getActivePotionEffects().clear();
-		player.setGlowing(false);
-		player.setVelocity(new Vector());
-		player.teleport(returnLoc);
-	}
-	
-	@Override
-	public void updateColors() {
-		Map<String, ChatColor> map = game.getColors();
+	public void updateColors(Map<String, ChatColor> map) {
 		for (Entry<String, ChatColor> e : map.entrySet()) {
 			String player = e.getKey();
 			ChatColor color = e.getValue();
@@ -333,25 +338,23 @@ public class PlayerData implements InGamePlayer {
 			team.setPrefix(ChatColor.COLOR_CHAR + "" + color.getChar());
 		}
 	}
-	
-	@Override
-	public void addStatistic(String string) {
-		customIndex++;
-		setStatistic(customIndex, string);
-		updateStats();
-	}
-	
-	@Override
-	public void updateStatistic(int index, String string) {
-		if (index >= customIndex) {
-			throw new IndexOutOfBoundsException("Index: " + index + ", Size: " + customIndex);
-		}
-		setStatistic(index + 1, string);
-	}
 
 	@Override
-	public void clearStats() {
-		customIndex = 0;
+	public List<SidebarLine> getLines() {
+		return lines;
+	}
+	
+	@Override
+	public void clear() {
+		player.setScoreboard(Bukkit.getScoreboardManager().getMainScoreboard());
+		player.getInventory().clear();
+		player.setHealth(player.getMaxHealth());
+		player.setFoodLevel(40);
+		player.setExhaustion(0);
+		player.getActivePotionEffects().clear();
+		player.setGlowing(false);
+		player.setVelocity(new Vector());
+		player.teleport(returnLoc);
 	}
 	
 	private boolean isAccelerating() {
@@ -431,17 +434,10 @@ public class PlayerData implements InGamePlayer {
 	}
 	
 	private void updateStats() {
-		double f = clazz.getEngine() == null ? 0 : 100 * fuel / clazz.getEngine().getMaxFuel();
-		double h = clazz.getWings() == null ? 0 : 100 * health / clazz.getWings().getHealth();
-		double s = getPlayer().getVelocity().length() * 10;
-		if (s < 1) {
-			s = 0;
+		int i = 0;
+		for (SidebarLine line : Lists.reverse(lines)) {
+			setStatistic(i++, line.getText());
 		}
-		double a = getPlayer().getLocation().getY() - 64;
-		setStatistic(customIndex + 4, String.format("F: %.1f%%", f));
-		setStatistic(customIndex + 3, String.format("H: %.1f%%", h));
-		setStatistic(customIndex + 2, String.format("S: %.1f~", s));
-		setStatistic(customIndex + 1, String.format("A: %.1fm", a));
 	}
 	
 	private void setStatistic(int index, String string) {
