@@ -28,6 +28,10 @@ import pl.betoncraft.flier.api.PlayerClass;
 import pl.betoncraft.flier.api.SidebarLine;
 import pl.betoncraft.flier.core.PlayerData;
 import pl.betoncraft.flier.core.Utils;
+import pl.betoncraft.flier.sidebar.Altitude;
+import pl.betoncraft.flier.sidebar.Fuel;
+import pl.betoncraft.flier.sidebar.Health;
+import pl.betoncraft.flier.sidebar.Speed;
 
 /**
  * A simple team deathmatch game.
@@ -126,6 +130,10 @@ public class TeamDeathMatch extends DefaultGame {
 		}
 		InGamePlayer data = new PlayerData(player, this);
 		dataMap.put(player.getUniqueId(), data);
+		data.getLines().add(new Fuel(data));
+		data.getLines().add(new Health(data));
+		data.getLines().add(new Speed(data));
+		data.getLines().add(new Altitude(data));
 		data.getLines().addAll(lines.values());
 		player.teleport(lobby.getSpawn());
 	}

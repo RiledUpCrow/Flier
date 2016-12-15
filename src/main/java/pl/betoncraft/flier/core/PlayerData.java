@@ -37,10 +37,6 @@ import pl.betoncraft.flier.api.SidebarLine;
 import pl.betoncraft.flier.api.UsableItem;
 import pl.betoncraft.flier.api.Wings;
 import pl.betoncraft.flier.core.Utils.ImmutableVector;
-import pl.betoncraft.flier.sidebar.Altitude;
-import pl.betoncraft.flier.sidebar.Fuel;
-import pl.betoncraft.flier.sidebar.Health;
-import pl.betoncraft.flier.sidebar.Speed;
 
 /**
  * Stores data about the player.
@@ -74,10 +70,6 @@ public class PlayerData implements InGamePlayer {
 		stats.setDisplaySlot(DisplaySlot.SIDEBAR);
 		stats.setDisplayName("Stats");
 		player.setScoreboard(sb);
-		lines.add(new Fuel(this));
-		lines.add(new Health(this));
-		lines.add(new Speed(this));
-		lines.add(new Altitude(this));
 	}
 	
 	@Override
