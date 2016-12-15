@@ -6,10 +6,12 @@
  */
 package pl.betoncraft.flier.api;
 
+import java.util.List;
+
 import org.bukkit.inventory.ItemStack;
 
 /**
- * Represents anything with weight.
+ * Represents an item.
  *
  * @author Jakub Sapalski
  */
@@ -29,5 +31,15 @@ public interface Item {
 	 * @return the slot in which this item is to be placed
 	 */
 	public int slot();
+	
+	/**
+	 * @return the list of passive effects of this item
+	 */
+	public List<Effect> getPassiveEffects();
+	
+	/**
+	 * @return the list of effects applied when this item is held
+	 */
+	public List<Effect> getInHandEffects();
 
 }

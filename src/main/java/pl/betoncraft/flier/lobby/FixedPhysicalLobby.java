@@ -68,7 +68,7 @@ public class FixedPhysicalLobby implements Lobby, Listener {
 		
 		public FixedClass(ConfigurationSection section) {
 			name = Utils.capitalize(section.getName());
-			engine = Flier.getInstance().getEngine(section.getString("engine", "default"));
+			engine = Flier.getInstance().getEngines().get(section.getString("engine", "default"));
 			List<String> itemNames = section.getStringList("items");
 			for (String item : itemNames) {
 				int amount = 1;
@@ -81,12 +81,12 @@ public class FixedPhysicalLobby implements Lobby, Listener {
 				if (amount <= 0) {
 					amount = 1;
 				}
-				Item ui = Flier.getInstance().getItem(item);
+				Item ui = Flier.getInstance().getItems().get(item);
 				if (ui != null) {
 					items.put(ui, amount);
 				} else {}
 			}
-			wings = Flier.getInstance().getWings(section.getString("wings", "default"));
+			wings = Flier.getInstance().getWings().get(section.getString("wings", "default"));
 		}
 		
 		@Override

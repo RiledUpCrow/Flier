@@ -14,12 +14,14 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import pl.betoncraft.flier.api.Effect;
 import pl.betoncraft.flier.api.Engine;
 import pl.betoncraft.flier.api.Game;
 import pl.betoncraft.flier.api.Item;
 import pl.betoncraft.flier.api.Lobby;
 import pl.betoncraft.flier.api.Wings;
 import pl.betoncraft.flier.command.FlierCommand;
+import pl.betoncraft.flier.effect.TargetCompass;
 import pl.betoncraft.flier.game.TeamDeathMatch;
 import pl.betoncraft.flier.item.Launcher;
 import pl.betoncraft.flier.item.VanillaItem;
@@ -38,12 +40,14 @@ public class Flier extends JavaPlugin implements Listener, CommandExecutor {
 	private Map<String, WingFactory> wingTypes = new HashMap<>();
 	private Map<String, LobbyFactory> lobbyTypes = new HashMap<>();
 	private Map<String, GameFactory> gameTypes = new HashMap<>();
+	private Map<String, EffectFactory> effectTypes = new HashMap<>();
 	
 	private Map<String, Engine> engines = new HashMap<>();
 	private Map<String, Item> items = new HashMap<>();
 	private Map<String, Wings> wings = new HashMap<>();
 	private Map<String, Lobby> lobbies = new HashMap<>();
 	private Map<String, Game> games = new HashMap<>();
+	private Map<String, Effect> effects = new HashMap<>();
 	
 	public interface EngineFactory {
 		public Engine get(ConfigurationSection settings);
@@ -65,10 +69,12 @@ public class Flier extends JavaPlugin implements Listener, CommandExecutor {
 		public Game get(ConfigurationSection settings);
 	}
 	
+	public interface EffectFactory {
+		public Effect get(ConfigurationSection section);
+	}
+	
 	@Override
 	public void onEnable() {
-		
-		// TODO NPE in notepad
 		
 		instance = this;
 		saveDefaultConfig();
@@ -82,7 +88,17 @@ public class Flier extends JavaPlugin implements Listener, CommandExecutor {
 		registerWings("simpleWings", s -> new SimpleWings(s));
 		registerLobby("fixedPhysicalLobby", s -> new FixedPhysicalLobby(s));
 		registerGame("teamDeathMatch", s -> new TeamDeathMatch(s));
-		// TODO separate files
+		registerEffect("targetCompass", s -> new TargetCompass(s));
+
+		ConfigurationSection effectSection = getConfig().getConfigurationSection("effects");
+		if (effectSection != null) {
+			for (String section : effectSection.getKeys(false)) {
+				ConfigurationSection effect = effectSection.getConfigurationSection(section);
+				String type = effect.getString("type", "target");
+				EffectFactory factory = effectTypes.get(type);
+				effects.put(section, factory.get(effect));
+			}
+		}
 		ConfigurationSection engineSection = getConfig().getConfigurationSection("engines");
 		if (engineSection != null) {
 			for (String section : engineSection.getKeys(false)) {
@@ -129,7 +145,7 @@ public class Flier extends JavaPlugin implements Listener, CommandExecutor {
 			}
 		}
 		getLogger().info("Loaded " + engines.size() + " engines, " + items.size() + " items, " + wings.size() +
-				" wings, " + lobbies.size() + " lobbies and " + games.size() + " games.");
+				" wings, " + lobbies.size() + " lobbies, " + games.size() + " games and " + effects.size() + " effects.");
 	}
 	
 	@Override
@@ -144,46 +160,6 @@ public class Flier extends JavaPlugin implements Listener, CommandExecutor {
 	 */
 	public static Flier getInstance() {
 		return instance;
-	}
-	
-	/**
-	 * @param name name of the engine
-	 * @return the engine
-	 */
-	public Engine getEngine(String name) {
-		return engines.get(name);
-	}
-	
-	/**
-	 * @param name name of the item
-	 * @return the item
-	 */
-	public Item getItem(String name) {
-		return items.get(name);
-	}
-	
-	/**
-	 * @param name name of the wings
-	 * @return the wings
-	 */
-	public Wings getWings(String name) {
-		return wings.get(name);
-	}
-	
-	/**
-	 * @param name name of the lobby
-	 * @return the lobby
-	 */
-	public Lobby getLobby(String name) {
-		return lobbies.get(name);
-	}
-	
-	/**
-	 * @param name name of the game
-	 * @return the game
-	 */
-	public Game getGame(String name) {
-		return games.get(name);
 	}
 
 	/**
@@ -221,6 +197,13 @@ public class Flier extends JavaPlugin implements Listener, CommandExecutor {
 		return games;
 	}
 	
+	/**
+	 * @return the effects
+	 */
+	public Map<String, Effect> getEffects() {
+		return effects;
+	}
+	
 	public void registerEngine(String name, EngineFactory factory) {
 		engineTypes.put(name, factory);
 	}
@@ -239,6 +222,10 @@ public class Flier extends JavaPlugin implements Listener, CommandExecutor {
 	
 	public void registerGame(String name, GameFactory factory) {
 		gameTypes.put(name, factory);
+	}
+	
+	public void registerEffect(String name, EffectFactory factory) {
+		effectTypes.put(name, factory);
 	}
 
 }

@@ -46,7 +46,7 @@ public class FlierCommand implements CommandExecutor {
 					return;
 				} else {
 					String gameName = it.next();
-					game = f.getGame(gameName);
+					game = f.getGames().get(gameName);
 					if (game == null) {
 						sender.sendMessage(ChatColor.RED + "No such game: " + ChatColor.DARK_RED + gameName);
 						StringBuilder builder = new StringBuilder();

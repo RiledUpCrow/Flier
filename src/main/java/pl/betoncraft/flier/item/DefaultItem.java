@@ -6,6 +6,7 @@
  */
 package pl.betoncraft.flier.item;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.ChatColor;
@@ -14,6 +15,8 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import pl.betoncraft.flier.Flier;
+import pl.betoncraft.flier.api.Effect;
 import pl.betoncraft.flier.api.Item;
 
 /**
@@ -26,6 +29,8 @@ public abstract class DefaultItem implements Item {
 	protected ItemStack item;
 	protected double weight;
 	protected int slot;
+	protected List<Effect> passive = new ArrayList<>();
+	protected List<Effect> inHand = new ArrayList<>();
 	
 	public DefaultItem(ConfigurationSection section) {
 		Material type = Material.matchMaterial(section.getString("material", "FEATHER"));
@@ -45,6 +50,13 @@ public abstract class DefaultItem implements Item {
 		item.setItemMeta(meta);
 		weight = section.getDouble("weight", weight);
 		slot = section.getInt("slot", slot);
+		for (String e : section.getStringList("passive_effects")) {
+			Effect eff = Flier.getInstance().getEffects().get(e);
+			passive.add(eff);
+		}
+		for (String e : section.getStringList("in_hand_effects")) {
+			inHand.add(Flier.getInstance().getEffects().get(e));
+		}
 	}
 	
 	@Override
@@ -60,6 +72,16 @@ public abstract class DefaultItem implements Item {
 	@Override
 	public int slot() {
 		return slot;
+	}
+	
+	@Override
+	public List<Effect> getPassiveEffects() {
+		return passive;
+	}
+	
+	@Override
+	public List<Effect> getInHandEffects() {
+		return inHand;
 	}
 
 }

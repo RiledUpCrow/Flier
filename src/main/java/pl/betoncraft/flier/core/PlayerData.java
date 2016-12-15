@@ -27,6 +27,7 @@ import org.bukkit.util.Vector;
 import com.google.common.collect.Lists;
 
 import pl.betoncraft.flier.api.Damager;
+import pl.betoncraft.flier.api.Effect;
 import pl.betoncraft.flier.api.Engine;
 import pl.betoncraft.flier.api.Game;
 import pl.betoncraft.flier.api.InGamePlayer;
@@ -84,7 +85,6 @@ public class PlayerData implements InGamePlayer {
 		if (!isPlaying()) {
 			return;
 		}
-		Player player = getPlayer();
 		if (isFlying()) {
 			player.setVelocity(clazz.getWings().applyFlightModifications(this).toVector());
 		}
@@ -93,14 +93,16 @@ public class PlayerData implements InGamePlayer {
 		} else {
 			regenerateFuel();
 		}
+		applyEffects(true);
 		regenerateWings();
 	}
-	
+
 	@Override
 	public void slowTick() {
 		if (!isPlaying()) {
 			return;
 		}
+		applyEffects(false);
 		stopGlowing();
 		updateStats();
 	}
@@ -455,6 +457,28 @@ public class PlayerData implements InGamePlayer {
 		}
 		Score newScore = sb.getObjective(DisplaySlot.SIDEBAR).getScore(string);
 		newScore.setScore(index);
+	}
+	
+	private void applyEffects(boolean fastTick) {
+		ItemStack heldItem = player.getInventory().getItemInMainHand();
+		for (Item item : clazz.getItems().keySet()) {
+			if (item == null) {
+				continue;
+			}
+			if (heldItem != null && item.getItem().isSimilar(heldItem)) {
+				for (Effect effect : item.getInHandEffects()) {
+					if (effect != null && effect.fast() == fastTick) {
+						effect.apply(this);
+					}
+				}
+				continue;
+			}
+			for (Effect effect : item.getPassiveEffects()) {
+				if (effect != null && effect.fast() == fastTick) {
+					effect.apply(this);
+				}
+			}
+		}
 	}
 
 }
