@@ -7,33 +7,32 @@
 package pl.betoncraft.flier.sidebar;
 
 import pl.betoncraft.flier.api.InGamePlayer;
-import pl.betoncraft.flier.api.PlayerClass;
 import pl.betoncraft.flier.api.SidebarLine;
-import pl.betoncraft.flier.api.Wings;
 
 /**
- * A sidebar line showing wings health.
+ * A sidebar line showing amount of money.
  *
  * @author Jakub Sapalski
  */
-public class Health implements SidebarLine {
-	 
+public class Money implements SidebarLine {
+	
 	private InGamePlayer player;
 	private double lastValue = 0;
 	private String lastString;
 	
-	public Health(InGamePlayer player) {
+	public Money(InGamePlayer player) {
 		this.player = player;
 	}
 
 	@Override
 	public String getText() {
-		PlayerClass c = player.getClazz();
-		Wings wings = c == null ? null : c.getWings();
-		double h = wings == null ? 0 : 100 * player.getHealth() / wings.getHealth();
-		if (lastString == null || h != lastValue) {
-			lastString = String.format("H: %.1f%%", h);
-			lastValue = h;
+		int m = player.getMoney();
+		if (m < 1) {
+			m = 0;
+		}
+		if (lastString == null || m != lastValue) {
+			lastString = String.format("M: %d$", m);
+			lastValue = m;
 		}
 		return lastString;
 	}

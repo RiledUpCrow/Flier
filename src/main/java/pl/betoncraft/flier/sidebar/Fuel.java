@@ -8,6 +8,7 @@ package pl.betoncraft.flier.sidebar;
 
 import pl.betoncraft.flier.api.Engine;
 import pl.betoncraft.flier.api.InGamePlayer;
+import pl.betoncraft.flier.api.PlayerClass;
 import pl.betoncraft.flier.api.SidebarLine;
 
 /**
@@ -27,7 +28,8 @@ public class Fuel implements SidebarLine {
 
 	@Override
 	public String getText() {
-		Engine engine = player.getClazz().getEngine();
+		PlayerClass c = player.getClazz();
+		Engine engine = c == null ? null : c.getEngine();
 		double f = engine == null ? 0 : 100 * player.getFuel() / engine.getMaxFuel();
 		if (lastString == null || f != lastValue) {
 			lastString = String.format("F: %.1f%%", f);

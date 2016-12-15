@@ -6,7 +6,12 @@
  */
 package pl.betoncraft.flier.game;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+
 import org.bukkit.Location;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
@@ -28,8 +33,10 @@ import org.bukkit.util.Vector;
 
 import pl.betoncraft.flier.Flier;
 import pl.betoncraft.flier.api.Damager;
+import pl.betoncraft.flier.api.Damager.DamageResult;
 import pl.betoncraft.flier.api.Game;
 import pl.betoncraft.flier.api.InGamePlayer;
+import pl.betoncraft.flier.api.Lobby;
 import pl.betoncraft.flier.core.Utils;
 
 /**
@@ -38,6 +45,36 @@ import pl.betoncraft.flier.core.Utils;
  * @author Jakub Sapalski
  */
 public abstract class DefaultGame implements Listener, Game {
+
+	protected Map<UUID, InGamePlayer> dataMap = new HashMap<>();
+	protected Lobby lobby;
+	
+	protected boolean useMoney = false;
+	protected int enemyKillMoney = 0;
+	protected int enemyHitMoney = 0;
+	protected int friendlyKillMoney = 0;
+	protected int friendlyHitMoney = 0;
+	protected int byEnemyDeathMoney = 0;
+	protected int byEnemyHitMoney = 0;
+	protected int byFriendlyDeathMoney = 0;
+	protected int byFriendlyHitMoney = 0;
+	protected int suicideMoney = 0;
+	
+	public DefaultGame(ConfigurationSection section) {
+		String lobbyName = section.getString("lobby");
+		lobby = Flier.getInstance().getLobbies().get(lobbyName);
+		lobby.setGame(this);
+		useMoney = section.getBoolean("money.enabled", useMoney);
+		enemyKillMoney = section.getInt("money.enemy_kill", enemyKillMoney);
+		enemyHitMoney = section.getInt("money.enemy_hit", enemyHitMoney);
+		friendlyKillMoney = section.getInt("money.friendly_kill", friendlyKillMoney);
+		friendlyHitMoney = section.getInt("money.friendly_hit", friendlyHitMoney);
+		byEnemyDeathMoney = section.getInt("money.by_enemy_death", byEnemyDeathMoney);
+		byEnemyHitMoney = section.getInt("money.by_enemy_hit", byEnemyHitMoney);
+		byFriendlyDeathMoney = section.getInt("money.by_friendly_death", byFriendlyDeathMoney);
+		byFriendlyHitMoney = section.getInt("money.by_friendly_hit", byFriendlyHitMoney);
+		suicideMoney = section.getInt("money.suicide", suicideMoney);
+	}
 	
 	public class GameHeartBeat extends BukkitRunnable {
 		
@@ -76,6 +113,16 @@ public abstract class DefaultGame implements Listener, Game {
 	 * @param killed the player who was killed
 	 */
 	public abstract void handleKill(InGamePlayer killer, InGamePlayer killed);
+	
+	/**
+	 * Handles one player hitting another one with a Damager.
+	 * 
+	 * @param result result of the hit; it's unmodifiable now
+	 * @param attacker the attacking player
+	 * @param attacked the attacked player
+	 * @param damager the Damager used in the hit
+	 */
+	public abstract void handleHit(DamageResult result, InGamePlayer attacker, InGamePlayer attacked, Damager damager);
 	
 	/**
 	 * The game should do game-specific stuff in a fast tick here.
@@ -130,7 +177,22 @@ public abstract class DefaultGame implements Listener, Game {
 		if (weapon == null) {
 			return;
 		}
-		player.damage(shooter, weapon);
+		DamageResult result = player.damage(shooter, weapon);
+		handleHit(result, shooter, player, weapon);
+		if (result != DamageResult.NOTHING) {
+			Attitude a = getAttitude(shooter, player);
+			if (a == Attitude.FRIENDLY) {
+				pay(shooter, friendlyHitMoney);
+				pay(player, byFriendlyHitMoney);
+			} else if (a == Attitude.HOSTILE) {
+				pay(shooter, enemyHitMoney);
+				pay(player, byEnemyHitMoney);
+			}
+		}
+	}
+	
+	private void pay(InGamePlayer player, int amount) {
+		player.setMoney(player.getMoney() + amount);
 	}
 	
 	@EventHandler
@@ -163,9 +225,18 @@ public abstract class DefaultGame implements Listener, Game {
 					break;
 				}
 				handleKill(killer, killed);
+				Attitude a = getAttitude(killer, killed);
+				if (a == Attitude.FRIENDLY) {
+					pay(killer, friendlyKillMoney);
+					pay(killed, byFriendlyDeathMoney);
+				} else if (a == Attitude.HOSTILE) {
+					pay(killer, enemyKillMoney);
+					pay(killed, byEnemyDeathMoney);
+				}
 			} else {
 				event.setDeathMessage(Utils.formatPlayer(killed) + " commited suicide...");
 				handleKill(null, killed);
+				pay(killed, suicideMoney);
 			}
 		}
 	}

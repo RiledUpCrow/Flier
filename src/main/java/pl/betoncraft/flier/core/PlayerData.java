@@ -27,6 +27,7 @@ import org.bukkit.util.Vector;
 import com.google.common.collect.Lists;
 
 import pl.betoncraft.flier.api.Damager;
+import pl.betoncraft.flier.api.Damager.DamageResult;
 import pl.betoncraft.flier.api.Effect;
 import pl.betoncraft.flier.api.Engine;
 import pl.betoncraft.flier.api.Game;
@@ -57,7 +58,8 @@ public class PlayerData implements InGamePlayer {
 	private ChatColor color;
 	
 	private long glowTimer;
-	
+
+	private int money;
 	private double fuel;
 	private double health;
 	
@@ -74,27 +76,25 @@ public class PlayerData implements InGamePlayer {
 	
 	@Override
 	public void fastTick() {
-		if (!isPlaying()) {
-			return;
+		if (isPlaying()) {
+			if (isFlying()) {
+				player.setVelocity(clazz.getWings().applyFlightModifications(this).toVector());
+			}
+			if (isAccelerating()) {
+				speedUp();
+			} else {
+				regenerateFuel();
+			}
+			applyEffects(true);
+			regenerateWings();
 		}
-		if (isFlying()) {
-			player.setVelocity(clazz.getWings().applyFlightModifications(this).toVector());
-		}
-		if (isAccelerating()) {
-			speedUp();
-		} else {
-			regenerateFuel();
-		}
-		applyEffects(true);
-		regenerateWings();
 	}
 
 	@Override
 	public void slowTick() {
-		if (!isPlaying()) {
-			return;
+		if (isPlaying()) {
+			applyEffects(false);
 		}
-		applyEffects(false);
 		stopGlowing();
 		updateStats();
 	}
@@ -122,16 +122,17 @@ public class PlayerData implements InGamePlayer {
 	}
 	
 	@Override
-	public void damage(InGamePlayer attacker, Damager damager) {
+	public DamageResult damage(InGamePlayer attacker, Damager damager) {
+		DamageResult result = DamageResult.NOTHING;
 		if (!isPlaying()) {
-			return;
+			return result;
 		}
 		Player shooter = attacker.getPlayer();
 		// was hit by himself
 		if (shooter.equals(player)) {
 			// ignore if you can's commit suicide with this weapon
 			if (!damager.suicidal()) {
-				return;
+				return result;
 			}
 		}
 		boolean notify = true;
@@ -142,15 +143,18 @@ public class PlayerData implements InGamePlayer {
 				takeWingsOff();
 				setAttacker(attacker);
 				removeHealth(damager.getDamage());
+				result = DamageResult.WINGS_OFF;
 			} else {
 				setAttacker(attacker);
 				removeHealth(damager.getDamage());
+				result = DamageResult.WINGS_DAMAGE;
 			}
 		} else if (Utils.getAltitude(getPlayer().getLocation(), 4) != 4) {
 			if (damager.killsOnGround()) {
 				setAttacker(attacker);
 				notify = false;
 				getPlayer().damage(player.getHealth() + 1);
+				result = DamageResult.INSTANT_KILL;
 			} else {
 				setAttacker(attacker);
 				double damage = damager.getPhysical();
@@ -158,6 +162,7 @@ public class PlayerData implements InGamePlayer {
 					notify = false;
 				}
 				player.getPlayer().damage(damage);
+				result = DamageResult.REGULAR_DAMAGE;
 			}
 		} else {
 			notify = false;
@@ -170,6 +175,7 @@ public class PlayerData implements InGamePlayer {
 			shooter.playSound(shooter.getLocation(), Sound.BLOCK_DISPENSER_DISPENSE, 1, 1);
 			player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_HURT, 1, 1);
 		}
+		return result;
 	}
 
 	@Override
@@ -241,6 +247,16 @@ public class PlayerData implements InGamePlayer {
 	@Override
 	public void setAttacker(InGamePlayer player) {
 		this.lastHit = player;
+	}
+
+	@Override
+	public int getMoney() {
+		return money;
+	}
+
+	@Override
+	public void setMoney(int amount) {
+		money = amount;
 	}
 
 	@Override

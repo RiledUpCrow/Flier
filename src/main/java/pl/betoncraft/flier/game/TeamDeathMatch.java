@@ -22,8 +22,9 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import pl.betoncraft.flier.Flier;
+import pl.betoncraft.flier.api.Damager;
+import pl.betoncraft.flier.api.Damager.DamageResult;
 import pl.betoncraft.flier.api.InGamePlayer;
-import pl.betoncraft.flier.api.Lobby;
 import pl.betoncraft.flier.api.PlayerClass;
 import pl.betoncraft.flier.api.SidebarLine;
 import pl.betoncraft.flier.core.PlayerData;
@@ -31,6 +32,7 @@ import pl.betoncraft.flier.core.Utils;
 import pl.betoncraft.flier.sidebar.Altitude;
 import pl.betoncraft.flier.sidebar.Fuel;
 import pl.betoncraft.flier.sidebar.Health;
+import pl.betoncraft.flier.sidebar.Money;
 import pl.betoncraft.flier.sidebar.Speed;
 
 /**
@@ -40,13 +42,16 @@ import pl.betoncraft.flier.sidebar.Speed;
  */
 public class TeamDeathMatch extends DefaultGame {
 	
-	private Map<UUID, InGamePlayer> dataMap = new HashMap<>();
 	private Map<String, SimpleTeam> teams = new HashMap<>();
 	private Map<String, TeamLine> lines = new HashMap<>();
 	private Map<UUID, SimpleTeam> players = new HashMap<>();
-	private Lobby lobby;
+	
+	private int suicideScore = -1;
+	private int friendlyKillScore = -1;
+	private int enemyKillScore = 1;
 	
 	public TeamDeathMatch(ConfigurationSection section) {
+		super(section);
 		ConfigurationSection teams = section.getConfigurationSection("teams");
 		if (teams != null) {
 			for (String t : teams.getKeys(false)) {
@@ -55,9 +60,6 @@ public class TeamDeathMatch extends DefaultGame {
 				this.lines.put(t, new TeamLine(team));
 			}
 		}
-		String lobbyName = section.getString("lobby");
-		lobby = Flier.getInstance().getLobbies().get(lobbyName);
-		lobby.setGame(this);
 		new GameHeartBeat(this);
 		Bukkit.getPluginManager().registerEvents(this, Flier.getInstance());
 	}
@@ -134,6 +136,9 @@ public class TeamDeathMatch extends DefaultGame {
 		data.getLines().add(new Health(data));
 		data.getLines().add(new Speed(data));
 		data.getLines().add(new Altitude(data));
+		if (useMoney) {
+			data.getLines().add(new Money(data));
+		}
 		data.getLines().addAll(lines.values());
 		player.teleport(lobby.getSpawn());
 	}
@@ -202,13 +207,19 @@ public class TeamDeathMatch extends DefaultGame {
 	@Override
 	public void handleKill(InGamePlayer killer, InGamePlayer killed) {
 		if (killer == null) {
-			score(getTeam(killed), -1);
-		} else if (getTeam(killer).equals(getTeam(killed))) {
-			score(getTeam(killed), -1);
-		} else {
-			score(getTeam(killer), 1);
+			score(getTeam(killed), suicideScore);
+			return;
+		}
+		Attitude a = getAttitude(killer, killed);
+		if (a == Attitude.FRIENDLY) {
+			score(getTeam(killed), friendlyKillScore);
+		} else if (a == Attitude.HOSTILE) {
+			score(getTeam(killer), enemyKillScore);
 		}
 	}
+
+	@Override
+	public void handleHit(DamageResult result, InGamePlayer attacker, InGamePlayer attacked, Damager damager) {}
 
 	@Override
 	public Location respawnLocation(InGamePlayer respawned) {

@@ -12,6 +12,8 @@ import java.util.Map;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
+import pl.betoncraft.flier.api.Damager.DamageResult;
+
 /**
  * Represents a player who is in a Game.
  *
@@ -43,8 +45,9 @@ public interface InGamePlayer {
 	 * 
 	 * @param attacker the player who fired the damager
 	 * @param damager the Damager object (for example Weapon)
+	 * @return the result of damage
 	 */
-	public void damage(InGamePlayer attacker, Damager damager);
+	public DamageResult damage(InGamePlayer attacker, Damager damager);
 
 	/**
 	 * @return the instance of the Game this player plays
@@ -92,6 +95,16 @@ public interface InGamePlayer {
 	 * @param attacker the player who last attacked this player
 	 */
 	public void setAttacker(InGamePlayer attacker);
+	
+	/**
+	 * @return the amount of money the player has
+	 */
+	public int getMoney();
+	
+	/**
+	 * @param amount the amount of money to set for the player
+	 */
+	public void setMoney(int amount);
 	
 	/**
 	 * @return the amount of fuel this player currently has
