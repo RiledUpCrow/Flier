@@ -63,22 +63,24 @@ public class PlayerData implements InGamePlayer {
 	private double fuel;
 	private double health;
 	
-	public PlayerData(Player player, Game game) {
+	public PlayerData(Player player, Game game, PlayerClass clazz) {
 		this.player = player;
 		this.game = game;
+		this.clazz = clazz;
 		returnLoc = player.getLocation();
 		sb = Bukkit.getScoreboardManager().getNewScoreboard();
 		Objective stats = sb.registerNewObjective("stats", "dummy");
 		stats.setDisplaySlot(DisplaySlot.SIDEBAR);
 		stats.setDisplayName("Stats");
 		player.setScoreboard(sb);
+		updateClass();
 	}
 	
 	@Override
 	public void fastTick() {
 		if (isPlaying()) {
 			if (isFlying()) {
-				player.setVelocity(clazz.getWings().applyFlightModifications(this).toVector());
+				player.setVelocity(clazz.getCurrentWings().applyFlightModifications(this).toVector());
 			}
 			if (isAccelerating()) {
 				speedUp();
@@ -111,6 +113,9 @@ public class PlayerData implements InGamePlayer {
 				return;
 			}
 			if (item.use(this) && item.isConsumable()) {
+				// class
+				clazz.getCurrentItems().put(item, clazz.getCurrentItems().get(item) - 1);
+				// inventory
 				ItemStack stack = getPlayer().getInventory().getItemInMainHand();
 				if (stack.getAmount() == 1) {
 					getPlayer().getInventory().setItemInMainHand(null); 
@@ -191,9 +196,9 @@ public class PlayerData implements InGamePlayer {
 	@Override
 	public double getWeight() {
 		double weight = 0;
-		weight += clazz.getEngine().getWeight();
-		weight += clazz.getWings().getWeight();
-		for (Item item : clazz.getItems().keySet()) {
+		weight += clazz.getCurrentEngine().getWeight();
+		weight += clazz.getCurrentWings().getWeight();
+		for (Item item : clazz.getCurrentItems().keySet()) {
 			weight += item.getWeight();
 		}
 		return weight;
@@ -215,11 +220,10 @@ public class PlayerData implements InGamePlayer {
 	}
 	
 	@Override
-	public void setClazz(PlayerClass clazz) {
-		this.clazz = clazz;
-		Engine engine = clazz.getEngine();
-		Wings wings = clazz.getWings();
-		Map<Item, Integer> items = clazz.getItems();
+	public void updateClass() {
+		Engine engine = clazz.getCurrentEngine();
+		Wings wings = clazz.getCurrentWings();
+		Map<Item, Integer> items = clazz.getCurrentItems();
 		getPlayer().getInventory().clear();
 		getPlayer().getInventory().setItemInOffHand(engine.getItem());
 		fuel = engine.getMaxFuel();
@@ -266,7 +270,7 @@ public class PlayerData implements InGamePlayer {
 	
 	@Override
 	public boolean addFuel(double amount) {
-		double max = clazz.getEngine().getMaxFuel();
+		double max = clazz.getCurrentEngine().getMaxFuel();
 		if (fuel >= max) {
 			return false;
 		}
@@ -298,7 +302,7 @@ public class PlayerData implements InGamePlayer {
 	
 	@Override
 	public boolean addHealth(double amount) {
-		double max = clazz.getWings().getHealth();
+		double max = clazz.getCurrentWings().getHealth();
 		if (health >= max) {
 			return false;
 		}
@@ -380,7 +384,7 @@ public class PlayerData implements InGamePlayer {
 		if (item == null) {
 			return null;
 		}
-		for (Item i : clazz.getItems().keySet()) {
+		for (Item i : clazz.getCurrentItems().keySet()) {
 			if (i.getItem().isSimilar(item)) {
 				return i;
 			}
@@ -400,7 +404,7 @@ public class PlayerData implements InGamePlayer {
 	}
 	
 	private void speedUp() {
-		Engine engine = clazz.getEngine();
+		Engine engine = clazz.getCurrentEngine();
 		if (engine == null) {
 			return;
 		}
@@ -413,7 +417,7 @@ public class PlayerData implements InGamePlayer {
 	}
 	
 	private void regenerateFuel() {
-		Engine engine = clazz.getEngine();
+		Engine engine = clazz.getCurrentEngine();
 		if (engine == null) {
 			return;
 		}
@@ -421,7 +425,7 @@ public class PlayerData implements InGamePlayer {
 	}
 	
 	private void regenerateWings() {
-		Wings wings = clazz.getWings();
+		Wings wings = clazz.getCurrentWings();
 		if (wings == null) {
 			return;
 		}
@@ -469,7 +473,7 @@ public class PlayerData implements InGamePlayer {
 	
 	private void applyEffects(boolean fastTick) {
 		ItemStack heldItem = player.getInventory().getItemInMainHand();
-		for (Item item : clazz.getItems().keySet()) {
+		for (Item item : clazz.getCurrentItems().keySet()) {
 			if (item == null) {
 				continue;
 			}

@@ -43,14 +43,6 @@ public interface Game {
 	public void startPlayer(Player player);
 	
 	/**
-	 * Sets the class for this player.
-	 * 
-	 * @param player player to set the class
-	 * @param clazz class to set
-	 */
-	public void setClass(Player player, PlayerClass clazz);
-	
-	/**
 	 * Returns the map containing players by their UUID.
 	 * 
 	 * @return the map of players

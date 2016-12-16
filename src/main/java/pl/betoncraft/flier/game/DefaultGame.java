@@ -37,6 +37,8 @@ import pl.betoncraft.flier.api.Damager.DamageResult;
 import pl.betoncraft.flier.api.Game;
 import pl.betoncraft.flier.api.InGamePlayer;
 import pl.betoncraft.flier.api.Lobby;
+import pl.betoncraft.flier.api.PlayerClass;
+import pl.betoncraft.flier.api.PlayerClass.RespawnAction;
 import pl.betoncraft.flier.core.Utils;
 
 /**
@@ -48,6 +50,7 @@ public abstract class DefaultGame implements Listener, Game {
 
 	protected Map<UUID, InGamePlayer> dataMap = new HashMap<>();
 	protected Lobby lobby;
+	protected RespawnAction respawnAction = RespawnAction.RESET;
 	
 	protected boolean useMoney = false;
 	protected int enemyKillMoney = 0;
@@ -64,6 +67,7 @@ public abstract class DefaultGame implements Listener, Game {
 		String lobbyName = section.getString("lobby");
 		lobby = Flier.getInstance().getLobbies().get(lobbyName);
 		lobby.setGame(this);
+		respawnAction = RespawnAction.valueOf(section.getString("respawn_action", respawnAction.toString()).toUpperCase());
 		useMoney = section.getBoolean("money.enabled", useMoney);
 		enemyKillMoney = section.getInt("money.enemy_kill", enemyKillMoney);
 		enemyHitMoney = section.getInt("money.enemy_hit", enemyHitMoney);
@@ -201,7 +205,21 @@ public abstract class DefaultGame implements Listener, Game {
 		if (data == null) {
 			return;
 		}
-		data.setClazz(data.getClazz());
+		PlayerClass c = data.getClazz();
+		switch (respawnAction) {
+		case LOAD:
+			c.load();
+			break;
+		case SAVE:
+			c.save();
+			break;
+		case RESET:
+			c.reset();
+			break;
+		case NOTHING:
+			break;
+		}
+		data.updateClass();
 		event.getPlayer().setVelocity(new Vector());
 		event.setRespawnLocation(respawnLocation(data));
 	}

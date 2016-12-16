@@ -4,8 +4,8 @@ engines:
     material: sugar cane
     name: '&2Balanced Engine'
     lore:
-    - ''
-    - '&aHold shift to accelerate.'
+    - '&bMedium speed, acceleration and fuel.'
+    - '&eHold shift to accelerate.'
     max_speed: 1.5
     acceleration: 0.025
     max_fuel: 750
@@ -17,7 +17,9 @@ engines:
     material: feather
     name: '&2Fast Engine'
     lore:
-    - '&aHold shift to accelerate.'
+    - '&bHigh maximum speed and fuel regeneration.'
+    - '&bLow acceleration and fuel reserves.'
+    - '&eHold shift to accelerate.'
     max_speed: 2.5
     acceleration: 0.01
     max_fuel: 500
@@ -29,7 +31,9 @@ engines:
     material: wheat
     name: '&2Strong Engine'
     lore:
-    - '&aHold shift to accelerate.'
+    - '&bLow speed and fuel regeneration.'
+    - '&bHigh acceleration and fuel reserves.'
+    - '&eHold shift to accelerate.'
     max_speed: 1
     acceleration: 0.05
     max_fuel: 1500
@@ -42,7 +46,9 @@ items:
     material: bone
     name: '&4Balanced Weapon'
     lore:
-    - '&cLeft click to shoot.'
+    - '&bMedium burst length, low damage.'
+    - '&bDisables wings.'
+    - '&eLeft click to shoot.'
     entity: small fireball
     slot: 0
     burst_amount: 15
@@ -60,7 +66,9 @@ items:
     material: blaze rod
     name: '&4Strong Weapon'
     lore:
-    - '&cLeft click to shoot.'
+    - '&bShort burst length, high damage.'
+    - '&bDisables wings, kills on ground.'
+    - '&eLeft click to shoot.'
     entity: fireball
     slot: 0
     burst_amount: 10
@@ -78,7 +86,8 @@ items:
     material: stick
     name: '&4Fast Weapon'
     lore:
-    - '&cLeft click to shoot.'
+    - '&bLong burst length, medium damage.'
+    - '&eLeft click to shoot.'
     entity: snowball
     slot: 0
     burst_amount: 20
@@ -94,9 +103,10 @@ items:
   gun:
     type: machineGun
     material: torch
-    name: '&4Gun'
+    name: '&cGun'
     lore:
-    - '&cLeft click to shoot.'
+    - '&bCan shoot from the ground.'
+    - '&eLeft click to shoot.'
     entity: snowball
     slot: 2
     burst_amount: 1
@@ -109,19 +119,43 @@ items:
     wings_off: false
     kills_on_ground: false
     physical_damage: 5
-  rocket:
+  strong_rocket:
     type: homingMissile
     material: arrow
-    name: '&eRocket'
+    name: '&dStrong Rocket'
     lore:
-    - '&cLeft click to launch.'
+    - '&bTracks players. Disables wings.'
+    - '&bLow speed, high damage.'
+    - '&eLeft click to launch.'
     entity: arrow
     slot: 3
     search_range: 64
-    search_radius: 0.2
-    speed: 2.5
+    search_radius: 0.05
+    speed: 1.5
+    lifetime: 1000
+    maneuverability: 0.25
+    cooldown: 200
+    consumable: true
+    only_air: true
+    damage: 4000
+    wings_off: true
+    kills_on_ground: true
+    physical_damage: 20
+  balanced_rocket:
+    type: homingMissile
+    material: arrow
+    name: '&dBalanced Rocket'
+    lore:
+    - '&bTracks players. Disables wings.'
+    - '&bMedium speed and damage.'
+    - '&eLeft click to launch.'
+    entity: arrow
+    slot: 3
+    search_range: 64
+    search_radius: 0.05
+    speed: 2
     lifetime: 400
-    maneuverability: 1.5
+    maneuverability: 0.5
     cooldown: 200
     consumable: true
     only_air: true
@@ -129,19 +163,84 @@ items:
     wings_off: true
     kills_on_ground: false
     physical_damage: 16
+  fast_rocket:
+    type: homingMissile
+    material: arrow
+    name: '&dFast Rocket'
+    lore:
+    - '&bTracks players. Disables wings.'
+    - '&bHigh speed and accuracy.'
+    - '&eLeft click to launch.'
+    entity: arrow
+    slot: 3
+    search_range: 64
+    search_radius: 0.05
+    speed: 3
+    lifetime: 200
+    maneuverability: 0.75
+    cooldown: 200
+    consumable: true
+    only_air: true
+    damage: 0
+    wings_off: true
+    kills_on_ground: false
+    physical_damage: 6
+  weak_launcher:
+    type: launcher
+    material: firework
+    name: '&5Weak Launcher'
+    lore:
+    - '&bLaunches you in the air.'
+    - '&bWeak force.'
+    - '&eLeft click to use.'
+    slot: 4
+    speed: 0.75
+    cooldown: 100
+    consumable: true
+    only_air: false
+  strong_launcher:
+    type: launcher
+    material: firework
+    name: '&5Strong Launcher'
+    lore:
+    - '&bLaunches you in the air.'
+    - '&bPowerful force.'
+    - '&eLeft click to use.'
+    slot: 4
+    speed: 2
+    cooldown: 100
+    consumable: true
+    only_air: false
+  radar:
+    type: vanillaItem
+    material: compass
+    name: '&aRadar'
+    lore:
+    - '&bShows hostile targets.'
+    slot: 8
+    passive_effects:
+    - radar
+effects:
+  radar:
+    type: targetCompass
+    target: hostile
 wings:
   balancedWings:
     type: simpleWings
     name: '&3Balanced Wings'
     lore:
-    - '&bPress space to fly.'
+    - '&bDefault Elytra fight.'
+    - '&bMedium durability.'
+    - '&ePress space to fly.'
     health: 2400
     regeneration: 0.5
   lightWings:
     type: simpleWings
     name: '&3Light Wings'
     lore:
-    - '&bPress space to fly.'
+    - '&bFast wings with strong lifting force.'
+    - '&bQuite fragile.'
+    - '&ePress space to fly.'
     health: 1800
     regeneration: 0.5
     aerodynamics: 0.0025
@@ -150,7 +249,9 @@ wings:
     type: simpleWings
     name: '&3Heavy Wings'
     lore:
-    - '&bPress space to fly.'
+    - '&bSlow, heavy wings.'
+    - '&bVery sturdy.'
+    - '&ePress space to fly.'
     health: 3600
     regeneration: 0.5
     weight: 0.002
@@ -160,36 +261,59 @@ lobbies:
     type: fixedPhysicalLobby
     join:
     - -19;64;334;world
-    spawn: -22.5;64;334.5;world;90;0
+    spawn: -22.5;63;334.5;world;90;0
     start: -32;64;334;world
     leave: -21;64;334;world
-    classes:
-      fast: 
+    default_class:
+      name: Balanced
+      engine: balancedEngine
+      items:
+      - balancedWeapon
+      - gun
+      - balanced_rocket 2
+      - weak_launcher 3
+      - radar
+      wings: balancedWings
+    items:
+      fast:
+        name: Fast
+        type: clear
         block: -25;64;337;world
         engine: fastEngine
         items:
         - fastWeapon
         - gun
-        - rocket 2
+        - fast_rocket 5
+        - strong_launcher 3
+        - radar
         wings: lightWings
       balanced:
+        name: Balanced
+        type: clear
         block: -27;64;337;world
         engine: balancedEngine
         items:
         - balancedWeapon
         - gun
-        - rocket 2
+        - balanced_rocket 2
+        - weak_launcher 3
+        - radar
         wings: balancedWings
       strong:
+        name: Strong
+        type: clear
         block: -29;64;337;world
         engine: strongEngine
         items:
         - strongWeapon
         - gun
-        - rocket 2
+        - strong_rocket
+        - weak_launcher
+        - radar
         wings: heavyWings
 games:
   default:
+    respawn_action: load
     type: teamDeathMatch
     teams:
       blue:

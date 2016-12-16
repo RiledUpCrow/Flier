@@ -88,7 +88,7 @@ public class Utils {
 	public static String formatPlayer(InGamePlayer player) {
 		PlayerClass clazz = player.getClazz();
 		String name = player.getPlayer().getName();
-		return player.getColor() + name + ChatColor.WHITE + " (" + ChatColor.AQUA + clazz.getName() + ChatColor.WHITE + ")";
+		return player.getColor() + name + ChatColor.WHITE + " (" + ChatColor.AQUA + clazz.getCurrentName() + ChatColor.WHITE + ")";
 	}
 	
 	public static class ImmutableVector {

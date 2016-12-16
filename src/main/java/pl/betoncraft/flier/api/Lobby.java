@@ -37,4 +37,9 @@ public interface Lobby {
 	 */
 	Game getGame();
 
+	/**
+	 * @return the copy of default class
+	 */
+	public PlayerClass getDefaultClass();
+
 }

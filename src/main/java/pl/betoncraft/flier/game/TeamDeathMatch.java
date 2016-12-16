@@ -25,7 +25,6 @@ import pl.betoncraft.flier.Flier;
 import pl.betoncraft.flier.api.Damager;
 import pl.betoncraft.flier.api.Damager.DamageResult;
 import pl.betoncraft.flier.api.InGamePlayer;
-import pl.betoncraft.flier.api.PlayerClass;
 import pl.betoncraft.flier.api.SidebarLine;
 import pl.betoncraft.flier.core.PlayerData;
 import pl.betoncraft.flier.core.Utils;
@@ -130,7 +129,7 @@ public class TeamDeathMatch extends DefaultGame {
 		if (dataMap.containsKey(player.getUniqueId())) {
 			return;
 		}
-		InGamePlayer data = new PlayerData(player, this);
+		InGamePlayer data = new PlayerData(player, this, lobby.getDefaultClass());
 		dataMap.put(player.getUniqueId(), data);
 		data.getLines().add(new Fuel(data));
 		data.getLines().add(new Health(data));
@@ -154,16 +153,6 @@ public class TeamDeathMatch extends DefaultGame {
 			for (SimpleTeam t : teams.values()) {
 				t.setScore(0);
 			}
-		}
-	}
-	
-	@Override
-	public void setClass(Player player, PlayerClass clazz) {
-		InGamePlayer data = dataMap.get(player.getUniqueId());
-		if (data != null) {
-			data.setClazz(clazz);
-			Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "title " + player.getName()
-					+ " title {\"text\":\"" + ChatColor.AQUA + clazz.getName() + "\"}");
 		}
 	}
 	

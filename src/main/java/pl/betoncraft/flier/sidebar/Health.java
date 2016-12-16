@@ -29,7 +29,7 @@ public class Health implements SidebarLine {
 	@Override
 	public String getText() {
 		PlayerClass c = player.getClazz();
-		Wings wings = c == null ? null : c.getWings();
+		Wings wings = c == null ? null : c.getCurrentWings();
 		double h = wings == null ? 0 : 100 * player.getHealth() / wings.getHealth();
 		if (lastString == null || h != lastValue) {
 			lastString = String.format("H: %.1f%%", h);

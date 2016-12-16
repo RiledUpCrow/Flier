@@ -29,7 +29,7 @@ public class Fuel implements SidebarLine {
 	@Override
 	public String getText() {
 		PlayerClass c = player.getClazz();
-		Engine engine = c == null ? null : c.getEngine();
+		Engine engine = c == null ? null : c.getCurrentEngine();
 		double f = engine == null ? 0 : 100 * player.getFuel() / engine.getMaxFuel();
 		if (lastString == null || f != lastValue) {
 			lastString = String.format("F: %.1f%%", f);

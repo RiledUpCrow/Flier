@@ -80,11 +80,9 @@ public interface InGamePlayer {
 	public PlayerClass getClazz();
 	
 	/**
-	 * Sets the PlayerClass object and gives all its items to the player
-	 * 
-	 * @param clazz the PlayerClass object to set
+	 * Updates the player with his class items.
 	 */
-	public void setClazz(PlayerClass clazz);
+	public void updateClass();
 	
 	/**
 	 * @return the player who last attacked this player

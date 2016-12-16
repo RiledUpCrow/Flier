@@ -29,7 +29,7 @@ import pl.betoncraft.flier.item.engine.MultiplyingEngine;
 import pl.betoncraft.flier.item.weapon.HomingMissile;
 import pl.betoncraft.flier.item.weapon.MachineGun;
 import pl.betoncraft.flier.item.wings.SimpleWings;
-import pl.betoncraft.flier.lobby.FixedPhysicalLobby;
+import pl.betoncraft.flier.lobby.PhysicalLobby;
 
 public class Flier extends JavaPlugin implements Listener, CommandExecutor {
 	
@@ -86,7 +86,7 @@ public class Flier extends JavaPlugin implements Listener, CommandExecutor {
 		registerItem("launcher", s -> new Launcher(s));
 		registerItem("vanillaItem", s -> new VanillaItem(s));
 		registerWings("simpleWings", s -> new SimpleWings(s));
-		registerLobby("fixedPhysicalLobby", s -> new FixedPhysicalLobby(s));
+		registerLobby("fixedPhysicalLobby", s -> new PhysicalLobby(s));
 		registerGame("teamDeathMatch", s -> new TeamDeathMatch(s));
 		registerEffect("targetCompass", s -> new TargetCompass(s));
 
