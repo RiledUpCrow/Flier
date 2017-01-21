@@ -20,5 +20,14 @@ public class VanillaItem extends DefaultItem {
 	public VanillaItem(ConfigurationSection section) throws LoadingException {
 		super(section);
 	}
+	
+	@Override
+	public VanillaItem replicate() {
+		try {
+			return new VanillaItem(base);
+		} catch (LoadingException e) {
+			return null; // dead code
+		}
+	}
 
 }

@@ -13,7 +13,7 @@ import org.bukkit.Location;
  *
  * @author Jakub Sapalski
  */
-public interface Bonus {
+public interface Bonus extends Replicable {
 
 	/**
 	 * @return the location of a Bonus

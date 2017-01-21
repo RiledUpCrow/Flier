@@ -297,7 +297,7 @@ public class PhysicalLobby implements Lobby, Listener {
 
 	@Override
 	public PlayerClass getDefaultClass() {
-		return defClass.clone();
+		return (PlayerClass) defClass.replicate();
 	}
 
 	@Override

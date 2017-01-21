@@ -7,6 +7,7 @@
 package pl.betoncraft.flier.item;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.bukkit.ChatColor;
@@ -27,6 +28,8 @@ import pl.betoncraft.flier.exception.LoadingException;
  * @author Jakub Sapalski
  */
 public abstract class DefaultItem implements Item {
+	
+	protected final ConfigurationSection base;
 
 	protected final ItemStack item;
 	protected final double weight;
@@ -35,6 +38,7 @@ public abstract class DefaultItem implements Item {
 	protected final List<Effect> inHand = new ArrayList<>();
 
 	public DefaultItem(ConfigurationSection section) throws LoadingException {
+		base = section;
 		Material type = ValueLoader.loadEnum(section, "material", Material.class);
 		String name = ChatColor.translateAlternateColorCodes('&', ValueLoader.loadString(section, "name"));
 		List<String> lore = section.getStringList("lore");
@@ -85,12 +89,12 @@ public abstract class DefaultItem implements Item {
 
 	@Override
 	public List<Effect> getPassiveEffects() {
-		return passive;
+		return Collections.unmodifiableList(passive);
 	}
 
 	@Override
 	public List<Effect> getInHandEffects() {
-		return inHand;
+		return Collections.unmodifiableList(inHand);
 	}
 
 }

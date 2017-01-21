@@ -9,9 +9,11 @@ package pl.betoncraft.flier.core;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.bukkit.configuration.ConfigurationSection;
 
+import javafx.util.Pair;
 import pl.betoncraft.flier.Flier;
 import pl.betoncraft.flier.api.Engine;
 import pl.betoncraft.flier.api.Item;
@@ -79,6 +81,7 @@ public class DefaultPlayerClass implements PlayerClass {
 		defaultEngine = defEngine;
 		defaultWings = defWings;
 		defaultItems.putAll(defItems);
+		reset();
 	}
 
 	@Override
@@ -128,17 +131,19 @@ public class DefaultPlayerClass implements PlayerClass {
 
 	@Override
 	public Engine getStoredEngine() {
-		return storedEngine;
+		return (Engine) storedEngine.replicate();
 	}
 
 	@Override
 	public Wings getStoredWings() {
-		return storedWings;
+		return (Wings) storedWings.replicate();
 	}
 
 	@Override
 	public Map<Item, Integer> getStoredItems() {
-		return new HashMap<>(storedItems);
+		return storedItems.entrySet().stream().map(
+				entry -> new Pair<>((Item) entry.getKey().replicate(), entry.getValue())
+			).collect(Collectors.toMap(pair -> pair.getKey(), pair -> pair.getValue()));
 	}
 
 	@Override
@@ -168,17 +173,19 @@ public class DefaultPlayerClass implements PlayerClass {
 
 	@Override
 	public Engine getDefaultEngine() {
-		return defaultEngine;
+		return (Engine) defaultEngine.replicate();
 	}
 
 	@Override
 	public Wings getDefaultWings() {
-		return defaultWings;
+		return (Wings) defaultWings.replicate();
 	}
 
 	@Override
 	public Map<Item, Integer> getDefaultItems() {
-		return new HashMap<>(defaultItems);
+		return defaultItems.entrySet().stream().map(
+					entry -> new Pair<>((Item) entry.getKey().replicate(), entry.getValue())
+				).collect(Collectors.toMap(pair -> pair.getKey(), pair -> pair.getValue()));
 	}
 
 	@Override
@@ -214,17 +221,8 @@ public class DefaultPlayerClass implements PlayerClass {
 	}
 	
 	@Override
-	public DefaultPlayerClass clone() {
-		DefaultPlayerClass pc = new DefaultPlayerClass(defaultName, defaultEngine, defaultWings, defaultItems);
-		pc.setStoredName(storedName);
-		pc.setStoredEngine(getStoredEngine());
-		pc.setStoredWings(getStoredWings());
-		pc.setStoredItems(getStoredItems());
-		pc.setCurrentName(getCurrentName());
-		pc.setCurrentEngine(getCurrentEngine());
-		pc.setCurrentWings(getCurrentWings());
-		pc.setCurrentItems(new HashMap<>(getCurrentItems()));
-		return pc;
+	public DefaultPlayerClass replicate() {
+		return new DefaultPlayerClass(defaultName, defaultEngine, defaultWings, defaultItems);
 	}
 
 }

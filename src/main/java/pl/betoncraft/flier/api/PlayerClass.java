@@ -26,7 +26,7 @@ import java.util.Map;
  *
  * @author Jakub Sapalski
  */
-public interface PlayerClass extends Cloneable {
+public interface PlayerClass extends Replicable {
 	
 	public enum RespawnAction {
 		SAVE, LOAD, RESET, NOTHING
@@ -172,10 +172,5 @@ public interface PlayerClass extends Cloneable {
 	 * @return this object
 	 */
 	public void reset();
-	
-	/**
-	 * @return the cloned instance of PlayerClass
-	 */
-	public PlayerClass clone();
 	
 }

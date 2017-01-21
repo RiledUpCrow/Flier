@@ -64,6 +64,14 @@ public class MachineGun extends DefaultWeapon {
 		}.runTaskTimer(Flier.getInstance(), 0, burstTicks);
 		return true;
 	}
-
+	
+	@Override
+	public MachineGun replicate() {
+		try {
+			return new MachineGun(base);
+		} catch (LoadingException e) {
+			return null; // dead code
+		}
+	}
 
 }

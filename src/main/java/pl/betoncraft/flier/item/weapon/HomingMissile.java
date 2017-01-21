@@ -19,8 +19,8 @@ import pl.betoncraft.flier.Flier;
 import pl.betoncraft.flier.api.Damager;
 import pl.betoncraft.flier.api.Game.Attitude;
 import pl.betoncraft.flier.api.InGamePlayer;
-import pl.betoncraft.flier.core.ValueLoader;
 import pl.betoncraft.flier.core.Utils.ImmutableVector;
+import pl.betoncraft.flier.core.ValueLoader;
 import pl.betoncraft.flier.exception.LoadingException;
 
 /**
@@ -154,6 +154,15 @@ public class HomingMissile extends DefaultWeapon {
 			}
 		}.runTaskTimer(Flier.getInstance(), 1, 1);
 		return true;
+	}
+	
+	@Override
+	public HomingMissile replicate() {
+		try {
+			return new HomingMissile(base);
+		} catch (LoadingException e) {
+			return null; // dead code
+		}
 	}
 
 }

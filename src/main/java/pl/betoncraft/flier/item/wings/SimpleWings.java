@@ -9,8 +9,8 @@ package pl.betoncraft.flier.item.wings;
 import org.bukkit.configuration.ConfigurationSection;
 
 import pl.betoncraft.flier.api.InGamePlayer;
-import pl.betoncraft.flier.core.ValueLoader;
 import pl.betoncraft.flier.core.Utils.ImmutableVector;
+import pl.betoncraft.flier.core.ValueLoader;
 import pl.betoncraft.flier.exception.LoadingException;
 
 /**
@@ -40,6 +40,15 @@ public class SimpleWings extends DefaultWings {
 		velocity = velocity.add(new ImmutableVector(0, length, 0));
 		ImmutableVector airResistance = velocity.multiply(aerodynamics);
 		return velocity.add(airResistance);
+	}
+	
+	@Override
+	public SimpleWings replicate() {
+		try {
+			return new SimpleWings(base);
+		} catch (LoadingException e) {
+			return null; // dead code
+		}
 	}
 
 }

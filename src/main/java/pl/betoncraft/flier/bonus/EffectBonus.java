@@ -51,5 +51,14 @@ public class EffectBonus extends DefaultBonus {
 		}, duration);
 		return true;
 	}
+	
+	@Override
+	public EffectBonus replicate() {
+		try {
+			return new EffectBonus(base);
+		} catch (LoadingException e) {
+			return null; // dead code
+		}
+	}
 
 }

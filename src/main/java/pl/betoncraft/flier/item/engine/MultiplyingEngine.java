@@ -8,8 +8,8 @@ package pl.betoncraft.flier.item.engine;
 
 import org.bukkit.configuration.ConfigurationSection;
 
-import pl.betoncraft.flier.core.ValueLoader;
 import pl.betoncraft.flier.core.Utils.ImmutableVector;
+import pl.betoncraft.flier.core.ValueLoader;
 import pl.betoncraft.flier.exception.LoadingException;
 
 /**
@@ -39,6 +39,15 @@ public class MultiplyingEngine extends DefaultEngine {
 			speed = minSpeed;
 		}
 		return velocity.add(direction.multiply(speed * acceleration));
+	}
+	
+	@Override
+	public MultiplyingEngine replicate() {
+		try {
+			return new MultiplyingEngine(base);
+		} catch (LoadingException e) {
+			return null; // dead code
+		}
 	}
 
 }

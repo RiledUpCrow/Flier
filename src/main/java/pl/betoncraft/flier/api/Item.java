@@ -15,7 +15,7 @@ import org.bukkit.inventory.ItemStack;
  *
  * @author Jakub Sapalski
  */
-public interface Item {
+public interface Item extends Replicable {
 	
 	/**
 	 * @return the ItemStack equal to this item
