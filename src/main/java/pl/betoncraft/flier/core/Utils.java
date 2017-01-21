@@ -10,10 +10,12 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.util.Vector;
 
 import pl.betoncraft.flier.api.InGamePlayer;
 import pl.betoncraft.flier.api.PlayerClass;
+import pl.betoncraft.flier.exception.LoadingException;
 
 /**
  * Various static utility methods.
@@ -39,30 +41,6 @@ public class Utils {
 			altitude++;
 		}
 		return altitude;
-	}
-
-	/**
-	 * Parses the location string.
-	 * 
-	 * @param string
-	 * @return optional location, which will be empty if the format was incorrect
-	 */
-	public static Location parseLocation(String string) {
-		try {
-			String[] parts = string.split(";");
-			if (parts.length == 4) {
-				return new Location(Bukkit.getWorld(parts[3]),
-					Double.parseDouble(parts[0]), Double.parseDouble(parts[1]), Double.parseDouble(parts[2]));
-			} else if (parts.length == 6) {
-				return new Location(Bukkit.getWorld(parts[3]),
-					Double.parseDouble(parts[0]), Double.parseDouble(parts[1]), Double.parseDouble(parts[2]),
-					Float.parseFloat(parts[4]), Float.parseFloat(parts[5]));
-			} else {
-				return null	;
-			}
-		} catch (Exception e) {
-			return null;
-		}
 	}
 
 	/**
@@ -141,6 +119,40 @@ public class Utils {
 		@Override
 		public String toString() {
 			return String.format("[%.3f,%.3f,%.3f]", x, y, z);
+		}
+	}
+
+	/**
+	 * @param string
+	 * @throws LoadingException 
+	 */
+	public static Location parseLocation(String string) throws LoadingException {
+		String[] parts = string.split(";");
+		if (parts.length >= 4) {
+			World world = Bukkit.getWorld(parts[3]);
+			if (world == null) {
+				throw new LoadingException(String.format("World '%s' does not exist.", parts[3]));
+			}
+			double x, y, z;
+			try {
+				x = Double.parseDouble(parts[0]);
+				y = Double.parseDouble(parts[1]);
+				z = Double.parseDouble(parts[2]);
+			} catch (NumberFormatException e) {
+				throw new LoadingException("Cannot parse coordinates.");
+			}
+			float yaw = 0, pitch = 0;
+			if (parts.length == 6) {
+				try {
+					yaw = Float.parseFloat(parts[4]);
+					pitch = Float.parseFloat(parts[5]);
+				} catch (NumberFormatException e) {
+					throw new LoadingException("Cannot parse head rotation.");
+				}
+			}
+			return new Location(world, x, y, z, yaw, pitch);
+		} else {
+			throw new LoadingException("Incorrect location format.");
 		}
 	}
 

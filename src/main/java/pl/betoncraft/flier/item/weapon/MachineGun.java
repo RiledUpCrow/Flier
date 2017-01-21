@@ -17,6 +17,7 @@ import org.bukkit.util.Vector;
 import pl.betoncraft.flier.Flier;
 import pl.betoncraft.flier.api.Damager;
 import pl.betoncraft.flier.api.InGamePlayer;
+import pl.betoncraft.flier.core.ValueLoader;
 import pl.betoncraft.flier.exception.LoadingException;
 
 /**
@@ -26,17 +27,17 @@ import pl.betoncraft.flier.exception.LoadingException;
  */
 public class MachineGun extends DefaultWeapon {
 	
-	private EntityType entity = EntityType.FIREBALL;
-	private int burstAmount = 10;
-	private int burstTicks = 1;
-	private double projectileSpeed = 5;
+	private final EntityType entity;
+	private final int burstAmount;
+	private final int burstTicks;
+	private final double projectileSpeed;
 	
 	public MachineGun(ConfigurationSection section) throws LoadingException {
 		super(section);
-		entity = EntityType.valueOf(section.getString("entity", "FIREBALL").toUpperCase().replace(' ', '_'));
-		burstAmount = section.getInt("burst_amount", burstAmount);
-		burstTicks = section.getInt("burst_ticks", burstTicks);
-		projectileSpeed = section.getDouble("projectile_speed", projectileSpeed);
+		entity = ValueLoader.loadEnum(section, "entity", EntityType.class);
+		burstAmount = ValueLoader.loadPositiveInt(section, "burst_amount");
+		burstTicks = ValueLoader.loadPositiveInt(section, "burst_ticks");
+		projectileSpeed = ValueLoader.loadPositiveDouble(section, "projectile_speed");
 	}
 	
 	@Override

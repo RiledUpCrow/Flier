@@ -46,9 +46,8 @@ import pl.betoncraft.flier.api.Lobby;
 import pl.betoncraft.flier.api.PlayerClass;
 import pl.betoncraft.flier.api.PlayerClass.RespawnAction;
 import pl.betoncraft.flier.core.Utils;
+import pl.betoncraft.flier.core.ValueLoader;
 import pl.betoncraft.flier.exception.LoadingException;
-import pl.betoncraft.flier.exception.ObjectUndefinedException;
-import pl.betoncraft.flier.exception.TypeUndefinedException;
 
 /**
  * Basic rules of a game.
@@ -77,12 +76,12 @@ public abstract class DefaultGame implements Listener, Game {
 		for (String bonusName : section.getStringList("bonuses")) {
 			try {
 				bonuses.add(Flier.getInstance().getBonus(bonusName));
-			} catch (ObjectUndefinedException | TypeUndefinedException | LoadingException e) {
+			} catch (LoadingException e) {
 				throw (LoadingException) new LoadingException(String.format("Error in '%s' bonus.", bonusName))
 						.initCause(e);
 			}
 		}
-		respawnAction = RespawnAction.valueOf(section.getString("respawn_action", respawnAction.toString()).toUpperCase());
+		respawnAction = ValueLoader.loadEnum(section, "respawn_action", RespawnAction.class);
 		useMoney = section.getBoolean("money.enabled", useMoney);
 		enemyKillMoney = section.getInt("money.enemy_kill", enemyKillMoney);
 		enemyHitMoney = section.getInt("money.enemy_hit", enemyHitMoney);

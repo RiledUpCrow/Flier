@@ -12,6 +12,7 @@ import org.bukkit.util.Vector;
 
 import pl.betoncraft.flier.Flier;
 import pl.betoncraft.flier.api.InGamePlayer;
+import pl.betoncraft.flier.core.ValueLoader;
 import pl.betoncraft.flier.exception.LoadingException;
 
 /**
@@ -21,11 +22,11 @@ import pl.betoncraft.flier.exception.LoadingException;
  */
 public class Launcher extends DefaultUsableItem {
 	
-	private double speed = 2;
+	private final double speed;
 
 	public Launcher(ConfigurationSection section) throws LoadingException {
 		super(section);
-		speed = section.getDouble("speed", speed);
+		speed = ValueLoader.loadPositiveDouble(section, "speed");
 	}
 
 	@Override

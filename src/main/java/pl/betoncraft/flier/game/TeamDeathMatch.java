@@ -25,6 +25,7 @@ import pl.betoncraft.flier.api.InGamePlayer;
 import pl.betoncraft.flier.api.SidebarLine;
 import pl.betoncraft.flier.core.PlayerData;
 import pl.betoncraft.flier.core.Utils;
+import pl.betoncraft.flier.core.ValueLoader;
 import pl.betoncraft.flier.exception.LoadingException;
 import pl.betoncraft.flier.sidebar.Altitude;
 import pl.betoncraft.flier.sidebar.Fuel;
@@ -52,10 +53,16 @@ public class TeamDeathMatch extends DefaultGame {
 		ConfigurationSection teams = section.getConfigurationSection("teams");
 		if (teams != null) {
 			for (String t : teams.getKeys(false)) {
-				SimpleTeam team = new SimpleTeam(teams.getConfigurationSection(t));
-				this.teams.put(t, team);
-				this.lines.put(t, new TeamLine(team));
+				try {
+					SimpleTeam team = new SimpleTeam(teams.getConfigurationSection(t));
+					this.teams.put(t, team);
+					this.lines.put(t, new TeamLine(team));
+				} catch (LoadingException e) {
+					throw (LoadingException) new LoadingException(String.format("Error in '%s' team.", t)).initCause(e);
+				}
 			}
+		} else {
+			throw new LoadingException("Teams must be defined.");
 		}
 		new GameHeartBeat(this);
 		Bukkit.getPluginManager().registerEvents(this, Flier.getInstance());
@@ -68,10 +75,10 @@ public class TeamDeathMatch extends DefaultGame {
 		private Location spawn;
 		private ChatColor color;
 		
-		public SimpleTeam(ConfigurationSection section) {
-			spawn = Utils.parseLocation(section.getString("location"));
-			color = ChatColor.valueOf(section.getString("color", "white").toUpperCase().replace(' ', '_'));
-			name = ChatColor.translateAlternateColorCodes('&', section.getString("name"));
+		public SimpleTeam(ConfigurationSection section) throws LoadingException {
+			spawn = ValueLoader.loadLocation(section, "location");
+			color = ValueLoader.loadEnum(section, "color", ChatColor.class);
+			name = ChatColor.translateAlternateColorCodes('&', ValueLoader.loadString(section, "name"));
 		}
 
 		public int getScore() {

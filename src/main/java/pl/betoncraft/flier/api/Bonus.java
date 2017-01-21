@@ -6,7 +6,7 @@
  */
 package pl.betoncraft.flier.api;
 
-import org.bukkit.entity.Entity;
+import org.bukkit.Location;
 
 /**
  * Represents a collectable Entity on the Game map.
@@ -14,14 +14,11 @@ import org.bukkit.entity.Entity;
  * @author Jakub Sapalski
  */
 public interface Bonus {
-	
+
 	/**
-	 * Returns the entity used for this bonus. The entity may be null if it
-	 * doesn't currently exist (for example bonus was used and it is despawned).
-	 * 
-	 * @return the Entity representing the Bonus
+	 * @return the location of a Bonus
 	 */
-	public Entity getEntity();
+	public Location getLocation();
 	
 	/**
 	 * @return the minimum distance to activate this Bonus

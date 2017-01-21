@@ -22,10 +22,9 @@ import pl.betoncraft.flier.api.Lobby;
 import pl.betoncraft.flier.api.Wings;
 import pl.betoncraft.flier.bonus.EffectBonus;
 import pl.betoncraft.flier.command.FlierCommand;
+import pl.betoncraft.flier.core.Utils;
 import pl.betoncraft.flier.effect.TargetCompass;
 import pl.betoncraft.flier.exception.LoadingException;
-import pl.betoncraft.flier.exception.ObjectUndefinedException;
-import pl.betoncraft.flier.exception.TypeUndefinedException;
 import pl.betoncraft.flier.game.TeamDeathMatch;
 import pl.betoncraft.flier.item.Launcher;
 import pl.betoncraft.flier.item.VanillaItem;
@@ -86,8 +85,8 @@ public class Flier extends JavaPlugin {
 		if (lobbySection != null) {
 			for (String section : lobbySection.getKeys(false)) {
 				try {
-					lobbies.put(section, getObject(section, "Lobby", "lobbies", lobbyTypes));
-				} catch (ObjectUndefinedException | TypeUndefinedException | LoadingException e) {
+					lobbies.put(section, getObject(section, "lobby", "lobbies", lobbyTypes));
+				} catch (LoadingException e) {
 					getLogger().severe(String.format("Error while loading lobby '%s':", section));
 					getLogger().severe(String.format("    - %s", e.getMessage()));
 					Throwable cause = e.getCause();
@@ -125,6 +124,7 @@ public class Flier extends JavaPlugin {
 	}
 
 	/**
+	 * @param id ID of the Engine
 	 * @return the Engine with specified name, never null
 	 * @throws ObjectUndefinedException
 	 *             when the Engine is not defined
@@ -133,11 +133,12 @@ public class Flier extends JavaPlugin {
 	 * @throws LoadingException
 	 *             when the Engine cannot be created due to an error
 	 */
-	public Engine getEngine(String id) throws ObjectUndefinedException, TypeUndefinedException, LoadingException {
-		return getObject(id, "Engine", "engines", engineTypes);
+	public Engine getEngine(String id) throws LoadingException {
+		return getObject(id, "engine", "engines", engineTypes);
 	}
 
 	/**
+	 * @param id ID of the Item
 	 * @return the Item with specified name, never null
 	 * @throws ObjectUndefinedException
 	 *             when the Item is not defined
@@ -146,11 +147,12 @@ public class Flier extends JavaPlugin {
 	 * @throws LoadingException
 	 *             when the Item cannot be created due to an error
 	 */
-	public Item getItem(String id) throws ObjectUndefinedException, TypeUndefinedException, LoadingException {
-		return getObject(id, "Item", "items", itemTypes);
+	public Item getItem(String id) throws LoadingException {
+		return getObject(id, "item", "items", itemTypes);
 	}
 
 	/**
+	 * @param id ID of the Wings
 	 * @return the Wings with specified name, never null
 	 * @throws ObjectUndefinedException
 	 *             when the Wings are not defined
@@ -159,11 +161,12 @@ public class Flier extends JavaPlugin {
 	 * @throws LoadingException
 	 *             when the Wings cannot be created due to an error
 	 */
-	public Wings getWing(String id) throws ObjectUndefinedException, TypeUndefinedException, LoadingException {
-		return getObject(id, "Wings", "wings", wingTypes);
+	public Wings getWing(String id) throws LoadingException {
+		return getObject(id, "wing", "wings", wingTypes);
 	}
 
 	/**
+	 * @param id ID of the Effect
 	 * @return the Effect with specified name, never null
 	 * @throws ObjectUndefinedException
 	 *             when the Effect is not defined
@@ -172,11 +175,12 @@ public class Flier extends JavaPlugin {
 	 * @throws LoadingException
 	 *             when the Effect cannot be created due to an error
 	 */
-	public Effect getEffect(String id) throws ObjectUndefinedException, TypeUndefinedException, LoadingException {
-		return getObject(id, "Effect", "effects", effectTypes);
+	public Effect getEffect(String id) throws LoadingException {
+		return getObject(id, "effect", "effects", effectTypes);
 	}
 	
 	/**
+	 * @param id ID of the Game
 	 * @return the Game with specified name, never null
 	 * @throws ObjectUndefinedException
 	 *             when the Game is not defined
@@ -185,35 +189,37 @@ public class Flier extends JavaPlugin {
 	 * @throws LoadingException
 	 *             when the Game cannot be created due to an error
 	 */
-	public Game getGame(String id) throws ObjectUndefinedException, TypeUndefinedException, LoadingException {
-		return getObject(id, "Game", "games", gameTypes);
+	public Game getGame(String id) throws LoadingException {
+		return getObject(id, "game", "games", gameTypes);
 	}
 	
 	/**
+	 * @param id ID of the Bonus
 	 * @return the Bonus with specified name, never null
-	 * @throws ObjectUndefinedException
-	 *             when the Bonus is not defined
-	 * @throws TypeUndefinedException
-	 *             when the Bonus type is not defined
 	 * @throws LoadingException
-	 *             when the Bonus cannot be created due to an error
+	 *             when the Bonus cannot be created due to an error, type is not defined or Bonus is not defined
 	 */
-	public Bonus getBonus(String id) throws ObjectUndefinedException, TypeUndefinedException, LoadingException {
-		return getObject(id, "Bonus", "bonuses", bonusTypes);
+	public Bonus getBonus(String id) throws LoadingException {
+		return getObject(id, "bonus", "bonuses", bonusTypes);
 	}
 
 	private <T> T getObject(String id, String name, String section, Map<String, Factory<T>> factories)
-			throws ObjectUndefinedException, TypeUndefinedException, LoadingException {
+			throws LoadingException {
+		name = Utils.capitalize(name);
 		ConfigurationSection config = getConfig().getConfigurationSection(String.format("%s.%s", section, id));
 		if (config == null || config.getKeys(false).size() == 0) {
-			throw new ObjectUndefinedException(String.format("%s do not exist.", name, id));
+			throw new LoadingException(String.format("%s with ID '%s' does not exist.", name, id));
 		}
-		String type = config.getString("type", "simpleWings");
+		String type = config.getString("type");
 		Factory<T> factory = factories.get(type);
 		if (factory == null) {
-			throw new TypeUndefinedException(String.format("%s type with ID %s does not exist.", name, type));
+			throw new LoadingException(String.format("%s type '%s' does not exist.", name, type));
 		}
-		return factory.get(config);
+		try {
+			return factory.get(config);
+		} catch (LoadingException e) {
+			throw (LoadingException) new LoadingException(String.format("Error in '%s' %s.", id, name)).initCause(e);
+		}
 	}
 
 	/**

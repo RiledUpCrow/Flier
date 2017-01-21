@@ -101,7 +101,7 @@ public class PlayerData implements InGamePlayer {
 				continue;
 			}
 			double distSqrd = bonus.distance() * bonus.distance();
-			if (bonus.getEntity().getLocation().distanceSquared(player.getLocation()) <= distSqrd) {
+			if (bonus.getLocation().distanceSquared(player.getLocation()) <= distSqrd) {
 				bonus.apply(this);
 			}
 		}

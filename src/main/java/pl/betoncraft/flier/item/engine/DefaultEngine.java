@@ -9,6 +9,7 @@ package pl.betoncraft.flier.item.engine;
 import org.bukkit.configuration.ConfigurationSection;
 
 import pl.betoncraft.flier.api.Engine;
+import pl.betoncraft.flier.core.ValueLoader;
 import pl.betoncraft.flier.exception.LoadingException;
 import pl.betoncraft.flier.item.DefaultItem;
 
@@ -19,17 +20,17 @@ import pl.betoncraft.flier.item.DefaultItem;
  */
 public abstract class DefaultEngine extends DefaultItem implements Engine {
 	
-	protected double maxFuel = 100;
-	protected double consumption = 2;
-	protected double regeneration = 1;
-	protected int glowTime = 100;
+	protected final double maxFuel;
+	protected final double consumption;
+	protected final double regeneration;
+	protected final int glowTime;
 
 	public DefaultEngine(ConfigurationSection section) throws LoadingException {
 		super(section);
-		maxFuel = section.getDouble("max_fuel", maxFuel);
-		consumption = section.getDouble("consumption", consumption);
-		regeneration = section.getDouble("regeneration", regeneration);
-		glowTime = section.getInt("glow_time", glowTime);
+		maxFuel = ValueLoader.loadPositiveDouble(section, "max_fuel");
+		consumption = ValueLoader.loadNonNegativeDouble(section, "consumption");
+		regeneration = ValueLoader.loadNonNegativeDouble(section, "regeneration");
+		glowTime = ValueLoader.loadNonNegativeInt(section, "glow_time");
 	}
 
 	@Override

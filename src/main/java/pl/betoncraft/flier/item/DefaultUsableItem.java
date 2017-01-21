@@ -14,6 +14,7 @@ import org.bukkit.configuration.ConfigurationSection;
 
 import pl.betoncraft.flier.api.InGamePlayer;
 import pl.betoncraft.flier.api.UsableItem;
+import pl.betoncraft.flier.core.ValueLoader;
 import pl.betoncraft.flier.exception.LoadingException;
 
 /**
@@ -23,17 +24,17 @@ import pl.betoncraft.flier.exception.LoadingException;
  */
 public abstract class DefaultUsableItem extends DefaultItem implements UsableItem {
 	
-	protected int cooldown = 40;
-	protected boolean consumable = false;
-	protected boolean onlyAir = false;
+	protected final int cooldown;
+	protected final boolean consumable;
+	protected final boolean onlyAir;
 
 	protected final Map<UUID, Long> cooldownData = new HashMap<>();
 
 	public DefaultUsableItem(ConfigurationSection section) throws LoadingException {
 		super(section);
-		cooldown = section.getInt("cooldown", cooldown);
-		consumable = section.getBoolean("consumable", consumable);
-		onlyAir = section.getBoolean("only_air", onlyAir);
+		cooldown = ValueLoader.loadNonNegativeInt(section, "cooldown");
+		consumable = ValueLoader.loadBoolean(section, "consumable");
+		onlyAir = ValueLoader.loadBoolean(section, "only_air");
 	}
 	
 	@Override

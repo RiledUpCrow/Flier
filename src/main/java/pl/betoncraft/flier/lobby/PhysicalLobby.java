@@ -6,6 +6,7 @@
  */
 package pl.betoncraft.flier.lobby;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -13,7 +14,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -39,9 +39,8 @@ import pl.betoncraft.flier.api.PlayerClass;
 import pl.betoncraft.flier.api.Wings;
 import pl.betoncraft.flier.core.DefaultPlayerClass;
 import pl.betoncraft.flier.core.Utils;
+import pl.betoncraft.flier.core.ValueLoader;
 import pl.betoncraft.flier.exception.LoadingException;
-import pl.betoncraft.flier.exception.ObjectUndefinedException;
-import pl.betoncraft.flier.exception.TypeUndefinedException;
 
 /**
  * Physical lobby with fixed classes selected by clicking on blocks.
@@ -52,7 +51,7 @@ public class PhysicalLobby implements Lobby, Listener {
 
 	private Map<String, Game> games = new HashMap<>();
 	private Game currentGame;
-	private List<Block> join;
+	private List<Block> join = new ArrayList<>();
 	private Location spawn;
 	private Block start;
 	private Block leave;
@@ -62,17 +61,26 @@ public class PhysicalLobby implements Lobby, Listener {
 	private List<UUID> blocked = new LinkedList<>();
 
 	public PhysicalLobby(ConfigurationSection section) throws LoadingException {
-		spawn = Utils.parseLocation(section.getString("spawn"));
-		join = section.getStringList("join").stream().map(e -> Utils.parseLocation(e).getBlock())
-				.collect(Collectors.toList());
-		start = Utils.parseLocation(section.getString("start")).getBlock();
-		leave = Utils.parseLocation(section.getString("leave")).getBlock();
-		defClass = new DefaultPlayerClass(section.getConfigurationSection("default_class"));
+		spawn = ValueLoader.loadLocation(section, "spawn");
+		for (String loc : section.getStringList("join")) {
+			join.add(Utils.parseLocation(loc).getBlock());
+		}
+		start = ValueLoader.loadLocation(section, "start").getBlock();
+		leave = ValueLoader.loadLocation(section, "leave").getBlock();
+		try {
+			ConfigurationSection playerClass = section.getConfigurationSection("default_class");
+			if (playerClass == null) {
+				throw new LoadingException("Player class is not defined.");
+			}
+			defClass = new DefaultPlayerClass(playerClass);
+		} catch (LoadingException e) {
+			throw (LoadingException) new LoadingException("Error in player class.").initCause(e);
+		}
 		ConfigurationSection itemsSection = section.getConfigurationSection("items");
-		for (String i : itemsSection.getKeys(false)) {
+		if (itemsSection != null) for (String i : itemsSection.getKeys(false)) {
 			ConfigurationSection itemSection = itemsSection.getConfigurationSection(i);
 			try {
-				blocks.put(Utils.parseLocation(itemSection.getString("block")).getBlock(), new ItemBlock(itemSection));
+				blocks.put(ValueLoader.loadLocation(itemSection, "block").getBlock(), new ItemBlock(itemSection));
 			} catch (LoadingException e) {
 				throw (LoadingException) new LoadingException(String.format("Error in '%s' item set.", i)).initCause(e);
 			}
@@ -83,8 +91,9 @@ public class PhysicalLobby implements Lobby, Listener {
 				Game game = Flier.getInstance().getGame(gameName); // TODO game starting/stopping
 				game.setLobby(this);
 				games.put(gameName, game);
-			} catch (ObjectUndefinedException | TypeUndefinedException | LoadingException e) {
-				throw (LoadingException) new LoadingException(String.format("Error in '%s' game.", gameName)).initCause(e);
+			} catch (LoadingException e) {
+				throw (LoadingException) new LoadingException(String.format("Error in '%s' game.", gameName))
+						.initCause(e);
 			}
 		}
 		if (games.isEmpty()) {
@@ -100,7 +109,7 @@ public class PhysicalLobby implements Lobby, Listener {
 
 	private class ItemBlock {
 
-		private AddType addType = AddType.RESET;
+		private final AddType addType;
 		private String name;
 		private int buyCost = 0;
 		private int unlockCost = 0;
@@ -109,7 +118,7 @@ public class PhysicalLobby implements Lobby, Listener {
 		private Map<Item, Integer> items = new HashMap<>();
 
 		private ItemBlock(ConfigurationSection section) throws LoadingException {
-			addType = AddType.valueOf(section.getString("type", addType.toString()).toUpperCase());
+			addType = ValueLoader.loadEnum(section, "type", AddType.class);
 			if (addType == AddType.RESET) {
 				return;
 			}
@@ -117,45 +126,41 @@ public class PhysicalLobby implements Lobby, Listener {
 			buyCost = section.getInt("buy_cost", buyCost);
 			unlockCost = section.getInt("unlock_cost", unlockCost);
 			String engineName = section.getString("engine");
-			try {
-				engine = Flier.getInstance().getEngine(engineName);
-			} catch (ObjectUndefinedException e) {
+			if (engineName == null) {
 				engine = null;
-			} catch (TypeUndefinedException | LoadingException e) {
-				throw (LoadingException) new LoadingException(String.format("Error in '%s' engine.", engineName))
-						.initCause(e);
+			} else {
+				engine = Flier.getInstance().getEngine(engineName);
 			}
 			String wingsName = section.getString("wings");
-			try {
-				wings = Flier.getInstance().getWing(wingsName);
-			} catch (ObjectUndefinedException e) {
+			if (wingsName == null) {
 				wings = null;
-			} catch (TypeUndefinedException | LoadingException e) {
-				throw (LoadingException) new LoadingException(String.format("Error in '%s' wings.", wingsName))
-						.initCause(e);
+			} else {
+				wings = Flier.getInstance().getWing(wingsName);
 			}
-			List<String> itemNames = section.getStringList("items");
-			for (String item : itemNames) {
-				int amount = 1;
-				if (item.contains(" ")) {
-					try {
-						amount = Integer.parseInt(item.substring(item.indexOf(' ') + 1));
-						item = item.substring(0, item.indexOf(' '));
-					} catch (NumberFormatException e) {
+			try {
+				List<String> itemNames = section.getStringList("items");
+				for (String item : itemNames) {
+					item = item.trim();
+					int amount = 1;
+					if (item.contains(" ")) {
+						String[] parts = item.split(" ");
+						if (parts.length != 2) {
+							throw new LoadingException(String.format("Item format in '%s' is incorrect.", item));
+						}
+						try {
+							amount = Integer.parseInt(parts[0]);
+						} catch (NumberFormatException e) {
+							throw new LoadingException(String.format("Cannot parse item amount in '%s'.", item));
+						}
+						item = parts[1];
 					}
-				}
-				if (amount <= 0) {
-					amount = 1;
-				}
-				try {
-					Item ui = Flier.getInstance().getItem(item);
-					if (ui != null) {
-						items.put(ui, amount);
+					if (amount <= 0) {
+						throw new LoadingException(String.format("Item amount in '%s' must be positive.", item));
 					}
-				} catch (ObjectUndefinedException | TypeUndefinedException | LoadingException e) {
-					throw (LoadingException) new LoadingException(String.format("Error in '%s' item.", item))
-							.initCause(e);
+					items.put(Flier.getInstance().getItem(item), amount);
 				}
+			} catch (LoadingException e) {
+				throw (LoadingException) new LoadingException("Error in items.").initCause(e);
 			}
 		}
 

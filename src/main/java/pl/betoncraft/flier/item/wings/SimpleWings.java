@@ -9,6 +9,7 @@ package pl.betoncraft.flier.item.wings;
 import org.bukkit.configuration.ConfigurationSection;
 
 import pl.betoncraft.flier.api.InGamePlayer;
+import pl.betoncraft.flier.core.ValueLoader;
 import pl.betoncraft.flier.core.Utils.ImmutableVector;
 import pl.betoncraft.flier.exception.LoadingException;
 
@@ -19,14 +20,15 @@ import pl.betoncraft.flier.exception.LoadingException;
  */
 public class SimpleWings extends DefaultWings {
 	
-	private double aerodynamics = 0;
-	private double liftingForce = 0;
-	private double maxLift = 0;
+	private final double aerodynamics;
+	private final double liftingForce;
+	private final double maxLift;
 	
 	public SimpleWings(ConfigurationSection section) throws LoadingException {
 		super(section);
-		aerodynamics = section.getDouble("aerodynamics", aerodynamics);
-		liftingForce = section.getDouble("liftingforce", liftingForce);
+		aerodynamics = ValueLoader.loadDouble(section, "aerodynamics");
+		liftingForce = ValueLoader.loadDouble(section, "liftingforce");
+		maxLift = ValueLoader.loadDouble(section, "maxLift");
 	}
 	
 	@Override

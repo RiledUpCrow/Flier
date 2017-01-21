@@ -9,6 +9,7 @@ package pl.betoncraft.flier.item.weapon;
 import org.bukkit.configuration.ConfigurationSection;
 
 import pl.betoncraft.flier.api.Weapon;
+import pl.betoncraft.flier.core.ValueLoader;
 import pl.betoncraft.flier.exception.LoadingException;
 import pl.betoncraft.flier.item.DefaultUsableItem;
 
@@ -19,22 +20,21 @@ import pl.betoncraft.flier.item.DefaultUsableItem;
  */
 public abstract class DefaultWeapon extends DefaultUsableItem implements Weapon {
 
-	protected boolean suicidal = false;
-	protected boolean friendlyFire = true;
-
-	protected double damage = 50;
-	protected boolean wingsOff = true;
-	protected boolean killsOnGround = true;
-	protected double physicalDamage = 5;
+	protected final boolean suicidal;
+	protected final boolean friendlyFire;
+	protected final double damage;
+	protected final boolean wingsOff;
+	protected final boolean killsOnGround;
+	protected final double physicalDamage;
 	
 	public DefaultWeapon(ConfigurationSection section) throws LoadingException {
 		super(section);
-		suicidal = section.getBoolean("suicidal", suicidal);
-		friendlyFire = section.getBoolean("friendly_fire", friendlyFire);
-		damage = section.getDouble("damage", damage);
-		wingsOff = section.getBoolean("wings_off", wingsOff);
-		killsOnGround = section.getBoolean("kills_on_ground", killsOnGround);
-		physicalDamage = section.getDouble("physical_damage", physicalDamage);
+		suicidal = ValueLoader.loadBoolean(section, "suicidal");
+		friendlyFire = ValueLoader.loadBoolean(section, "friendly_fire");
+		damage = ValueLoader.loadDouble(section, "damage");
+		wingsOff = ValueLoader.loadBoolean(section, "wings_off");
+		killsOnGround = ValueLoader.loadBoolean(section, "kills_on_ground");
+		physicalDamage = ValueLoader.loadDouble(section, "physical_damage");
 	}
 	
 	@Override

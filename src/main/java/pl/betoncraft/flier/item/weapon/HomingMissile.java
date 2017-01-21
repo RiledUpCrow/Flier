@@ -19,6 +19,7 @@ import pl.betoncraft.flier.Flier;
 import pl.betoncraft.flier.api.Damager;
 import pl.betoncraft.flier.api.Game.Attitude;
 import pl.betoncraft.flier.api.InGamePlayer;
+import pl.betoncraft.flier.core.ValueLoader;
 import pl.betoncraft.flier.core.Utils.ImmutableVector;
 import pl.betoncraft.flier.exception.LoadingException;
 
@@ -29,23 +30,23 @@ import pl.betoncraft.flier.exception.LoadingException;
  */
 public class HomingMissile extends DefaultWeapon {
 	
-	private EntityType entity = EntityType.ARROW;
-	private int searchRange = 64;
-	private double searchRadius = 0.2;
-	private double speed = 3;
-	private int lifetime = 400;
-	private double maneuverability = 1;
-	private int radius;
-	private int radiusSqr;
+	private final EntityType entity;
+	private final int searchRange;
+	private final double searchRadius;
+	private final double speed;
+	private final int lifetime;
+	private final double maneuverability;
+	private final int radius;
+	private final int radiusSqr;
 
 	public HomingMissile(ConfigurationSection section) throws LoadingException {
 		super(section);
-		entity = EntityType.valueOf(section.getString("entity", entity.toString()).toUpperCase().replace(' ', '_'));
-		searchRange = section.getInt("search_range", searchRange);
-		searchRadius = section.getDouble("search_radius", searchRadius);
-		speed = section.getDouble("speed", speed);
-		lifetime = section.getInt("lifetime", lifetime);
-		maneuverability = section.getDouble("maneuverability", maneuverability);
+		entity = ValueLoader.loadEnum(section, "entity", EntityType.class);
+		searchRange = ValueLoader.loadPositiveInt(section, "search_range");
+		searchRadius = ValueLoader.loadPositiveDouble(section, "search_radius");
+		speed = ValueLoader.loadPositiveDouble(section, "speed");
+		lifetime = ValueLoader.loadPositiveInt(section, "lifetime");
+		maneuverability = ValueLoader.loadPositiveDouble(section, "maneuverability");
 		radius = searchRange / 2;
 		radiusSqr = radius * radius;
 	}

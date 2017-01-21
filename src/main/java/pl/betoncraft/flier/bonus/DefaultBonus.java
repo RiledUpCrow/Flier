@@ -19,7 +19,8 @@ import org.bukkit.entity.EntityType;
 import pl.betoncraft.flier.Flier;
 import pl.betoncraft.flier.api.Bonus;
 import pl.betoncraft.flier.api.InGamePlayer;
-import pl.betoncraft.flier.core.Utils;
+import pl.betoncraft.flier.core.ValueLoader;
+import pl.betoncraft.flier.exception.LoadingException;
 
 /**
  * A default Bonus implementation.
@@ -28,24 +29,24 @@ import pl.betoncraft.flier.core.Utils;
  */
 public abstract class DefaultBonus implements Bonus {
 	
-	protected Entity entity;
-	protected double distance = 5;
-	protected boolean consumable = true;
-	protected int cooldown = 20 * 10;
-	protected int respawn = 20 * 10;
-	
+	protected final double distance;
+	protected final boolean consumable;
+	protected final int cooldown;
+	protected final int respawn;
+	protected final Location location;
+
 	private EntityType type;
-	private Location location;
+	private Entity entity;
 	private boolean available;
 	private Map<UUID, Long> cooldowns = new HashMap<>();
 	
-	public DefaultBonus(ConfigurationSection section) {
-		distance = section.getDouble("distance", distance);
-		consumable = section.getBoolean("consumable", consumable);
-		cooldown = section.getInt("cooldonw", cooldown);
-		respawn = section.getInt("respawn", respawn);
-		type = EntityType.valueOf(section.getString("entity", "SHEEP").toUpperCase().replace(' ', '_'));
-		location = Utils.parseLocation(section.getString("location"));
+	public DefaultBonus(ConfigurationSection section) throws LoadingException {
+		distance = ValueLoader.loadPositiveDouble(section, "distance");
+		consumable = ValueLoader.loadBoolean(section, "consumable");
+		cooldown = ValueLoader.loadNonNegativeInt(section, "cooldown");
+		respawn = ValueLoader.loadNonNegativeInt(section, "respawn");
+		type = ValueLoader.loadEnum(section, "entity", EntityType.class);
+		location = ValueLoader.loadLocation(section, "location");
 		spawn();
 	}
 	
@@ -106,8 +107,8 @@ public abstract class DefaultBonus implements Bonus {
 	}
 
 	@Override
-	public Entity getEntity() {
-		return entity;
+	public Location getLocation() {
+		return location;
 	}
 
 	@Override

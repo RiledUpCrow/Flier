@@ -18,8 +18,6 @@ import pl.betoncraft.flier.api.Item;
 import pl.betoncraft.flier.api.PlayerClass;
 import pl.betoncraft.flier.api.Wings;
 import pl.betoncraft.flier.exception.LoadingException;
-import pl.betoncraft.flier.exception.ObjectUndefinedException;
-import pl.betoncraft.flier.exception.TypeUndefinedException;
 
 /**
  * Default implementation of PlayerClass.
@@ -44,36 +42,31 @@ public class DefaultPlayerClass implements PlayerClass {
 	private final Map<Item, Integer> defaultItems = new HashMap<>();
 	
 	public DefaultPlayerClass(ConfigurationSection section) throws LoadingException {
-		defaultName = Utils.capitalize(section.getString("name", "default"));
-		String engineName = section.getString("engine");
-		try {
-			defaultEngine = Flier.getInstance().getEngine(engineName);
-		} catch (ObjectUndefinedException | TypeUndefinedException | LoadingException e) {
-			throw (LoadingException) new LoadingException(String.format("Error in '%s' engine.", engineName))
-					.initCause(e);
-		}
-		String wingsName = section.getString("wings");
-		try {
-			defaultWings = Flier.getInstance().getWing(wingsName);
-		} catch (ObjectUndefinedException | TypeUndefinedException | LoadingException e) {
-			throw (LoadingException) new LoadingException(String.format("Error in '%s' wings.", wingsName))
-					.initCause(e);
-		}
+		defaultName = Utils.capitalize(ValueLoader.loadString(section, "name"));
+		defaultEngine = ValueLoader.loadEngine(section, "engine");
+		defaultWings = ValueLoader.loadWings(section, "wings");
 		List<String> itemNames = section.getStringList("items");
 		for (String item : itemNames) {
+			item = item.trim();
 			int amount = 1;
 			if (item.contains(" ")) {
+				String[] parts = item.split(" ");
+				if (parts.length != 2) {
+					throw new LoadingException(String.format("Item format in '%s' is incorrect.", item));
+				}
 				try {
-					amount = Integer.parseInt(item.substring(item.indexOf(' ') + 1));
-					item = item.substring(0, item.indexOf(' '));
-				} catch (NumberFormatException e) {}
+					amount = Integer.parseInt(parts[0]);
+				} catch (NumberFormatException e) {
+					throw new LoadingException(String.format("Cannot parse item amount in '%s'.", item));
+				}
+				item = parts[1];
 			}
 			if (amount <= 0) {
-				amount = 1;
+				throw new LoadingException(String.format("Item amount in '%s' must be positive.", item));
 			}
 			try {
 				defaultItems.put(Flier.getInstance().getItem(item), amount);
-			} catch (ObjectUndefinedException | TypeUndefinedException | LoadingException e) {
+			} catch (LoadingException e) {
 				throw (LoadingException) new LoadingException(String.format("Error in '%s' item.", item))
 						.initCause(e);
 			}

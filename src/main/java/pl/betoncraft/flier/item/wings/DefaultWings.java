@@ -10,6 +10,7 @@ import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 
 import pl.betoncraft.flier.api.Wings;
+import pl.betoncraft.flier.core.ValueLoader;
 import pl.betoncraft.flier.exception.LoadingException;
 import pl.betoncraft.flier.item.DefaultItem;
 
@@ -20,14 +21,14 @@ import pl.betoncraft.flier.item.DefaultItem;
  */
 public abstract class DefaultWings extends DefaultItem implements Wings {
 	
-	private double health = 100;
-	private double regeneration = 1;
+	protected final double health;
+	protected final double regeneration;
 
 	public DefaultWings(ConfigurationSection section) throws LoadingException {
 		super(section);
 		super.item.setType(Material.ELYTRA);
-		health = section.getDouble("health", health);
-		regeneration = section.getDouble("regeneration", regeneration);
+		health = ValueLoader.loadPositiveDouble(section, "health");
+		regeneration = ValueLoader.loadNonNegativeDouble(section, "regeneration");
 	}
 	
 	@Override

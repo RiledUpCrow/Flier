@@ -11,6 +11,8 @@ import org.bukkit.configuration.ConfigurationSection;
 import pl.betoncraft.flier.api.Effect;
 import pl.betoncraft.flier.api.InGamePlayer;
 import pl.betoncraft.flier.api.Game.Attitude;
+import pl.betoncraft.flier.core.ValueLoader;
+import pl.betoncraft.flier.exception.LoadingException;
 
 /**
  * Targets hostile players.
@@ -19,10 +21,10 @@ import pl.betoncraft.flier.api.Game.Attitude;
  */
 public class TargetCompass implements Effect {
 	
-	private Attitude target = Attitude.HOSTILE;
+	private final Attitude target;
 	
-	public TargetCompass(ConfigurationSection section) {
-		this.target = Attitude.valueOf(section.getString("target", target.toString()).toUpperCase());
+	public TargetCompass(ConfigurationSection section) throws LoadingException {
+		this.target = ValueLoader.loadEnum(section, "target", Attitude.class);
 	}
 
 	@Override
