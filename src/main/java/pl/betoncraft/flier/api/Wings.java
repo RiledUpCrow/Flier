@@ -27,11 +27,28 @@ public interface Wings extends Item {
 	/**
 	 * @return maximum health of the wings
 	 */
-	public double getHealth();
+	double getMaxHealth();
 
 	/**
 	 * @return the regeneration rate of the wings
 	 */
 	public double getRegeneration();
+
+	/**
+	 * @return the amount of health these Wings currently have
+	 */
+	public double getHealth();
+
+	/**
+	 * @param amount of health to add to these Wings; must be positive
+	 * @return whenever the Wings were fixed or were already at full HP
+	 */
+	public boolean addHealth(double amount);
+	
+	/**
+	 * @param amount of health to remove from these Wings; must be positive
+	 * @return whenever the health of these Wings dropped to zero or not
+	 */
+	public boolean removeHealth(double amount);
 
 }

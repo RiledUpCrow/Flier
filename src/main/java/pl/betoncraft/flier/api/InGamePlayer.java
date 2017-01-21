@@ -105,54 +105,6 @@ public interface InGamePlayer {
 	public void setMoney(int amount);
 	
 	/**
-	 * @return the amount of fuel this player currently has
-	 */
-	public double getFuel();
-	
-	/**
-	 * Adds the fuel to this player's reserves. It won't go above
-	 * engine's maximum fuel amount.
-	 * 
-	 * @param amount amount of fuel to add
-	 * @return true if anything was added
-	 */
-	public boolean addFuel(double amount);
-	
-	/**
-	 * Removes specified amount of fuel from this player's reserves.
-	 * It won't go below 0.
-	 * 
-	 * @param amount amount of fuel to remove
-	 * @return true if the whole amount was removed, false if there
-	 *         was not enough fuel to remove that amount
-	 */
-	public boolean removeFuel(double amount);
-	
-	/**
-	 * @return the health level of this player's wings
-	 */
-	public double getHealth();
-	
-	/**
-	 * Adds the health to this player's wings. It won't go above
-	 * wings' maximum health level.
-	 * 
-	 * @param amount amount of health to add
-	 * @return true if anything was added
-	 */
-	public boolean addHealth(double amount);
-	
-	/**
-	 * Removes specified amount of health from this player's wings.
-	 * It won't go below 0.
-	 * 
-	 * @param amount amount of health to remove
-	 * @return true if the whole amount was removed, false if there
-	 *         was not enough health to remove that amount
-	 */
-	public boolean removeHealth(double amount);
-	
-	/**
 	 * @return the color of this player
 	 */
 	public ChatColor getColor();

@@ -237,27 +237,28 @@ public abstract class DefaultGame implements Listener, Game {
 	
 	@EventHandler
 	public void onRespawn(PlayerRespawnEvent event) {
-		InGamePlayer data = getPlayers().get(event.getPlayer().getUniqueId());
-		if (data == null) {
+		InGamePlayer player = getPlayers().get(event.getPlayer().getUniqueId());
+		if (player == null) {
 			return;
 		}
-		PlayerClass c = data.getClazz();
+		PlayerClass clazz = player.getClazz();
 		switch (respawnAction) {
 		case LOAD:
-			c.load();
+			clazz.load();
 			break;
 		case SAVE:
-			c.save();
+			clazz.save();
+			clazz.load();
 			break;
 		case RESET:
-			c.reset();
+			clazz.reset();
 			break;
 		case NOTHING:
 			break;
 		}
-		data.updateClass();
+		player.updateClass();
 		event.getPlayer().setVelocity(new Vector());
-		event.setRespawnLocation(respawnLocation(data));
+		event.setRespawnLocation(respawnLocation(player));
 	}
 	
 	@EventHandler

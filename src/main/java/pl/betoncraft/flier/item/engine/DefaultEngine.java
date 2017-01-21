@@ -24,6 +24,8 @@ public abstract class DefaultEngine extends DefaultItem implements Engine {
 	protected final double consumption;
 	protected final double regeneration;
 	protected final int glowTime;
+	
+	protected double fuel;
 
 	public DefaultEngine(ConfigurationSection section) throws LoadingException {
 		super(section);
@@ -31,6 +33,8 @@ public abstract class DefaultEngine extends DefaultItem implements Engine {
 		consumption = ValueLoader.loadNonNegativeDouble(section, "consumption");
 		regeneration = ValueLoader.loadNonNegativeDouble(section, "regeneration");
 		glowTime = ValueLoader.loadNonNegativeInt(section, "glow_time");
+		
+		fuel = maxFuel;
 	}
 
 	@Override
@@ -51,6 +55,37 @@ public abstract class DefaultEngine extends DefaultItem implements Engine {
 	@Override
 	public int getGlowTime() {
 		return glowTime;
+	}
+
+	@Override
+	public double getFuel() {
+		return fuel;
+	}
+	
+	@Override
+	public boolean addFuel(double amount) {
+		if (fuel >= maxFuel) {
+			return false;
+		}
+		if (fuel + amount > maxFuel) {
+			fuel = maxFuel;
+		} else {
+			fuel += amount;
+		}
+		return true;
+	}
+	
+	@Override
+	public boolean removeFuel(double amount) {
+		if (fuel <= 0) {
+			return false;
+		}
+		if (fuel < amount) {
+			fuel = 0;
+		} else {
+			fuel -= amount;
+		}
+		return true;
 	}
 
 }

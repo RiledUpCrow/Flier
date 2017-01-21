@@ -21,24 +21,56 @@ import pl.betoncraft.flier.item.DefaultItem;
  */
 public abstract class DefaultWings extends DefaultItem implements Wings {
 	
-	protected final double health;
+	protected final double maxHealth;
 	protected final double regeneration;
+	
+	protected double health;
 
 	public DefaultWings(ConfigurationSection section) throws LoadingException {
 		super(section);
 		super.item.setType(Material.ELYTRA);
-		health = ValueLoader.loadPositiveDouble(section, "health");
+		maxHealth = ValueLoader.loadPositiveDouble(section, "max_health");
 		regeneration = ValueLoader.loadNonNegativeDouble(section, "regeneration");
+		health = maxHealth;
 	}
 	
 	@Override
-	public double getHealth() {
-		return health;
+	public double getMaxHealth() {
+		return maxHealth;
 	}
 
 	@Override
 	public double getRegeneration() {
 		return regeneration;
+	}
+
+	@Override
+	public double getHealth() {
+		return health;
+	}
+	
+	@Override
+	public boolean addHealth(double amount) {
+		if (health >= maxHealth) {
+			return false;
+		}
+		if (health + amount > maxHealth) {
+			health = maxHealth;
+		} else {
+			health += amount;
+		}
+		return true;
+	}
+	
+	@Override
+	public boolean removeHealth(double amount) {
+		if (health <= amount) {
+			health = 0;
+			return true;
+		} else {
+			health -= amount;
+			return false;
+		}
 	}
 
 }

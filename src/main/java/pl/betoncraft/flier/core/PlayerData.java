@@ -61,8 +61,6 @@ public class PlayerData implements InGamePlayer {
 	private List<Effect> activeEffects = new LinkedList<>();
 
 	private int money;
-	private double fuel;
-	private double health;
 	
 	public PlayerData(Player player, Game game, PlayerClass clazz) {
 		this.player = player;
@@ -157,26 +155,24 @@ public class PlayerData implements InGamePlayer {
 		}
 		boolean notify = true;
 		boolean sound = true;
-		if (isFlying()) {
+		if (isFlying()) { // flying, handle air attack
+			setAttacker(attacker);
 			if (damager.wingsOff()) {
-				setAttacker(attacker);
 				takeWingsOff();
-				setAttacker(attacker);
-				removeHealth(damager.getDamage());
 				result = DamageResult.WINGS_OFF;
 			} else {
-				setAttacker(attacker);
-				removeHealth(damager.getDamage());
 				result = DamageResult.WINGS_DAMAGE;
 			}
-		} else if (Utils.getAltitude(getPlayer().getLocation(), 4) != 4) {
+			if (clazz.getCurrentWings().removeHealth(damager.getDamage())) {
+				destroyWings();
+			}
+		} else if (Utils.getAltitude(getPlayer().getLocation(), 4) != 4) { // in general proximity of the ground,
+			setAttacker(attacker);                                         // handle ground attack
 			if (damager.killsOnGround()) {
-				setAttacker(attacker);
 				notify = false;
 				getPlayer().damage(player.getHealth() + 1);
 				result = DamageResult.INSTANT_KILL;
 			} else {
-				setAttacker(attacker);
 				double damage = damager.getPhysical();
 				if (player.getPlayer().getHealth() <= damage) {
 					notify = false;
@@ -184,7 +180,7 @@ public class PlayerData implements InGamePlayer {
 				player.getPlayer().damage(damage);
 				result = DamageResult.REGULAR_DAMAGE;
 			}
-		} else {
+		} else { // falling from a high place, do not attack
 			notify = false;
 			sound = false;
 		}
@@ -241,9 +237,7 @@ public class PlayerData implements InGamePlayer {
 		Map<Item, Integer> items = clazz.getCurrentItems();
 		getPlayer().getInventory().clear();
 		getPlayer().getInventory().setItemInOffHand(engine.getItem());
-		fuel = engine.getMaxFuel();
 		getPlayer().getInventory().setChestplate(wings.getItem());
-		health = wings.getHealth();
 		for (Entry<Item, Integer> e : items.entrySet()) {
 			Item item = e.getKey();
 			int amount = e.getValue();
@@ -276,71 +270,6 @@ public class PlayerData implements InGamePlayer {
 	@Override
 	public void setMoney(int amount) {
 		money = amount;
-	}
-
-	@Override
-	public double getFuel() {
-		return fuel;
-	}
-	
-	@Override
-	public boolean addFuel(double amount) {
-		double max = clazz.getCurrentEngine().getMaxFuel();
-		if (fuel >= max) {
-			return false;
-		}
-		if (fuel + amount > max) {
-			fuel = max;
-		} else {
-			fuel += amount;
-		}
-		return true;
-	}
-	
-	@Override
-	public boolean removeFuel(double amount) {
-		if (fuel <= 0) {
-			return false;
-		}
-		if (fuel < amount) {
-			fuel = 0;
-		} else {
-			fuel -= amount;
-		}
-		return true;
-	}
-
-	@Override
-	public double getHealth() {
-		return health;
-	}
-	
-	@Override
-	public boolean addHealth(double amount) {
-		double max = clazz.getCurrentWings().getHealth();
-		if (health >= max) {
-			return false;
-		}
-		if (health + amount > max) {
-			health = max;
-		} else {
-			health += amount;
-		}
-		return true;
-	}
-	
-	@Override
-	public boolean removeHealth(double amount) {
-		if (health <= 0) {
-			return false;
-		}
-		if (health < amount) {
-			health = 0;
-			destroyWings();
-		} else {
-			health -= amount;
-		}
-		return true;
 	}
 
 	@Override
@@ -433,7 +362,7 @@ public class PlayerData implements InGamePlayer {
 		if (engine == null) {
 			return;
 		}
-		if (!removeFuel(engine.getConsumption())) {
+		if (!engine.removeFuel(engine.getConsumption())) {
 			return;
 		}
 		getPlayer().setVelocity(engine.launch(ImmutableVector.fromVector(getPlayer().getVelocity()),
@@ -446,7 +375,7 @@ public class PlayerData implements InGamePlayer {
 		if (engine == null) {
 			return;
 		}
-		addFuel(engine.getRegeneration());
+		engine.addFuel(engine.getRegeneration());
 	}
 	
 	private void regenerateWings() {
@@ -454,7 +383,7 @@ public class PlayerData implements InGamePlayer {
 		if (wings == null) {
 			return;
 		}
-		addHealth(wings.getRegeneration());
+		wings.addHealth(wings.getRegeneration());
 	}
 	
 	private void takeWingsOff() {
