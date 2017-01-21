@@ -7,10 +7,8 @@
 package pl.betoncraft.flier.game;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
@@ -18,7 +16,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
-import org.bukkit.event.HandlerList;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import pl.betoncraft.flier.Flier;
@@ -28,6 +25,7 @@ import pl.betoncraft.flier.api.InGamePlayer;
 import pl.betoncraft.flier.api.SidebarLine;
 import pl.betoncraft.flier.core.PlayerData;
 import pl.betoncraft.flier.core.Utils;
+import pl.betoncraft.flier.exception.LoadingException;
 import pl.betoncraft.flier.sidebar.Altitude;
 import pl.betoncraft.flier.sidebar.Fuel;
 import pl.betoncraft.flier.sidebar.Health;
@@ -49,7 +47,7 @@ public class TeamDeathMatch extends DefaultGame {
 	private int friendlyKillScore = -1;
 	private int enemyKillScore = 1;
 	
-	public TeamDeathMatch(ConfigurationSection section) {
+	public TeamDeathMatch(ConfigurationSection section) throws LoadingException {
 		super(section);
 		ConfigurationSection teams = section.getConfigurationSection("teams");
 		if (teams != null) {
@@ -159,16 +157,6 @@ public class TeamDeathMatch extends DefaultGame {
 	@Override
 	public Map<UUID, InGamePlayer> getPlayers() {
 		return dataMap;
-	}
-
-	@Override
-	public void stop() {
-		lobby.stop();
-		HandlerList.unregisterAll(this);
-		Set<InGamePlayer> copy = new HashSet<>(dataMap.values());
-		for (InGamePlayer data : copy) {
-			removePlayer(data.getPlayer());
-		}
 	}
 	
 	@Override

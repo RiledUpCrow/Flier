@@ -1,0 +1,62 @@
+/** This program is free software. It comes without any warranty, to
+ * the extent permitted by applicable law. You can redistribute it
+ * and/or modify it under the terms of the Do What The Fuck You Want
+ * To Public License, Version 2, as published by Sam Hocevar. See
+ * http://www.wtfpl.net/ for more details.
+ */
+package pl.betoncraft.flier.api;
+
+import org.bukkit.entity.Entity;
+
+/**
+ * Represents a collectable Entity on the Game map.
+ *
+ * @author Jakub Sapalski
+ */
+public interface Bonus {
+	
+	/**
+	 * Returns the entity used for this bonus. The entity may be null if it
+	 * doesn't currently exist (for example bonus was used and it is despawned).
+	 * 
+	 * @return the Entity representing the Bonus
+	 */
+	public Entity getEntity();
+	
+	/**
+	 * @return the minimum distance to activate this Bonus
+	 */
+	public double distance();
+	
+	/**
+	 * @return true if the Bonus should be removed after using
+	 */
+	public boolean consumable();
+	
+	/**
+	 * @return true if the bonus is available for use
+	 */
+	public boolean isAvailable();
+	
+	/**
+	 * @return the cooldown time
+	 */
+	public int cooldown();
+	
+	/**
+	 * @return in how many ticks should this Bonus be respawned;
+	 *         it will return -1 if it shouldn't respawn at all
+	 */
+	public int respawn();
+	
+	/**
+	 * @param player applies the Bonus to the player
+	 */
+	public void apply(InGamePlayer player);
+
+	/**
+	 * Cleans up the bonus, for example removing the entity.
+	 */
+	public void cleanUp();
+
+}

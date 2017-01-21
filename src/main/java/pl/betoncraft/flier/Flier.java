@@ -13,12 +13,14 @@ import java.util.Map;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import pl.betoncraft.flier.api.Bonus;
 import pl.betoncraft.flier.api.Effect;
 import pl.betoncraft.flier.api.Engine;
 import pl.betoncraft.flier.api.Game;
 import pl.betoncraft.flier.api.Item;
 import pl.betoncraft.flier.api.Lobby;
 import pl.betoncraft.flier.api.Wings;
+import pl.betoncraft.flier.bonus.EffectBonus;
 import pl.betoncraft.flier.command.FlierCommand;
 import pl.betoncraft.flier.effect.TargetCompass;
 import pl.betoncraft.flier.exception.LoadingException;
@@ -43,6 +45,7 @@ public class Flier extends JavaPlugin {
 	private Map<String, Factory<Game>> gameTypes = new HashMap<>();
 	private Map<String, Factory<Effect>> effectTypes = new HashMap<>();
 	private Map<String, Factory<Lobby>> lobbyTypes = new HashMap<>();
+	private Map<String, Factory<Bonus>> bonusTypes = new HashMap<>();
 	
 	private Map<String, Lobby> lobbies = new HashMap<>();
 
@@ -72,6 +75,7 @@ public class Flier extends JavaPlugin {
 		registerLobby("fixedPhysicalLobby", s -> new PhysicalLobby(s));
 		registerGame("teamDeathMatch", s -> new TeamDeathMatch(s));
 		registerEffect("targetCompass", s -> new TargetCompass(s));
+		registerBonus("effect", s -> new EffectBonus(s));
 
 		loadLobbies();
 	}
@@ -184,6 +188,19 @@ public class Flier extends JavaPlugin {
 	public Game getGame(String id) throws ObjectUndefinedException, TypeUndefinedException, LoadingException {
 		return getObject(id, "Game", "games", gameTypes);
 	}
+	
+	/**
+	 * @return the Bonus with specified name, never null
+	 * @throws ObjectUndefinedException
+	 *             when the Bonus is not defined
+	 * @throws TypeUndefinedException
+	 *             when the Bonus type is not defined
+	 * @throws LoadingException
+	 *             when the Bonus cannot be created due to an error
+	 */
+	public Bonus getBonus(String id) throws ObjectUndefinedException, TypeUndefinedException, LoadingException {
+		return getObject(id, "Bonus", "bonuses", bonusTypes);
+	}
 
 	private <T> T getObject(String id, String name, String section, Map<String, Factory<T>> factories)
 			throws ObjectUndefinedException, TypeUndefinedException, LoadingException {
@@ -275,6 +292,19 @@ public class Flier extends JavaPlugin {
 	 */
 	public void registerEffect(String name, Factory<Effect> factory) {
 		effectTypes.put(name, factory);
+	}
+	
+	/**
+	 * Registers a new Bonus type with specified name. The factory will be used
+	 * to obtain copies of the Bonus.
+	 * 
+	 * @param name
+	 *            name of the type
+	 * @param factory
+	 *            factory which creates instances of that type
+	 */
+	public void registerBonus(String name, Factory<Bonus> factory) {
+		bonusTypes.put(name, factory);
 	}
 
 }

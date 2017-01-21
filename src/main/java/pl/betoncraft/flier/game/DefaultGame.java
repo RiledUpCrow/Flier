@@ -6,8 +6,12 @@
  */
 package pl.betoncraft.flier.game;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.Location;
@@ -16,6 +20,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
+import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
@@ -32,6 +37,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import pl.betoncraft.flier.Flier;
+import pl.betoncraft.flier.api.Bonus;
 import pl.betoncraft.flier.api.Damager;
 import pl.betoncraft.flier.api.Damager.DamageResult;
 import pl.betoncraft.flier.api.Game;
@@ -40,6 +46,9 @@ import pl.betoncraft.flier.api.Lobby;
 import pl.betoncraft.flier.api.PlayerClass;
 import pl.betoncraft.flier.api.PlayerClass.RespawnAction;
 import pl.betoncraft.flier.core.Utils;
+import pl.betoncraft.flier.exception.LoadingException;
+import pl.betoncraft.flier.exception.ObjectUndefinedException;
+import pl.betoncraft.flier.exception.TypeUndefinedException;
 
 /**
  * Basic rules of a game.
@@ -49,6 +58,7 @@ import pl.betoncraft.flier.core.Utils;
 public abstract class DefaultGame implements Listener, Game {
 
 	protected Map<UUID, InGamePlayer> dataMap = new HashMap<>();
+	protected List<Bonus> bonuses = new ArrayList<>();
 	protected Lobby lobby;
 	protected RespawnAction respawnAction = RespawnAction.RESET;
 	
@@ -63,7 +73,15 @@ public abstract class DefaultGame implements Listener, Game {
 	protected int byFriendlyHitMoney = 0;
 	protected int suicideMoney = 0;
 	
-	public DefaultGame(ConfigurationSection section) {
+	public DefaultGame(ConfigurationSection section) throws LoadingException {
+		for (String bonusName : section.getStringList("bonuses")) {
+			try {
+				bonuses.add(Flier.getInstance().getBonus(bonusName));
+			} catch (ObjectUndefinedException | TypeUndefinedException | LoadingException e) {
+				throw (LoadingException) new LoadingException(String.format("Error in '%s' bonus.", bonusName))
+						.initCause(e);
+			}
+		}
 		respawnAction = RespawnAction.valueOf(section.getString("respawn_action", respawnAction.toString()).toUpperCase());
 		useMoney = section.getBoolean("money.enabled", useMoney);
 		enemyKillMoney = section.getInt("money.enemy_kill", enemyKillMoney);
@@ -146,6 +164,23 @@ public abstract class DefaultGame implements Listener, Game {
 	 * @param respawned the player who needs respawning
 	 */
 	public abstract Location respawnLocation(InGamePlayer respawned);
+	
+	@Override
+	public List<Bonus> getBonuses() {
+		return bonuses;
+	}
+
+	@Override
+	public void stop() {
+		HandlerList.unregisterAll(this);
+		Set<InGamePlayer> copy = new HashSet<>(dataMap.values());
+		for (InGamePlayer data : copy) {
+			removePlayer(data.getPlayer());
+		}
+		for (Bonus bonus : bonuses) {
+			bonus.cleanUp();
+		}
+	}
 	
 	@EventHandler(priority=EventPriority.LOW)
 	public void onClick(PlayerInteractEvent event) {

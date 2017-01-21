@@ -297,6 +297,9 @@ public class PhysicalLobby implements Lobby, Listener {
 
 	@Override
 	public void stop() {
+		for (Game game : games.values()) {
+			game.stop();
+		}
 		HandlerList.unregisterAll(this);
 	}
 

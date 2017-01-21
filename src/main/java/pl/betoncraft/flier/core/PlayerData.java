@@ -26,6 +26,7 @@ import org.bukkit.util.Vector;
 
 import com.google.common.collect.Lists;
 
+import pl.betoncraft.flier.api.Bonus;
 import pl.betoncraft.flier.api.Damager;
 import pl.betoncraft.flier.api.Damager.DamageResult;
 import pl.betoncraft.flier.api.Effect;
@@ -56,8 +57,8 @@ public class PlayerData implements InGamePlayer {
 	private List<SidebarLine> lines = new LinkedList<>();
 	private InGamePlayer lastHit = null;
 	private ChatColor color;
-	
 	private long glowTimer;
+	private List<Effect> activeEffects = new LinkedList<>();
 
 	private int money;
 	private double fuel;
@@ -89,6 +90,20 @@ public class PlayerData implements InGamePlayer {
 			}
 			applyEffects(true);
 			regenerateWings();
+			checkBonuses();
+		}
+	}
+
+	private void checkBonuses() {
+		List<Bonus> bonuses = game.getBonuses();
+		for (Bonus bonus : bonuses) {
+			if (!bonus.isAvailable()) {
+				continue;
+			}
+			double distSqrd = bonus.distance() * bonus.distance();
+			if (bonus.getEntity().getLocation().distanceSquared(player.getLocation()) <= distSqrd) {
+				bonus.apply(this);
+			}
 		}
 	}
 
@@ -327,6 +342,16 @@ public class PlayerData implements InGamePlayer {
 		}
 		return true;
 	}
+
+	@Override
+	public void addEffect(Effect effect) {
+		activeEffects.add(effect);
+	}
+
+	@Override
+	public void removeEffect(Effect effect) {
+		activeEffects.remove(effect);
+	}
 	
 	@Override
 	public ChatColor getColor() {
@@ -479,17 +504,21 @@ public class PlayerData implements InGamePlayer {
 			}
 			if (heldItem != null && item.getItem().isSimilar(heldItem)) {
 				for (Effect effect : item.getInHandEffects()) {
-					if (effect != null && effect.fast() == fastTick) {
-						effect.apply(this);
-					}
+					applyEffect(effect, fastTick);
 				}
-				continue;
 			}
 			for (Effect effect : item.getPassiveEffects()) {
-				if (effect != null && effect.fast() == fastTick) {
-					effect.apply(this);
-				}
+				applyEffect(effect, fastTick);
 			}
+		}
+		for (Effect effect : activeEffects) {
+			applyEffect(effect, fastTick);
+		}
+	}
+	
+	private void applyEffect(Effect effect, boolean fastTick) {
+		if (effect != null && effect.fast() == fastTick) {
+			effect.apply(this);
 		}
 	}
 

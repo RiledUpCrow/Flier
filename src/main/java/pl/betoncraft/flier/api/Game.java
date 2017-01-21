@@ -6,6 +6,7 @@
  */
 package pl.betoncraft.flier.api;
 
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -63,7 +64,7 @@ public interface Game {
 	 * 
 	 * @param toThisOne
 	 * @param ofThisOne
-	 * @return
+	 * @return the attitude
 	 */
 	public Attitude getAttitude(InGamePlayer toThisOne, InGamePlayer ofThisOne);
 
@@ -81,6 +82,16 @@ public interface Game {
 	 */
 	public Map<String, ChatColor> getColors();
 	
+	/**
+	 * @return the list of Bonuses in this Game
+	 */
+	public List<Bonus> getBonuses();
+	
+	/**
+	 * Attitude of one player to another.
+	 *
+	 * @author Jakub Sapalski
+	 */
 	public enum Attitude {
 		FRIENDLY, NEUTRAL, HOSTILE
 	}
