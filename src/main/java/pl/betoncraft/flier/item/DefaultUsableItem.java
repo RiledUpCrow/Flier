@@ -14,6 +14,7 @@ import org.bukkit.configuration.ConfigurationSection;
 
 import pl.betoncraft.flier.api.InGamePlayer;
 import pl.betoncraft.flier.api.UsableItem;
+import pl.betoncraft.flier.exception.LoadingException;
 
 /**
  * Default implementation of UsableItem.
@@ -28,7 +29,7 @@ public abstract class DefaultUsableItem extends DefaultItem implements UsableIte
 
 	protected final Map<UUID, Long> cooldownData = new HashMap<>();
 
-	public DefaultUsableItem(ConfigurationSection section) {
+	public DefaultUsableItem(ConfigurationSection section) throws LoadingException {
 		super(section);
 		cooldown = section.getInt("cooldown", cooldown);
 		consumable = section.getBoolean("consumable", consumable);

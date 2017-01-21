@@ -18,7 +18,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import pl.betoncraft.flier.Flier;
-import pl.betoncraft.flier.api.Game;
+import pl.betoncraft.flier.api.Lobby;
 
 /**
  * The main command.
@@ -40,26 +40,26 @@ public class FlierCommand implements CommandExecutor {
 				}
 				Flier f = Flier.getInstance();
 				
-				Game game;
+				Lobby lobby;
 				if (!it.hasNext()) {
 					displayHelp(sender, currentCommand, this);
 					return;
 				} else {
-					String gameName = it.next();
-					game = f.getGames().get(gameName);
-					if (game == null) {
-						sender.sendMessage(ChatColor.RED + "No such game: " + ChatColor.DARK_RED + gameName);
+					String lobbyName = it.next();
+					lobby = f.getLobbies().get(lobbyName);
+					if (lobby == null) {
+						sender.sendMessage(ChatColor.RED + "No such game: " + ChatColor.DARK_RED + lobbyName);
 						StringBuilder builder = new StringBuilder();
-						for (String g : f.getGames().keySet()) {
+						for (String g : f.getLobbies().keySet()) {
 							builder.append(ChatColor.YELLOW + g + ChatColor.GREEN + ", ");
 						}
-						sender.sendMessage(ChatColor.GREEN + "Available games: "
+						sender.sendMessage(ChatColor.GREEN + "Available lobbies: "
 								+ builder.toString().trim().substring(0, builder.lastIndexOf(",")));
 						return;
 					}
 				}
 				
-				game.addPlayer((Player) sender);
+				lobby.getGame().addPlayer((Player) sender);
 			}
 		});
 		
@@ -72,9 +72,9 @@ public class FlierCommand implements CommandExecutor {
 				}
 				Flier f = Flier.getInstance();
 				Player player = (Player) sender;
-				for (Game g : f.getGames().values()) {
-					if (g.getPlayers().containsKey(player.getUniqueId())) {
-						g.removePlayer(player);
+				for (Lobby lobby : f.getLobbies().values()) {
+					if (lobby.getGame().getPlayers().containsKey(player.getUniqueId())) {
+						lobby.getGame().removePlayer(player);
 						return;
 					}
 				}

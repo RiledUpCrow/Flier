@@ -12,6 +12,7 @@ import org.bukkit.util.Vector;
 
 import pl.betoncraft.flier.Flier;
 import pl.betoncraft.flier.api.InGamePlayer;
+import pl.betoncraft.flier.exception.LoadingException;
 
 /**
  * Launches players in the direction of looking.
@@ -22,7 +23,7 @@ public class Launcher extends DefaultUsableItem {
 	
 	private double speed = 2;
 
-	public Launcher(ConfigurationSection section) {
+	public Launcher(ConfigurationSection section) throws LoadingException {
 		super(section);
 		speed = section.getDouble("speed", speed);
 	}

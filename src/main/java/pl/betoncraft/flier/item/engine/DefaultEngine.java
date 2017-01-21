@@ -9,6 +9,7 @@ package pl.betoncraft.flier.item.engine;
 import org.bukkit.configuration.ConfigurationSection;
 
 import pl.betoncraft.flier.api.Engine;
+import pl.betoncraft.flier.exception.LoadingException;
 import pl.betoncraft.flier.item.DefaultItem;
 
 /**
@@ -23,7 +24,7 @@ public abstract class DefaultEngine extends DefaultItem implements Engine {
 	protected double regeneration = 1;
 	protected int glowTime = 100;
 
-	public DefaultEngine(ConfigurationSection section) {
+	public DefaultEngine(ConfigurationSection section) throws LoadingException {
 		super(section);
 		maxFuel = section.getDouble("max_fuel", maxFuel);
 		consumption = section.getDouble("consumption", consumption);

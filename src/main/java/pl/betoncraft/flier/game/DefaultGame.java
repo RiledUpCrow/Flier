@@ -64,9 +64,6 @@ public abstract class DefaultGame implements Listener, Game {
 	protected int suicideMoney = 0;
 	
 	public DefaultGame(ConfigurationSection section) {
-		String lobbyName = section.getString("lobby");
-		lobby = Flier.getInstance().getLobbies().get(lobbyName);
-		lobby.setGame(this);
 		respawnAction = RespawnAction.valueOf(section.getString("respawn_action", respawnAction.toString()).toUpperCase());
 		useMoney = section.getBoolean("money.enabled", useMoney);
 		enemyKillMoney = section.getInt("money.enemy_kill", enemyKillMoney);
@@ -107,6 +104,11 @@ public abstract class DefaultGame implements Listener, Game {
 				i = 0;
 			}
 		}
+	}
+	
+	@Override
+	public void setLobby(Lobby lobby) {
+		this.lobby = lobby;
 	}
 	
 	/**

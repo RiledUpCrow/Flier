@@ -39,6 +39,9 @@ import pl.betoncraft.flier.api.PlayerClass;
 import pl.betoncraft.flier.api.Wings;
 import pl.betoncraft.flier.core.DefaultPlayerClass;
 import pl.betoncraft.flier.core.Utils;
+import pl.betoncraft.flier.exception.LoadingException;
+import pl.betoncraft.flier.exception.ObjectUndefinedException;
+import pl.betoncraft.flier.exception.TypeUndefinedException;
 
 /**
  * Physical lobby with fixed classes selected by clicking on blocks.
@@ -46,8 +49,9 @@ import pl.betoncraft.flier.core.Utils;
  * @author Jakub Sapalski
  */
 public class PhysicalLobby implements Lobby, Listener {
-	
-	private Game game;
+
+	private Map<String, Game> games = new HashMap<>();
+	private Game currentGame;
 	private List<Block> join;
 	private Location spawn;
 	private Block start;
@@ -57,26 +61,45 @@ public class PhysicalLobby implements Lobby, Listener {
 	private Map<InGamePlayer, List<ItemBlock>> unlocked = new HashMap<>();
 	private List<UUID> blocked = new LinkedList<>();
 
-	public PhysicalLobby(ConfigurationSection section) {
+	public PhysicalLobby(ConfigurationSection section) throws LoadingException {
 		spawn = Utils.parseLocation(section.getString("spawn"));
-		join = section.getStringList("join").stream().map(e -> Utils.parseLocation(e).getBlock()).collect(Collectors.toList());
+		join = section.getStringList("join").stream().map(e -> Utils.parseLocation(e).getBlock())
+				.collect(Collectors.toList());
 		start = Utils.parseLocation(section.getString("start")).getBlock();
 		leave = Utils.parseLocation(section.getString("leave")).getBlock();
 		defClass = new DefaultPlayerClass(section.getConfigurationSection("default_class"));
 		ConfigurationSection itemsSection = section.getConfigurationSection("items");
 		for (String i : itemsSection.getKeys(false)) {
 			ConfigurationSection itemSection = itemsSection.getConfigurationSection(i);
-			blocks.put(Utils.parseLocation(itemSection.getString("block")).getBlock(), new ItemBlock(itemSection));
+			try {
+				blocks.put(Utils.parseLocation(itemSection.getString("block")).getBlock(), new ItemBlock(itemSection));
+			} catch (LoadingException e) {
+				throw (LoadingException) new LoadingException(String.format("Error in '%s' item set.", i)).initCause(e);
+			}
 		}
+		List<String> gameNames = section.getStringList("games");
+		for (String gameName : gameNames) {
+			try {
+				Game game = Flier.getInstance().getGame(gameName); // TODO game starting/stopping
+				game.setLobby(this);
+				games.put(gameName, game);
+			} catch (ObjectUndefinedException | TypeUndefinedException | LoadingException e) {
+				throw (LoadingException) new LoadingException(String.format("Error in '%s' game.", gameName)).initCause(e);
+			}
+		}
+		if (games.isEmpty()) {
+			throw new LoadingException("Game list is empty.");
+		}
+		currentGame = games.get(gameNames.get(0));
 		Bukkit.getPluginManager().registerEvents(this, Flier.getInstance());
 	}
-	
+
 	private enum AddType {
 		RESET, CLEAR, REPLACE, ADD, TAKE
 	}
-	
+
 	private class ItemBlock {
-		
+
 		private AddType addType = AddType.RESET;
 		private String name;
 		private int buyCost = 0;
@@ -84,8 +107,8 @@ public class PhysicalLobby implements Lobby, Listener {
 		private Engine engine;
 		private Wings wings;
 		private Map<Item, Integer> items = new HashMap<>();
-		
-		private ItemBlock(ConfigurationSection section) {
+
+		private ItemBlock(ConfigurationSection section) throws LoadingException {
 			addType = AddType.valueOf(section.getString("type", addType.toString()).toUpperCase());
 			if (addType == AddType.RESET) {
 				return;
@@ -93,8 +116,24 @@ public class PhysicalLobby implements Lobby, Listener {
 			name = section.getString("name");
 			buyCost = section.getInt("buy_cost", buyCost);
 			unlockCost = section.getInt("unlock_cost", unlockCost);
-			engine = Flier.getInstance().getEngines().get(section.getString("engine"));
-			wings = Flier.getInstance().getWings().get(section.getString("wings"));
+			String engineName = section.getString("engine");
+			try {
+				engine = Flier.getInstance().getEngine(engineName);
+			} catch (ObjectUndefinedException e) {
+				engine = null;
+			} catch (TypeUndefinedException | LoadingException e) {
+				throw (LoadingException) new LoadingException(String.format("Error in '%s' engine.", engineName))
+						.initCause(e);
+			}
+			String wingsName = section.getString("wings");
+			try {
+				wings = Flier.getInstance().getWing(wingsName);
+			} catch (ObjectUndefinedException e) {
+				wings = null;
+			} catch (TypeUndefinedException | LoadingException e) {
+				throw (LoadingException) new LoadingException(String.format("Error in '%s' wings.", wingsName))
+						.initCause(e);
+			}
 			List<String> itemNames = section.getStringList("items");
 			for (String item : itemNames) {
 				int amount = 1;
@@ -102,26 +141,32 @@ public class PhysicalLobby implements Lobby, Listener {
 					try {
 						amount = Integer.parseInt(item.substring(item.indexOf(' ') + 1));
 						item = item.substring(0, item.indexOf(' '));
-					} catch (NumberFormatException e) {}
+					} catch (NumberFormatException e) {
+					}
 				}
 				if (amount <= 0) {
 					amount = 1;
 				}
-				Item ui = Flier.getInstance().getItems().get(item);
-				if (ui != null) {
-					items.put(ui, amount);
+				try {
+					Item ui = Flier.getInstance().getItem(item);
+					if (ui != null) {
+						items.put(ui, amount);
+					}
+				} catch (ObjectUndefinedException | TypeUndefinedException | LoadingException e) {
+					throw (LoadingException) new LoadingException(String.format("Error in '%s' item.", item))
+							.initCause(e);
 				}
 			}
 		}
-		
+
 		private int getBuyCost() {
 			return buyCost;
 		}
-		
+
 		private int getUnlockCost() {
 			return unlockCost;
 		}
-		
+
 		private boolean apply(PlayerClass c) {
 			c.save();
 			if (name != null) {
@@ -227,17 +272,17 @@ public class PhysicalLobby implements Lobby, Listener {
 			c.load();
 			return true;
 		}
-		
+
 	}
-	
+
 	@Override
 	public void setGame(Game game) {
-		this.game = game;
+		this.currentGame = game;
 	}
-	
+
 	@Override
 	public Game getGame() {
-		return game;
+		return currentGame;
 	}
 
 	@Override
@@ -249,13 +294,13 @@ public class PhysicalLobby implements Lobby, Listener {
 	public PlayerClass getDefaultClass() {
 		return defClass.clone();
 	}
-	
+
 	@Override
 	public void stop() {
 		HandlerList.unregisterAll(this);
 	}
-	
-	@EventHandler(priority=EventPriority.HIGH)
+
+	@EventHandler(priority = EventPriority.HIGH)
 	public void onClick(PlayerInteractEvent event) {
 		if (event.getAction() != Action.LEFT_CLICK_BLOCK) {
 			return;
@@ -279,18 +324,18 @@ public class PhysicalLobby implements Lobby, Listener {
 		}
 		// handle the click
 		if (join.contains(block)) {
-			game.addPlayer(player);
+			currentGame.addPlayer(player);
 		} else if (block.equals(start)) {
-			game.startPlayer(player);
+			currentGame.startPlayer(player);
 		} else if (block.equals(leave)) {
-			game.removePlayer(player);
+			currentGame.removePlayer(player);
 		} else {
 			handleItems(player, block);
 		}
 	}
 
 	private void handleItems(Player player, Block block) {
-		InGamePlayer p = game.getPlayers().get(player.getUniqueId());
+		InGamePlayer p = currentGame.getPlayers().get(player.getUniqueId());
 		if (p == null) {
 			return;
 		}

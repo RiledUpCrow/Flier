@@ -9,6 +9,7 @@ package pl.betoncraft.flier.item.weapon;
 import org.bukkit.configuration.ConfigurationSection;
 
 import pl.betoncraft.flier.api.Weapon;
+import pl.betoncraft.flier.exception.LoadingException;
 import pl.betoncraft.flier.item.DefaultUsableItem;
 
 /**
@@ -26,7 +27,7 @@ public abstract class DefaultWeapon extends DefaultUsableItem implements Weapon 
 	protected boolean killsOnGround = true;
 	protected double physicalDamage = 5;
 	
-	public DefaultWeapon(ConfigurationSection section) {
+	public DefaultWeapon(ConfigurationSection section) throws LoadingException {
 		super(section);
 		suicidal = section.getBoolean("suicidal", suicidal);
 		friendlyFire = section.getBoolean("friendly_fire", friendlyFire);

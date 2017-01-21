@@ -8,6 +8,8 @@ package pl.betoncraft.flier.item;
 
 import org.bukkit.configuration.ConfigurationSection;
 
+import pl.betoncraft.flier.exception.LoadingException;
+
 /**
  * A simple item without any additional mechanics.
  *
@@ -15,7 +17,7 @@ import org.bukkit.configuration.ConfigurationSection;
  */
 public class VanillaItem extends DefaultItem {
 
-	public VanillaItem(ConfigurationSection section) {
+	public VanillaItem(ConfigurationSection section) throws LoadingException {
 		super(section);
 	}
 

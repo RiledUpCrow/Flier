@@ -10,6 +10,7 @@ import org.bukkit.configuration.ConfigurationSection;
 
 import pl.betoncraft.flier.api.InGamePlayer;
 import pl.betoncraft.flier.core.Utils.ImmutableVector;
+import pl.betoncraft.flier.exception.LoadingException;
 
 /**
  * Simple wings with scalable lifting force and air resistance.
@@ -22,7 +23,7 @@ public class SimpleWings extends DefaultWings {
 	private double liftingForce = 0;
 	private double maxLift = 0;
 	
-	public SimpleWings(ConfigurationSection section) {
+	public SimpleWings(ConfigurationSection section) throws LoadingException {
 		super(section);
 		aerodynamics = section.getDouble("aerodynamics", aerodynamics);
 		liftingForce = section.getDouble("liftingforce", liftingForce);

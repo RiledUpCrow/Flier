@@ -17,6 +17,7 @@ import org.bukkit.util.Vector;
 import pl.betoncraft.flier.Flier;
 import pl.betoncraft.flier.api.Damager;
 import pl.betoncraft.flier.api.InGamePlayer;
+import pl.betoncraft.flier.exception.LoadingException;
 
 /**
  * Burst shooting weapon with unguided projectiles.
@@ -30,7 +31,7 @@ public class MachineGun extends DefaultWeapon {
 	private int burstTicks = 1;
 	private double projectileSpeed = 5;
 	
-	public MachineGun(ConfigurationSection section) {
+	public MachineGun(ConfigurationSection section) throws LoadingException {
 		super(section);
 		entity = EntityType.valueOf(section.getString("entity", "FIREBALL").toUpperCase().replace(' ', '_'));
 		burstAmount = section.getInt("burst_amount", burstAmount);

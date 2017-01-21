@@ -20,6 +20,13 @@ import org.bukkit.entity.Player;
 public interface Game {
 
 	/**
+	 * This method must be used to set a lobby for a game.
+	 * 
+	 * @param lobby game's lobby
+	 */
+	void setLobby(Lobby lobby);
+
+	/**
 	 * Adds the player to the game.
 	 * 
 	 * @param player

@@ -20,6 +20,7 @@ import pl.betoncraft.flier.api.Damager;
 import pl.betoncraft.flier.api.Game.Attitude;
 import pl.betoncraft.flier.api.InGamePlayer;
 import pl.betoncraft.flier.core.Utils.ImmutableVector;
+import pl.betoncraft.flier.exception.LoadingException;
 
 /**
  * A homing missile which targets flying players.
@@ -37,7 +38,7 @@ public class HomingMissile extends DefaultWeapon {
 	private int radius;
 	private int radiusSqr;
 
-	public HomingMissile(ConfigurationSection section) {
+	public HomingMissile(ConfigurationSection section) throws LoadingException {
 		super(section);
 		entity = EntityType.valueOf(section.getString("entity", entity.toString()).toUpperCase().replace(' ', '_'));
 		searchRange = section.getInt("search_range", searchRange);

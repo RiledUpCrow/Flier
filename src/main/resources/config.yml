@@ -311,6 +311,8 @@ lobbies:
         - weak_launcher
         - radar
         wings: heavyWings
+    games:
+    - default
 games:
   default:
     respawn_action: load
@@ -324,4 +326,3 @@ games:
         name: 'Red'
         location: -82.5;140;377.5;world;180;0
         color: red
-    lobby: default

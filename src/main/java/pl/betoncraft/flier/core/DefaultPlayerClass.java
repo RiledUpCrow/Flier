@@ -17,6 +17,9 @@ import pl.betoncraft.flier.api.Engine;
 import pl.betoncraft.flier.api.Item;
 import pl.betoncraft.flier.api.PlayerClass;
 import pl.betoncraft.flier.api.Wings;
+import pl.betoncraft.flier.exception.LoadingException;
+import pl.betoncraft.flier.exception.ObjectUndefinedException;
+import pl.betoncraft.flier.exception.TypeUndefinedException;
 
 /**
  * Default implementation of PlayerClass.
@@ -40,11 +43,22 @@ public class DefaultPlayerClass implements PlayerClass {
 	private final Wings defaultWings;
 	private final Map<Item, Integer> defaultItems = new HashMap<>();
 	
-	public DefaultPlayerClass(ConfigurationSection section) {
+	public DefaultPlayerClass(ConfigurationSection section) throws LoadingException {
 		defaultName = Utils.capitalize(section.getString("name", "default"));
-		// defaults
-		defaultEngine = Flier.getInstance().getEngines().get(section.getString("engine"));
-		defaultWings = Flier.getInstance().getWings().get(section.getString("wings"));
+		String engineName = section.getString("engine");
+		try {
+			defaultEngine = Flier.getInstance().getEngine(engineName);
+		} catch (ObjectUndefinedException | TypeUndefinedException | LoadingException e) {
+			throw (LoadingException) new LoadingException(String.format("Error in '%s' engine.", engineName))
+					.initCause(e);
+		}
+		String wingsName = section.getString("wings");
+		try {
+			defaultWings = Flier.getInstance().getWing(wingsName);
+		} catch (ObjectUndefinedException | TypeUndefinedException | LoadingException e) {
+			throw (LoadingException) new LoadingException(String.format("Error in '%s' wings.", wingsName))
+					.initCause(e);
+		}
 		List<String> itemNames = section.getStringList("items");
 		for (String item : itemNames) {
 			int amount = 1;
@@ -57,9 +71,11 @@ public class DefaultPlayerClass implements PlayerClass {
 			if (amount <= 0) {
 				amount = 1;
 			}
-			Item ui = Flier.getInstance().getItems().get(item);
-			if (ui != null) {
-				defaultItems.put(ui, amount);
+			try {
+				defaultItems.put(Flier.getInstance().getItem(item), amount);
+			} catch (ObjectUndefinedException | TypeUndefinedException | LoadingException e) {
+				throw (LoadingException) new LoadingException(String.format("Error in '%s' item.", item))
+						.initCause(e);
 			}
 		}
 		reset();

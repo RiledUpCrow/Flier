@@ -9,6 +9,7 @@ package pl.betoncraft.flier.item.engine;
 import org.bukkit.configuration.ConfigurationSection;
 
 import pl.betoncraft.flier.core.Utils.ImmutableVector;
+import pl.betoncraft.flier.exception.LoadingException;
 
 /**
  * Engine which multiplies speed instead of adding a fixed acceleration.
@@ -21,7 +22,7 @@ public class MultiplyingEngine extends DefaultEngine {
 	private double minSpeed = 0.5;
 	private double acceleration = 1.2;
 	
-	public MultiplyingEngine(ConfigurationSection section) {
+	public MultiplyingEngine(ConfigurationSection section) throws LoadingException {
 		super(section);
 		maxSpeed = section.getDouble("max_speed", maxSpeed);
 		minSpeed = section.getDouble("min_speed", minSpeed);

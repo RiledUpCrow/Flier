@@ -18,6 +18,9 @@ import org.bukkit.inventory.meta.ItemMeta;
 import pl.betoncraft.flier.Flier;
 import pl.betoncraft.flier.api.Effect;
 import pl.betoncraft.flier.api.Item;
+import pl.betoncraft.flier.exception.LoadingException;
+import pl.betoncraft.flier.exception.ObjectUndefinedException;
+import pl.betoncraft.flier.exception.TypeUndefinedException;
 
 /**
  * A base class for items saved in the configuration sections.
@@ -25,19 +28,21 @@ import pl.betoncraft.flier.api.Item;
  * @author Jakub Sapalski
  */
 public abstract class DefaultItem implements Item {
-	
+
 	protected ItemStack item;
-	protected double weight;
-	protected int slot;
+	protected double weight = 0;
+	protected int slot = 1;
 	protected List<Effect> passive = new ArrayList<>();
 	protected List<Effect> inHand = new ArrayList<>();
-	
-	public DefaultItem(ConfigurationSection section) {
-		Material type = Material.matchMaterial(section.getString("material", "FEATHER"));
+
+	public DefaultItem(ConfigurationSection section) throws LoadingException {
+		String typeName = section.getString("material", "FEATHER");
+		Material type = Material.matchMaterial(typeName);
 		if (type == null) {
-			type = Material.FEATHER;
+			throw new LoadingException(String.format("Material '%s' does not exist.", typeName));
 		}
-		String name = ChatColor.translateAlternateColorCodes('&', section.getString("name", ChatColor.GREEN + "Engine"));
+		String name = ChatColor.translateAlternateColorCodes('&',
+				section.getString("name", ChatColor.GREEN + "Engine"));
 		List<String> lore = section.getStringList("lore");
 		for (int i = 0; i < lore.size(); i++) {
 			lore.set(i, ChatColor.translateAlternateColorCodes('&', lore.get(i)));
@@ -50,35 +55,45 @@ public abstract class DefaultItem implements Item {
 		item.setItemMeta(meta);
 		weight = section.getDouble("weight", weight);
 		slot = section.getInt("slot", slot);
-		for (String e : section.getStringList("passive_effects")) {
-			Effect eff = Flier.getInstance().getEffects().get(e);
-			passive.add(eff);
+		for (String effect : section.getStringList("passive_effects")) {
+			try {
+				Effect eff = Flier.getInstance().getEffect(effect);
+				passive.add(eff);
+			} catch (ObjectUndefinedException | TypeUndefinedException | LoadingException e) {
+				throw (LoadingException) new LoadingException(String.format("Error in '%s' passive effect.", effect))
+						.initCause(e);
+			}
 		}
-		for (String e : section.getStringList("in_hand_effects")) {
-			inHand.add(Flier.getInstance().getEffects().get(e));
+		for (String effect : section.getStringList("in_hand_effects")) {
+			try {
+				inHand.add(Flier.getInstance().getEffect(effect));
+			} catch (ObjectUndefinedException | TypeUndefinedException | LoadingException e) {
+				throw (LoadingException) new LoadingException(String.format("Error in '%s' in-hand effect.", effect))
+						.initCause(e);
+			}
 		}
 	}
-	
+
 	@Override
 	public ItemStack getItem() {
 		return item.clone();
 	}
-	
+
 	@Override
 	public double getWeight() {
 		return weight;
 	}
-	
+
 	@Override
 	public int slot() {
 		return slot;
 	}
-	
+
 	@Override
 	public List<Effect> getPassiveEffects() {
 		return passive;
 	}
-	
+
 	@Override
 	public List<Effect> getInHandEffects() {
 		return inHand;
