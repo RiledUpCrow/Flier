@@ -6,6 +6,7 @@
  */
 package pl.betoncraft.flier.bonus;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -88,10 +89,21 @@ public abstract class DefaultBonus implements Bonus {
 		if (entity == null) {
 			return;
 		}
-		float yaw = entity.getLocation().getYaw();
-		Location rotated = entity.getLocation();
-		rotated.setYaw((yaw + 10) % 360);
-		entity.teleport(rotated);
+		if (!entity.isValid()) {
+			if (!location.getChunk().isLoaded()) {
+				return;
+			}
+			Entity newEntity = Arrays.asList(location.getChunk().getEntities()).stream()
+					.filter(e -> e.getUniqueId().equals(entity.getUniqueId()))
+					.findFirst().orElse(null);
+			if (newEntity == null) {
+				return;
+			}
+			entity = newEntity;
+		}
+		float yaw = location.getYaw();
+		location.setYaw((yaw + 10) % 360);
+		entity.teleport(location);
 	}
 	
 	@Override
