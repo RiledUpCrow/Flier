@@ -26,7 +26,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.inventory.InventoryInteractEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
@@ -321,7 +321,7 @@ public abstract class DefaultGame implements Listener, Game {
 	}
 	
 	@EventHandler
-	public void onInvInteract(InventoryInteractEvent event) {
+	public void onInvInteract(InventoryClickEvent event) {
 		if (getPlayers().containsKey(event.getWhoClicked().getUniqueId())) {
 			event.setCancelled(true);
 		}
