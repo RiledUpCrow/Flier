@@ -104,7 +104,7 @@ public class PhysicalLobby implements Lobby, Listener {
 	}
 
 	private enum AddType {
-		RESET, CLEAR, REPLACE, ADD, TAKE
+		RESET, CLEAR, REPLACE, ADD, TAKE // TODO add "SINGLE" for a single item
 	}
 
 	private class ItemBlock {
@@ -116,6 +116,7 @@ public class PhysicalLobby implements Lobby, Listener {
 		private Engine engine;
 		private Wings wings;
 		private Map<Item, Integer> items = new HashMap<>();
+		private boolean saving = true;
 
 		private ItemBlock(ConfigurationSection section) throws LoadingException {
 			addType = ValueLoader.loadEnum(section, "type", AddType.class);
@@ -123,6 +124,7 @@ public class PhysicalLobby implements Lobby, Listener {
 				return;
 			}
 			name = section.getString("name");
+			saving = section.getBoolean("saving", saving);
 			buyCost = section.getInt("buy_cost", buyCost);
 			unlockCost = section.getInt("unlock_cost", unlockCost);
 			String engineName = section.getString("engine");
@@ -171,85 +173,108 @@ public class PhysicalLobby implements Lobby, Listener {
 		private int getUnlockCost() {
 			return unlockCost;
 		}
-
-		private boolean apply(PlayerClass c) {
-			c.save();
-			if (name != null) {
+		
+		private void setName(PlayerClass c, String name) {
+			c.setCurrentName(name);
+			if (saving) {
 				c.setStoredName(name);
 			}
+		}
+		
+		private void setEngine(PlayerClass c, Engine engine) {
+			c.setCurrentEngine(engine);
+			if (saving) {
+				c.setStoredEngine(engine);
+			}
+		}
+		
+		private void setWings(PlayerClass c, Wings wings) {
+			c.setCurrentWings(wings);
+			if (saving) {
+				c.setStoredWings(wings);
+			}
+		}
+		
+		private void setItems(PlayerClass c, Map<Item, Integer> items) {
+			c.setCurrentItems(items);
+			if (saving) {
+				c.setStoredItems(items);
+			}
+		}
+
+		private boolean apply(PlayerClass c) {
+			if (name != null) {
+				setName(c, name);
+			}
 			switch (addType) {
-			case RESET:
+			case RESET: // reset all items to default class
 				c.reset();
 				break;
-			case CLEAR:
-				c.setStoredEngine(engine);
-				c.setStoredWings(wings);
-				c.setStoredItems(items);
+			case CLEAR: // set inventory to these items only
+				setEngine(c, engine);
+				setWings(c, wings);
+				setItems(c, items);
 				break;
-			case REPLACE:
+			case REPLACE: // replace these items, don't touch others
 				if (engine != null) {
-					c.setStoredEngine(engine);
+					setEngine(c, engine);
 				}
 				if (wings != null) {
-					c.setStoredWings(wings);
+					setWings(c, wings);
 				}
-				Map<Item, Integer> storedItems = c.getStoredItems();
+				Map<Item, Integer> storedItems1 = c.getCurrentItems();
 				for (Iterator<Entry<Item, Integer>> i = items.entrySet().iterator(); i.hasNext();) {
 					Entry<Item, Integer> e = i.next();
-					for (Iterator<Entry<Item, Integer>> si = storedItems.entrySet().iterator(); si.hasNext();) {
+					for (Iterator<Entry<Item, Integer>> si = storedItems1.entrySet().iterator(); si.hasNext();) {
 						Entry<Item, Integer> se = si.next();
 						if (e.getKey().slot() == se.getKey().slot()) {
 							si.remove();
 						}
 					}
-					storedItems.put(e.getKey(), e.getValue());
+					storedItems1.put(e.getKey(), e.getValue());
 				}
-				c.setStoredItems(storedItems);
+				setItems(c, storedItems1);
 				break;
-			case ADD:
-				if (engine != null && c.getStoredEngine() != null) {
-					c.save();
-					return false;
-				}
+			case ADD: // add items to existing ones
 				if (engine != null) {
-					c.setStoredEngine(engine);
-				}
-				if (wings != null && c.getStoredWings() != null) {
-					c.save();
-					return false;
+					if (c.getCurrentEngine() != null) {
+						return false;
+					}
+					setEngine(c, engine);
 				}
 				if (wings != null) {
-					c.setStoredWings(wings);
+					if (c.getCurrentWings() != null) {
+						return false;
+					}
+					setWings(c, wings);
 				}
-				Map<Item, Integer> storedItems2 = c.getStoredItems();
+				Map<Item, Integer> storedItems2 = new HashMap<>(c.getCurrentItems());
+				loop:
 				for (Iterator<Entry<Item, Integer>> i = items.entrySet().iterator(); i.hasNext();) {
 					Entry<Item, Integer> e = i.next();
-					int oldAmount = 0;
 					for (Iterator<Entry<Item, Integer>> si = storedItems2.entrySet().iterator(); si.hasNext();) {
 						Entry<Item, Integer> se = si.next();
 						if (e.getKey().slot() == se.getKey().slot()) {
-							si.remove();
-							if (e.getKey().equals(se.getKey())) {
-								oldAmount = se.getValue();
-								break;
+							if (e.getKey().isSameAs(se.getKey())) {
+								se.setValue(se.getValue() + e.getValue());
+								continue loop;
 							} else {
-								c.save();
 								return false;
 							}
 						}
 					}
-					storedItems2.put(e.getKey(), oldAmount + e.getValue());
+					storedItems2.put(e.getKey(), e.getValue());
 				}
-				c.setStoredItems(storedItems2);
+				setItems(c, storedItems2);
 				break;
-			case TAKE:
-				if (engine != null && engine.equals(c.getStoredEngine())) {
-					c.setStoredEngine(null);
+			case TAKE: // take items from existing ones
+				if (engine != null && engine.equals(c.getCurrentEngine())) {
+					setEngine(c, null);
 				}
-				if (wings != null && wings.equals(c.getStoredWings())) {
-					c.setStoredWings(null);
+				if (wings != null && wings.equals(c.getCurrentWings())) {
+					setWings(c, null);
 				}
-				Map<Item, Integer> storedItems3 = c.getStoredItems();
+				Map<Item, Integer> storedItems3 = c.getCurrentItems();
 				for (Iterator<Entry<Item, Integer>> i = items.entrySet().iterator(); i.hasNext();) {
 					Entry<Item, Integer> e = i.next();
 					int oldAmount = 0;
@@ -267,14 +292,12 @@ public class PhysicalLobby implements Lobby, Listener {
 					if (newAmount > 0) {
 						storedItems3.put(e.getKey(), newAmount);
 					} else if (newAmount < 0) {
-						c.save();
 						return false;
 					}
 				}
-				c.setStoredItems(storedItems3);
+				setItems(c, storedItems3);
 				break;
 			}
-			c.load();
 			return true;
 		}
 

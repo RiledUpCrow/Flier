@@ -42,4 +42,13 @@ public interface Item extends Replicable {
 	 */
 	public List<Effect> getInHandEffects();
 
+	/**
+	 * Compares two items by the default values (ignores mutable values).
+	 * This returns true for replicated items.
+	 * 
+	 * @param key another item to compare
+	 * @return true if the item was replicated from this one, false if not
+	 */
+	public boolean isSameAs(Item key);
+
 }

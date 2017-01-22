@@ -96,5 +96,14 @@ public abstract class DefaultItem implements Item {
 	public List<Effect> getInHandEffects() {
 		return Collections.unmodifiableList(inHand);
 	}
+	
+	@Override
+	public boolean isSameAs(Item item) {
+		if (item instanceof DefaultItem) {
+			DefaultItem defItem = (DefaultItem) item;
+			return defItem.base.equals(base);
+		}
+		return false;
+	}
 
 }
