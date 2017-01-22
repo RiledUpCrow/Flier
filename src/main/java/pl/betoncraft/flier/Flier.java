@@ -21,6 +21,7 @@ import pl.betoncraft.flier.api.Item;
 import pl.betoncraft.flier.api.Lobby;
 import pl.betoncraft.flier.api.Wings;
 import pl.betoncraft.flier.bonus.EffectBonus;
+import pl.betoncraft.flier.bonus.MoneyBonus;
 import pl.betoncraft.flier.command.FlierCommand;
 import pl.betoncraft.flier.core.Utils;
 import pl.betoncraft.flier.effect.TargetCompass;
@@ -75,6 +76,7 @@ public class Flier extends JavaPlugin {
 		registerGame("teamDeathMatch", s -> new TeamDeathMatch(s));
 		registerEffect("targetCompass", s -> new TargetCompass(s));
 		registerBonus("effect", s -> new EffectBonus(s));
+		registerBonus("money", s -> new MoneyBonus(s));
 
 		loadLobbies();
 	}
