@@ -47,6 +47,12 @@ public interface Bonus extends Replicable {
 	public int respawn();
 	
 	/**
+	 * Called in game fast tick to allow Bonus updating (for example rotating
+	 * the entity).
+	 */
+	public void update();
+	
+	/**
 	 * @param player applies the Bonus to the player
 	 */
 	public void apply(InGamePlayer player);

@@ -84,6 +84,17 @@ public abstract class DefaultBonus implements Bonus {
 	protected abstract boolean use(InGamePlayer player);
 	
 	@Override
+	public void update() {
+		if (entity == null) {
+			return;
+		}
+		float yaw = entity.getLocation().getYaw();
+		Location rotated = entity.getLocation();
+		rotated.setYaw((yaw + 10) % 360);
+		entity.teleport(rotated);
+	}
+	
+	@Override
 	public void apply(InGamePlayer player) {
 		if (!available) {
 			return;

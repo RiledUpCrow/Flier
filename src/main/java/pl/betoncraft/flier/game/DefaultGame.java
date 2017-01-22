@@ -106,6 +106,9 @@ public abstract class DefaultGame implements Listener, Game {
 
 		@Override
 		public void run() {
+			for (Bonus bonus : bonuses) {
+				bonus.update();
+			}
 			game.fastTick();
 			for (InGamePlayer data : getPlayers().values()) {
 				data.fastTick();
