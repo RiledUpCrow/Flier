@@ -270,6 +270,9 @@ public class PlayerData implements InGamePlayer {
 	@Override
 	public void setMoney(int amount) {
 		money = amount;
+		if (money < 0) {
+			money = 0;
+		}
 	}
 
 	@Override
