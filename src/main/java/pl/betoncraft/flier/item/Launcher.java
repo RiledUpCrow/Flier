@@ -6,8 +6,9 @@
  */
 package pl.betoncraft.flier.item;
 
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.entity.Entity;
 import org.bukkit.util.Vector;
 
 import pl.betoncraft.flier.Flier;
@@ -31,16 +32,21 @@ public class Launcher extends DefaultUsableItem {
 
 	@Override
 	public boolean use(InGamePlayer player) {
-		Vector vel = player.getPlayer().getLocation().getDirection().multiply(speed);
-		player.getPlayer().setVelocity(vel);
-		if (!player.getPlayer().isGliding()) {
-			new BukkitRunnable() {
-				@Override
-				public void run() {
+		Runnable launch = () -> {
+			Vector vel = player.getPlayer().getLocation().getDirection().multiply(speed);
+			player.getPlayer().setVelocity(vel);
+			if (!player.getPlayer().isGliding()) {
+				Bukkit.getScheduler().runTask(Flier.getInstance(), () -> {
 					player.getPlayer().setGliding(true);
 					player.getPlayer().setVelocity(vel);
-				}
-			}.runTask(Flier.getInstance());
+				});
+			}
+		};
+		if (((Entity) player.getPlayer()).isOnGround()) {
+			player.getPlayer().setVelocity(new Vector(0, 2, 0));
+			Bukkit.getScheduler().runTaskLater(Flier.getInstance(), launch, 5);
+		} else {
+			launch.run();
 		}
 		return true;
 	}
