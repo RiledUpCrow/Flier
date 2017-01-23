@@ -7,6 +7,7 @@
 package pl.betoncraft.flier.game;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -15,6 +16,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -30,9 +32,10 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Vector;
 
 import pl.betoncraft.flier.Flier;
 import pl.betoncraft.flier.api.Bonus;
@@ -42,6 +45,11 @@ import pl.betoncraft.flier.api.Game;
 import pl.betoncraft.flier.api.InGamePlayer;
 import pl.betoncraft.flier.core.Utils;
 import pl.betoncraft.flier.exception.LoadingException;
+import pl.betoncraft.flier.sidebar.Altitude;
+import pl.betoncraft.flier.sidebar.Fuel;
+import pl.betoncraft.flier.sidebar.Health;
+import pl.betoncraft.flier.sidebar.Money;
+import pl.betoncraft.flier.sidebar.Speed;
 
 /**
  * Basic rules of a game.
@@ -145,6 +153,68 @@ public abstract class DefaultGame implements Listener, Game {
 	 * @param damager the Damager used in the hit
 	 */
 	public abstract void handleHit(DamageResult result, InGamePlayer attacker, InGamePlayer attacked, Damager damager);
+	
+	/**
+	 * Should return the exact place to respawn the player. Use it if you want
+	 * to do something special after respawning the player, or just return
+	 * lobby.getSpawn().
+	 * 
+	 * @param player
+	 *            player who is about to be respawned
+	 * @return the location where the player will be respawned
+	 */
+	public abstract Location getRespawnLocation(InGamePlayer player);
+	
+	/**
+	 * This method is called for the respawned player. Use it if you want to do
+	 * something special after respawning the player, or just pass him to
+	 * lobby.respawnPlayer().
+	 * 
+	 * @param player
+	 *            the player who has just respawned
+	 */
+	public abstract void afterRespawn(InGamePlayer player);
+
+	@Override
+	public void addPlayer(InGamePlayer data) {
+		UUID uuid = data.getPlayer().getUniqueId();
+		if (dataMap.isEmpty()) {
+			start();
+		} else if (dataMap.containsKey(uuid)) {
+			return;
+		}
+		dataMap.put(uuid, data);
+		data.getLines().add(new Fuel(data));
+		data.getLines().add(new Health(data));
+		data.getLines().add(new Speed(data));
+		data.getLines().add(new Altitude(data));
+		if (useMoney) {
+			data.getLines().add(new Money(data));
+		}
+	}
+	
+	@Override
+	public void startPlayer(InGamePlayer data) {
+		new BukkitRunnable() {
+			@Override
+			public void run() {
+				data.setPlaying(true);
+			}
+		}.runTaskLater(Flier.getInstance(), 20);
+	}
+	
+	@Override
+	public void removePlayer(InGamePlayer data) {
+		dataMap.remove(data.getPlayer().getUniqueId());
+		if (dataMap.isEmpty()) {
+			stop();
+		}
+	}
+	
+	@Override
+	public Map<UUID, InGamePlayer> getPlayers() {
+		return Collections.unmodifiableMap(dataMap);
+	}
 
 	@Override
 	public void start() {
@@ -262,6 +332,16 @@ public abstract class DefaultGame implements Listener, Game {
 	}
 	
 	@EventHandler
+	public void onRespawn(PlayerRespawnEvent event) {
+		InGamePlayer player = getPlayers().get(event.getPlayer().getUniqueId());
+		if (player == null) {
+			return;
+		}
+		event.getPlayer().setVelocity(new Vector());
+		event.setRespawnLocation(getRespawnLocation(player));
+	}
+	
+	@EventHandler
 	public void onDrop(PlayerDropItemEvent event) {
 		if (getPlayers().containsKey(event.getPlayer().getUniqueId())) {
 			event.setCancelled(true);
@@ -286,14 +366,6 @@ public abstract class DefaultGame implements Listener, Game {
 	public void onInvInteract(InventoryClickEvent event) {
 		if (getPlayers().containsKey(event.getWhoClicked().getUniqueId())) {
 			event.setCancelled(true);
-		}
-	}
-	
-	@EventHandler
-	public void onLeave(PlayerQuitEvent event) {
-		InGamePlayer player = getPlayers().get(event.getPlayer().getUniqueId());
-		if (player != null) {
-			player.exitGame();
 		}
 	}
 	

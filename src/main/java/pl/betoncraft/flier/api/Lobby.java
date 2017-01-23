@@ -19,14 +19,33 @@ import org.bukkit.entity.Player;
 public interface Lobby {
 	
 	/**
-	 * @param player the player to add to this lobby
+	 * Adds player to the lobby. Creates an InGamePlayer instance and adds the
+	 * player to the current Game.
+	 * 
+	 * @param player
+	 *            the player to add to this lobby
 	 */
 	public void addPlayer(Player player);
-	
+
 	/**
-	 * @param player the player to remove from this lobby
+	 * Removes player from the current Game, clears him and removes him from
+	 * this Lobby.
+	 * 
+	 * @param player
+	 *            the player to remove from this lobby
 	 */
 	public void removePlayer(Player player);
+	
+	/**
+	 * Teleports the player to the lobby spawn and prepares him for further
+	 * playing, according to RespawnAction. It does not actually respawns the
+	 * player, because this is the Game's responsibility. The game can then pass
+	 * the player to the Lobby when it decides to using this method.
+	 * 
+	 * @param player
+	 *            player to respawn in the lobby
+	 */
+	public void respawnPlayer(InGamePlayer player);
 	
 	/**
 	 * Called when the game ends.

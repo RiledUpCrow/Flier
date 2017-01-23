@@ -6,7 +6,6 @@
  */
 package pl.betoncraft.flier.game;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -16,9 +15,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.scheduler.BukkitRunnable;
 
-import pl.betoncraft.flier.Flier;
 import pl.betoncraft.flier.api.Damager;
 import pl.betoncraft.flier.api.Damager.DamageResult;
 import pl.betoncraft.flier.api.InGamePlayer;
@@ -26,11 +23,6 @@ import pl.betoncraft.flier.api.SidebarLine;
 import pl.betoncraft.flier.core.Utils;
 import pl.betoncraft.flier.core.ValueLoader;
 import pl.betoncraft.flier.exception.LoadingException;
-import pl.betoncraft.flier.sidebar.Altitude;
-import pl.betoncraft.flier.sidebar.Fuel;
-import pl.betoncraft.flier.sidebar.Health;
-import pl.betoncraft.flier.sidebar.Money;
-import pl.betoncraft.flier.sidebar.Speed;
 
 /**
  * A simple team deathmatch game.
@@ -142,34 +134,26 @@ public class TeamDeathMatch extends DefaultGame {
 
 	@Override
 	public void handleHit(DamageResult result, InGamePlayer attacker, InGamePlayer attacked, Damager damager) {}
-
+	
+	@Override
+	public Location getRespawnLocation(InGamePlayer player) {
+		return player.getLobby().getSpawn();
+	}
+	
+	@Override
+	public void afterRespawn(InGamePlayer player) {
+		player.getLobby().respawnPlayer(player);
+	}
+	
 	@Override
 	public void addPlayer(InGamePlayer data) {
-		UUID uuid = data.getPlayer().getUniqueId();
-		if (dataMap.isEmpty()) {
-			start();
-		} else if (dataMap.containsKey(uuid)) {
-			return;
-		}
-		dataMap.put(uuid, data);
-		data.getLines().add(new Fuel(data));
-		data.getLines().add(new Health(data));
-		data.getLines().add(new Speed(data));
-		data.getLines().add(new Altitude(data));
-		if (useMoney) {
-			data.getLines().add(new Money(data));
-		}
+		super.addPlayer(data);
 		data.getLines().addAll(lines.values());
 	}
 	
 	@Override
 	public void startPlayer(InGamePlayer data) {
-		new BukkitRunnable() {
-			@Override
-			public void run() {
-				data.setPlaying(true);
-			}
-		}.runTaskLater(Flier.getInstance(), 20);
+		super.startPlayer(data);
 		SimpleTeam team = getTeam(data);
 		if (team == null) {
 			team = chooseTeam();
@@ -180,12 +164,8 @@ public class TeamDeathMatch extends DefaultGame {
 	
 	@Override
 	public void removePlayer(InGamePlayer data) {
-		UUID uuid = data.getPlayer().getUniqueId();
-		dataMap.remove(uuid);
-		players.remove(uuid);
-		if (dataMap.isEmpty()) {
-			stop();
-		}
+		super.removePlayer(data);
+		players.remove(data.getPlayer().getUniqueId());
 	}
 	
 	@Override
@@ -206,11 +186,6 @@ public class TeamDeathMatch extends DefaultGame {
 		} else {
 			return Attitude.HOSTILE;
 		}
-	}
-	
-	@Override
-	public Map<UUID, InGamePlayer> getPlayers() {
-		return Collections.unmodifiableMap(dataMap);
 	}
 
 	@Override

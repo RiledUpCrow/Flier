@@ -28,7 +28,7 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerRespawnEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
@@ -334,6 +334,28 @@ public class PhysicalLobby implements Lobby, Listener {
 			data.exitLobby();
 		}
 	}
+	
+	@Override
+	public void respawnPlayer(InGamePlayer player) {
+		PlayerClass clazz = player.getClazz();
+		switch (respawnAction) {
+		case LOAD:
+			clazz.load();
+			break;
+		case SAVE:
+			clazz.save();
+			clazz.load();
+			break;
+		case RESET:
+			clazz.reset();
+			break;
+		case NOTHING:
+			break;
+		}
+		player.updateClass();
+		player.getPlayer().setVelocity(new Vector());
+		player.getPlayer().teleport(spawn);
+	}
 
 	@Override
 	public void stop() {
@@ -409,29 +431,11 @@ public class PhysicalLobby implements Lobby, Listener {
 	}
 	
 	@EventHandler
-	public void onRespawn(PlayerRespawnEvent event) {
-		InGamePlayer player = currentGame.getPlayers().get(event.getPlayer().getUniqueId());
-		if (player == null) {
-			return;
+	public void onLeave(PlayerQuitEvent event) {
+		InGamePlayer player = players.get(event.getPlayer().getUniqueId());
+		if (player != null) {
+			player.exitLobby();
 		}
-		PlayerClass clazz = player.getClazz();
-		switch (respawnAction) {
-		case LOAD:
-			clazz.load();
-			break;
-		case SAVE:
-			clazz.save();
-			clazz.load();
-			break;
-		case RESET:
-			clazz.reset();
-			break;
-		case NOTHING:
-			break;
-		}
-		player.updateClass();
-		event.getPlayer().setVelocity(new Vector());
-		event.setRespawnLocation(spawn);
 	}
 
 	private void handleItems(InGamePlayer player, Block block) {
