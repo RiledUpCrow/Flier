@@ -58,6 +58,7 @@ import pl.betoncraft.flier.sidebar.Speed;
  */
 public abstract class DefaultGame implements Listener, Game {
 
+	protected GameHeartBeat heartBeat;
 	protected Map<UUID, InGamePlayer> dataMap = new HashMap<>();
 	protected List<Bonus> bonuses = new ArrayList<>();
 	
@@ -218,7 +219,7 @@ public abstract class DefaultGame implements Listener, Game {
 
 	@Override
 	public void start() {
-		new GameHeartBeat(this);
+		heartBeat = new GameHeartBeat(this);
 		Bukkit.getPluginManager().registerEvents(this, Flier.getInstance());
 		for (Bonus bonus : bonuses) {
 			bonus.start();
@@ -228,6 +229,7 @@ public abstract class DefaultGame implements Listener, Game {
 	@Override
 	public void stop() {
 		HandlerList.unregisterAll(this);
+		heartBeat.cancel();
 		Set<InGamePlayer> copy = new HashSet<>(dataMap.values());
 		for (InGamePlayer data : copy) {
 			data.exitGame();
