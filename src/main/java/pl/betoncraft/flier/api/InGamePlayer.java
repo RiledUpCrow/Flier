@@ -50,9 +50,9 @@ public interface InGamePlayer {
 	public DamageResult damage(InGamePlayer attacker, Damager damager);
 
 	/**
-	 * @return the instance of the Game this player plays
+	 * @return the the lobby this player is in
 	 */
-	public Game getGame();
+	public Lobby getLobby();
 	
 	/**
 	 * @return the Player object of this player
@@ -130,10 +130,14 @@ public interface InGamePlayer {
 	public List<SidebarLine> getLines();
 	
 	/**
-	 * Moves the player out of the game, clears and restores everything
-	 * related to him.
+	 * Makes the player leave the game back to the lobby.
 	 */
-	public void clear();
+	public void exitGame();
+	
+	/**
+	 * Makes the player leave the lobby back to Minecraft.
+	 */
+	public void exitLobby();
 
 	/**
 	 * Adds an effect to the list of active effects. This is independent of item

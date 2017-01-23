@@ -100,9 +100,9 @@ public class HomingMissile extends DefaultWeapon {
 				// find a target in the area
 				Player target = null;
 				double distance = radiusSqr;
-				for (InGamePlayer p : data.getGame().getPlayers().values()) {
+				for (InGamePlayer p : data.getLobby().getGame().getPlayers().values()) {
 					// skip the player if he shouldn't be targeted
-					Attitude attitude = data.getGame().getAttitude(p, data);
+					Attitude attitude = data.getLobby().getGame().getAttitude(p, data);
 					if (attitude == Attitude.NEUTRAL) {
 						continue;
 					}

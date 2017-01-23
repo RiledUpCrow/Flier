@@ -51,32 +51,6 @@ public abstract class DefaultBonus implements Bonus {
 		respawn = ValueLoader.loadNonNegativeInt(section, "respawn");
 		type = ValueLoader.loadEnum(section, "entity", EntityType.class);
 		location = ValueLoader.loadLocation(section, "location");
-		spawn();
-	}
-	
-	/**
-	 * Replaces the last entity with a new one. Will spawn new one if it doesn't
-	 * exist yet.
-	 */
-	protected final void spawn() {
-		despawn();
-		available = true;
-		entity = location.getWorld().spawnEntity(location, type);
-		entity.setGravity(false);
-		entity.setInvulnerable(true);
-		entity.setSilent(true);
-		entity.setGlowing(true);
-	}
-	
-	/**
-	 * Removes the current entity. Entity will be null after calling this method.
-	 */
-	protected final void despawn() {
-		if (entity != null) {
-			available = false;
-			entity.remove();
-			entity = null;
-		}
 	}
 	
 	/**
@@ -126,8 +100,8 @@ public abstract class DefaultBonus implements Bonus {
 				cooldowns.put(uuid, System.currentTimeMillis() + (cooldown * 50));
 			}
 			if (consumable) {
-				despawn();
-				Bukkit.getScheduler().scheduleSyncDelayedTask(Flier.getInstance(), () -> spawn(), respawn);
+				stop();
+				Bukkit.getScheduler().scheduleSyncDelayedTask(Flier.getInstance(), () -> start(), respawn);
 			}
 		}
 	}
@@ -138,12 +112,12 @@ public abstract class DefaultBonus implements Bonus {
 	}
 
 	@Override
-	public double distance() {
+	public double getDistance() {
 		return distance;
 	}
 
 	@Override
-	public boolean consumable() {
+	public boolean isConsumable() {
 		return consumable;
 	}
 	
@@ -153,18 +127,33 @@ public abstract class DefaultBonus implements Bonus {
 	}
 	
 	@Override
-	public int cooldown() {
+	public int getCooldown() {
 		return cooldown;
 	}
 
 	@Override
-	public int respawn() {
+	public int getRespawn() {
 		return respawn;
 	}
 	
 	@Override
-	public void cleanUp() {
-		despawn();
+	public void start() {
+		stop();
+		available = true;
+		entity = location.getWorld().spawnEntity(location, type);
+		entity.setGravity(false);
+		entity.setInvulnerable(true);
+		entity.setSilent(true);
+		entity.setGlowing(true);
+	}
+	
+	@Override
+	public void stop() {
+		if (entity != null) {
+			available = false;
+			entity.remove();
+			entity = null;
+		}
 	}
 
 }

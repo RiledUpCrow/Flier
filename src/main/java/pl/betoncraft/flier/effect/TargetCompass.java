@@ -32,8 +32,8 @@ public class TargetCompass implements Effect {
 		if (data.isPlaying()) {
 			InGamePlayer nearest = null;
 			double distance = 0;
-			for (InGamePlayer d : data.getGame().getPlayers().values()) {
-				if (data.getGame().getAttitude(d, data) == target) {
+			for (InGamePlayer d : data.getLobby().getGame().getPlayers().values()) {
+				if (data.getLobby().getGame().getAttitude(d, data) == target) {
 					double dist = data.getPlayer().getLocation().distanceSquared(d.getPlayer().getLocation());
 					if (distance == 0 || dist < distance) {
 						distance = dist;

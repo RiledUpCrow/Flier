@@ -11,7 +11,6 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.bukkit.ChatColor;
-import org.bukkit.entity.Player;
 
 /**
  * Represents a game.
@@ -21,19 +20,12 @@ import org.bukkit.entity.Player;
 public interface Game {
 
 	/**
-	 * This method must be used to set a lobby for a game.
-	 * 
-	 * @param lobby game's lobby
-	 */
-	void setLobby(Lobby lobby);
-
-	/**
 	 * Adds the player to the game.
 	 * 
 	 * @param player
 	 *            player to add
 	 */
-	public void addPlayer(Player player);
+	public void addPlayer(InGamePlayer player);
 
 	/**
 	 * Removes the player from the game.
@@ -41,14 +33,7 @@ public interface Game {
 	 * @param player
 	 *            player to remove
 	 */
-	public void removePlayer(Player player);
-	
-	/**
-	 * Starts the game for a player, moving him from the lobby to the actual game.
-	 * 
-	 * @param player player to start a game
-	 */
-	public void startPlayer(Player player);
+	public void removePlayer(InGamePlayer player);
 	
 	/**
 	 * Returns the map containing players by their UUID.
@@ -56,6 +41,17 @@ public interface Game {
 	 * @return the map of players
 	 */
 	public Map<UUID, InGamePlayer> getPlayers();
+	
+	/**
+	 * This method will be called when the game needs to be started.
+	 */
+	public void start();
+
+	/**
+	 * This method will be called once the game is forced to end. It should
+	 * clean up all its data so it can be freshly started again.
+	 */
+	public void stop();
 	
 	/**
 	 * Returns the Attitude of one player towards another. The game should
@@ -67,11 +63,6 @@ public interface Game {
 	 * @return the attitude
 	 */
 	public Attitude getAttitude(InGamePlayer toThisOne, InGamePlayer ofThisOne);
-
-	/**
-	 * This method will be called once the game is forced to end.
-	 */
-	public void stop();
 
 	/**
 	 * Returns a map where the key is player's name and the value is his color.

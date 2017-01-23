@@ -32,7 +32,7 @@ public class FlierCommand implements CommandExecutor {
 	public FlierCommand() {
 		
 		// JOIN GAME ARGUMENT
-		arguments.add(new Argument(new String[]{"join", "j"}, "Join a game.", "<game>", new Argument[]{}) {
+		arguments.add(new Argument(new String[]{"join", "j"}, "Join a lobby.", "<lobby>", new Argument[]{}) {
 			@Override
 			void parse(CommandSender sender, String currentCommand, Iterator<String> it) {
 				if (!(sender instanceof Player)) {
@@ -48,7 +48,7 @@ public class FlierCommand implements CommandExecutor {
 					String lobbyName = it.next();
 					lobby = f.getLobbies().get(lobbyName);
 					if (lobby == null) {
-						sender.sendMessage(ChatColor.RED + "No such game: " + ChatColor.DARK_RED + lobbyName);
+						sender.sendMessage(ChatColor.RED + "No such lobby: " + ChatColor.DARK_RED + lobbyName);
 						StringBuilder builder = new StringBuilder();
 						for (String g : f.getLobbies().keySet()) {
 							builder.append(ChatColor.YELLOW + g + ChatColor.GREEN + ", ");
@@ -59,12 +59,12 @@ public class FlierCommand implements CommandExecutor {
 					}
 				}
 				
-				lobby.getGame().addPlayer((Player) sender);
+				lobby.addPlayer((Player) sender);
 			}
 		});
 		
 		// LEAVE GAME ARGUMENT
-		arguments.add(new Argument(new String[]{"leave", "l"}, "Leave a game.", "<game>", new Argument[]{}) {
+		arguments.add(new Argument(new String[]{"leave", "l"}, "Leave a lobby.", "<lobby>", new Argument[]{}) {
 			@Override
 			void parse(CommandSender sender, String currentCommand, Iterator<String> it) {
 				if (!(sender instanceof Player)) {
@@ -73,10 +73,8 @@ public class FlierCommand implements CommandExecutor {
 				Flier f = Flier.getInstance();
 				Player player = (Player) sender;
 				for (Lobby lobby : f.getLobbies().values()) {
-					if (lobby.getGame().getPlayers().containsKey(player.getUniqueId())) {
-						lobby.getGame().removePlayer(player);
-						return;
-					}
+					lobby.removePlayer(player);
+					return;
 				}
 			}
 		});

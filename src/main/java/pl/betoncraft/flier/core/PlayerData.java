@@ -31,9 +31,9 @@ import pl.betoncraft.flier.api.Damager;
 import pl.betoncraft.flier.api.Damager.DamageResult;
 import pl.betoncraft.flier.api.Effect;
 import pl.betoncraft.flier.api.Engine;
-import pl.betoncraft.flier.api.Game;
 import pl.betoncraft.flier.api.InGamePlayer;
 import pl.betoncraft.flier.api.Item;
+import pl.betoncraft.flier.api.Lobby;
 import pl.betoncraft.flier.api.PlayerClass;
 import pl.betoncraft.flier.api.SidebarLine;
 import pl.betoncraft.flier.api.UsableItem;
@@ -48,7 +48,7 @@ import pl.betoncraft.flier.core.Utils.ImmutableVector;
 public class PlayerData implements InGamePlayer {
 	
 	private Player player;
-	private Game game;
+	private Lobby lobby;
 	private PlayerClass clazz;
 	private boolean isPlaying;
 
@@ -62,9 +62,9 @@ public class PlayerData implements InGamePlayer {
 
 	private int money;
 	
-	public PlayerData(Player player, Game game, PlayerClass clazz) {
+	public PlayerData(Player player, Lobby lobby, PlayerClass clazz) {
 		this.player = player;
-		this.game = game;
+		this.lobby = lobby;
 		this.clazz = clazz;
 		returnLoc = player.getLocation();
 		sb = Bukkit.getScoreboardManager().getNewScoreboard();
@@ -93,12 +93,12 @@ public class PlayerData implements InGamePlayer {
 	}
 
 	private void checkBonuses() {
-		List<Bonus> bonuses = game.getBonuses();
+		List<Bonus> bonuses = lobby.getGame().getBonuses();
 		for (Bonus bonus : bonuses) {
 			if (!bonus.isAvailable()) {
 				continue;
 			}
-			double distSqrd = bonus.distance() * bonus.distance();
+			double distSqrd = bonus.getDistance() * bonus.getDistance();
 			if (bonus.getLocation().distanceSquared(player.getLocation()) <= distSqrd) {
 				bonus.apply(this);
 			}
@@ -195,8 +195,8 @@ public class PlayerData implements InGamePlayer {
 	}
 
 	@Override
-	public Game getGame() {
-		return game;
+	public Lobby getLobby() {
+		return lobby;
 	}
 	
 	@Override
@@ -316,7 +316,15 @@ public class PlayerData implements InGamePlayer {
 	}
 	
 	@Override
-	public void clear() {
+	public void exitGame() {
+		if (lobby.getGame().getPlayers().containsKey(getPlayer().getUniqueId())) {
+			lobby.getGame().removePlayer(this);
+		}
+	}
+	
+	@Override
+	public void exitLobby() {
+		exitGame();
 		player.setScoreboard(Bukkit.getScoreboardManager().getMainScoreboard());
 		player.getInventory().clear();
 		player.setHealth(player.getMaxHealth());

@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -26,7 +27,9 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Vector;
 
 import net.md_5.bungee.api.ChatColor;
 import pl.betoncraft.flier.Flier;
@@ -36,8 +39,10 @@ import pl.betoncraft.flier.api.InGamePlayer;
 import pl.betoncraft.flier.api.Item;
 import pl.betoncraft.flier.api.Lobby;
 import pl.betoncraft.flier.api.PlayerClass;
+import pl.betoncraft.flier.api.PlayerClass.RespawnAction;
 import pl.betoncraft.flier.api.Wings;
 import pl.betoncraft.flier.core.DefaultPlayerClass;
+import pl.betoncraft.flier.core.PlayerData;
 import pl.betoncraft.flier.core.Utils;
 import pl.betoncraft.flier.core.ValueLoader;
 import pl.betoncraft.flier.exception.LoadingException;
@@ -48,19 +53,25 @@ import pl.betoncraft.flier.exception.LoadingException;
  * @author Jakub Sapalski
  */
 public class PhysicalLobby implements Lobby, Listener {
+	
+	private PlayerClass defClass;
+	private RespawnAction respawnAction = RespawnAction.RESET;
+	private Map<UUID, InGamePlayer> players = new HashMap<>();
 
 	private Map<String, Game> games = new HashMap<>();
 	private Game currentGame;
+
 	private List<Block> join = new ArrayList<>();
 	private Location spawn;
 	private Block start;
 	private Block leave;
-	private PlayerClass defClass;
 	private Map<Block, ItemBlock> blocks = new HashMap<>();
 	private Map<InGamePlayer, List<ItemBlock>> unlocked = new HashMap<>();
+
 	private List<UUID> blocked = new LinkedList<>();
 
 	public PhysicalLobby(ConfigurationSection section) throws LoadingException {
+		respawnAction = ValueLoader.loadEnum(section, "respawn_action", RespawnAction.class);
 		spawn = ValueLoader.loadLocation(section, "spawn");
 		for (String loc : section.getStringList("join")) {
 			join.add(Utils.parseLocation(loc).getBlock());
@@ -89,7 +100,6 @@ public class PhysicalLobby implements Lobby, Listener {
 		for (String gameName : gameNames) {
 			try {
 				Game game = Flier.getInstance().getGame(gameName); // TODO game starting/stopping
-				game.setLobby(this);
 				games.put(gameName, game);
 			} catch (LoadingException e) {
 				throw (LoadingException) new LoadingException(String.format("Error in '%s' game.", gameName))
@@ -304,31 +314,44 @@ public class PhysicalLobby implements Lobby, Listener {
 	}
 
 	@Override
+	public void addPlayer(Player player) {
+		UUID uuid = player.getUniqueId();
+		if (players.containsKey(uuid)) {
+			return;
+		}
+		InGamePlayer data = new PlayerData(player, this, (DefaultPlayerClass) defClass.replicate());
+		players.put(uuid, data);
+		player.teleport(spawn);
+	}
+
+	@Override
+	public void removePlayer(Player player) {
+		UUID uuid = player.getUniqueId();
+		InGamePlayer data = players.remove(uuid);
+		if (data != null) {
+			data.exitLobby();
+		}
+	}
+
+	@Override
+	public void stop() {
+		for (Player player : players.values().stream().map(data -> data.getPlayer()).collect(Collectors.toList())) {
+			removePlayer(player);
+		}
+		currentGame.stop();
+		HandlerList.unregisterAll(this);
+	}
+
+	@Override
 	public void setGame(Game game) {
-		this.currentGame = game;
+		currentGame.stop();
+		currentGame = game;
+		currentGame.start();
 	}
 
 	@Override
 	public Game getGame() {
 		return currentGame;
-	}
-
-	@Override
-	public Location getSpawn() {
-		return spawn;
-	}
-
-	@Override
-	public PlayerClass getDefaultClass() {
-		return (PlayerClass) defClass.replicate();
-	}
-
-	@Override
-	public void stop() {
-		for (Game game : games.values()) {
-			game.stop();
-		}
-		HandlerList.unregisterAll(this);
 	}
 
 	@EventHandler(priority = EventPriority.HIGH)
@@ -355,51 +378,78 @@ public class PhysicalLobby implements Lobby, Listener {
 		}
 		// handle the click
 		if (join.contains(block)) {
-			currentGame.addPlayer(player);
-		} else if (block.equals(start)) {
-			currentGame.startPlayer(player);
+			addPlayer(player);
 		} else if (block.equals(leave)) {
-			currentGame.removePlayer(player);
+			removePlayer(player);
 		} else {
-			handleItems(player, block);
+			InGamePlayer data = players.get(player.getUniqueId());
+			if (data != null) {
+				if (block.equals(start)) {
+					currentGame.addPlayer(data);
+				} else {
+					handleItems(data, block);
+				}
+			}
 		}
 	}
-
-	private void handleItems(Player player, Block block) {
-		InGamePlayer p = currentGame.getPlayers().get(player.getUniqueId());
-		if (p == null) {
+	
+	@EventHandler
+	public void onRespawn(PlayerRespawnEvent event) {
+		InGamePlayer player = currentGame.getPlayers().get(event.getPlayer().getUniqueId());
+		if (player == null) {
 			return;
 		}
-		PlayerClass c = p.getClazz();
+		PlayerClass clazz = player.getClazz();
+		switch (respawnAction) {
+		case LOAD:
+			clazz.load();
+			break;
+		case SAVE:
+			clazz.save();
+			clazz.load();
+			break;
+		case RESET:
+			clazz.reset();
+			break;
+		case NOTHING:
+			break;
+		}
+		player.updateClass();
+		event.getPlayer().setVelocity(new Vector());
+		event.setRespawnLocation(spawn);
+	}
+
+	private void handleItems(InGamePlayer player, Block block) {
+		PlayerClass c = player.getClazz();
 		ItemBlock b = blocks.get(block);
 		if (b != null) {
-			List<ItemBlock> ul = unlocked.get(p);
+			List<ItemBlock> ul = unlocked.get(player);
 			if (ul == null) {
 				ul = new LinkedList<>();
-				unlocked.put(p, ul);
+				unlocked.put(player, ul);
 			}
 			if (!ul.contains(b)) {
-				if (b.getUnlockCost() <= p.getMoney()) {
+				if (b.getUnlockCost() <= player.getMoney()) {
 					ul.add(b);
-					p.setMoney(p.getMoney() - b.getUnlockCost());
+					player.setMoney(player.getMoney() - b.getUnlockCost());
 					if (b.getUnlockCost() != 0) {
-						player.sendMessage(ChatColor.GREEN + "Unlocked!");
+						player.getPlayer().sendMessage(ChatColor.GREEN + "Unlocked!");
 					}
 				} else {
-					player.sendMessage(ChatColor.RED + "Not enough money to unlock.");
+					player.getPlayer().sendMessage(ChatColor.RED + "Not enough money to unlock.");
 					return;
 				}
 			}
-			if (b.getBuyCost() <= p.getMoney()) {
+			if (b.getBuyCost() <= player.getMoney()) {
 				if (b.apply(c)) {
-					p.setMoney(p.getMoney() - b.getBuyCost());
-					p.updateClass();
-					player.sendMessage(ChatColor.GREEN + "Class updated!");
+					player.setMoney(player.getMoney() - b.getBuyCost());
+					player.updateClass();
+					player.getPlayer().sendMessage(ChatColor.GREEN + "Class updated!");
 				} else {
-					player.sendMessage(ChatColor.RED + "You can't use this right now.");
+					player.getPlayer().sendMessage(ChatColor.RED + "You can't use this right now.");
 				}
 			} else {
-				player.sendMessage(ChatColor.RED + "Not enough money.");
+				player.getPlayer().sendMessage(ChatColor.RED + "Not enough money.");
 			}
 		}
 	}

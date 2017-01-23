@@ -6,6 +6,7 @@
  */
 package pl.betoncraft.flier.game;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -15,7 +16,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import pl.betoncraft.flier.Flier;
@@ -23,7 +23,6 @@ import pl.betoncraft.flier.api.Damager;
 import pl.betoncraft.flier.api.Damager.DamageResult;
 import pl.betoncraft.flier.api.InGamePlayer;
 import pl.betoncraft.flier.api.SidebarLine;
-import pl.betoncraft.flier.core.PlayerData;
 import pl.betoncraft.flier.core.Utils;
 import pl.betoncraft.flier.core.ValueLoader;
 import pl.betoncraft.flier.exception.LoadingException;
@@ -64,8 +63,6 @@ public class TeamDeathMatch extends DefaultGame {
 		} else {
 			throw new LoadingException("Teams must be defined.");
 		}
-		new GameHeartBeat(this);
-		Bukkit.getPluginManager().registerEvents(this, Flier.getInstance());
 	}
 	
 	private class SimpleTeam {
@@ -128,65 +125,6 @@ public class TeamDeathMatch extends DefaultGame {
 	
 	@Override
 	public void slowTick() {}
-	
-	@Override
-	public void addPlayer(Player player) {
-		if (dataMap.containsKey(player.getUniqueId())) {
-			return;
-		}
-		InGamePlayer data = new PlayerData(player, this, lobby.getDefaultClass());
-		dataMap.put(player.getUniqueId(), data);
-		data.getLines().add(new Fuel(data));
-		data.getLines().add(new Health(data));
-		data.getLines().add(new Speed(data));
-		data.getLines().add(new Altitude(data));
-		if (useMoney) {
-			data.getLines().add(new Money(data));
-		}
-		data.getLines().addAll(lines.values());
-		player.teleport(lobby.getSpawn());
-	}
-	
-	@Override
-	public void removePlayer(Player player) {
-		InGamePlayer data = dataMap.remove(player.getUniqueId());
-		if (data != null) {
-			players.remove(player.getUniqueId());
-			data.clear();
-		}
-		if (dataMap.isEmpty()) {
-			for (SimpleTeam t : teams.values()) {
-				t.setScore(0);
-			}
-		}
-	}
-	
-	@Override
-	public Map<UUID, InGamePlayer> getPlayers() {
-		return dataMap;
-	}
-	
-	@Override
-	public void startPlayer(Player player) {
-		InGamePlayer data = dataMap.get(player.getUniqueId());
-		if (data != null) {
-			if (data.getClazz() == null) {
-				player.sendMessage(ChatColor.RED + "Choose your class!");
-			} else {
-				new BukkitRunnable() {
-					@Override
-					public void run() {
-						data.setPlaying(true);
-					}
-				}.runTaskLater(Flier.getInstance(), 20);
-				SimpleTeam team = getTeam(data);
-				if (team == null) {
-					setTeam(player, chooseTeam());
-				}
-				player.teleport(getTeam(data).getSpawn());
-			}
-		}
-	}
 
 	@Override
 	public void handleKill(InGamePlayer killer, InGamePlayer killed) {
@@ -206,20 +144,57 @@ public class TeamDeathMatch extends DefaultGame {
 	public void handleHit(DamageResult result, InGamePlayer attacker, InGamePlayer attacked, Damager damager) {}
 
 	@Override
-	public Location respawnLocation(InGamePlayer respawned) {
-		return lobby.getSpawn();
+	public void addPlayer(InGamePlayer data) {
+		UUID uuid = data.getPlayer().getUniqueId();
+		if (dataMap.isEmpty()) {
+			start();
+		} else if (dataMap.containsKey(uuid)) {
+			startPlayer(data);
+			return;
+		}
+		dataMap.put(uuid, data);
+		data.getLines().add(new Fuel(data));
+		data.getLines().add(new Health(data));
+		data.getLines().add(new Speed(data));
+		data.getLines().add(new Altitude(data));
+		if (useMoney) {
+			data.getLines().add(new Money(data));
+		}
+		data.getLines().addAll(lines.values());
+		startPlayer(data);
+	}
+	
+	private void startPlayer(InGamePlayer data) {
+		new BukkitRunnable() {
+			@Override
+			public void run() {
+				data.setPlaying(true);
+			}
+		}.runTaskLater(Flier.getInstance(), 20);
+		SimpleTeam team = getTeam(data);
+		if (team == null) {
+			team = chooseTeam();
+			setTeam(data, team);
+		}
+		data.getPlayer().teleport(team.getSpawn());
 	}
 	
 	@Override
-	public Map<String, ChatColor> getColors() {
-		HashMap<String, ChatColor> map = new HashMap<>();
-		for (Entry<UUID, InGamePlayer> e : dataMap.entrySet()) {
-			SimpleTeam team = getTeam(dataMap.get(e.getKey()));
-			if (team != null) {
-				map.put(e.getValue().getPlayer().getName(), team.getColor());
-			}
+	public void removePlayer(InGamePlayer data) {
+		UUID uuid = data.getPlayer().getUniqueId();
+		dataMap.remove(uuid);
+		players.remove(uuid);
+		if (dataMap.isEmpty()) {
+			stop();
 		}
-		return map;
+	}
+	
+	@Override
+	public void stop() {
+		super.stop();
+		for (SimpleTeam team : teams.values()) {
+			team.setScore(0);
+		}
 	}
 	
 	@Override
@@ -234,21 +209,35 @@ public class TeamDeathMatch extends DefaultGame {
 		}
 	}
 	
+	@Override
+	public Map<UUID, InGamePlayer> getPlayers() {
+		return Collections.unmodifiableMap(dataMap);
+	}
+
+	@Override
+	public Map<String, ChatColor> getColors() {
+		HashMap<String, ChatColor> map = new HashMap<>();
+		for (Entry<UUID, InGamePlayer> e : dataMap.entrySet()) {
+			SimpleTeam team = getTeam(dataMap.get(e.getKey()));
+			if (team != null) {
+				map.put(e.getValue().getPlayer().getName(), team.getColor());
+			}
+		}
+		return map;
+	}
+	
 	private  SimpleTeam getTeam(InGamePlayer data) {
 		return players.get(data.getPlayer().getUniqueId());
 	}
 	
-	private void setTeam(Player player, SimpleTeam team) {
-		InGamePlayer data = dataMap.get(player.getUniqueId());
-		if (data != null) {
-			players.put(player.getUniqueId(), team);
-			data.setColor(team.getColor());
-			Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "title " + player.getName()
-					+ " title {\"text\":\"" + team.getColor() + Utils.capitalize(team.getName()) + "\"}");
-			Map<String, ChatColor> colors = getColors();
-			for (InGamePlayer g : dataMap.values()) {
-				g.updateColors(colors);
-			}
+	private void setTeam(InGamePlayer data, SimpleTeam team) {
+		players.put(data.getPlayer().getUniqueId(), team);
+		data.setColor(team.getColor());
+		Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "title " + data.getPlayer().getName()
+				+ " title {\"text\":\"" + team.getColor() + Utils.capitalize(team.getName()) + "\"}");
+		Map<String, ChatColor> colors = getColors();
+		for (InGamePlayer g : dataMap.values()) {
+			g.updateColors(colors);
 		}
 	}
 	

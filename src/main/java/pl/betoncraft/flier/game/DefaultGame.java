@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import org.bukkit.Location;
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -31,10 +31,8 @@ import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.Vector;
 
 import pl.betoncraft.flier.Flier;
 import pl.betoncraft.flier.api.Bonus;
@@ -42,11 +40,7 @@ import pl.betoncraft.flier.api.Damager;
 import pl.betoncraft.flier.api.Damager.DamageResult;
 import pl.betoncraft.flier.api.Game;
 import pl.betoncraft.flier.api.InGamePlayer;
-import pl.betoncraft.flier.api.Lobby;
-import pl.betoncraft.flier.api.PlayerClass;
-import pl.betoncraft.flier.api.PlayerClass.RespawnAction;
 import pl.betoncraft.flier.core.Utils;
-import pl.betoncraft.flier.core.ValueLoader;
 import pl.betoncraft.flier.exception.LoadingException;
 
 /**
@@ -58,8 +52,6 @@ public abstract class DefaultGame implements Listener, Game {
 
 	protected Map<UUID, InGamePlayer> dataMap = new HashMap<>();
 	protected List<Bonus> bonuses = new ArrayList<>();
-	protected Lobby lobby;
-	protected RespawnAction respawnAction = RespawnAction.RESET;
 	
 	protected boolean useMoney = false;
 	protected int enemyKillMoney = 0;
@@ -81,7 +73,6 @@ public abstract class DefaultGame implements Listener, Game {
 						.initCause(e);
 			}
 		}
-		respawnAction = ValueLoader.loadEnum(section, "respawn_action", RespawnAction.class);
 		useMoney = section.getBoolean("money.enabled", useMoney);
 		enemyKillMoney = section.getInt("money.enemy_kill", enemyKillMoney);
 		enemyHitMoney = section.getInt("money.enemy_hit", enemyHitMoney);
@@ -124,12 +115,17 @@ public abstract class DefaultGame implements Listener, Game {
 				i = 0;
 			}
 		}
-	}
-	
-	@Override
-	public void setLobby(Lobby lobby) {
-		this.lobby = lobby;
-	}
+	}	
+
+	/**
+	 * The game should do game-specific stuff in a fast tick here.
+	 */
+	public abstract void fastTick();;
+
+	/**
+	 * The game should do game-specific stuff in a slow tick here.
+	 */
+	public abstract void slowTick();
 	
 	/**
 	 * Handles one player killing another one.
@@ -149,27 +145,14 @@ public abstract class DefaultGame implements Listener, Game {
 	 * @param damager the Damager used in the hit
 	 */
 	public abstract void handleHit(DamageResult result, InGamePlayer attacker, InGamePlayer attacked, Damager damager);
-	
-	/**
-	 * The game should do game-specific stuff in a fast tick here.
-	 */
-	public abstract void fastTick();;
 
-	/**
-	 * The game should do game-specific stuff in a slow tick here.
-	 */
-	public abstract void slowTick();
-
-	/**
-	 * Returns a respawn location for the player.
-	 * 
-	 * @param respawned the player who needs respawning
-	 */
-	public abstract Location respawnLocation(InGamePlayer respawned);
-	
 	@Override
-	public List<Bonus> getBonuses() {
-		return bonuses;
+	public void start() {
+		new GameHeartBeat(this);
+		Bukkit.getPluginManager().registerEvents(this, Flier.getInstance());
+		for (Bonus bonus : bonuses) {
+			bonus.start();
+		}
 	}
 
 	@Override
@@ -177,11 +160,16 @@ public abstract class DefaultGame implements Listener, Game {
 		HandlerList.unregisterAll(this);
 		Set<InGamePlayer> copy = new HashSet<>(dataMap.values());
 		for (InGamePlayer data : copy) {
-			removePlayer(data.getPlayer());
+			data.exitGame();
 		}
 		for (Bonus bonus : bonuses) {
-			bonus.cleanUp();
+			bonus.stop();
 		}
+	}
+	
+	@Override
+	public List<Bonus> getBonuses() {
+		return bonuses;
 	}
 	
 	@EventHandler(priority=EventPriority.LOW)
@@ -236,32 +224,6 @@ public abstract class DefaultGame implements Listener, Game {
 	
 	private void pay(InGamePlayer player, int amount) {
 		player.setMoney(player.getMoney() + amount);
-	}
-	
-	@EventHandler
-	public void onRespawn(PlayerRespawnEvent event) {
-		InGamePlayer player = getPlayers().get(event.getPlayer().getUniqueId());
-		if (player == null) {
-			return;
-		}
-		PlayerClass clazz = player.getClazz();
-		switch (respawnAction) {
-		case LOAD:
-			clazz.load();
-			break;
-		case SAVE:
-			clazz.save();
-			clazz.load();
-			break;
-		case RESET:
-			clazz.reset();
-			break;
-		case NOTHING:
-			break;
-		}
-		player.updateClass();
-		event.getPlayer().setVelocity(new Vector());
-		event.setRespawnLocation(respawnLocation(player));
 	}
 	
 	@EventHandler
@@ -329,8 +291,9 @@ public abstract class DefaultGame implements Listener, Game {
 	
 	@EventHandler
 	public void onLeave(PlayerQuitEvent event) {
-		if (getPlayers().containsKey(event.getPlayer().getUniqueId())) {
-			removePlayer(event.getPlayer());
+		InGamePlayer player = getPlayers().get(event.getPlayer().getUniqueId());
+		if (player != null) {
+			player.exitGame();
 		}
 	}
 	

@@ -6,7 +6,7 @@
  */
 package pl.betoncraft.flier.api;
 
-import org.bukkit.Location;
+import org.bukkit.entity.Player;
 
 /**
  * Represents a lobby.
@@ -16,9 +16,14 @@ import org.bukkit.Location;
 public interface Lobby {
 	
 	/**
-	 * @return the location of a lobby spawn.
+	 * @param player the player to add to this lobby
 	 */
-	public Location getSpawn();
+	public void addPlayer(Player player);
+	
+	/**
+	 * @param player the player to remove from this lobby
+	 */
+	public void removePlayer(Player player);
 	
 	/**
 	 * Called when the game ends.
@@ -33,13 +38,8 @@ public interface Lobby {
 	void setGame(Game game);
 
 	/**
-	 * @return the game this lobby is meant for.
+	 * @return the current game
 	 */
-	Game getGame();
-
-	/**
-	 * @return the copy of default class
-	 */
-	public PlayerClass getDefaultClass();
+	public Game getGame();
 
 }

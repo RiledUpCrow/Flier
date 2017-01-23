@@ -23,12 +23,12 @@ public interface Bonus extends Replicable {
 	/**
 	 * @return the minimum distance to activate this Bonus
 	 */
-	public double distance();
+	public double getDistance();
 	
 	/**
 	 * @return true if the Bonus should be removed after using
 	 */
-	public boolean consumable();
+	public boolean isConsumable();
 	
 	/**
 	 * @return true if the bonus is available for use
@@ -38,13 +38,13 @@ public interface Bonus extends Replicable {
 	/**
 	 * @return the cooldown time
 	 */
-	public int cooldown();
+	public int getCooldown();
 	
 	/**
 	 * @return in how many ticks should this Bonus be respawned;
 	 *         it will return -1 if it shouldn't respawn at all
 	 */
-	public int respawn();
+	public int getRespawn();
 	
 	/**
 	 * Called in game fast tick to allow Bonus updating (for example rotating
@@ -53,13 +53,18 @@ public interface Bonus extends Replicable {
 	public void update();
 	
 	/**
-	 * @param player applies the Bonus to the player
+	 * Starts the bonus, for example spawning the entity.
 	 */
-	public void apply(InGamePlayer player);
+	public void start();
 
 	/**
 	 * Cleans up the bonus, for example removing the entity.
 	 */
-	public void cleanUp();
+	public void stop();
+	
+	/**
+	 * @param player applies the Bonus to the player
+	 */
+	public void apply(InGamePlayer player);
 
 }
