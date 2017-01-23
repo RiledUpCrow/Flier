@@ -10,7 +10,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -22,6 +21,7 @@ import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Score;
 import org.bukkit.scoreboard.Scoreboard;
+import org.bukkit.scoreboard.Team;
 import org.bukkit.util.Vector;
 
 import com.google.common.collect.Lists;
@@ -424,23 +424,28 @@ public class PlayerData implements InGamePlayer {
 		for (SidebarLine line : Lists.reverse(lines)) {
 			setStatistic(i++, line.getText());
 		}
+		while (i < ChatColor.values().length) {
+			setStatistic(i++, null);
+		}
 	}
 	
 	private void setStatistic(int index, String string) {
-		for (String entry : sb.getEntries()) {
-			Set<Score> scores = sb.getScores(entry);
-			for (Score score : scores) {
-				if (score.getScore() == index) {
-					Objective objective = score.getObjective();
-					sb.resetScores(entry);
-					Score updatedScore = objective.getScore(string);
-					updatedScore.setScore(index);
-					return;
-				}
-			}
+		if (index >= ChatColor.values().length) {
+			return;
 		}
-		Score newScore = sb.getObjective(DisplaySlot.SIDEBAR).getScore(string);
-		newScore.setScore(index);
+		String name = ChatColor.values()[index].toString();
+		if (string != null) {
+			Score score = sb.getObjective(DisplaySlot.SIDEBAR).getScore(name);
+			score.setScore(index);
+			Team team = sb.getEntryTeam(name);
+			if (team == null) {
+				team = sb.registerNewTeam(name);
+				team.addEntry(name);
+			}
+			team.setPrefix(string);
+		} else {
+			sb.resetScores(name);
+		}
 	}
 	
 	private void applyEffects(boolean fastTick) {
