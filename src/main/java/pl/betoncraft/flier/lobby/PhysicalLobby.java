@@ -395,6 +395,9 @@ public class PhysicalLobby implements Lobby, Listener {
 
 	@EventHandler(priority = EventPriority.HIGH)
 	public void onClick(PlayerInteractEvent event) {
+		if (event.isCancelled()) {
+			return;
+		}
 		if (event.getAction() != Action.LEFT_CLICK_BLOCK) {
 			return;
 		}

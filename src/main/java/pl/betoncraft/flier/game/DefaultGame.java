@@ -252,6 +252,9 @@ public abstract class DefaultGame implements Listener, Game {
 	
 	@EventHandler
 	public void onHit(EntityDamageByEntityEvent event) {
+		if (event.isCancelled()) {
+			return;
+		}
 		InGamePlayer player = getPlayers().get(event.getEntity().getUniqueId());
 		// hit player in Game
 		if (player == null) {
