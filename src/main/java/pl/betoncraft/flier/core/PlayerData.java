@@ -50,16 +50,15 @@ public class PlayerData implements InGamePlayer {
 	private Player player;
 	private Lobby lobby;
 	private PlayerClass clazz;
-	private boolean isPlaying;
-
 	private Location returnLoc;
 	private Scoreboard sb;
+
+	private boolean isPlaying;
 	private List<SidebarLine> lines = new LinkedList<>();
 	private InGamePlayer lastHit = null;
 	private ChatColor color;
 	private long glowTimer;
 	private List<Effect> activeEffects = new LinkedList<>();
-
 	private int money;
 	
 	public PlayerData(Player player, Lobby lobby, PlayerClass clazz) {
@@ -317,9 +316,23 @@ public class PlayerData implements InGamePlayer {
 	
 	@Override
 	public void exitGame() {
-		if (lobby.getGame().getPlayers().containsKey(getPlayer().getUniqueId())) {
-			lobby.getGame().removePlayer(this);
-		}
+		lobby.getGame().removePlayer(this);
+		isPlaying = false;
+		lines.clear();
+		lastHit = null;
+		color = null;
+		glowTimer = 0;
+		player.setGlowing(false);
+		player.getActivePotionEffects().clear();
+		player.setHealth(player.getMaxHealth());
+		player.setFoodLevel(40);
+		player.setExhaustion(0);
+		player.setVelocity(new Vector());
+		activeEffects.clear();
+		money = 0;
+		clazz.reset();
+		updateClass();
+		getPlayer().teleport(lobby.getSpawn());
 	}
 	
 	@Override
@@ -327,12 +340,6 @@ public class PlayerData implements InGamePlayer {
 		exitGame();
 		player.setScoreboard(Bukkit.getScoreboardManager().getMainScoreboard());
 		player.getInventory().clear();
-		player.setHealth(player.getMaxHealth());
-		player.setFoodLevel(40);
-		player.setExhaustion(0);
-		player.getActivePotionEffects().clear();
-		player.setGlowing(false);
-		player.setVelocity(new Vector());
 		player.teleport(returnLoc);
 	}
 	

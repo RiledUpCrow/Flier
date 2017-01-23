@@ -34,6 +34,14 @@ public interface Game {
 	 *            player to remove
 	 */
 	public void removePlayer(InGamePlayer player);
+
+	/**
+	 * Moves the player from the lobby to the game.
+	 * 
+	 * @param data
+	 *            player to start
+	 */
+	void startPlayer(InGamePlayer data);
 	
 	/**
 	 * Returns the map containing players by their UUID.

@@ -7,6 +7,7 @@
 package pl.betoncraft.flier.lobby;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -322,6 +323,7 @@ public class PhysicalLobby implements Lobby, Listener {
 		InGamePlayer data = new PlayerData(player, this, (DefaultPlayerClass) defClass.replicate());
 		players.put(uuid, data);
 		player.teleport(spawn);
+		currentGame.addPlayer(data);
 	}
 
 	@Override
@@ -338,7 +340,7 @@ public class PhysicalLobby implements Lobby, Listener {
 		for (Player player : players.values().stream().map(data -> data.getPlayer()).collect(Collectors.toList())) {
 			removePlayer(player);
 		}
-		currentGame.stop();
+		// no need to stop the game, it's not running without players
 		HandlerList.unregisterAll(this);
 	}
 
@@ -346,12 +348,25 @@ public class PhysicalLobby implements Lobby, Listener {
 	public void setGame(Game game) {
 		currentGame.stop();
 		currentGame = game;
-		currentGame.start();
+		for (InGamePlayer player : players.values()) {
+			currentGame.addPlayer(player);
+		}
+		// no need to start the game, it's running if there were players
 	}
 
 	@Override
 	public Game getGame() {
 		return currentGame;
+	}
+	
+	@Override
+	public Map<String, Game> getGames() {
+		return Collections.unmodifiableMap(games);
+	}
+	
+	@Override
+	public Location getSpawn() {
+		return spawn;
 	}
 
 	@EventHandler(priority = EventPriority.HIGH)
@@ -385,7 +400,7 @@ public class PhysicalLobby implements Lobby, Listener {
 			InGamePlayer data = players.get(player.getUniqueId());
 			if (data != null) {
 				if (block.equals(start)) {
-					currentGame.addPlayer(data);
+					currentGame.startPlayer(data);
 				} else {
 					handleItems(data, block);
 				}

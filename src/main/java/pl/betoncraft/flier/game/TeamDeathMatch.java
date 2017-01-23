@@ -149,7 +149,6 @@ public class TeamDeathMatch extends DefaultGame {
 		if (dataMap.isEmpty()) {
 			start();
 		} else if (dataMap.containsKey(uuid)) {
-			startPlayer(data);
 			return;
 		}
 		dataMap.put(uuid, data);
@@ -161,10 +160,10 @@ public class TeamDeathMatch extends DefaultGame {
 			data.getLines().add(new Money(data));
 		}
 		data.getLines().addAll(lines.values());
-		startPlayer(data);
 	}
 	
-	private void startPlayer(InGamePlayer data) {
+	@Override
+	public void startPlayer(InGamePlayer data) {
 		new BukkitRunnable() {
 			@Override
 			public void run() {

@@ -6,6 +6,9 @@
  */
 package pl.betoncraft.flier.api;
 
+import java.util.Map;
+
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 /**
@@ -41,5 +44,15 @@ public interface Lobby {
 	 * @return the current game
 	 */
 	public Game getGame();
+
+	/**
+	 * @return the map of games and their names
+	 */
+	public Map<String, Game> getGames();
+
+	/**
+	 * @return the spawn location of the lobby
+	 */
+	public Location getSpawn();
 
 }
