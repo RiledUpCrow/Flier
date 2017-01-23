@@ -6,10 +6,14 @@
  */
 package pl.betoncraft.flier.api;
 
+import java.util.List;
+
 import org.bukkit.entity.Projectile;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.metadata.MetadataValue;
 
 import pl.betoncraft.flier.Flier;
+import pl.betoncraft.flier.core.DummyDamager;
 
 /**
  * Represents a source of projectiles with wing damage.
@@ -117,12 +121,16 @@ public interface Damager {
 	 * @return Damager or null
 	 */
 	public static Damager getDamager(Projectile projectile) {
-		try {
-			return (Damager) projectile.getMetadata("flier-damager").get(0).value();
-		} catch (NullPointerException | ArrayIndexOutOfBoundsException e) {
-			// do not catch cast exception - it should not happen
-			return null;
+		List<MetadataValue> list = projectile.getMetadata("flier-damager");
+		if (!list.isEmpty()) {
+			Object value = list.get(0).value();
+			if (value instanceof Damager) {
+				return (Damager) value;
+			} else {
+				return DummyDamager.DUMMY;
+			}
 		}
+		return null;
 	}
 
 }

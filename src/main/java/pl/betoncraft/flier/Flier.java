@@ -10,10 +10,17 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Projectile;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import pl.betoncraft.flier.api.Bonus;
+import pl.betoncraft.flier.api.Damager;
 import pl.betoncraft.flier.api.Effect;
 import pl.betoncraft.flier.api.Engine;
 import pl.betoncraft.flier.api.Game;
@@ -79,6 +86,19 @@ public class Flier extends JavaPlugin {
 		registerBonus("money", s -> new MoneyBonus(s));
 
 		loadLobbies();
+		
+		// add projectile cleanup listener
+		Bukkit.getPluginManager().registerEvents(new Listener() {
+			@EventHandler
+			public void onChunkUnload(ChunkUnloadEvent event) {
+				Entity[] entities = event.getChunk().getEntities();
+				for (int i = 0; i < entities.length; i++) {
+					if (entities[i] instanceof Projectile && Damager.getDamager((Projectile) entities[i]) != null) {
+						entities[i].remove();
+					}
+				}
+			}
+		}, this);
 	}
 
 	private void loadLobbies() {
