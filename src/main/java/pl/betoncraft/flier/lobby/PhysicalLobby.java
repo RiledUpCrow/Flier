@@ -354,7 +354,9 @@ public class PhysicalLobby implements Lobby, Listener {
 		}
 		player.updateClass();
 		player.getPlayer().setVelocity(new Vector());
-		player.getPlayer().teleport(spawn);
+		if (player.getPlayer().getLocation().distanceSquared(spawn) > 1) {
+			player.getPlayer().teleport(spawn);
+		}
 	}
 
 	@Override

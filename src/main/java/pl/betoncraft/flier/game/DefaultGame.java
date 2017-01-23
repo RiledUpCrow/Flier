@@ -339,6 +339,7 @@ public abstract class DefaultGame implements Listener, Game {
 		}
 		event.getPlayer().setVelocity(new Vector());
 		event.setRespawnLocation(getRespawnLocation(player));
+		Bukkit.getScheduler().runTask(Flier.getInstance(), () -> afterRespawn(player));
 	}
 	
 	@EventHandler
