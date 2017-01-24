@@ -437,7 +437,7 @@ public class PhysicalLobby implements Lobby, Listener {
 	
 	@EventHandler
 	public void onLeave(PlayerQuitEvent event) {
-		InGamePlayer player = players.get(event.getPlayer().getUniqueId());
+		InGamePlayer player = players.remove(event.getPlayer().getUniqueId());
 		if (player != null) {
 			player.exitLobby();
 		}
