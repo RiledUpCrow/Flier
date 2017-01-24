@@ -256,6 +256,11 @@ public abstract class DefaultGame implements Listener, Game {
 		return bonuses;
 	}
 	
+	@Override
+	public int getHeightLimit() {
+		return heightLimit;
+	}
+	
 	@EventHandler(priority=EventPriority.LOW)
 	public void onClick(PlayerInteractEvent event) {
 		InGamePlayer data = getPlayers().get(event.getPlayer().getUniqueId());

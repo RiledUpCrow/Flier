@@ -6,6 +6,8 @@
  */
 package pl.betoncraft.flier.sidebar;
 
+import org.bukkit.ChatColor;
+
 import pl.betoncraft.flier.api.Engine;
 import pl.betoncraft.flier.api.InGamePlayer;
 import pl.betoncraft.flier.api.PlayerClass;
@@ -32,7 +34,17 @@ public class Fuel implements SidebarLine {
 		Engine engine = c == null ? null : c.getCurrentEngine();
 		double f = engine == null ? 0 : 100 * engine.getFuel() / engine.getMaxFuel();
 		if (lastString == null || f != lastValue) {
-			lastString = String.format("F: %.1f%%", f);
+			String color;
+			if (f == 0) {
+				color = ChatColor.BLACK.toString();
+			} else if (f > 75) {
+				color = ChatColor.GREEN.toString();
+			} else if (f < 25) {
+				color = ChatColor.RED.toString();
+			} else {
+				color = ChatColor.YELLOW.toString();
+			}
+			lastString = String.format("F: %s%.1f%%", color, f);
 			lastValue = f;
 		}
 		return lastString;

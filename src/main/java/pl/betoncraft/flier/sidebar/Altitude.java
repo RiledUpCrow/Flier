@@ -6,8 +6,12 @@
  */
 package pl.betoncraft.flier.sidebar;
 
+import org.bukkit.ChatColor;
+import org.bukkit.Location;
+
 import pl.betoncraft.flier.api.InGamePlayer;
 import pl.betoncraft.flier.api.SidebarLine;
+import pl.betoncraft.flier.core.Utils;
 
 /**
  * A sidebar line showing player's altitude.
@@ -28,7 +32,20 @@ public class Altitude implements SidebarLine {
 	public String getText() {
 		double a = player.getPlayer().getLocation().getY() - 64;
 		if (lastString == null || a != lastValue) {
-			lastString = String.format("A: %.1fm", a);
+			String color;
+			double health = player.getPlayer().getHealth();
+			Location loc = player.getPlayer().getLocation();
+			int aboveGround = Utils.getAltitude(loc, (int) health + 1);
+			if (aboveGround == 0) {
+				color = ChatColor.GRAY.toString();
+			} else if (aboveGround < health) {
+				color = ChatColor.GREEN.toString();
+			} else if (loc.getBlockY() < player.getLobby().getGame().getHeightLimit()) {
+				color = ChatColor.YELLOW.toString();
+			} else {
+				color = ChatColor.RED.toString();
+			}
+			lastString = String.format("A: %s%.1fm", color, a);
 			lastValue = a;
 		}
 		return lastString;

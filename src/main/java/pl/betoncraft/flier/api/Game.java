@@ -87,6 +87,11 @@ public interface Game {
 	public List<Bonus> getBonuses();
 	
 	/**
+	 * @return the height limit in this game; 0 and less means no limit
+	 */
+	public int getHeightLimit();
+	
+	/**
 	 * Attitude of one player to another.
 	 *
 	 * @author Jakub Sapalski

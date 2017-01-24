@@ -6,6 +6,9 @@
  */
 package pl.betoncraft.flier.sidebar;
 
+import org.bukkit.ChatColor;
+import org.bukkit.util.Vector;
+
 import pl.betoncraft.flier.api.InGamePlayer;
 import pl.betoncraft.flier.api.SidebarLine;
 
@@ -26,12 +29,24 @@ public class Speed implements SidebarLine {
 
 	@Override
 	public String getText() {
-		double s = player.getPlayer().getVelocity().length() * 10;
+		Vector vel = player.getPlayer().getVelocity();
+		double s = vel.length() * 10;
+		double vertical = vel.getY();
 		if (s < 1) {
 			s = 0;
 		}
 		if (lastString == null || s != lastValue) {
-			lastString = String.format("S: %.1f~", s);
+			String color;
+			if (s == 0) {
+				color = ChatColor.GRAY.toString();
+			} else if (vertical > 0.5) {
+				color = ChatColor.GREEN.toString();
+			} else if (vertical < -0.5) {
+				color = ChatColor.RED.toString();
+			} else {
+				color = ChatColor.YELLOW.toString();
+			}
+			lastString = String.format("S: %s%.1f~", color, s);
 			lastValue = s;
 		}
 		return lastString;

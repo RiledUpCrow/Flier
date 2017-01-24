@@ -6,6 +6,7 @@
  */
 package pl.betoncraft.flier.sidebar;
 
+import net.md_5.bungee.api.ChatColor;
 import pl.betoncraft.flier.api.InGamePlayer;
 import pl.betoncraft.flier.api.SidebarLine;
 
@@ -31,7 +32,7 @@ public class Money implements SidebarLine {
 			m = 0;
 		}
 		if (lastString == null || m != lastValue) {
-			lastString = String.format("M: %d$", m);
+			lastString = String.format("M: %s%d$", ChatColor.LIGHT_PURPLE, m);
 			lastValue = m;
 		}
 		return lastString;

@@ -6,6 +6,8 @@
  */
 package pl.betoncraft.flier.sidebar;
 
+import org.bukkit.ChatColor;
+
 import pl.betoncraft.flier.api.InGamePlayer;
 import pl.betoncraft.flier.api.PlayerClass;
 import pl.betoncraft.flier.api.SidebarLine;
@@ -32,7 +34,17 @@ public class Health implements SidebarLine {
 		Wings wings = c == null ? null : c.getCurrentWings();
 		double h = wings == null ? 0 : 100 * wings.getHealth() / wings.getMaxHealth();
 		if (lastString == null || h != lastValue) {
-			lastString = String.format("H: %.1f%%", h);
+			String color;
+			if (h == 0) {
+				color = ChatColor.BLACK.toString();
+			} else if (h > 75) {
+				color = ChatColor.GREEN.toString();
+			} else if (h < 25) {
+				color = ChatColor.RED.toString();
+			} else {
+				color = ChatColor.YELLOW.toString();
+			}
+			lastString = String.format("H: %s%.1f%%", color, h);
 			lastValue = h;
 		}
 		return lastString;
