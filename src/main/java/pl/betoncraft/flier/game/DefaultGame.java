@@ -44,6 +44,7 @@ import pl.betoncraft.flier.api.Damager.DamageResult;
 import pl.betoncraft.flier.api.Game;
 import pl.betoncraft.flier.api.InGamePlayer;
 import pl.betoncraft.flier.core.Utils;
+import pl.betoncraft.flier.core.ValueLoader;
 import pl.betoncraft.flier.exception.LoadingException;
 import pl.betoncraft.flier.sidebar.Altitude;
 import pl.betoncraft.flier.sidebar.Fuel;
@@ -62,6 +63,8 @@ public abstract class DefaultGame implements Listener, Game {
 	protected Map<UUID, InGamePlayer> dataMap = new HashMap<>();
 	protected List<Bonus> bonuses = new ArrayList<>();
 	
+	protected int heightLimit;
+	protected double heightDamage;
 	protected boolean useMoney = false;
 	protected int enemyKillMoney = 0;
 	protected int enemyHitMoney = 0;
@@ -82,6 +85,8 @@ public abstract class DefaultGame implements Listener, Game {
 						.initCause(e);
 			}
 		}
+		heightLimit = ValueLoader.loadInt(section, "height_limit");
+		heightDamage = ValueLoader.loadNonNegativeDouble(section, "height_damage");
 		useMoney = section.getBoolean("money.enabled", useMoney);
 		enemyKillMoney = section.getInt("money.enemy_kill", enemyKillMoney);
 		enemyHitMoney = section.getInt("money.enemy_hit", enemyHitMoney);
@@ -117,6 +122,13 @@ public abstract class DefaultGame implements Listener, Game {
 				game.slowTick();
 				for (InGamePlayer data : getPlayers().values()) {
 					data.slowTick();
+				}
+			}
+			if (heightLimit > 0 && i % 20 == 0) {
+				for (InGamePlayer data : getPlayers().values()) {
+					if (data.getPlayer().getLocation().getY() > heightLimit) {
+						data.getPlayer().damage(heightDamage);
+					}
 				}
 			}
 			i++;
