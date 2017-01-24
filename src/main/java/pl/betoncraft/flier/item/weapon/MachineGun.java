@@ -9,6 +9,7 @@ package pl.betoncraft.flier.item.weapon;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Explosive;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -55,7 +56,13 @@ public class MachineGun extends DefaultWeapon {
 				projectile.setVelocity(velocity);
 				projectile.setShooter(player);
 				projectile.setGravity(false);
-				Damager.saveDamager(projectile, MachineGun.this);
+				projectile.setBounce(false);
+				if (projectile instanceof Explosive) {
+					Explosive explosive = (Explosive) projectile;
+					explosive.setIsIncendiary(false);
+					explosive.setYield(0);
+				}
+				Damager.saveDamager(projectile, MachineGun.this, data);
 				counter --;
 				if (counter <= 0) {
 					cancel();

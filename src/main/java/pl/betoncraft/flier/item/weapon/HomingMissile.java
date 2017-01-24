@@ -62,7 +62,7 @@ public class HomingMissile extends DefaultWeapon {
 		missile.setShooter(player);
 		missile.setGravity(false);
 		missile.setGlowing(true);
-		Damager.saveDamager(missile, HomingMissile.this);
+		Damager.saveDamager(missile, HomingMissile.this, data);
 		new BukkitRunnable() {
 			int i = 0;
 			Location lastLoc;

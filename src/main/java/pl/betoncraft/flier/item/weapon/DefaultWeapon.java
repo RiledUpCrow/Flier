@@ -26,6 +26,7 @@ public abstract class DefaultWeapon extends DefaultUsableItem implements Weapon 
 	protected final boolean wingsOff;
 	protected final boolean killsOnGround;
 	protected final double physicalDamage;
+	protected final boolean isExploding;
 	
 	public DefaultWeapon(ConfigurationSection section) throws LoadingException {
 		super(section);
@@ -35,6 +36,7 @@ public abstract class DefaultWeapon extends DefaultUsableItem implements Weapon 
 		wingsOff = ValueLoader.loadBoolean(section, "wings_off");
 		killsOnGround = ValueLoader.loadBoolean(section, "kills_on_ground");
 		physicalDamage = ValueLoader.loadDouble(section, "physical_damage");
+		isExploding = ValueLoader.loadBoolean(section, "exploding");
 	}
 	
 	@Override
@@ -65,6 +67,11 @@ public abstract class DefaultWeapon extends DefaultUsableItem implements Weapon 
 	@Override
 	public boolean suicidal() {
 		return suicidal;
+	}
+	
+	@Override
+	public boolean isExploding() {
+		return isExploding;
 	}
 
 }

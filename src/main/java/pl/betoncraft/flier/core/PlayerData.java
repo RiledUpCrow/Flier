@@ -144,9 +144,9 @@ public class PlayerData implements InGamePlayer {
 		if (!isPlaying()) {
 			return result;
 		}
-		Player shooter = attacker.getPlayer();
+		Player shooter = attacker == null ? null : attacker.getPlayer();
 		// was hit by himself
-		if (shooter.equals(player)) {
+		if (shooter != null && shooter.equals(player)) {
 			// ignore if you can's commit suicide with this weapon
 			if (!damager.suicidal()) {
 				return result;
@@ -183,11 +183,13 @@ public class PlayerData implements InGamePlayer {
 			notify = false;
 			sound = false;
 		}
-		if (notify) {
+		if (shooter != null && notify) {
 			shooter.sendMessage(ChatColor.YELLOW + "You managed to hit " + Utils.formatPlayer(this) + "!");
 		}
 		if (sound) {
-			shooter.playSound(shooter.getLocation(), Sound.BLOCK_DISPENSER_DISPENSE, 1, 1);
+			if (shooter != null) {
+				shooter.playSound(shooter.getLocation(), Sound.BLOCK_DISPENSER_DISPENSE, 1, 1);
+			}
 			player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_HURT, 1, 1);
 		}
 		return result;

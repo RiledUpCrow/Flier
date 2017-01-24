@@ -43,6 +43,11 @@ public class DummyDamager implements Damager {
 	public boolean suicidal() {
 		return false;
 	}
+	
+	@Override
+	public boolean isExploding() {
+		return false;
+	}
 
 	@Override
 	public double getPhysical() {

@@ -18,8 +18,6 @@ import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.HandlerList;
@@ -27,6 +25,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.ExplosionPrimeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
@@ -40,6 +39,7 @@ import org.bukkit.util.Vector;
 import pl.betoncraft.flier.Flier;
 import pl.betoncraft.flier.api.Bonus;
 import pl.betoncraft.flier.api.Damager;
+import pl.betoncraft.flier.api.Damager.Attacker;
 import pl.betoncraft.flier.api.Damager.DamageResult;
 import pl.betoncraft.flier.api.Game;
 import pl.betoncraft.flier.api.InGamePlayer;
@@ -254,38 +254,22 @@ public abstract class DefaultGame implements Listener, Game {
 	
 	@EventHandler
 	public void onHit(EntityDamageByEntityEvent event) {
-		if (event.isCancelled()) {
-			return;
-		}
+		// the damaged player is in game
 		InGamePlayer player = getPlayers().get(event.getEntity().getUniqueId());
-		// hit player in Game
 		if (player == null) {
 			return;
 		}
 		event.setCancelled(true);
-		// hit by a projectile
-		if (!(event.getDamager() instanceof Projectile)) {
-			return;
-		}
-		Projectile projectile = (Projectile) event.getDamager();
-		projectile.remove();
-		// shooter was some player
-		if (!(projectile.getShooter() instanceof Player)) {
-			return;
-		}
-		Player shooterPlayer = (Player) projectile.getShooter();
-		InGamePlayer shooter = getPlayers().get(shooterPlayer.getUniqueId());
-		// was hit by someone in Game
-		if (shooter == null) {
-			return;
-		}
-		Damager weapon = Damager.getDamager(projectile);
+		event.getDamager().remove();
+		// the damage was done with a Damager
+		Attacker weapon = Damager.getDamager(event.getDamager());
 		if (weapon == null) {
 			return;
 		}
-		DamageResult result = player.damage(shooter, weapon);
-		handleHit(result, shooter, player, weapon);
-		if (result != DamageResult.NOTHING) {
+		DamageResult result = player.damage(weapon.getAttacker(), weapon.getDamager());
+		handleHit(result, weapon.getAttacker(), player, weapon.getDamager());
+		InGamePlayer shooter = weapon.getAttacker();
+		if (result != DamageResult.NOTHING && shooter != null) {
 			Attitude a = getAttitude(shooter, player);
 			if (a == Attitude.FRIENDLY) {
 				pay(shooter, friendlyHitMoney);
@@ -299,6 +283,20 @@ public abstract class DefaultGame implements Listener, Game {
 	
 	private void pay(InGamePlayer player, int amount) {
 		player.setMoney(player.getMoney() + amount);
+	}
+	
+	@EventHandler
+	public void onExplode(ExplosionPrimeEvent event) {
+		if (event.isCancelled()) {
+			return;
+		}
+		Attacker weapon = Damager.getDamager(event.getEntity());
+		if (weapon == null) {
+			return;
+		}
+		if (!weapon.getDamager().isExploding()) {
+			event.setCancelled(true);
+		}
 	}
 	
 	@EventHandler
