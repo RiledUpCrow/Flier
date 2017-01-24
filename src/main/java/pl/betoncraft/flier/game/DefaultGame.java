@@ -325,6 +325,7 @@ public abstract class DefaultGame implements Listener, Game {
 			InGamePlayer lastHit = killed.getAttacker();
 			InGamePlayer killer = lastHit == null ? null : getPlayers().get(lastHit.getPlayer().getUniqueId());
 			killed.setAttacker(null);
+			killed.getPlayer().setGlowing(false);
 			if (killer != null) {
 				switch (event.getEntity().getLastDamageCause().getCause()) {
 				case FALL:
