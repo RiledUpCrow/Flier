@@ -13,8 +13,9 @@ import org.bukkit.util.Vector;
 
 import pl.betoncraft.flier.Flier;
 import pl.betoncraft.flier.api.InGamePlayer;
-import pl.betoncraft.flier.core.ValueLoader;
+import pl.betoncraft.flier.core.DefaultUsableItem;
 import pl.betoncraft.flier.exception.LoadingException;
+import pl.betoncraft.flier.util.ValueLoader;
 
 /**
  * Launches players in the direction of looking.

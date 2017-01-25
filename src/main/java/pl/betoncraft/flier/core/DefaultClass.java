@@ -20,13 +20,15 @@ import pl.betoncraft.flier.api.Item;
 import pl.betoncraft.flier.api.PlayerClass;
 import pl.betoncraft.flier.api.Wings;
 import pl.betoncraft.flier.exception.LoadingException;
+import pl.betoncraft.flier.util.Utils;
+import pl.betoncraft.flier.util.ValueLoader;
 
 /**
  * Default implementation of PlayerClass.
  *
  * @author Jakub Sapalski
  */
-public class DefaultPlayerClass implements PlayerClass {
+public class DefaultClass implements PlayerClass {
 
 	private String currentName;
 	private Engine currentEngine;
@@ -43,7 +45,7 @@ public class DefaultPlayerClass implements PlayerClass {
 	private final Wings defaultWings;
 	private final Map<Item, Integer> defaultItems = new HashMap<>();
 	
-	public DefaultPlayerClass(ConfigurationSection section) throws LoadingException {
+	public DefaultClass(ConfigurationSection section) throws LoadingException {
 		defaultName = Utils.capitalize(ValueLoader.loadString(section, "name"));
 		defaultEngine = ValueLoader.loadEngine(section, "engine");
 		defaultWings = ValueLoader.loadWings(section, "wings");
@@ -76,7 +78,7 @@ public class DefaultPlayerClass implements PlayerClass {
 		reset();
 	}
 
-	private DefaultPlayerClass(String defName, Engine defEngine, Wings defWings, Map<Item, Integer> defItems) {
+	private DefaultClass(String defName, Engine defEngine, Wings defWings, Map<Item, Integer> defItems) {
 		defaultName = defName;
 		defaultEngine = defEngine;
 		defaultWings = defWings;
@@ -221,8 +223,8 @@ public class DefaultPlayerClass implements PlayerClass {
 	}
 	
 	@Override
-	public DefaultPlayerClass replicate() {
-		return new DefaultPlayerClass(defaultName, defaultEngine, defaultWings, defaultItems);
+	public DefaultClass replicate() {
+		return new DefaultClass(defaultName, defaultEngine, defaultWings, defaultItems);
 	}
 
 }

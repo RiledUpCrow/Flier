@@ -18,8 +18,9 @@ import org.bukkit.util.Vector;
 import pl.betoncraft.flier.Flier;
 import pl.betoncraft.flier.api.Damager;
 import pl.betoncraft.flier.api.InGamePlayer;
-import pl.betoncraft.flier.core.ValueLoader;
+import pl.betoncraft.flier.core.DefaultWeapon;
 import pl.betoncraft.flier.exception.LoadingException;
+import pl.betoncraft.flier.util.ValueLoader;
 
 /**
  * Burst shooting weapon with unguided projectiles.

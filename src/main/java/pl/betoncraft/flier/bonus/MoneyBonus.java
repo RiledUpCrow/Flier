@@ -10,8 +10,9 @@ import org.bukkit.configuration.ConfigurationSection;
 
 import pl.betoncraft.flier.api.InGamePlayer;
 import pl.betoncraft.flier.api.Replicable;
-import pl.betoncraft.flier.core.ValueLoader;
+import pl.betoncraft.flier.core.DefaultBonus;
 import pl.betoncraft.flier.exception.LoadingException;
+import pl.betoncraft.flier.util.ValueLoader;
 
 /**
  * Adds or removes money from player.

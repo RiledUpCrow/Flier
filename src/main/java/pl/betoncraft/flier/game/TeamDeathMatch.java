@@ -18,11 +18,12 @@ import org.bukkit.configuration.ConfigurationSection;
 
 import pl.betoncraft.flier.api.Damager;
 import pl.betoncraft.flier.api.Damager.DamageResult;
+import pl.betoncraft.flier.core.DefaultGame;
 import pl.betoncraft.flier.api.InGamePlayer;
 import pl.betoncraft.flier.api.SidebarLine;
-import pl.betoncraft.flier.core.Utils;
-import pl.betoncraft.flier.core.ValueLoader;
 import pl.betoncraft.flier.exception.LoadingException;
+import pl.betoncraft.flier.util.Utils;
+import pl.betoncraft.flier.util.ValueLoader;
 
 /**
  * A simple team deathmatch game.

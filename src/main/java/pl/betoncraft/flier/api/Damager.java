@@ -13,7 +13,7 @@ import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.metadata.MetadataValue;
 
 import pl.betoncraft.flier.Flier;
-import pl.betoncraft.flier.core.DummyDamager;
+import pl.betoncraft.flier.util.DummyDamager;
 
 /**
  * Represents a source of projectiles with wing damage.

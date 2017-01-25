@@ -8,6 +8,7 @@ package pl.betoncraft.flier.item;
 
 import org.bukkit.configuration.ConfigurationSection;
 
+import pl.betoncraft.flier.core.DefaultItem;
 import pl.betoncraft.flier.exception.LoadingException;
 
 /**

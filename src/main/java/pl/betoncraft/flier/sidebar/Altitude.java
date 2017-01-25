@@ -11,7 +11,7 @@ import org.bukkit.Location;
 
 import pl.betoncraft.flier.api.InGamePlayer;
 import pl.betoncraft.flier.api.SidebarLine;
-import pl.betoncraft.flier.core.Utils;
+import pl.betoncraft.flier.util.Utils;
 
 /**
  * A sidebar line showing player's altitude.

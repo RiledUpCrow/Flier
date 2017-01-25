@@ -8,9 +8,10 @@ package pl.betoncraft.flier.item.engine;
 
 import org.bukkit.configuration.ConfigurationSection;
 
-import pl.betoncraft.flier.core.Utils.ImmutableVector;
-import pl.betoncraft.flier.core.ValueLoader;
+import pl.betoncraft.flier.core.DefaultEngine;
 import pl.betoncraft.flier.exception.LoadingException;
+import pl.betoncraft.flier.util.ValueLoader;
+import pl.betoncraft.flier.util.Utils.ImmutableVector;
 
 /**
  * Engine which multiplies speed instead of adding a fixed acceleration.

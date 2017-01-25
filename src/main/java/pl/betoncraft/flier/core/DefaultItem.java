@@ -4,7 +4,7 @@
  * To Public License, Version 2, as published by Sam Hocevar. See
  * http://www.wtfpl.net/ for more details.
  */
-package pl.betoncraft.flier.item;
+package pl.betoncraft.flier.core;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -19,8 +19,8 @@ import org.bukkit.inventory.meta.ItemMeta;
 import pl.betoncraft.flier.Flier;
 import pl.betoncraft.flier.api.Effect;
 import pl.betoncraft.flier.api.Item;
-import pl.betoncraft.flier.core.ValueLoader;
 import pl.betoncraft.flier.exception.LoadingException;
+import pl.betoncraft.flier.util.ValueLoader;
 
 /**
  * A base class for items saved in the configuration sections.

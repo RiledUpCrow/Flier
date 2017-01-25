@@ -4,7 +4,7 @@
  * To Public License, Version 2, as published by Sam Hocevar. See
  * http://www.wtfpl.net/ for more details.
  */
-package pl.betoncraft.flier.bonus;
+package pl.betoncraft.flier.core;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -20,8 +20,8 @@ import org.bukkit.entity.EntityType;
 import pl.betoncraft.flier.Flier;
 import pl.betoncraft.flier.api.Bonus;
 import pl.betoncraft.flier.api.InGamePlayer;
-import pl.betoncraft.flier.core.ValueLoader;
 import pl.betoncraft.flier.exception.LoadingException;
+import pl.betoncraft.flier.util.ValueLoader;
 
 /**
  * A default Bonus implementation.

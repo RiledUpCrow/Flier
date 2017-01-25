@@ -6,7 +6,7 @@
  */
 package pl.betoncraft.flier.api;
 
-import pl.betoncraft.flier.core.Utils.ImmutableVector;
+import pl.betoncraft.flier.util.Utils.ImmutableVector;
 
 /**
  * Represents an engine, which speeds players up.

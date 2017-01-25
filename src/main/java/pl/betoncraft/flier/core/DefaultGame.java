@@ -4,7 +4,7 @@
  * To Public License, Version 2, as published by Sam Hocevar. See
  * http://www.wtfpl.net/ for more details.
  */
-package pl.betoncraft.flier.game;
+package pl.betoncraft.flier.core;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -43,14 +43,14 @@ import pl.betoncraft.flier.api.Damager.Attacker;
 import pl.betoncraft.flier.api.Damager.DamageResult;
 import pl.betoncraft.flier.api.Game;
 import pl.betoncraft.flier.api.InGamePlayer;
-import pl.betoncraft.flier.core.Utils;
-import pl.betoncraft.flier.core.ValueLoader;
 import pl.betoncraft.flier.exception.LoadingException;
 import pl.betoncraft.flier.sidebar.Altitude;
 import pl.betoncraft.flier.sidebar.Fuel;
 import pl.betoncraft.flier.sidebar.Health;
 import pl.betoncraft.flier.sidebar.Money;
 import pl.betoncraft.flier.sidebar.Speed;
+import pl.betoncraft.flier.util.Utils;
+import pl.betoncraft.flier.util.ValueLoader;
 
 /**
  * Basic rules of a game.

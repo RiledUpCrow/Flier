@@ -11,8 +11,8 @@ import org.bukkit.configuration.ConfigurationSection;
 import pl.betoncraft.flier.api.Effect;
 import pl.betoncraft.flier.api.InGamePlayer;
 import pl.betoncraft.flier.api.Game.Attitude;
-import pl.betoncraft.flier.core.ValueLoader;
 import pl.betoncraft.flier.exception.LoadingException;
+import pl.betoncraft.flier.util.ValueLoader;
 
 /**
  * Targets hostile players.

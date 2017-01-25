@@ -29,6 +29,8 @@ import com.google.common.collect.Lists;
 import pl.betoncraft.flier.api.Bonus;
 import pl.betoncraft.flier.api.Damager;
 import pl.betoncraft.flier.api.Damager.DamageResult;
+import pl.betoncraft.flier.util.Utils;
+import pl.betoncraft.flier.util.Utils.ImmutableVector;
 import pl.betoncraft.flier.api.Effect;
 import pl.betoncraft.flier.api.Engine;
 import pl.betoncraft.flier.api.InGamePlayer;
@@ -38,14 +40,13 @@ import pl.betoncraft.flier.api.PlayerClass;
 import pl.betoncraft.flier.api.SidebarLine;
 import pl.betoncraft.flier.api.UsableItem;
 import pl.betoncraft.flier.api.Wings;
-import pl.betoncraft.flier.core.Utils.ImmutableVector;
 
 /**
  * Stores data about the player.
  *
  * @author Jakub Sapalski
  */
-public class PlayerData implements InGamePlayer {
+public class DefaultPlayer implements InGamePlayer {
 	
 	private Player player;
 	private Lobby lobby;
@@ -61,7 +62,7 @@ public class PlayerData implements InGamePlayer {
 	private List<Effect> activeEffects = new LinkedList<>();
 	private int money;
 	
-	public PlayerData(Player player, Lobby lobby, PlayerClass clazz) {
+	public DefaultPlayer(Player player, Lobby lobby, PlayerClass clazz) {
 		this.player = player;
 		this.lobby = lobby;
 		this.clazz = clazz;

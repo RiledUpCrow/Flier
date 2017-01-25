@@ -30,7 +30,6 @@ import pl.betoncraft.flier.api.Wings;
 import pl.betoncraft.flier.bonus.EffectBonus;
 import pl.betoncraft.flier.bonus.MoneyBonus;
 import pl.betoncraft.flier.command.FlierCommand;
-import pl.betoncraft.flier.core.Utils;
 import pl.betoncraft.flier.effect.TargetCompass;
 import pl.betoncraft.flier.exception.LoadingException;
 import pl.betoncraft.flier.game.TeamDeathMatch;
@@ -41,6 +40,7 @@ import pl.betoncraft.flier.item.weapon.HomingMissile;
 import pl.betoncraft.flier.item.weapon.MachineGun;
 import pl.betoncraft.flier.item.wings.SimpleWings;
 import pl.betoncraft.flier.lobby.PhysicalLobby;
+import pl.betoncraft.flier.util.Utils;
 
 public class Flier extends JavaPlugin {
 

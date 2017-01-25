@@ -9,9 +9,10 @@ package pl.betoncraft.flier.item.wings;
 import org.bukkit.configuration.ConfigurationSection;
 
 import pl.betoncraft.flier.api.InGamePlayer;
-import pl.betoncraft.flier.core.Utils.ImmutableVector;
-import pl.betoncraft.flier.core.ValueLoader;
+import pl.betoncraft.flier.core.DefaultWings;
 import pl.betoncraft.flier.exception.LoadingException;
+import pl.betoncraft.flier.util.ValueLoader;
+import pl.betoncraft.flier.util.Utils.ImmutableVector;
 
 /**
  * Simple wings with scalable lifting force and air resistance.

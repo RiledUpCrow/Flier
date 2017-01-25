@@ -42,11 +42,11 @@ import pl.betoncraft.flier.api.Lobby;
 import pl.betoncraft.flier.api.PlayerClass;
 import pl.betoncraft.flier.api.PlayerClass.RespawnAction;
 import pl.betoncraft.flier.api.Wings;
-import pl.betoncraft.flier.core.DefaultPlayerClass;
-import pl.betoncraft.flier.core.PlayerData;
-import pl.betoncraft.flier.core.Utils;
-import pl.betoncraft.flier.core.ValueLoader;
+import pl.betoncraft.flier.core.DefaultClass;
+import pl.betoncraft.flier.core.DefaultPlayer;
 import pl.betoncraft.flier.exception.LoadingException;
+import pl.betoncraft.flier.util.Utils;
+import pl.betoncraft.flier.util.ValueLoader;
 
 /**
  * Physical lobby with fixed classes selected by clicking on blocks.
@@ -84,7 +84,7 @@ public class PhysicalLobby implements Lobby, Listener {
 			if (playerClass == null) {
 				throw new LoadingException("Player class is not defined.");
 			}
-			defClass = new DefaultPlayerClass(playerClass);
+			defClass = new DefaultClass(playerClass);
 		} catch (LoadingException e) {
 			throw (LoadingException) new LoadingException("Error in player class.").initCause(e);
 		}
@@ -320,7 +320,7 @@ public class PhysicalLobby implements Lobby, Listener {
 		if (players.containsKey(uuid)) {
 			return;
 		}
-		InGamePlayer data = new PlayerData(player, this, (DefaultPlayerClass) defClass.replicate());
+		InGamePlayer data = new DefaultPlayer(player, this, (DefaultClass) defClass.replicate());
 		players.put(uuid, data);
 		player.teleport(spawn);
 		currentGame.addPlayer(data);

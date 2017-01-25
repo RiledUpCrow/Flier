@@ -4,15 +4,14 @@
  * To Public License, Version 2, as published by Sam Hocevar. See
  * http://www.wtfpl.net/ for more details.
  */
-package pl.betoncraft.flier.item.wings;
+package pl.betoncraft.flier.core;
 
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 
 import pl.betoncraft.flier.api.Wings;
-import pl.betoncraft.flier.core.ValueLoader;
 import pl.betoncraft.flier.exception.LoadingException;
-import pl.betoncraft.flier.item.DefaultItem;
+import pl.betoncraft.flier.util.ValueLoader;
 
 /**
  * Default Wings implementation.
