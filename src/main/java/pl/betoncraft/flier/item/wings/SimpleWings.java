@@ -34,11 +34,11 @@ public class SimpleWings extends DefaultWings {
 	@Override
 	public ImmutableVector applyFlightModifications(InGamePlayer data) {
 		ImmutableVector velocity = ImmutableVector.fromVector(data.getPlayer().getVelocity());
-		double horizontalSpeed = Math.sqrt((velocity.getX() * velocity.getX()) + (velocity.getZ() * velocity.getZ()));
-		double length = (liftingForce * horizontalSpeed) - data.getWeight();
-		length = length >= maxLift ? maxLift : length;
-		velocity = velocity.add(new ImmutableVector(0, length, 0));
-		ImmutableVector airResistance = velocity.multiply(aerodynamics);
+		double lift = (liftingForce * velocity.length() * velocity.length() * 0.5) - data.getWeight();
+		lift = lift >= maxLift ? maxLift : lift;
+		velocity = velocity.add(new ImmutableVector(0, lift, 0));
+		double drag = velocity.length() * velocity.length() * 0.5 * aerodynamics;
+		ImmutableVector airResistance = velocity.normalize().multiply(drag);
 		return velocity.add(airResistance);
 	}
 	
