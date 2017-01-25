@@ -33,6 +33,7 @@ import pl.betoncraft.flier.command.FlierCommand;
 import pl.betoncraft.flier.effect.TargetCompass;
 import pl.betoncraft.flier.exception.LoadingException;
 import pl.betoncraft.flier.game.TeamDeathMatch;
+import pl.betoncraft.flier.item.EmergencyWings;
 import pl.betoncraft.flier.item.Launcher;
 import pl.betoncraft.flier.item.VanillaItem;
 import pl.betoncraft.flier.item.engine.MultiplyingEngine;
@@ -78,6 +79,7 @@ public class Flier extends JavaPlugin {
 		registerItem("homingMissile", s -> new HomingMissile(s));
 		registerItem("launcher", s -> new Launcher(s));
 		registerItem("vanillaItem", s -> new VanillaItem(s));
+		registerItem("emergencyWings", s -> new EmergencyWings(s));
 		registerWings("simpleWings", s -> new SimpleWings(s));
 		registerLobby("fixedPhysicalLobby", s -> new PhysicalLobby(s));
 		registerGame("teamDeathMatch", s -> new TeamDeathMatch(s));
