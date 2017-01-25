@@ -19,11 +19,12 @@ import pl.betoncraft.flier.util.ValueLoader;
  * @author Jakub Sapalski
  */
 public abstract class DefaultWings extends DefaultItem implements Wings {
-	
+
 	protected final double maxHealth;
 	protected final double regeneration;
-	
+
 	protected double health;
+	protected boolean disabled;
 
 	public DefaultWings(ConfigurationSection section) throws LoadingException {
 		super(section);
@@ -32,7 +33,7 @@ public abstract class DefaultWings extends DefaultItem implements Wings {
 		regeneration = ValueLoader.loadNonNegativeDouble(section, "regeneration");
 		health = maxHealth;
 	}
-	
+
 	@Override
 	public double getMaxHealth() {
 		return maxHealth;
@@ -47,7 +48,7 @@ public abstract class DefaultWings extends DefaultItem implements Wings {
 	public double getHealth() {
 		return health;
 	}
-	
+
 	@Override
 	public boolean addHealth(double amount) {
 		if (health >= maxHealth) {
@@ -60,7 +61,7 @@ public abstract class DefaultWings extends DefaultItem implements Wings {
 		}
 		return true;
 	}
-	
+
 	@Override
 	public boolean removeHealth(double amount) {
 		if (health <= amount) {
@@ -70,6 +71,16 @@ public abstract class DefaultWings extends DefaultItem implements Wings {
 			health -= amount;
 			return false;
 		}
+	}
+
+	@Override
+	public boolean areDisabled() {
+		return disabled;
+	}
+
+	@Override
+	public void setDisabled(boolean disabled) {
+		this.disabled = disabled;
 	}
 
 }

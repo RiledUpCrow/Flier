@@ -78,30 +78,38 @@ public class DefaultPlayer implements InGamePlayer {
 	@Override
 	public void fastTick() {
 		if (isPlaying()) {
-			if (isFlying()) {
-				player.setVelocity(clazz.getCurrentWings().applyFlightModifications(this).toVector());
+			boolean hasWings = hasWings();
+			boolean wingsDead = clazz.getCurrentWings().getHealth() == 0;
+			boolean wingsDisabled = clazz.getCurrentWings().areDisabled();
+			boolean fastTick = true;
+
+			if (hasWings) { // has wings
+				if (wingsDead) { // wings should be dead, destroying
+					destroyWings();
+				} else { // wings are alive
+					regenerateWings();
+					if (wingsDisabled) { // wings are disabled, take off
+						takeWingsOff();
+						enableWings();
+					} else { // wings are not disabled
+						if (isFlying()) { // the player is flying
+							modifyFlight();
+							if (isAccelerating()) { // the player is accelerating
+								speedUp();
+							}
+						}
+					}
+				}
+			} else { // has no wings
+				if (!wingsDead) { // wings should be alive, create them
+					createWings();
+				}
 			}
-			if (isAccelerating()) {
-				speedUp();
-			} else {
+			if (!isAccelerating()) { // is not accelerating
 				regenerateFuel();
 			}
-			applyEffects(true);
-			regenerateWings();
+			applyEffects(fastTick);
 			checkBonuses();
-		}
-	}
-
-	private void checkBonuses() {
-		List<Bonus> bonuses = lobby.getGame().getBonuses();
-		for (Bonus bonus : bonuses) {
-			if (!bonus.isAvailable()) {
-				continue;
-			}
-			double distSqrd = bonus.getDistance() * bonus.getDistance();
-			if (bonus.getLocation().distanceSquared(player.getLocation()) <= distSqrd) {
-				bonus.apply(this);
-			}
 		}
 	}
 
@@ -163,9 +171,7 @@ public class DefaultPlayer implements InGamePlayer {
 			} else {
 				result = DamageResult.WINGS_DAMAGE;
 			}
-			if (clazz.getCurrentWings().removeHealth(damager.getDamage())) {
-				destroyWings();
-			}
+			clazz.getCurrentWings().removeHealth(damager.getDamage());
 		} else if (Utils.getAltitude(getPlayer().getLocation(), 4) != 4) { // in general proximity of the ground,
 			setAttacker(attacker);                                         // handle ground attack
 			if (damager.killsOnGround()) {
@@ -374,7 +380,7 @@ public class DefaultPlayer implements InGamePlayer {
 	
 	private void stopGlowing() {
 		if (System.currentTimeMillis() >= glowTimer) {
-			getPlayer().setGlowing(false);
+			player.setGlowing(false);
 		}
 	}
 	
@@ -408,7 +414,6 @@ public class DefaultPlayer implements InGamePlayer {
 	}
 	
 	private void takeWingsOff() {
-		Player player = getPlayer();
 		ItemStack elytra = player.getInventory().getChestplate();
 		if (elytra != null) {
 			player.getInventory().setChestplate(null);
@@ -417,9 +422,21 @@ public class DefaultPlayer implements InGamePlayer {
 	}
 	
 	private void destroyWings() {
-		Player player = getPlayer();
 		player.getInventory().setChestplate(null);
 		player.getInventory().setItem(1, null);
+	}
+	
+	private boolean hasWings() {
+		ItemStack wings = clazz.getCurrentWings().getItem();
+		ItemStack chestPlate = player.getInventory().getChestplate();
+		if (chestPlate != null && chestPlate.isSimilar(wings)) {
+			return true;
+		}
+		ItemStack slot = player.getInventory().getItem(1);
+		if (slot != null && slot.isSimilar(wings)) {
+			return true;
+		}
+		return false;
 	}
 	
 	private void updateStats() {
@@ -475,6 +492,31 @@ public class DefaultPlayer implements InGamePlayer {
 		if (effect != null && effect.fast() == fastTick) {
 			effect.apply(this);
 		}
+	}
+
+	private void checkBonuses() {
+		List<Bonus> bonuses = lobby.getGame().getBonuses();
+		for (Bonus bonus : bonuses) {
+			if (!bonus.isAvailable()) {
+				continue;
+			}
+			double distSqrd = bonus.getDistance() * bonus.getDistance();
+			if (bonus.getLocation().distanceSquared(player.getLocation()) <= distSqrd) {
+				bonus.apply(this);
+			}
+		}
+	}
+
+	private void createWings() {
+		player.getInventory().setItem(1, clazz.getCurrentWings().getItem());
+	}
+
+	private void enableWings() {
+		clazz.getCurrentWings().setDisabled(false);
+	}
+
+	private void modifyFlight() {
+		player.setVelocity(clazz.getCurrentWings().applyFlightModifications(this).toVector());
 	}
 
 }

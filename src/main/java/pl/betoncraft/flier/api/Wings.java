@@ -50,5 +50,15 @@ public interface Wings extends Item {
 	 * @return whenever the health of these Wings dropped to zero or not
 	 */
 	public boolean removeHealth(double amount);
+	
+	/**
+	 * @return whenever the wings are disabled
+	 */
+	public boolean areDisabled();
+	
+	/**
+	 * @param disabled whenever the wings should be disabled
+	 */
+	public void setDisabled(boolean disabled);
 
 }
