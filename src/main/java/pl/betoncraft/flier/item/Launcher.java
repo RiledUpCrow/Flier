@@ -51,14 +51,5 @@ public class Launcher extends DefaultUsableItem {
 		}
 		return true;
 	}
-	
-	@Override
-	public Launcher replicate() {
-		try {
-			return new Launcher(base);
-		} catch (LoadingException e) {
-			return null; // dead code
-		}
-	}
 
 }

@@ -29,7 +29,7 @@ import pl.betoncraft.flier.util.ValueLoader;
  */
 public abstract class DefaultItem implements Item {
 	
-	protected final ConfigurationSection base;
+	protected final String id;
 
 	protected final ItemStack item;
 	protected final double weight;
@@ -38,7 +38,7 @@ public abstract class DefaultItem implements Item {
 	protected final List<Effect> inHand = new ArrayList<>();
 
 	public DefaultItem(ConfigurationSection section) throws LoadingException {
-		base = section;
+		id = section.getName();
 		Material type = ValueLoader.loadEnum(section, "material", Material.class);
 		String name = ChatColor.translateAlternateColorCodes('&', ValueLoader.loadString(section, "name"));
 		List<String> lore = section.getStringList("lore");
@@ -98,10 +98,19 @@ public abstract class DefaultItem implements Item {
 	}
 	
 	@Override
+	public Item replicate() {
+		try {
+			return Flier.getInstance().getItem(id);
+		} catch (LoadingException e) {
+			return null; // dead code
+		}
+	}
+	
+	@Override
 	public boolean isSameAs(Item item) {
 		if (item instanceof DefaultItem) {
 			DefaultItem defItem = (DefaultItem) item;
-			return defItem.base.equals(base);
+			return defItem.id.equals(id);
 		}
 		return false;
 	}

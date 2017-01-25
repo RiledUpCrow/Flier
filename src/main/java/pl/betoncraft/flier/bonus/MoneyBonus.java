@@ -9,7 +9,6 @@ package pl.betoncraft.flier.bonus;
 import org.bukkit.configuration.ConfigurationSection;
 
 import pl.betoncraft.flier.api.InGamePlayer;
-import pl.betoncraft.flier.api.Replicable;
 import pl.betoncraft.flier.core.DefaultBonus;
 import pl.betoncraft.flier.exception.LoadingException;
 import pl.betoncraft.flier.util.ValueLoader;
@@ -26,15 +25,6 @@ public class MoneyBonus extends DefaultBonus {
 	public MoneyBonus(ConfigurationSection section) throws LoadingException {
 		super(section);
 		money = ValueLoader.loadInt(section, "money");
-	}
-
-	@Override
-	public Replicable replicate() {
-		try {
-			return new MoneyBonus(base);
-		} catch (LoadingException e) {
-			return null; // dead code
-		}
 	}
 
 	@Override

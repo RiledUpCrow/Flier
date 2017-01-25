@@ -30,7 +30,7 @@ import pl.betoncraft.flier.util.ValueLoader;
  */
 public abstract class DefaultBonus implements Bonus {
 	
-	protected final ConfigurationSection base;
+	protected final String id;
 	
 	protected final double distance;
 	protected final boolean consumable;
@@ -44,7 +44,7 @@ public abstract class DefaultBonus implements Bonus {
 	private Map<UUID, Long> cooldowns = new HashMap<>();
 	
 	public DefaultBonus(ConfigurationSection section) throws LoadingException {
-		base = section;
+		id = section.getName();
 		distance = ValueLoader.loadPositiveDouble(section, "distance");
 		consumable = ValueLoader.loadBoolean(section, "consumable");
 		cooldown = ValueLoader.loadNonNegativeInt(section, "cooldown");
@@ -153,6 +153,15 @@ public abstract class DefaultBonus implements Bonus {
 			available = false;
 			entity.remove();
 			entity = null;
+		}
+	}
+	
+	@Override
+	public Bonus replicate() {
+		try {
+			return Flier.getInstance().getBonus(id);
+		} catch (LoadingException e) {
+			return null; // dead code
 		}
 	}
 

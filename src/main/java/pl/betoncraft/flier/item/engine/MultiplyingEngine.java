@@ -41,14 +41,5 @@ public class MultiplyingEngine extends DefaultEngine {
 		}
 		return velocity.add(direction.multiply(speed * acceleration));
 	}
-	
-	@Override
-	public MultiplyingEngine replicate() {
-		try {
-			return new MultiplyingEngine(base);
-		} catch (LoadingException e) {
-			return null; // dead code
-		}
-	}
 
 }

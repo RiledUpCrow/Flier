@@ -42,14 +42,5 @@ public class SimpleWings extends DefaultWings {
 		ImmutableVector airResistance = velocity.normalize().multiply(drag);
 		return velocity.add(airResistance);
 	}
-	
-	@Override
-	public SimpleWings replicate() {
-		try {
-			return new SimpleWings(base);
-		} catch (LoadingException e) {
-			return null; // dead code
-		}
-	}
 
 }

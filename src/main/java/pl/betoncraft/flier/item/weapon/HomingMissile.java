@@ -156,14 +156,5 @@ public class HomingMissile extends DefaultWeapon {
 		}.runTaskTimer(Flier.getInstance(), 1, 1);
 		return true;
 	}
-	
-	@Override
-	public HomingMissile replicate() {
-		try {
-			return new HomingMissile(base);
-		} catch (LoadingException e) {
-			return null; // dead code
-		}
-	}
 
 }
