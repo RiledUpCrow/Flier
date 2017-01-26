@@ -6,6 +6,10 @@
  */
 package pl.betoncraft.flier.item.weapon;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.EntityType;
@@ -33,6 +37,7 @@ public class MachineGun extends DefaultWeapon {
 	private final int burstAmount;
 	private final int burstTicks;
 	private final double projectileSpeed;
+	private final int range = 10 * 20;
 	
 	public MachineGun(ConfigurationSection section) throws LoadingException {
 		super(section);
@@ -45,6 +50,7 @@ public class MachineGun extends DefaultWeapon {
 	@Override
 	public boolean use(InGamePlayer data) {
 		Player player = data.getPlayer();
+		Map<Projectile, Vector> projectiles = new HashMap<>(burstAmount);
 		new BukkitRunnable() {
 			int counter = burstAmount;
 			@Override
@@ -64,12 +70,27 @@ public class MachineGun extends DefaultWeapon {
 					explosive.setYield(0);
 				}
 				Damager.saveDamager(projectile, MachineGun.this, data);
+				projectiles.put(projectile, velocity);
 				counter --;
 				if (counter <= 0) {
 					cancel();
 				}
 			}
 		}.runTaskTimer(Flier.getInstance(), 0, burstTicks);
+		new BukkitRunnable() {
+			int life = 0;
+			@Override
+			public void run() {
+				// update projectile path to prevent them from flying around
+				for (Entry<Projectile, Vector> entry : projectiles.entrySet()) {
+					entry.getKey().setVelocity(entry.getValue());
+				}
+				// cancel after the range has passed
+				if (++life >= range) {
+					cancel();
+				}
+			}
+		}.runTaskTimer(Flier.getInstance(), 0, 1);
 		return true;
 	}
 
