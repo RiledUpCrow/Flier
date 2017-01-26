@@ -11,17 +11,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.bukkit.configuration.ConfigurationSection;
-
 import javafx.util.Pair;
-import pl.betoncraft.flier.Flier;
 import pl.betoncraft.flier.api.Engine;
 import pl.betoncraft.flier.api.Item;
+import pl.betoncraft.flier.api.ItemSet;
 import pl.betoncraft.flier.api.PlayerClass;
 import pl.betoncraft.flier.api.Wings;
 import pl.betoncraft.flier.exception.LoadingException;
-import pl.betoncraft.flier.util.Utils;
-import pl.betoncraft.flier.util.ValueLoader;
 
 /**
  * Default implementation of PlayerClass.
@@ -43,38 +39,22 @@ public class DefaultClass implements PlayerClass {
 	private final String defaultName;
 	private final Engine defaultEngine;
 	private final Wings defaultWings;
-	private final Map<Item, Integer> defaultItems = new HashMap<>();
+	private final Map<Item, Integer> defaultItems;
 	
-	public DefaultClass(ConfigurationSection section) throws LoadingException {
-		defaultName = Utils.capitalize(ValueLoader.loadString(section, "name"));
-		defaultEngine = ValueLoader.loadEngine(section, "engine");
-		defaultWings = ValueLoader.loadWings(section, "wings");
-		List<String> itemNames = section.getStringList("items");
-		for (String item : itemNames) {
-			item = item.trim();
-			int amount = 1;
-			if (item.contains(" ")) {
-				String[] parts = item.split(" ");
-				if (parts.length != 2) {
-					throw new LoadingException(String.format("Item format in '%s' is incorrect.", item));
-				}
-				try {
-					amount = Integer.parseInt(parts[0]);
-				} catch (NumberFormatException e) {
-					throw new LoadingException(String.format("Cannot parse item amount in '%s'.", item));
-				}
-				item = parts[1];
+	public DefaultClass(List<ItemSet> sets) throws LoadingException {
+		for (ItemSet set : sets) {
+			if (set == null) {
+				throw new LoadingException("One of the item sets is not defined.");
 			}
-			if (amount <= 0) {
-				throw new LoadingException(String.format("Item amount in '%s' must be positive.", item));
-			}
-			try {
-				defaultItems.put(Flier.getInstance().getItem(item), amount);
-			} catch (LoadingException e) {
-				throw (LoadingException) new LoadingException(String.format("Error in '%s' item.", item))
-						.initCause(e);
-			}
+			set.apply(this);
 		}
+		if (currentName == null) {
+			throw new LoadingException("Name is not specified.");
+		}
+		defaultName = currentName;
+		defaultEngine = currentEngine;
+		defaultWings = currentWings;
+		defaultItems = currentItems;
 		reset();
 	}
 
@@ -82,7 +62,7 @@ public class DefaultClass implements PlayerClass {
 		defaultName = defName;
 		defaultEngine = defEngine;
 		defaultWings = defWings;
-		defaultItems.putAll(defItems);
+		defaultItems = defItems;
 		reset();
 	}
 
@@ -185,9 +165,9 @@ public class DefaultClass implements PlayerClass {
 
 	@Override
 	public Map<Item, Integer> getDefaultItems() {
-		return defaultItems.entrySet().stream().map(
-					entry -> new Pair<>((Item) entry.getKey().replicate(), entry.getValue())
-				).collect(Collectors.toMap(pair -> pair.getKey(), pair -> pair.getValue()));
+		return defaultItems.entrySet().stream().collect(Collectors.toMap(
+				entry -> (Item) entry.getKey().replicate(), entry -> entry.getValue()
+		));
 	}
 
 	@Override

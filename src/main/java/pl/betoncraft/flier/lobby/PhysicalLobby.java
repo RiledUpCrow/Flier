@@ -75,15 +75,6 @@ public class PhysicalLobby implements Lobby, Listener {
 		}
 		start = ValueLoader.loadLocation(section, "start").getBlock();
 		leave = ValueLoader.loadLocation(section, "leave").getBlock();
-		try {
-			ConfigurationSection playerClass = section.getConfigurationSection("default_class");
-			if (playerClass == null) {
-				throw new LoadingException("Player class is not defined.");
-			}
-			defClass = new DefaultClass(playerClass);
-		} catch (LoadingException e) {
-			throw (LoadingException) new LoadingException("Error in player class.").initCause(e);
-		}
 		ConfigurationSection itemsSection = section.getConfigurationSection("items");
 		if (itemsSection != null) for (String i : itemsSection.getKeys(false)) {
 			ConfigurationSection itemSection = itemsSection.getConfigurationSection(i);
@@ -93,10 +84,22 @@ public class PhysicalLobby implements Lobby, Listener {
 				throw (LoadingException) new LoadingException(String.format("Error in '%s' item set.", i)).initCause(e);
 			}
 		}
+		try {
+			List<String> playerClass = section.getStringList("default_class");
+			defClass = new DefaultClass(
+					playerClass.stream().map(
+							name -> blocks.values().stream().filter(
+									itemBlock -> itemBlock.name.equals(name)
+							).findFirst().orElse(null)
+					).collect(Collectors.toList())
+			);
+		} catch (LoadingException e) {
+			throw (LoadingException) new LoadingException("Error in player class.").initCause(e);
+		}
 		List<String> gameNames = section.getStringList("games");
 		for (String gameName : gameNames) {
 			try {
-				Game game = Flier.getInstance().getGame(gameName); // TODO game starting/stopping
+				Game game = Flier.getInstance().getGame(gameName);
 				games.put(gameName, game);
 			} catch (LoadingException e) {
 				throw (LoadingException) new LoadingException(String.format("Error in '%s' game.", gameName))
@@ -112,11 +115,13 @@ public class PhysicalLobby implements Lobby, Listener {
 
 	private class ItemBlock extends DefaultSet {
 
+		private String name;
 		private int buyCost = 0;
 		private int unlockCost = 0;
 
 		private ItemBlock(ConfigurationSection section) throws LoadingException {
 			super(section);
+			name = section.getName();
 			buyCost = section.getInt("buy_cost", buyCost);
 			unlockCost = section.getInt("unlock_cost", unlockCost);
 		}
