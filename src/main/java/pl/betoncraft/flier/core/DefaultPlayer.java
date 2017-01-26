@@ -29,8 +29,6 @@ import com.google.common.collect.Lists;
 import pl.betoncraft.flier.api.Bonus;
 import pl.betoncraft.flier.api.Damager;
 import pl.betoncraft.flier.api.Damager.DamageResult;
-import pl.betoncraft.flier.util.Utils;
-import pl.betoncraft.flier.util.Utils.ImmutableVector;
 import pl.betoncraft.flier.api.Effect;
 import pl.betoncraft.flier.api.Engine;
 import pl.betoncraft.flier.api.InGamePlayer;
@@ -39,7 +37,10 @@ import pl.betoncraft.flier.api.Lobby;
 import pl.betoncraft.flier.api.PlayerClass;
 import pl.betoncraft.flier.api.SidebarLine;
 import pl.betoncraft.flier.api.UsableItem;
+import pl.betoncraft.flier.api.UsableItem.Where;
 import pl.betoncraft.flier.api.Wings;
+import pl.betoncraft.flier.util.Utils;
+import pl.betoncraft.flier.util.Utils.ImmutableVector;
 
 /**
  * Stores data about the player.
@@ -128,20 +129,23 @@ public class DefaultPlayer implements InGamePlayer {
 			return;
 		}
 		Item i = getHeldItem();
+		if (i == null) {
+			return;
+		}
 		if (i instanceof UsableItem) {
 			UsableItem item = (UsableItem) i;
-			if (item == null || (item.onlyAir() && !isFlying()) || !item.cooldown(this)) {
+			if (!canUse(item.where())) {
 				return;
 			}
 			if (item.use(this) && item.isConsumable()) {
-				// class
-				clazz.getCurrentItems().put(item, clazz.getCurrentItems().get(item) - 1);
-				// inventory
+				int amount = clazz.getCurrentItems().get(item) - 1;
 				ItemStack stack = getPlayer().getInventory().getItemInMainHand();
-				if (stack.getAmount() == 1) {
+				if (amount <= 0) { // remove stack
+					clazz.getCurrentItems().remove(item);
 					getPlayer().getInventory().setItemInMainHand(null); 
-				} else {
-					stack.setAmount(stack.getAmount() - 1);
+				} else { // decrease stack
+					clazz.getCurrentItems().put(item, amount);
+					stack.setAmount(amount);
 				}
 			}
 		}
@@ -517,6 +521,22 @@ public class DefaultPlayer implements InGamePlayer {
 
 	private void modifyFlight() {
 		player.setVelocity(clazz.getCurrentWings().applyFlightModifications(this).toVector());
+	}
+
+	private boolean canUse(Where where) {
+		boolean ground = Utils.getAltitude(player.getLocation(), 4) == 4;
+		boolean air = player.isGliding();
+		boolean fall = !ground && !air;
+		switch (where) {
+		case GROUND:	 return ground;
+		case AIR:		 return air;
+		case FALL:		 return fall;
+		case NO_GROUND:	 return !ground;
+		case NO_AIR:	 return !air;
+		case NO_FALL:	 return !fall;
+		case EVERYWHERE: return true;
+		}
+		return false;
 	}
 
 }

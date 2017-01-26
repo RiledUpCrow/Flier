@@ -12,6 +12,10 @@ package pl.betoncraft.flier.api;
  * @author Jakub Sapalski
  */
 public interface UsableItem extends Item {
+	
+	public enum Where {
+		GROUND, AIR, FALL, NO_GROUND, NO_AIR, NO_FALL, EVERYWHERE
+	}
 
 	/**
 	 * Uses this item once.
@@ -35,8 +39,8 @@ public interface UsableItem extends Item {
 	public boolean isConsumable();
 
 	/**
-	 * @return whenever this item is only usable while gliding
+	 * @return where this item can be used
 	 */
-	public boolean onlyAir();
+	public Where where();
 
 }

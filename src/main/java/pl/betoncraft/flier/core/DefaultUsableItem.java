@@ -26,7 +26,7 @@ public abstract class DefaultUsableItem extends DefaultItem implements UsableIte
 	
 	protected final int cooldown;
 	protected final boolean consumable;
-	protected final boolean onlyAir;
+	protected final Where where;
 
 	protected final Map<UUID, Long> cooldownData = new HashMap<>();
 
@@ -34,7 +34,7 @@ public abstract class DefaultUsableItem extends DefaultItem implements UsableIte
 		super(section);
 		cooldown = ValueLoader.loadNonNegativeInt(section, "cooldown");
 		consumable = ValueLoader.loadBoolean(section, "consumable");
-		onlyAir = ValueLoader.loadBoolean(section, "only_air");
+		where = ValueLoader.loadEnum(section, "where", Where.class);
 	}
 	
 	@Override
@@ -55,7 +55,7 @@ public abstract class DefaultUsableItem extends DefaultItem implements UsableIte
 	}
 	
 	@Override
-	public boolean onlyAir() {
-		return onlyAir;
+	public Where where() {
+		return where;
 	}
 }
