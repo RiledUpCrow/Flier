@@ -137,7 +137,7 @@ public class DefaultPlayer implements InGamePlayer {
 			if (!canUse(item.where())) {
 				return;
 			}
-			if (item.use(this) && item.isConsumable()) {
+			if (item.cooldown(this) && item.use(this) && item.isConsumable()) {
 				int amount = clazz.getCurrentItems().get(item) - 1;
 				ItemStack stack = getPlayer().getInventory().getItemInMainHand();
 				if (amount <= 0) { // remove stack
