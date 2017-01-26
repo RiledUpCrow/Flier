@@ -6,11 +6,13 @@
  */
 package pl.betoncraft.flier.core;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 import org.bukkit.configuration.ConfigurationSection;
 
@@ -34,8 +36,14 @@ public class DefaultSet implements ItemSet {
 	protected String name;
 	protected Engine engine;
 	protected Wings wings;
-	protected Map<Item, Integer> items = new HashMap<>();
+	protected List<Items> items = new ArrayList<>();
 	protected boolean saving;
+	
+	private class Items {
+		private Item item;
+		private int amount = 1;
+		private int max = 0;
+	}
 
 	public DefaultSet(ConfigurationSection section) throws LoadingException {
 		addType = ValueLoader.loadEnum(section, "type", AddType.class);
@@ -57,26 +65,31 @@ public class DefaultSet implements ItemSet {
 			wings = Flier.getInstance().getWing(wingsName);
 		}
 		try {
-			List<String> itemNames = section.getStringList("items");
-			for (String item : itemNames) {
-				item = item.trim();
-				int amount = 1;
-				if (item.contains(" ")) {
-					String[] parts = item.split(" ");
-					if (parts.length != 2) {
-						throw new LoadingException(String.format("Item format in '%s' is incorrect.", item));
-					}
-					try {
-						amount = Integer.parseInt(parts[0]);
-					} catch (NumberFormatException e) {
-						throw new LoadingException(String.format("Cannot parse item amount in '%s'.", item));
-					}
-					item = parts[1];
+			List<Map<?, ?>> maps = section.getMapList("items");
+			for (Map<?, ?> map : maps) {
+				Items items = new Items();
+				Object itemObject = map.get("item");
+				if (itemObject == null || !(itemObject instanceof String)) {
+					throw new LoadingException("Item name is missing.");
 				}
-				if (amount <= 0) {
-					throw new LoadingException(String.format("Item amount in '%s' must be positive.", item));
+				items.item = Flier.getInstance().getItem((String) itemObject);
+				Object amountObject = map.get("amount");
+				if (amountObject != null) {
+					if (!(amountObject instanceof Integer)) {
+						throw new LoadingException("Item amount must be an integer.");
+					} else {
+						items.amount = (Integer) amountObject;
+					}
 				}
-				items.put(Flier.getInstance().getItem(item), amount);
+				Object maxObject = map.get("max");
+				if (maxObject != null) {
+					if (!(maxObject instanceof Integer)) {
+						throw new LoadingException("Maximum item amount must be an integer.");
+					} else {
+						items.max = (Integer) maxObject;
+					}
+				}
+				this.items.add(items);
 			}
 		} catch (LoadingException e) {
 			throw (LoadingException) new LoadingException("Error in items.").initCause(e);
@@ -91,21 +104,30 @@ public class DefaultSet implements ItemSet {
 	}
 
 	private void setEngine(PlayerClass c, Engine engine) {
-		c.setCurrentEngine(engine);
+		c.setCurrentEngine((Engine) engine.replicate());
 		if (saving) {
 			c.setStoredEngine(engine);
 		}
 	}
 
 	private void setWings(PlayerClass c, Wings wings) {
-		c.setCurrentWings(wings);
+		c.setCurrentWings((Wings) wings.replicate());
 		if (saving) {
 			c.setStoredWings(wings);
 		}
 	}
 
+	private void setItems(PlayerClass c, List<Items> items) {
+		c.setCurrentItems(itemsToMap(items));
+		if (saving) {
+			c.setStoredItems(itemsToMap(items));
+		}
+	}
+	
 	private void setItems(PlayerClass c, Map<Item, Integer> items) {
-		c.setCurrentItems(items);
+		c.setCurrentItems(items.entrySet().stream().collect(Collectors.toMap(
+				e -> (Item) e.getKey(), e -> e.getValue()
+		)));
 		if (saving) {
 			c.setStoredItems(items);
 		}
@@ -133,15 +155,15 @@ public class DefaultSet implements ItemSet {
 				setWings(c, wings);
 			}
 			Map<Item, Integer> storedItems1 = c.getCurrentItems();
-			for (Iterator<Entry<Item, Integer>> i = items.entrySet().iterator(); i.hasNext();) {
-				Entry<Item, Integer> e = i.next();
+			for (Iterator<Items> i = items.iterator(); i.hasNext();) {
+				Items e = i.next();
 				for (Iterator<Entry<Item, Integer>> si = storedItems1.entrySet().iterator(); si.hasNext();) {
 					Entry<Item, Integer> se = si.next();
-					if (e.getKey().slot() == se.getKey().slot()) {
+					if (e.item.slot() == se.getKey().slot()) {
 						si.remove();
 					}
 				}
-				storedItems1.put(e.getKey(), e.getValue());
+				storedItems1.put(e.item, e.amount);
 			}
 			setItems(c, storedItems1);
 			break;
@@ -159,20 +181,20 @@ public class DefaultSet implements ItemSet {
 				setWings(c, wings);
 			}
 			Map<Item, Integer> storedItems2 = new HashMap<>(c.getCurrentItems());
-			loop: for (Iterator<Entry<Item, Integer>> i = items.entrySet().iterator(); i.hasNext();) {
-				Entry<Item, Integer> e = i.next();
+			loop: for (Iterator<Items> i = items.iterator(); i.hasNext();) {
+				Items e = i.next();
 				for (Iterator<Entry<Item, Integer>> si = storedItems2.entrySet().iterator(); si.hasNext();) {
 					Entry<Item, Integer> se = si.next();
-					if (e.getKey().slot() == se.getKey().slot()) {
-						if (e.getKey().isSameAs(se.getKey())) {
-							se.setValue(se.getValue() + e.getValue());
+					if (e.item.slot() == se.getKey().slot()) {
+						if (e.item.isSameAs(se.getKey()) && (e.max <= 0 || se.getValue() + e.amount <= e.max)) {
+							se.setValue(se.getValue() + e.amount);
 							continue loop;
 						} else {
 							return false;
 						}
 					}
 				}
-				storedItems2.put(e.getKey(), e.getValue());
+				storedItems2.put(e.item, e.amount);
 			}
 			setItems(c, storedItems2);
 			break;
@@ -184,22 +206,22 @@ public class DefaultSet implements ItemSet {
 				setWings(c, null);
 			}
 			Map<Item, Integer> storedItems3 = c.getCurrentItems();
-			for (Iterator<Entry<Item, Integer>> i = items.entrySet().iterator(); i.hasNext();) {
-				Entry<Item, Integer> e = i.next();
+			for (Iterator<Items> i = items.iterator(); i.hasNext();) {
+				Items e = i.next();
 				int oldAmount = 0;
 				for (Iterator<Entry<Item, Integer>> si = storedItems3.entrySet().iterator(); si.hasNext();) {
 					Entry<Item, Integer> se = si.next();
-					if (e.getKey().slot() == se.getKey().slot()) {
+					if (e.item.slot() == se.getKey().slot()) {
 						si.remove();
-						if (e.getKey().equals(se.getKey())) {
+						if (e.item.equals(se.getKey())) {
 							oldAmount = se.getValue();
 							break;
 						}
 					}
 				}
-				int newAmount = oldAmount - e.getValue();
+				int newAmount = oldAmount - e.amount;
 				if (newAmount > 0) {
-					storedItems3.put(e.getKey(), newAmount);
+					storedItems3.put(e.item, newAmount);
 				} else if (newAmount < 0) {
 					return false;
 				}
@@ -212,22 +234,26 @@ public class DefaultSet implements ItemSet {
 
 	@Override
 	public Engine getEngine() {
-		return engine;
+		return (Engine) engine.replicate();
 	}
 
 	@Override
 	public Wings getWings() {
-		return wings;
+		return (Wings) wings.replicate();
 	}
 
 	@Override
 	public Map<Item, Integer> getItems() {
-		return items;
+		return itemsToMap(items);
 	}
 
 	@Override
 	public AddType getType() {
 		return addType;
+	}
+	
+	private Map<Item, Integer> itemsToMap(List<Items> list) {
+		return list.stream().collect(Collectors.toMap(i -> (Item) i.item.replicate(), i -> i.amount));
 	}
 
 }
