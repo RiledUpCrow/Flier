@@ -248,6 +248,9 @@ public class PhysicalLobby implements Lobby, Listener {
 		} else {
 			InGamePlayer data = players.get(player.getUniqueId());
 			if (data != null) {
+				if (data.isPlaying()) {
+					return;
+				}
 				if (block.equals(start)) {
 					currentGame.startPlayer(data);
 				} else {
