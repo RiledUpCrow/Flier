@@ -4,7 +4,7 @@
  * To Public License, Version 2, as published by Sam Hocevar. See
  * http://www.wtfpl.net/ for more details.
  */
-package pl.betoncraft.flier.core;
+package pl.betoncraft.flier.core.defaults;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -95,15 +95,6 @@ public abstract class DefaultItem implements Item {
 	@Override
 	public List<Effect> getInHandEffects() {
 		return Collections.unmodifiableList(inHand);
-	}
-	
-	@Override
-	public Item replicate() {
-		try {
-			return Flier.getInstance().getItem(id);
-		} catch (LoadingException e) {
-			return null; // dead code
-		}
 	}
 	
 	@Override

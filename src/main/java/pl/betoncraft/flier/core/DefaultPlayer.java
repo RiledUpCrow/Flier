@@ -137,7 +137,7 @@ public class DefaultPlayer implements InGamePlayer {
 			if (!canUse(item.where())) {
 				return;
 			}
-			if (item.cooldown(this) && item.use(this) && item.isConsumable()) {
+			if (item.cooldown() && item.use(this) && item.isConsumable()) {
 				int amount = clazz.getCurrentItems().get(item) - 1;
 				ItemStack stack = getPlayer().getInventory().getItemInMainHand();
 				if (amount <= 0) { // remove stack
@@ -524,7 +524,7 @@ public class DefaultPlayer implements InGamePlayer {
 	}
 
 	private boolean canUse(Where where) {
-		boolean ground = Utils.getAltitude(player.getLocation(), 4) == 4;
+		boolean ground = Utils.getAltitude(player.getLocation(), 4) < 4;
 		boolean air = player.isGliding();
 		boolean fall = !ground && !air;
 		switch (where) {

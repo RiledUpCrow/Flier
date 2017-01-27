@@ -4,7 +4,7 @@
  * To Public License, Version 2, as published by Sam Hocevar. See
  * http://www.wtfpl.net/ for more details.
  */
-package pl.betoncraft.flier.item.weapon;
+package pl.betoncraft.flier.action.attack;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -22,7 +22,7 @@ import org.bukkit.util.Vector;
 import pl.betoncraft.flier.Flier;
 import pl.betoncraft.flier.api.Damager;
 import pl.betoncraft.flier.api.InGamePlayer;
-import pl.betoncraft.flier.core.DefaultWeapon;
+import pl.betoncraft.flier.core.defaults.DefaultAttack;
 import pl.betoncraft.flier.exception.LoadingException;
 import pl.betoncraft.flier.util.ValueLoader;
 
@@ -31,7 +31,7 @@ import pl.betoncraft.flier.util.ValueLoader;
  *
  * @author Jakub Sapalski
  */
-public class MachineGun extends DefaultWeapon {
+public class MachineGun extends DefaultAttack {
 	
 	private final EntityType entity;
 	private final int burstAmount;
@@ -48,7 +48,7 @@ public class MachineGun extends DefaultWeapon {
 	}
 	
 	@Override
-	public boolean use(InGamePlayer data) {
+	public boolean act(InGamePlayer data) {
 		Player player = data.getPlayer();
 		Map<Projectile, Vector> projectiles = new HashMap<>(burstAmount);
 		new BukkitRunnable() {

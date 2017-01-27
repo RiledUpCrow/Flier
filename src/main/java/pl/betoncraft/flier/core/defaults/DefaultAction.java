@@ -4,11 +4,20 @@
  * To Public License, Version 2, as published by Sam Hocevar. See
  * http://www.wtfpl.net/ for more details.
  */
-package pl.betoncraft.flier.api;
+package pl.betoncraft.flier.core.defaults;
+
+import pl.betoncraft.flier.api.Action;
 
 /**
- * Represents a weapon item.
+ * Default implementation of Action (only replication, actually).
  *
  * @author Jakub Sapalski
  */
-public interface Weapon extends UsableItem, Damager {}
+public abstract class DefaultAction implements Action {
+
+	@Override
+	public DefaultAction replicate() {
+		return null; // TODO replicate
+	}
+
+}

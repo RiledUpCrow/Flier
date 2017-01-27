@@ -4,7 +4,7 @@
  * To Public License, Version 2, as published by Sam Hocevar. See
  * http://www.wtfpl.net/ for more details.
  */
-package pl.betoncraft.flier.item.weapon;
+package pl.betoncraft.flier.action.attack;
 
 import org.bukkit.Location;
 import org.bukkit.Sound;
@@ -18,7 +18,7 @@ import org.bukkit.util.Vector;
 import pl.betoncraft.flier.Flier;
 import pl.betoncraft.flier.api.Damager;
 import pl.betoncraft.flier.api.Game.Attitude;
-import pl.betoncraft.flier.core.DefaultWeapon;
+import pl.betoncraft.flier.core.defaults.DefaultAttack;
 import pl.betoncraft.flier.api.InGamePlayer;
 import pl.betoncraft.flier.exception.LoadingException;
 import pl.betoncraft.flier.util.ValueLoader;
@@ -29,7 +29,7 @@ import pl.betoncraft.flier.util.Utils.ImmutableVector;
  *
  * @author Jakub Sapalski
  */
-public class HomingMissile extends DefaultWeapon {
+public class HomingMissile extends DefaultAttack {
 	
 	private final EntityType entity;
 	private final int searchRange;
@@ -53,7 +53,7 @@ public class HomingMissile extends DefaultWeapon {
 	}
 
 	@Override
-	public boolean use(InGamePlayer data) {
+	public boolean act(InGamePlayer data) {
 		Player player = data.getPlayer();
 		Vector velocity = player.getLocation().getDirection().clone().multiply(speed);
 		Vector pointer = player.getLocation().getDirection().clone().multiply(player.getVelocity().length() * 3);

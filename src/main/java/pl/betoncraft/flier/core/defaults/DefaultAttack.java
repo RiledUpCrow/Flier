@@ -4,11 +4,11 @@
  * To Public License, Version 2, as published by Sam Hocevar. See
  * http://www.wtfpl.net/ for more details.
  */
-package pl.betoncraft.flier.core;
+package pl.betoncraft.flier.core.defaults;
 
 import org.bukkit.configuration.ConfigurationSection;
 
-import pl.betoncraft.flier.api.Weapon;
+import pl.betoncraft.flier.api.Attack;
 import pl.betoncraft.flier.exception.LoadingException;
 import pl.betoncraft.flier.util.ValueLoader;
 
@@ -17,7 +17,7 @@ import pl.betoncraft.flier.util.ValueLoader;
  *
  * @author Jakub Sapalski
  */
-public abstract class DefaultWeapon extends DefaultUsableItem implements Weapon {
+public abstract class DefaultAttack extends DefaultAction implements Attack {
 
 	protected final boolean suicidal;
 	protected final boolean friendlyFire;
@@ -27,8 +27,7 @@ public abstract class DefaultWeapon extends DefaultUsableItem implements Weapon 
 	protected final double physicalDamage;
 	protected final boolean isExploding;
 	
-	public DefaultWeapon(ConfigurationSection section) throws LoadingException {
-		super(section);
+	public DefaultAttack(ConfigurationSection section) throws LoadingException {
 		suicidal = ValueLoader.loadBoolean(section, "suicidal");
 		friendlyFire = ValueLoader.loadBoolean(section, "friendly_fire");
 		damage = ValueLoader.loadDouble(section, "damage");

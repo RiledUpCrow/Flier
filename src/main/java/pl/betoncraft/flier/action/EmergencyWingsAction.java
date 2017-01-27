@@ -4,13 +4,13 @@
  * To Public License, Version 2, as published by Sam Hocevar. See
  * http://www.wtfpl.net/ for more details.
  */
-package pl.betoncraft.flier.item;
+package pl.betoncraft.flier.action;
 
 import org.bukkit.configuration.ConfigurationSection;
 
 import pl.betoncraft.flier.api.InGamePlayer;
 import pl.betoncraft.flier.api.Wings;
-import pl.betoncraft.flier.core.DefaultUsableItem;
+import pl.betoncraft.flier.core.defaults.DefaultAction;
 import pl.betoncraft.flier.exception.LoadingException;
 import pl.betoncraft.flier.util.ValueLoader;
 
@@ -19,17 +19,16 @@ import pl.betoncraft.flier.util.ValueLoader;
  *
  * @author Jakub Sapalski
  */
-public class EmergencyWings extends DefaultUsableItem {
+public class EmergencyWingsAction extends DefaultAction {
 	
 	private double amount;
 
-	public EmergencyWings(ConfigurationSection section) throws LoadingException {
-		super(section);
+	public EmergencyWingsAction(ConfigurationSection section) throws LoadingException {
 		amount = ValueLoader.loadNonNegativeDouble(section, "amount");
 	}
 
 	@Override
-	public boolean use(InGamePlayer player) {
+	public boolean act(InGamePlayer player) {
 		Wings wings = player.getClazz().getCurrentWings();
 		if (wings.getHealth() == 0) {
 			wings.addHealth(amount);

@@ -4,12 +4,12 @@
  * To Public License, Version 2, as published by Sam Hocevar. See
  * http://www.wtfpl.net/ for more details.
  */
-package pl.betoncraft.flier.bonus;
+package pl.betoncraft.flier.action;
 
 import org.bukkit.configuration.ConfigurationSection;
 
 import pl.betoncraft.flier.api.InGamePlayer;
-import pl.betoncraft.flier.core.DefaultBonus;
+import pl.betoncraft.flier.core.defaults.DefaultAction;
 import pl.betoncraft.flier.exception.LoadingException;
 import pl.betoncraft.flier.util.ValueLoader;
 
@@ -18,17 +18,16 @@ import pl.betoncraft.flier.util.ValueLoader;
  *
  * @author Jakub Sapalski
  */
-public class MoneyBonus extends DefaultBonus {
+public class MoneyAction extends DefaultAction {
 	
 	private final int money;
 
-	public MoneyBonus(ConfigurationSection section) throws LoadingException {
-		super(section);
+	public MoneyAction(ConfigurationSection section) throws LoadingException {
 		money = ValueLoader.loadInt(section, "money");
 	}
 
 	@Override
-	protected boolean use(InGamePlayer player) {
+	public boolean act(InGamePlayer player) {
 		player.setMoney(player.getMoney() + money);
 		return true;
 	}

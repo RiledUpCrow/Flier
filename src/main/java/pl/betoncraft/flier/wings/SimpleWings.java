@@ -4,12 +4,12 @@
  * To Public License, Version 2, as published by Sam Hocevar. See
  * http://www.wtfpl.net/ for more details.
  */
-package pl.betoncraft.flier.item.wings;
+package pl.betoncraft.flier.wings;
 
 import org.bukkit.configuration.ConfigurationSection;
 
 import pl.betoncraft.flier.api.InGamePlayer;
-import pl.betoncraft.flier.core.DefaultWings;
+import pl.betoncraft.flier.core.defaults.DefaultWings;
 import pl.betoncraft.flier.exception.LoadingException;
 import pl.betoncraft.flier.util.ValueLoader;
 import pl.betoncraft.flier.util.Utils.ImmutableVector;

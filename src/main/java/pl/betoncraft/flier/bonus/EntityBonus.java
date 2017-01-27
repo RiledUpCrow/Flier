@@ -4,10 +4,12 @@
  * To Public License, Version 2, as published by Sam Hocevar. See
  * http://www.wtfpl.net/ for more details.
  */
-package pl.betoncraft.flier.core;
+package pl.betoncraft.flier.bonus;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -18,6 +20,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 
 import pl.betoncraft.flier.Flier;
+import pl.betoncraft.flier.api.Action;
 import pl.betoncraft.flier.api.Bonus;
 import pl.betoncraft.flier.api.InGamePlayer;
 import pl.betoncraft.flier.exception.LoadingException;
@@ -28,7 +31,7 @@ import pl.betoncraft.flier.util.ValueLoader;
  *
  * @author Jakub Sapalski
  */
-public abstract class DefaultBonus implements Bonus {
+public class EntityBonus implements Bonus {
 	
 	protected final String id;
 	
@@ -37,13 +40,14 @@ public abstract class DefaultBonus implements Bonus {
 	protected final int cooldown;
 	protected final int respawn;
 	protected final Location location;
+	protected final List<Action> actions = new ArrayList<>();
 
 	private EntityType type;
 	private Entity entity;
 	private boolean available;
 	private Map<UUID, Long> cooldowns = new HashMap<>();
 	
-	public DefaultBonus(ConfigurationSection section) throws LoadingException {
+	public EntityBonus(ConfigurationSection section) throws LoadingException {
 		id = section.getName();
 		distance = ValueLoader.loadPositiveDouble(section, "distance");
 		consumable = ValueLoader.loadBoolean(section, "consumable");
@@ -51,12 +55,10 @@ public abstract class DefaultBonus implements Bonus {
 		respawn = ValueLoader.loadNonNegativeInt(section, "respawn");
 		type = ValueLoader.loadEnum(section, "entity", EntityType.class);
 		location = ValueLoader.loadLocation(section, "location");
+		for (String id : section.getStringList("actions")) {
+			actions.add(Flier.getInstance().getAction(id));
+		}
 	}
-	
-	/**
-	 * Specified the behavior of this bonus.
-	 */
-	protected abstract boolean use(InGamePlayer player);
 	
 	@Override
 	public void update() {
@@ -155,6 +157,11 @@ public abstract class DefaultBonus implements Bonus {
 			entity = null;
 		}
 	}
+
+	@Override
+	public List<Action> getActions() {
+		return actions;
+	}
 	
 	@Override
 	public Bonus replicate() {
@@ -163,6 +170,16 @@ public abstract class DefaultBonus implements Bonus {
 		} catch (LoadingException e) {
 			return null; // dead code
 		}
+	}
+	
+	private boolean use(InGamePlayer player) {
+		boolean used = false;
+		for (Action action : actions) {
+			if (action.act(player)) {
+				used = true;
+			}
+		}
+		return used;
 	}
 
 }

@@ -6,8 +6,10 @@
  */
 package pl.betoncraft.flier.api;
 
+import java.util.List;
+
 /**
- * Represents an item which can be used by the player.
+ * Represents an item which can be used by the player to run an action.
  *
  * @author Jakub Sapalski
  */
@@ -24,14 +26,16 @@ public interface UsableItem extends Item {
 	 * @return if the item was used
 	 */
 	public boolean use(InGamePlayer player);
+	
+	/**
+	 * @return the list of all actions in this item
+	 */
+	public List<Action> getActions();
 
 	/**
-	 * Checks cooldown for this player. If it's true,
-	 * it should start another cooldown.
-	 * 
-	 * @param player
+	 * Checks cooldown. It will start another cooldown upon returning true.
 	 */
-	public boolean cooldown(InGamePlayer player);
+	public boolean cooldown();
 
 	/**
 	 * @return whenever this item should be consumed on use

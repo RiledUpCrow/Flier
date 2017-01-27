@@ -18,7 +18,7 @@ import org.bukkit.configuration.ConfigurationSection;
 
 import pl.betoncraft.flier.api.Damager;
 import pl.betoncraft.flier.api.Damager.DamageResult;
-import pl.betoncraft.flier.core.DefaultGame;
+import pl.betoncraft.flier.core.defaults.DefaultGame;
 import pl.betoncraft.flier.api.InGamePlayer;
 import pl.betoncraft.flier.api.SidebarLine;
 import pl.betoncraft.flier.exception.LoadingException;

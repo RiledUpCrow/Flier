@@ -4,7 +4,7 @@
  * To Public License, Version 2, as published by Sam Hocevar. See
  * http://www.wtfpl.net/ for more details.
  */
-package pl.betoncraft.flier.core;
+package pl.betoncraft.flier.core.defaults;
 
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;

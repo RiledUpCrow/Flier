@@ -6,6 +6,8 @@
  */
 package pl.betoncraft.flier.api;
 
+import java.util.List;
+
 import org.bukkit.Location;
 
 /**
@@ -61,6 +63,11 @@ public interface Bonus extends Replicable {
 	 * Cleans up the bonus, for example removing the entity.
 	 */
 	public void stop();
+	
+	/**
+	 * @return the list of all actions in this Bonus
+	 */
+	public List<Action> getActions();
 	
 	/**
 	 * @param player applies the Bonus to the player

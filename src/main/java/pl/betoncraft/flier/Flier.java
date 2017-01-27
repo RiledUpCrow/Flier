@@ -19,41 +19,43 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import pl.betoncraft.flier.action.EffectAction;
+import pl.betoncraft.flier.action.EmergencyWingsAction;
+import pl.betoncraft.flier.action.LaunchAction;
+import pl.betoncraft.flier.action.MoneyAction;
+import pl.betoncraft.flier.action.attack.HomingMissile;
+import pl.betoncraft.flier.action.attack.MachineGun;
+import pl.betoncraft.flier.api.Action;
 import pl.betoncraft.flier.api.Bonus;
 import pl.betoncraft.flier.api.Damager;
 import pl.betoncraft.flier.api.Effect;
 import pl.betoncraft.flier.api.Engine;
 import pl.betoncraft.flier.api.Game;
-import pl.betoncraft.flier.api.Item;
 import pl.betoncraft.flier.api.Lobby;
+import pl.betoncraft.flier.api.UsableItem;
 import pl.betoncraft.flier.api.Wings;
-import pl.betoncraft.flier.bonus.EffectBonus;
-import pl.betoncraft.flier.bonus.MoneyBonus;
+import pl.betoncraft.flier.bonus.EntityBonus;
 import pl.betoncraft.flier.command.FlierCommand;
+import pl.betoncraft.flier.core.DefaultUsableItem;
 import pl.betoncraft.flier.effect.TargetCompass;
+import pl.betoncraft.flier.engine.MultiplyingEngine;
 import pl.betoncraft.flier.exception.LoadingException;
 import pl.betoncraft.flier.game.TeamDeathMatch;
-import pl.betoncraft.flier.item.EmergencyWings;
-import pl.betoncraft.flier.item.Launcher;
-import pl.betoncraft.flier.item.VanillaItem;
-import pl.betoncraft.flier.item.engine.MultiplyingEngine;
-import pl.betoncraft.flier.item.weapon.HomingMissile;
-import pl.betoncraft.flier.item.weapon.MachineGun;
-import pl.betoncraft.flier.item.wings.SimpleWings;
 import pl.betoncraft.flier.lobby.PhysicalLobby;
 import pl.betoncraft.flier.util.Utils;
+import pl.betoncraft.flier.wings.SimpleWings;
 
 public class Flier extends JavaPlugin {
 
 	private static Flier instance;
 
 	private Map<String, Factory<Engine>> engineTypes = new HashMap<>();
-	private Map<String, Factory<Item>> itemTypes = new HashMap<>();
 	private Map<String, Factory<Wings>> wingTypes = new HashMap<>();
 	private Map<String, Factory<Game>> gameTypes = new HashMap<>();
 	private Map<String, Factory<Effect>> effectTypes = new HashMap<>();
 	private Map<String, Factory<Lobby>> lobbyTypes = new HashMap<>();
 	private Map<String, Factory<Bonus>> bonusTypes = new HashMap<>();
+	private Map<String, Factory<Action>> actionTypes = new HashMap<>();
 	
 	private Map<String, Lobby> lobbies = new HashMap<>();
 
@@ -75,17 +77,17 @@ public class Flier extends JavaPlugin {
 
 		// register new types
 		registerEngine("multiplyingEngine", s -> new MultiplyingEngine(s));
-		registerItem("machineGun", s -> new MachineGun(s));
-		registerItem("homingMissile", s -> new HomingMissile(s));
-		registerItem("launcher", s -> new Launcher(s));
-		registerItem("vanillaItem", s -> new VanillaItem(s));
-		registerItem("emergencyWings", s -> new EmergencyWings(s));
 		registerWings("simpleWings", s -> new SimpleWings(s));
 		registerLobby("fixedPhysicalLobby", s -> new PhysicalLobby(s));
 		registerGame("teamDeathMatch", s -> new TeamDeathMatch(s));
 		registerEffect("targetCompass", s -> new TargetCompass(s));
-		registerBonus("effect", s -> new EffectBonus(s));
-		registerBonus("money", s -> new MoneyBonus(s));
+		registerBonus("entity", s -> new EntityBonus(s));
+		registerAction("machineGun", s -> new MachineGun(s));
+		registerAction("homingMissile", s -> new HomingMissile(s));
+		registerAction("launcher", s -> new LaunchAction(s));
+		registerAction("effect", s -> new EffectAction(s));
+		registerAction("money", s -> new MoneyAction(s));
+		registerAction("restoreWings", s -> new EmergencyWingsAction(s));
 
 		loadLobbies();
 		
@@ -150,10 +152,6 @@ public class Flier extends JavaPlugin {
 	/**
 	 * @param id ID of the Engine
 	 * @return the Engine with specified name, never null
-	 * @throws ObjectUndefinedException
-	 *             when the Engine is not defined
-	 * @throws TypeUndefinedException
-	 *             when the Engine type is not defined
 	 * @throws LoadingException
 	 *             when the Engine cannot be created due to an error
 	 */
@@ -164,24 +162,24 @@ public class Flier extends JavaPlugin {
 	/**
 	 * @param id ID of the Item
 	 * @return the Item with specified name, never null
-	 * @throws ObjectUndefinedException
-	 *             when the Item is not defined
-	 * @throws TypeUndefinedException
-	 *             when the Item type is not defined
 	 * @throws LoadingException
 	 *             when the Item cannot be created due to an error
 	 */
-	public Item getItem(String id) throws LoadingException {
-		return getObject(id, "item", "items", itemTypes);
+	public UsableItem getItem(String id) throws LoadingException {
+		ConfigurationSection section = getConfig().getConfigurationSection("items").getConfigurationSection(id);
+		if (section == null) {
+			throw new LoadingException(String.format("Item with ID '%s' does not exist.", id));
+		}
+		try {
+			return new DefaultUsableItem(section);
+		} catch (LoadingException e) {
+			throw (LoadingException) new LoadingException(String.format("Error in '%s' item.", id)).initCause(e);
+		}
 	}
 
 	/**
 	 * @param id ID of the Wings
 	 * @return the Wings with specified name, never null
-	 * @throws ObjectUndefinedException
-	 *             when the Wings are not defined
-	 * @throws TypeUndefinedException
-	 *             when the Wings type is not defined
 	 * @throws LoadingException
 	 *             when the Wings cannot be created due to an error
 	 */
@@ -192,10 +190,6 @@ public class Flier extends JavaPlugin {
 	/**
 	 * @param id ID of the Effect
 	 * @return the Effect with specified name, never null
-	 * @throws ObjectUndefinedException
-	 *             when the Effect is not defined
-	 * @throws TypeUndefinedException
-	 *             when the Effect type is not defined
 	 * @throws LoadingException
 	 *             when the Effect cannot be created due to an error
 	 */
@@ -206,15 +200,21 @@ public class Flier extends JavaPlugin {
 	/**
 	 * @param id ID of the Game
 	 * @return the Game with specified name, never null
-	 * @throws ObjectUndefinedException
-	 *             when the Game is not defined
-	 * @throws TypeUndefinedException
-	 *             when the Game type is not defined
 	 * @throws LoadingException
 	 *             when the Game cannot be created due to an error
 	 */
 	public Game getGame(String id) throws LoadingException {
 		return getObject(id, "game", "games", gameTypes);
+	}
+	
+	/**
+	 * @param id ID of the Action
+	 * @return the Action with specified name, never null
+	 * @throws LoadingException
+	 *             when the Action cannot be created due to an error
+	 */
+	public Action getAction(String id) throws LoadingException {
+		return getObject(id, "action", "actions", actionTypes);
 	}
 	
 	/**
@@ -257,19 +257,6 @@ public class Flier extends JavaPlugin {
 	 */
 	public void registerEngine(String name, Factory<Engine> factory) {
 		engineTypes.put(name, factory);
-	}
-
-	/**
-	 * Registers a new Item type with specified name. The factory will be used
-	 * to obtain copies of the Item.
-	 * 
-	 * @param name
-	 *            name of the type
-	 * @param factory
-	 *            factory which creates instances of that type
-	 */
-	public void registerItem(String name, Factory<Item> factory) {
-		itemTypes.put(name, factory);
 	}
 
 	/**
@@ -335,6 +322,19 @@ public class Flier extends JavaPlugin {
 	 */
 	public void registerBonus(String name, Factory<Bonus> factory) {
 		bonusTypes.put(name, factory);
+	}
+	
+	/**
+	 * Registers a new Action type with specified name. The factory will be used
+	 * to obtain copies of the Action.
+	 * 
+	 * @param name
+	 *            name of the type
+	 * @param factory
+	 *            factory which creates instances of that type
+	 */
+	public void registerAction(String name, Factory<Action> factory) {
+		actionTypes.put(name, factory);
 	}
 
 }

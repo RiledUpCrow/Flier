@@ -4,11 +4,11 @@
  * To Public License, Version 2, as published by Sam Hocevar. See
  * http://www.wtfpl.net/ for more details.
  */
-package pl.betoncraft.flier.item.engine;
+package pl.betoncraft.flier.engine;
 
 import org.bukkit.configuration.ConfigurationSection;
 
-import pl.betoncraft.flier.core.DefaultEngine;
+import pl.betoncraft.flier.core.defaults.DefaultEngine;
 import pl.betoncraft.flier.exception.LoadingException;
 import pl.betoncraft.flier.util.ValueLoader;
 import pl.betoncraft.flier.util.Utils.ImmutableVector;
