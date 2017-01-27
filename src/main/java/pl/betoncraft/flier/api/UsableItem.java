@@ -14,7 +14,7 @@ import java.util.List;
  * @author Jakub Sapalski
  */
 public interface UsableItem extends Item {
-	
+
 	public enum Where {
 		GROUND, AIR, FALL, NO_GROUND, NO_AIR, NO_FALL, EVERYWHERE
 	}
@@ -26,12 +26,12 @@ public interface UsableItem extends Item {
 	 * @return if the item was used
 	 */
 	public boolean use(InGamePlayer player);
-	
+
 	/**
 	 * @return the list of all usages of this item
 	 */
 	public List<Usage> getUsages();
-	
+
 	/**
 	 * @return whenever this item is ready to use
 	 */
@@ -41,7 +41,7 @@ public interface UsableItem extends Item {
 	 * @return whole cooldown time for this item when it started
 	 */
 	public int getWholeCooldown();
-	
+
 	/**
 	 * @return the current remaining cooldown time();
 	 */
@@ -51,6 +51,26 @@ public interface UsableItem extends Item {
 	 * @return whenever this item should be consumed on use
 	 */
 	public boolean isConsumable();
+
+	/**
+	 * @return maximum ammunition amount for this item; 0 means it doesn't use
+	 *         ammunition
+	 */
+	public int getMaxAmmo();
+
+	/**
+	 * @return the current amount of ammunition
+	 */
+	public int getAmmo();
+
+	/**
+	 * Sets the ammunition of the UsableItem. This won't go above max ammunition
+	 * nor below 0.
+	 * 
+	 * @param ammo
+	 *            the amount of ammunition to set
+	 */
+	public void setAmmo(int ammo);
 
 	/**
 	 * @return where this item can be used

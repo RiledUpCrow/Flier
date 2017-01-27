@@ -6,6 +6,7 @@
  */
 package pl.betoncraft.flier.core;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -523,16 +524,20 @@ public class DefaultPlayer implements InGamePlayer {
 		if (!isPlaying()) {
 			return;
 		}
-		for (UsableItem item : clazz.getCurrentItems().keySet()) {
-			if (item.use(this) && item.isConsumable()) {
-				int amount = clazz.getCurrentItems().get(item) - 1;
+		for (Iterator<Entry<UsableItem, Integer>> it = clazz.getCurrentItems().entrySet().iterator(); it.hasNext();) {
+			Entry<UsableItem, Integer> entry = it.next();
+			UsableItem item = entry.getKey();
+			int amount = entry.getValue();
+			if (item.use(this) && item.getAmmo() == 0 && item.isConsumable()) {
+				amount--;
 				ItemStack stack = getPlayer().getInventory().getItemInMainHand();
 				if (amount <= 0) { // remove stack
-					clazz.getCurrentItems().remove(item);
-					getPlayer().getInventory().setItemInMainHand(null); 
+					it.remove();
+					getPlayer().getInventory().setItemInMainHand(null);
 				} else { // decrease stack
-					clazz.getCurrentItems().put(item, amount);
+					entry.setValue(amount);
 					stack.setAmount(amount);
+					item.setAmmo(item.getMaxAmmo());
 				}
 			}
 		}

@@ -45,6 +45,7 @@ import pl.betoncraft.flier.api.Game;
 import pl.betoncraft.flier.api.InGamePlayer;
 import pl.betoncraft.flier.exception.LoadingException;
 import pl.betoncraft.flier.sidebar.Altitude;
+import pl.betoncraft.flier.sidebar.Ammo;
 import pl.betoncraft.flier.sidebar.Fuel;
 import pl.betoncraft.flier.sidebar.Health;
 import pl.betoncraft.flier.sidebar.Money;
@@ -201,6 +202,7 @@ public abstract class DefaultGame implements Listener, Game {
 		data.getLines().add(new Health(data));
 		data.getLines().add(new Speed(data));
 		data.getLines().add(new Altitude(data));
+		data.getLines().add(new Ammo(data));
 		if (useMoney) {
 			data.getLines().add(new Money(data));
 		}

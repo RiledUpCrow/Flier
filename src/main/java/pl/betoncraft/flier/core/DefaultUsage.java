@@ -26,11 +26,13 @@ import pl.betoncraft.flier.util.ValueLoader;
 public class DefaultUsage implements Usage {
 	
 	protected int cooldown;
+	protected int ammoUse;
 	protected List<Activator> activators = new ArrayList<>();
 	protected List<Action> actions = new ArrayList<>();
 	
 	public DefaultUsage(ConfigurationSection section) throws LoadingException {
 		cooldown = ValueLoader.loadNonNegativeInt(section, "cooldown");
+		ammoUse = ValueLoader.loadInt(section, "ammo_use");
 		for (String activator : section.getStringList("activators")) {
 			activators.add(Flier.getInstance().getActivator(activator));
 		}
@@ -52,6 +54,11 @@ public class DefaultUsage implements Usage {
 	@Override
 	public int getCooldown() {
 		return cooldown;
+	}
+
+	@Override
+	public int getAmmoUse() {
+		return ammoUse;
 	}
 
 }

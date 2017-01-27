@@ -29,5 +29,10 @@ public interface Usage {
 	 * @return the cooldown time this Usage takes
 	 */
 	public int getCooldown();
+	
+	/**
+	 * @return the amount of ammo this Usage uses per use
+	 */
+	public int getAmmoUse();
 
 }
