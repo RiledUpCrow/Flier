@@ -51,7 +51,7 @@ public interface PlayerClass extends Replicable {
 	 * @return mutable map of items and their amounts; the map can be empty if the player
 	 *         doesn't have any items currently
 	 */
-	public Map<Item, Integer> getCurrentItems();
+	public Map<UsableItem, Integer> getCurrentItems();
 	
 	/**
 	 * Sets the current name of this class.
@@ -80,7 +80,7 @@ public interface PlayerClass extends Replicable {
 	 * 
 	 * @param items
 	 */
-	public void setCurrentItems(Map<Item, Integer> items);
+	public void setCurrentItems(Map<UsableItem, Integer> items);
 	
 	/**
 	 * @return the stored name of this class
@@ -101,7 +101,7 @@ public interface PlayerClass extends Replicable {
 	 * @return an immutable map of stored items; the map can be empty if the
 	 *         player doesn't have any stored items
 	 */
-	public Map<Item, Integer> getStoredItems();
+	public Map<UsableItem, Integer> getStoredItems();
 	
 	/**
 	 * Sets the stored name of this class.
@@ -130,7 +130,7 @@ public interface PlayerClass extends Replicable {
 	 * 
 	 * @param items
 	 */
-	public void setStoredItems(Map<Item, Integer> items);
+	public void setStoredItems(Map<UsableItem, Integer> items);
 	
 	/**
 	 * @return the default name of this class
@@ -150,7 +150,7 @@ public interface PlayerClass extends Replicable {
 	/**
 	 * @return the copy of default items
 	 */
-	public Map<Item, Integer> getDefaultItems();
+	public Map<UsableItem, Integer> getDefaultItems();
 	
 	/**
 	 * Saves all current items into stored items.

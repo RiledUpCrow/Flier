@@ -265,7 +265,18 @@ public abstract class DefaultGame implements Listener, Game {
 	public void onClick(PlayerInteractEvent event) {
 		InGamePlayer data = getPlayers().get(event.getPlayer().getUniqueId());
 		if (data != null) {
-			data.use();
+			switch (event.getAction()) {
+			case LEFT_CLICK_AIR:
+			case LEFT_CLICK_BLOCK:
+				data.leftClick();
+				break;
+			case RIGHT_CLICK_AIR:
+			case RIGHT_CLICK_BLOCK:
+				data.rightClick();
+				break;
+			default:
+				break;
+			}
 		}
 	}
 	

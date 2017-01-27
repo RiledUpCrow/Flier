@@ -56,6 +56,8 @@ public class DefaultPlayer implements InGamePlayer {
 	private Scoreboard sb;
 
 	private boolean isPlaying;
+	private boolean leftClicked = false;
+	private boolean rightClicked = false;
 	private List<SidebarLine> lines = new LinkedList<>();
 	private InGamePlayer lastHit = null;
 	private ChatColor color;
@@ -111,6 +113,12 @@ public class DefaultPlayer implements InGamePlayer {
 			}
 			applyEffects(fastTick);
 			checkBonuses();
+			
+			// manage UsableItems
+			use();
+			leftClicked = false;
+			rightClicked = false;
+			
 		}
 	}
 
@@ -124,31 +132,33 @@ public class DefaultPlayer implements InGamePlayer {
 	}
 	
 	@Override
-	public void use() {
-		if (!isPlaying()) {
-			return;
+	public void leftClick() {
+		if (isPlaying()) {
+			leftClicked = true;
 		}
-		Item i = getHeldItem();
-		if (i == null) {
-			return;
+	}
+	
+	@Override
+	public void rightClick() {
+		if (isPlaying()) {
+			rightClicked = true;
 		}
-		if (i instanceof UsableItem) {
-			UsableItem item = (UsableItem) i;
-			if (!canUse(item.where())) {
-				return;
-			}
-			if (item.cooldown() && item.use(this) && item.isConsumable()) {
-				int amount = clazz.getCurrentItems().get(item) - 1;
-				ItemStack stack = getPlayer().getInventory().getItemInMainHand();
-				if (amount <= 0) { // remove stack
-					clazz.getCurrentItems().remove(item);
-					getPlayer().getInventory().setItemInMainHand(null); 
-				} else { // decrease stack
-					clazz.getCurrentItems().put(item, amount);
-					stack.setAmount(amount);
-				}
-			}
-		}
+	}
+	
+	@Override
+	public boolean didLeftClick() {
+		return leftClicked;
+	}
+	
+	@Override
+	public boolean didRightClick() {
+		return rightClicked;
+	}
+	
+	@Override
+	public boolean isHolding(UsableItem item) {
+		ItemStack stack = player.getInventory().getItemInMainHand();
+		return item == null && stack == null || item != null && stack != null && item.getItem().isSimilar(stack);
 	}
 	
 	@Override
@@ -246,12 +256,12 @@ public class DefaultPlayer implements InGamePlayer {
 	public void updateClass() {
 		Engine engine = clazz.getCurrentEngine();
 		Wings wings = clazz.getCurrentWings();
-		Map<Item, Integer> items = clazz.getCurrentItems();
+		Map<UsableItem, Integer> items = clazz.getCurrentItems();
 		getPlayer().getInventory().clear();
 		getPlayer().getInventory().setItemInOffHand(engine.getItem());
 		getPlayer().getInventory().setChestplate(wings.getItem());
-		for (Entry<Item, Integer> e : items.entrySet()) {
-			Item item = e.getKey();
+		for (Entry<UsableItem, Integer> e : items.entrySet()) {
+			UsableItem item = e.getKey();
 			int amount = e.getValue();
 			int slot = item.slot();
 			ItemStack itemStack = item.getItem();
@@ -362,19 +372,6 @@ public class DefaultPlayer implements InGamePlayer {
 	
 	private boolean isFlying() {
 		return player.isGliding();
-	}
-	
-	private Item getHeldItem() {
-		ItemStack item = player.getInventory().getItemInMainHand();
-		if (item == null) {
-			return null;
-		}
-		for (Item i : clazz.getCurrentItems().keySet()) {
-			if (i.getItem().isSimilar(item)) {
-				return i;
-			}
-		}
-		return null; 
 	}
 	
 	private void startGlowing(int ticks) {
@@ -521,6 +518,28 @@ public class DefaultPlayer implements InGamePlayer {
 
 	private void modifyFlight() {
 		player.setVelocity(clazz.getCurrentWings().applyFlightModifications(this).toVector());
+	}
+	
+	private void use() {
+		if (!isPlaying()) {
+			return;
+		}
+		for (UsableItem item : clazz.getCurrentItems().keySet()) {
+			if (!canUse(item.where())) {
+				continue;
+			}
+			if (item.use(this) && item.isConsumable()) {
+				int amount = clazz.getCurrentItems().get(item) - 1;
+				ItemStack stack = getPlayer().getInventory().getItemInMainHand();
+				if (amount <= 0) { // remove stack
+					clazz.getCurrentItems().remove(item);
+					getPlayer().getInventory().setItemInMainHand(null); 
+				} else { // decrease stack
+					clazz.getCurrentItems().put(item, amount);
+					stack.setAmount(amount);
+				}
+			}
+		}
 	}
 
 	private boolean canUse(Where where) {

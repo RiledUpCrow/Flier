@@ -34,10 +34,29 @@ public interface InGamePlayer {
 	public void slowTick();
 	
 	/**
-	 * Called when the Game decides the player used an item.
-	 * Validates if the use is correct and uses the item.
+	 * Called to indicate the player left clicked.
 	 */
-	public void use();
+	public void leftClick();
+	
+	/**
+	 * @return whenever the player left clicked; 
+	 */
+	public boolean didLeftClick();
+	
+	/**
+	 * Called to indicate the player right clicked.
+	 */
+	public void rightClick();
+	
+	/**
+	 * @return whenever the player right clicked;
+	 */
+	public boolean didRightClick();
+
+	/**
+	 * @return whenever the player is holding this item or not
+	 */
+	public boolean isHolding(UsableItem item);
 	
 	/**
 	 * Called when the Game decides the player was damaged by

@@ -13,9 +13,9 @@ import java.util.stream.Collectors;
 
 import javafx.util.Pair;
 import pl.betoncraft.flier.api.Engine;
-import pl.betoncraft.flier.api.Item;
 import pl.betoncraft.flier.api.ItemSet;
 import pl.betoncraft.flier.api.PlayerClass;
+import pl.betoncraft.flier.api.UsableItem;
 import pl.betoncraft.flier.api.Wings;
 import pl.betoncraft.flier.exception.LoadingException;
 
@@ -29,17 +29,17 @@ public class DefaultClass implements PlayerClass {
 	private String currentName;
 	private Engine currentEngine;
 	private Wings currentWings;
-	private Map<Item, Integer> currentItems = new HashMap<>();
+	private Map<UsableItem, Integer> currentItems = new HashMap<>();
 	
 	private String storedName;
 	private Engine storedEngine;
 	private Wings storedWings;
-	private Map<Item, Integer> storedItems = new HashMap<>();
+	private Map<UsableItem, Integer> storedItems = new HashMap<>();
 
 	private final String defaultName;
 	private final Engine defaultEngine;
 	private final Wings defaultWings;
-	private final Map<Item, Integer> defaultItems;
+	private final Map<UsableItem, Integer> defaultItems;
 	
 	public DefaultClass(List<ItemSet> sets) throws LoadingException {
 		for (ItemSet set : sets) {
@@ -58,7 +58,7 @@ public class DefaultClass implements PlayerClass {
 		reset();
 	}
 
-	private DefaultClass(String defName, Engine defEngine, Wings defWings, Map<Item, Integer> defItems) {
+	private DefaultClass(String defName, Engine defEngine, Wings defWings, Map<UsableItem, Integer> defItems) {
 		defaultName = defName;
 		defaultEngine = defEngine;
 		defaultWings = defWings;
@@ -82,7 +82,7 @@ public class DefaultClass implements PlayerClass {
 	}
 
 	@Override
-	public Map<Item, Integer> getCurrentItems() {
+	public Map<UsableItem, Integer> getCurrentItems() {
 		return currentItems;
 	}
 
@@ -102,7 +102,7 @@ public class DefaultClass implements PlayerClass {
 	}
 
 	@Override
-	public void setCurrentItems(Map<Item, Integer> items) {
+	public void setCurrentItems(Map<UsableItem, Integer> items) {
 		currentItems = items;
 	}
 
@@ -122,9 +122,9 @@ public class DefaultClass implements PlayerClass {
 	}
 
 	@Override
-	public Map<Item, Integer> getStoredItems() {
+	public Map<UsableItem, Integer> getStoredItems() {
 		return storedItems.entrySet().stream().map(
-				entry -> new Pair<>((Item) entry.getKey().replicate(), entry.getValue())
+				entry -> new Pair<>((UsableItem) entry.getKey().replicate(), entry.getValue())
 			).collect(Collectors.toMap(pair -> pair.getKey(), pair -> pair.getValue()));
 	}
 
@@ -144,7 +144,7 @@ public class DefaultClass implements PlayerClass {
 	}
 
 	@Override
-	public void setStoredItems(Map<Item, Integer> items) {
+	public void setStoredItems(Map<UsableItem, Integer> items) {
 		storedItems = new HashMap<>(items);
 	}
 
@@ -164,9 +164,9 @@ public class DefaultClass implements PlayerClass {
 	}
 
 	@Override
-	public Map<Item, Integer> getDefaultItems() {
+	public Map<UsableItem, Integer> getDefaultItems() {
 		return defaultItems.entrySet().stream().collect(Collectors.toMap(
-				entry -> (Item) entry.getKey().replicate(), entry -> entry.getValue()
+				entry -> (UsableItem) entry.getKey().replicate(), entry -> entry.getValue()
 		));
 	}
 

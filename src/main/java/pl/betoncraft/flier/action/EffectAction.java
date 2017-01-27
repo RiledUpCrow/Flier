@@ -33,6 +33,7 @@ public class EffectAction extends DefaultAction {
 	private Set<UUID> players = new HashSet<>();
 
 	public EffectAction(ConfigurationSection section) throws LoadingException {
+		super(section);
 		effect = ValueLoader.loadEffect(section, "effect");
 		duration = ValueLoader.loadPositiveInt(section, "duration");
 	}

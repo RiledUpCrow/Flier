@@ -18,9 +18,9 @@ import org.bukkit.configuration.ConfigurationSection;
 
 import pl.betoncraft.flier.Flier;
 import pl.betoncraft.flier.api.Engine;
-import pl.betoncraft.flier.api.Item;
 import pl.betoncraft.flier.api.ItemSet;
 import pl.betoncraft.flier.api.PlayerClass;
+import pl.betoncraft.flier.api.UsableItem;
 import pl.betoncraft.flier.api.Wings;
 import pl.betoncraft.flier.exception.LoadingException;
 import pl.betoncraft.flier.util.ValueLoader;
@@ -40,7 +40,7 @@ public class DefaultSet implements ItemSet {
 	protected boolean saving;
 	
 	private class Items {
-		private Item item;
+		private UsableItem item;
 		private int amount = 1;
 		private int max = 0;
 	}
@@ -124,9 +124,9 @@ public class DefaultSet implements ItemSet {
 		}
 	}
 	
-	private void setItems(PlayerClass c, Map<Item, Integer> items) {
+	private void setItems(PlayerClass c, Map<UsableItem, Integer> items) {
 		c.setCurrentItems(items.entrySet().stream().collect(Collectors.toMap(
-				e -> (Item) e.getKey(), e -> e.getValue()
+				e -> (UsableItem) e.getKey(), e -> e.getValue()
 		)));
 		if (saving) {
 			c.setStoredItems(items);
@@ -154,11 +154,11 @@ public class DefaultSet implements ItemSet {
 			if (wings != null) {
 				setWings(c, wings);
 			}
-			Map<Item, Integer> storedItems1 = c.getCurrentItems();
+			Map<UsableItem, Integer> storedItems1 = c.getCurrentItems();
 			for (Iterator<Items> i = items.iterator(); i.hasNext();) {
 				Items e = i.next();
-				for (Iterator<Entry<Item, Integer>> si = storedItems1.entrySet().iterator(); si.hasNext();) {
-					Entry<Item, Integer> se = si.next();
+				for (Iterator<Entry<UsableItem, Integer>> si = storedItems1.entrySet().iterator(); si.hasNext();) {
+					Entry<UsableItem, Integer> se = si.next();
 					if (e.item.slot() == se.getKey().slot()) {
 						si.remove();
 					}
@@ -180,11 +180,11 @@ public class DefaultSet implements ItemSet {
 				}
 				setWings(c, wings);
 			}
-			Map<Item, Integer> storedItems2 = new HashMap<>(c.getCurrentItems());
+			Map<UsableItem, Integer> storedItems2 = new HashMap<>(c.getCurrentItems());
 			loop: for (Iterator<Items> i = items.iterator(); i.hasNext();) {
 				Items e = i.next();
-				for (Iterator<Entry<Item, Integer>> si = storedItems2.entrySet().iterator(); si.hasNext();) {
-					Entry<Item, Integer> se = si.next();
+				for (Iterator<Entry<UsableItem, Integer>> si = storedItems2.entrySet().iterator(); si.hasNext();) {
+					Entry<UsableItem, Integer> se = si.next();
 					if (e.item.slot() == se.getKey().slot()) {
 						if (e.item.isSameAs(se.getKey()) && (e.max <= 0 || se.getValue() + e.amount <= e.max)) {
 							se.setValue(se.getValue() + e.amount);
@@ -205,12 +205,12 @@ public class DefaultSet implements ItemSet {
 			if (wings != null && wings.equals(c.getCurrentWings())) {
 				setWings(c, null);
 			}
-			Map<Item, Integer> storedItems3 = c.getCurrentItems();
+			Map<UsableItem, Integer> storedItems3 = c.getCurrentItems();
 			for (Iterator<Items> i = items.iterator(); i.hasNext();) {
 				Items e = i.next();
 				int oldAmount = 0;
-				for (Iterator<Entry<Item, Integer>> si = storedItems3.entrySet().iterator(); si.hasNext();) {
-					Entry<Item, Integer> se = si.next();
+				for (Iterator<Entry<UsableItem, Integer>> si = storedItems3.entrySet().iterator(); si.hasNext();) {
+					Entry<UsableItem, Integer> se = si.next();
 					if (e.item.slot() == se.getKey().slot()) {
 						si.remove();
 						if (e.item.equals(se.getKey())) {
@@ -243,7 +243,7 @@ public class DefaultSet implements ItemSet {
 	}
 
 	@Override
-	public Map<Item, Integer> getItems() {
+	public Map<UsableItem, Integer> getItems() {
 		return itemsToMap(items);
 	}
 
@@ -252,8 +252,8 @@ public class DefaultSet implements ItemSet {
 		return addType;
 	}
 	
-	private Map<Item, Integer> itemsToMap(List<Items> list) {
-		return list.stream().collect(Collectors.toMap(i -> (Item) i.item.replicate(), i -> i.amount));
+	private Map<UsableItem, Integer> itemsToMap(List<Items> list) {
+		return list.stream().collect(Collectors.toMap(i -> (UsableItem) i.item.replicate(), i -> i.amount));
 	}
 
 }

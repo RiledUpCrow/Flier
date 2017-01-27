@@ -24,6 +24,7 @@ public class EmergencyWingsAction extends DefaultAction {
 	private double amount;
 
 	public EmergencyWingsAction(ConfigurationSection section) throws LoadingException {
+		super(section);
 		amount = ValueLoader.loadNonNegativeDouble(section, "amount");
 	}
 

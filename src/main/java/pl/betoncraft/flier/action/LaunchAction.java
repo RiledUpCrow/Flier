@@ -27,6 +27,7 @@ public class LaunchAction extends DefaultAction {
 	private final double speed;
 
 	public LaunchAction(ConfigurationSection section) throws LoadingException {
+		super(section);
 		speed = ValueLoader.loadPositiveDouble(section, "speed");
 	}
 

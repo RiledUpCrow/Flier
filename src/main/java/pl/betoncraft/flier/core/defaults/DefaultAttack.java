@@ -28,6 +28,7 @@ public abstract class DefaultAttack extends DefaultAction implements Attack {
 	protected final boolean isExploding;
 	
 	public DefaultAttack(ConfigurationSection section) throws LoadingException {
+		super(section);
 		suicidal = ValueLoader.loadBoolean(section, "suicidal");
 		friendlyFire = ValueLoader.loadBoolean(section, "friendly_fire");
 		damage = ValueLoader.loadDouble(section, "damage");

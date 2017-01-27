@@ -28,14 +28,14 @@ public interface UsableItem extends Item {
 	public boolean use(InGamePlayer player);
 	
 	/**
-	 * @return the list of all actions in this item
+	 * @return the list of all usages of this item
 	 */
-	public List<Action> getActions();
+	public List<Usage> getUsages();
 
 	/**
-	 * Checks cooldown. It will start another cooldown upon returning true.
+	 * @return cooldown time for this item
 	 */
-	public boolean cooldown();
+	public int getCooldown();
 
 	/**
 	 * @return whenever this item should be consumed on use

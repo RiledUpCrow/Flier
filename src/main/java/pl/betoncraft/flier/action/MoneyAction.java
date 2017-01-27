@@ -23,6 +23,7 @@ public class MoneyAction extends DefaultAction {
 	private final int money;
 
 	public MoneyAction(ConfigurationSection section) throws LoadingException {
+		super(section);
 		money = ValueLoader.loadInt(section, "money");
 	}
 

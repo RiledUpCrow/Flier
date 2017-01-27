@@ -34,7 +34,7 @@ public interface ItemSet {
 
 	public Wings getWings();
 
-	public Map<Item, Integer> getItems();
+	public Map<UsableItem, Integer> getItems();
 
 	public AddType getType();
 

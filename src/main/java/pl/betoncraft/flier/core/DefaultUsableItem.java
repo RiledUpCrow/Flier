@@ -13,9 +13,11 @@ import org.bukkit.configuration.ConfigurationSection;
 
 import pl.betoncraft.flier.Flier;
 import pl.betoncraft.flier.api.Action;
+import pl.betoncraft.flier.api.Activator;
 import pl.betoncraft.flier.api.InGamePlayer;
 import pl.betoncraft.flier.api.Item;
 import pl.betoncraft.flier.api.UsableItem;
+import pl.betoncraft.flier.api.Usage;
 import pl.betoncraft.flier.core.defaults.DefaultItem;
 import pl.betoncraft.flier.exception.LoadingException;
 import pl.betoncraft.flier.util.ValueLoader;
@@ -30,7 +32,7 @@ public class DefaultUsableItem extends DefaultItem implements UsableItem {
 	protected final int cooldown;
 	protected final boolean consumable;
 	protected final Where where;
-	protected final List<Action> actions = new ArrayList<>();
+	protected final List<Usage> usages = new ArrayList<>();
 
 	protected long time = 0;
 
@@ -39,19 +41,19 @@ public class DefaultUsableItem extends DefaultItem implements UsableItem {
 		cooldown = ValueLoader.loadNonNegativeInt(section, "cooldown");
 		consumable = ValueLoader.loadBoolean(section, "consumable");
 		where = ValueLoader.loadEnum(section, "where", Where.class);
-		for (String id : section.getStringList("actions")) {
-			actions.add(Flier.getInstance().getAction(id));
+		ConfigurationSection usageSection = section.getConfigurationSection("usages");
+		if (usageSection != null) for (String id : usageSection.getKeys(false)) {
+			try {
+				usages.add(new DefaultUsage(usageSection.getConfigurationSection(id)));
+			} catch (LoadingException e) {
+				throw (LoadingException) new LoadingException(String.format("Error in '%s' usage.", id)).initCause(e);
+			}
 		}
 	}
 	
 	@Override
-	public boolean cooldown() {
-		if (System.currentTimeMillis() >= time) {
-			time = System.currentTimeMillis() + 50*cooldown;
-			return true;
-		} else {
-			return false;
-		}
+	public int getCooldown() {
+		return cooldown;
 	}
 	
 	@Override
@@ -65,19 +67,29 @@ public class DefaultUsableItem extends DefaultItem implements UsableItem {
 	}
 
 	@Override
-	public List<Action> getActions() {
-		return actions;
+	public List<Usage> getUsages() {
+		return usages;
 	}
 
 	@Override
 	public boolean use(InGamePlayer player) {
-		boolean acted = false;
-		for (Action action : actions) {
-			if (action.act(player)) {
-				acted = true;
+		boolean used = false;
+		if (System.currentTimeMillis() >= time) {
+			usages:
+			for (Usage usage : usages) {
+				for (Activator activator : usage.getActivators()) {
+					if (!activator.isActive(player, this)) {
+						continue usages;
+					}
+				}
+				used = true;
+				time = System.currentTimeMillis() + 50*cooldown;
+				for (Action action : usage.getActions()) {
+					action.act(player);
+				}
 			}
 		}
-		return acted;
+		return used;
 	}
 	
 	@Override

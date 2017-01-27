@@ -25,7 +25,9 @@ import pl.betoncraft.flier.action.LaunchAction;
 import pl.betoncraft.flier.action.MoneyAction;
 import pl.betoncraft.flier.action.attack.HomingMissile;
 import pl.betoncraft.flier.action.attack.MachineGun;
+import pl.betoncraft.flier.activator.LeftClickActivator;
 import pl.betoncraft.flier.api.Action;
+import pl.betoncraft.flier.api.Activator;
 import pl.betoncraft.flier.api.Bonus;
 import pl.betoncraft.flier.api.Damager;
 import pl.betoncraft.flier.api.Effect;
@@ -56,6 +58,7 @@ public class Flier extends JavaPlugin {
 	private Map<String, Factory<Lobby>> lobbyTypes = new HashMap<>();
 	private Map<String, Factory<Bonus>> bonusTypes = new HashMap<>();
 	private Map<String, Factory<Action>> actionTypes = new HashMap<>();
+	private Map<String, Factory<Activator>> activatorTypes = new HashMap<>();
 	
 	private Map<String, Lobby> lobbies = new HashMap<>();
 
@@ -88,6 +91,7 @@ public class Flier extends JavaPlugin {
 		registerAction("effect", s -> new EffectAction(s));
 		registerAction("money", s -> new MoneyAction(s));
 		registerAction("restoreWings", s -> new EmergencyWingsAction(s));
+		registerActivator("leftClick", s -> new LeftClickActivator(s));
 
 		loadLobbies();
 		
@@ -218,6 +222,16 @@ public class Flier extends JavaPlugin {
 	}
 	
 	/**
+	 * @param id ID of the Activator
+	 * @return the Activator with specified name, never null
+	 * @throws LoadingException
+	 *             when the Activator cannot be created due to an error
+	 */
+	public Activator getActivator(String id) throws LoadingException {
+		return getObject(id, "activator", "activators", activatorTypes);
+	}
+	
+	/**
 	 * @param id ID of the Bonus
 	 * @return the Bonus with specified name, never null
 	 * @throws LoadingException
@@ -335,6 +349,19 @@ public class Flier extends JavaPlugin {
 	 */
 	public void registerAction(String name, Factory<Action> factory) {
 		actionTypes.put(name, factory);
+	}
+	
+	/**
+	 * Registers a new Activator type with specified name. The factory will be used
+	 * to obtain copies of the Activator.
+	 * 
+	 * @param name
+	 *            name of the type
+	 * @param factory
+	 *            factory which creates instances of that type
+	 */
+	public void registerActivator(String name, Factory<Activator> factory) {
+		activatorTypes.put(name, factory);
 	}
 
 }

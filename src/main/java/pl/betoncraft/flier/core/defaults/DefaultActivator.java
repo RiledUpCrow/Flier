@@ -9,26 +9,26 @@ package pl.betoncraft.flier.core.defaults;
 import org.bukkit.configuration.ConfigurationSection;
 
 import pl.betoncraft.flier.Flier;
-import pl.betoncraft.flier.api.Action;
+import pl.betoncraft.flier.api.Activator;
 import pl.betoncraft.flier.exception.LoadingException;
 
 /**
- * Default implementation of Action (only replication, actually).
+ * Default implementation of an Activator (only replication, actually).
  *
  * @author Jakub Sapalski
  */
-public abstract class DefaultAction implements Action {
+public abstract class DefaultActivator implements Activator {
 	
 	protected final String id;
 	
-	public DefaultAction(ConfigurationSection section) {
+	public DefaultActivator(ConfigurationSection section) {
 		id = section.getName();
 	}
 
 	@Override
-	public Action replicate() {
+	public Activator replicate() {
 		try {
-			return Flier.getInstance().getAction(id);
+			return Flier.getInstance().getActivator(id);
 		} catch (LoadingException e) {
 			return null; // dead code
 		}
