@@ -24,5 +24,10 @@ public interface Usage {
 	 * @return the list of Actions in this Usage
 	 */
 	public List<Action> getActions();
+	
+	/**
+	 * @return the cooldown time this Usage takes
+	 */
+	public int getCooldown();
 
 }

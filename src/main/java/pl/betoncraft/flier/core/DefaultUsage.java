@@ -16,6 +16,7 @@ import pl.betoncraft.flier.api.Action;
 import pl.betoncraft.flier.api.Activator;
 import pl.betoncraft.flier.api.Usage;
 import pl.betoncraft.flier.exception.LoadingException;
+import pl.betoncraft.flier.util.ValueLoader;
 
 /**
  * Default implementation of Usage.
@@ -24,10 +25,12 @@ import pl.betoncraft.flier.exception.LoadingException;
  */
 public class DefaultUsage implements Usage {
 	
+	protected int cooldown;
 	protected List<Activator> activators = new ArrayList<>();
 	protected List<Action> actions = new ArrayList<>();
 	
 	public DefaultUsage(ConfigurationSection section) throws LoadingException {
+		cooldown = ValueLoader.loadNonNegativeInt(section, "cooldown");
 		for (String activator : section.getStringList("activators")) {
 			activators.add(Flier.getInstance().getActivator(activator));
 		}
@@ -44,6 +47,11 @@ public class DefaultUsage implements Usage {
 	@Override
 	public List<Action> getActions() {
 		return actions;
+	}
+
+	@Override
+	public int getCooldown() {
+		return cooldown;
 	}
 
 }

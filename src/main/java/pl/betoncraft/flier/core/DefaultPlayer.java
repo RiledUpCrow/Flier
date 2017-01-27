@@ -37,7 +37,6 @@ import pl.betoncraft.flier.api.Lobby;
 import pl.betoncraft.flier.api.PlayerClass;
 import pl.betoncraft.flier.api.SidebarLine;
 import pl.betoncraft.flier.api.UsableItem;
-import pl.betoncraft.flier.api.UsableItem.Where;
 import pl.betoncraft.flier.api.Wings;
 import pl.betoncraft.flier.util.Utils;
 import pl.betoncraft.flier.util.Utils.ImmutableVector;
@@ -525,9 +524,6 @@ public class DefaultPlayer implements InGamePlayer {
 			return;
 		}
 		for (UsableItem item : clazz.getCurrentItems().keySet()) {
-			if (!canUse(item.where())) {
-				continue;
-			}
 			if (item.use(this) && item.isConsumable()) {
 				int amount = clazz.getCurrentItems().get(item) - 1;
 				ItemStack stack = getPlayer().getInventory().getItemInMainHand();
@@ -540,22 +536,6 @@ public class DefaultPlayer implements InGamePlayer {
 				}
 			}
 		}
-	}
-
-	private boolean canUse(Where where) {
-		boolean ground = Utils.getAltitude(player.getLocation(), 4) < 4;
-		boolean air = player.isGliding();
-		boolean fall = !ground && !air;
-		switch (where) {
-		case GROUND:	 return ground;
-		case AIR:		 return air;
-		case FALL:		 return fall;
-		case NO_GROUND:	 return !ground;
-		case NO_AIR:	 return !air;
-		case NO_FALL:	 return !fall;
-		case EVERYWHERE: return true;
-		}
-		return false;
 	}
 
 }

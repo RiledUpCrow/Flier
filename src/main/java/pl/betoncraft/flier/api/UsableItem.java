@@ -31,9 +31,19 @@ public interface UsableItem extends Item {
 	 * @return the list of all usages of this item
 	 */
 	public List<Usage> getUsages();
+	
+	/**
+	 * @return whenever this item is ready to use
+	 */
+	public boolean isReady();
 
 	/**
-	 * @return cooldown time for this item
+	 * @return whole cooldown time for this item when it started
+	 */
+	public int getWholeCooldown();
+	
+	/**
+	 * @return the current remaining cooldown time();
 	 */
 	public int getCooldown();
 

@@ -20,6 +20,7 @@ import pl.betoncraft.flier.api.UsableItem;
 import pl.betoncraft.flier.api.Usage;
 import pl.betoncraft.flier.core.defaults.DefaultItem;
 import pl.betoncraft.flier.exception.LoadingException;
+import pl.betoncraft.flier.util.Utils;
 import pl.betoncraft.flier.util.ValueLoader;
 
 /**
@@ -29,31 +30,41 @@ import pl.betoncraft.flier.util.ValueLoader;
  */
 public class DefaultUsableItem extends DefaultItem implements UsableItem {
 	
-	protected final int cooldown;
 	protected final boolean consumable;
 	protected final Where where;
 	protected final List<Usage> usages = new ArrayList<>();
 
-	protected long time = 0;
+	protected int time = 0;
+	protected int whole = 0;
 
 	public DefaultUsableItem(ConfigurationSection section) throws LoadingException {
 		super(section);
-		cooldown = ValueLoader.loadNonNegativeInt(section, "cooldown");
 		consumable = ValueLoader.loadBoolean(section, "consumable");
 		where = ValueLoader.loadEnum(section, "where", Where.class);
-		ConfigurationSection usageSection = section.getConfigurationSection("usages");
-		if (usageSection != null) for (String id : usageSection.getKeys(false)) {
-			try {
-				usages.add(new DefaultUsage(usageSection.getConfigurationSection(id)));
+		ConfigurationSection usagesSection = section.getConfigurationSection("usages");
+		if (usagesSection != null) for (String id : usagesSection.getKeys(false)) {
+			ConfigurationSection usageSection = usagesSection.getConfigurationSection(id);
+			if (usageSection != null) try {
+				usages.add(new DefaultUsage(usageSection));
 			} catch (LoadingException e) {
 				throw (LoadingException) new LoadingException(String.format("Error in '%s' usage.", id)).initCause(e);
 			}
 		}
 	}
-	
+
+	@Override
+	public boolean isReady() {
+		return time == 0;
+	}
+
+	@Override
+	public int getWholeCooldown() {
+		return whole;
+	}
+
 	@Override
 	public int getCooldown() {
-		return cooldown;
+		return time;
 	}
 	
 	@Override
@@ -73,8 +84,11 @@ public class DefaultUsableItem extends DefaultItem implements UsableItem {
 
 	@Override
 	public boolean use(InGamePlayer player) {
+		if (time > 0) {
+			time--;
+		}
 		boolean used = false;
-		if (System.currentTimeMillis() >= time) {
+		if (isReady() && canUse(player)) {
 			usages:
 			for (Usage usage : usages) {
 				for (Activator activator : usage.getActivators()) {
@@ -83,7 +97,8 @@ public class DefaultUsableItem extends DefaultItem implements UsableItem {
 					}
 				}
 				used = true;
-				time = System.currentTimeMillis() + 50*cooldown;
+				time = usage.getCooldown();
+				whole = time;
 				for (Action action : usage.getActions()) {
 					action.act(player);
 				}
@@ -99,5 +114,21 @@ public class DefaultUsableItem extends DefaultItem implements UsableItem {
 		} catch (LoadingException e) {
 			return null; // dead code
 		}
+	}
+
+	private boolean canUse(InGamePlayer player) {
+		boolean ground = Utils.getAltitude(player.getPlayer().getLocation(), 4) < 4;
+		boolean air = player.getPlayer().isGliding();
+		boolean fall = !ground && !air;
+		switch (where) {
+		case GROUND:	 return ground;
+		case AIR:		 return air;
+		case FALL:		 return fall;
+		case NO_GROUND:	 return !ground;
+		case NO_AIR:	 return !air;
+		case NO_FALL:	 return !fall;
+		case EVERYWHERE: return true;
+		}
+		return false;
 	}
 }
