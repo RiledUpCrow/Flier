@@ -20,7 +20,6 @@ import pl.betoncraft.flier.api.UsableItem;
 import pl.betoncraft.flier.api.Usage;
 import pl.betoncraft.flier.core.defaults.DefaultItem;
 import pl.betoncraft.flier.exception.LoadingException;
-import pl.betoncraft.flier.util.Utils;
 import pl.betoncraft.flier.util.ValueLoader;
 
 /**
@@ -32,7 +31,6 @@ public class DefaultUsableItem extends DefaultItem implements UsableItem {
 	
 	protected final boolean consumable;
 	protected final int maxAmmo;
-	protected final Where where;
 	protected final List<Usage> usages = new ArrayList<>();
 
 	protected int time = 0;
@@ -42,7 +40,6 @@ public class DefaultUsableItem extends DefaultItem implements UsableItem {
 	public DefaultUsableItem(ConfigurationSection section) throws LoadingException {
 		super(section);
 		consumable = ValueLoader.loadBoolean(section, "consumable");
-		where = ValueLoader.loadEnum(section, "where", Where.class);
 		maxAmmo = ValueLoader.loadNonNegativeInt(section, "ammo");
 		ammo = maxAmmo;
 		ConfigurationSection usagesSection = section.getConfigurationSection("usages");
@@ -96,29 +93,6 @@ public class DefaultUsableItem extends DefaultItem implements UsableItem {
 			this.ammo = maxAmmo;
 		}
 	}
-	
-	@Override
-	public Where where() {
-		return where;
-	}
-
-	@Override
-	public boolean canUse(InGamePlayer player) {
-		boolean air = player.getPlayer().isGliding();
-		boolean ground = !air && Utils.getAltitude(player.getPlayer().getLocation(), 4) < 4;
-		boolean fall = !ground && !air;
-		switch (where) {
-		case GROUND:	 return ground;
-		case AIR:		 return air;
-		case FALL:		 return fall;
-		case NO_GROUND:	 return !ground;
-		case NO_AIR:	 return !air;
-		case NO_FALL:	 return !fall;
-		case EVERYWHERE: return true;
-		case NOWHERE:    return false;
-		}
-		return false;
-	}
 
 	@Override
 	public List<Usage> getUsages() {
@@ -131,9 +105,12 @@ public class DefaultUsableItem extends DefaultItem implements UsableItem {
 			time--;
 		}
 		boolean used = false;
-		if (isReady() && canUse(player)) {
+		if (isReady()) {
 			usages:
 			for (Usage usage : usages) {
+				if (!usage.canUse(player)) {
+					continue;
+				}
 				if (maxAmmo > 0 && ammo - usage.getAmmoUse() < 0) {
 					continue;
 				}

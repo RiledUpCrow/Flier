@@ -14,8 +14,11 @@ import org.bukkit.configuration.ConfigurationSection;
 import pl.betoncraft.flier.Flier;
 import pl.betoncraft.flier.api.Action;
 import pl.betoncraft.flier.api.Activator;
+import pl.betoncraft.flier.api.InGamePlayer;
 import pl.betoncraft.flier.api.Usage;
+import pl.betoncraft.flier.api.UsableItem.Where;
 import pl.betoncraft.flier.exception.LoadingException;
+import pl.betoncraft.flier.util.Utils;
 import pl.betoncraft.flier.util.ValueLoader;
 
 /**
@@ -27,12 +30,14 @@ public class DefaultUsage implements Usage {
 	
 	protected int cooldown;
 	protected int ammoUse;
+	protected final Where where;
 	protected List<Activator> activators = new ArrayList<>();
 	protected List<Action> actions = new ArrayList<>();
 	
 	public DefaultUsage(ConfigurationSection section) throws LoadingException {
 		cooldown = ValueLoader.loadNonNegativeInt(section, "cooldown");
 		ammoUse = ValueLoader.loadInt(section, "ammo_use");
+		where = ValueLoader.loadEnum(section, "where", Where.class);
 		for (String activator : section.getStringList("activators")) {
 			activators.add(Flier.getInstance().getActivator(activator));
 		}
@@ -59,6 +64,28 @@ public class DefaultUsage implements Usage {
 	@Override
 	public int getAmmoUse() {
 		return ammoUse;
+	}
+	
+	@Override
+	public Where where() {
+		return where;
+	}
+
+	@Override
+	public boolean canUse(InGamePlayer player) {
+		boolean air = player.getPlayer().isGliding();
+		boolean ground = !air && Utils.getAltitude(player.getPlayer().getLocation(), 4) < 4;
+		boolean fall = !ground && !air;
+		switch (where) {
+		case GROUND:	 return ground;
+		case AIR:		 return air;
+		case FALL:		 return fall;
+		case NO_GROUND:	 return !ground;
+		case NO_AIR:	 return !air;
+		case NO_FALL:	 return !fall;
+		case EVERYWHERE: return true;
+		}
+		return false;
 	}
 
 }

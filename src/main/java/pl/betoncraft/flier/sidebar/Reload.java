@@ -37,7 +37,7 @@ public class Reload implements SidebarLine {
 				break;
 			}
 		}
-		if (item == null || !item.canUse(player)) {
+		if (item == null || !item.getUsages().stream().filter(usage -> usage.canUse(player)).findAny().isPresent()) {
 			return inactive;
 		}
 		int ticks = item.getCooldown();

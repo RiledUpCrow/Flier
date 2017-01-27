@@ -8,6 +8,8 @@ package pl.betoncraft.flier.api;
 
 import java.util.List;
 
+import pl.betoncraft.flier.api.UsableItem.Where;
+
 /**
  * Represents a set of Activators which can activate a set of Actions.
  *
@@ -34,5 +36,18 @@ public interface Usage {
 	 * @return the amount of ammo this Usage uses per use
 	 */
 	public int getAmmoUse();
+
+	/**
+	 * @return where this item can be used
+	 */
+	public Where where();
+
+	/**
+	 * Checks if the player is in a correct position to use this item.
+	 * 
+	 * @param player player to check
+	 * @return whenever it's possible to use this item in player's position
+	 */
+	public boolean canUse(InGamePlayer player);
 
 }
