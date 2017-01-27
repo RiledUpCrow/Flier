@@ -26,6 +26,7 @@ import pl.betoncraft.flier.action.MoneyAction;
 import pl.betoncraft.flier.action.attack.HomingMissile;
 import pl.betoncraft.flier.action.attack.MachineGun;
 import pl.betoncraft.flier.activator.LeftClickActivator;
+import pl.betoncraft.flier.activator.RightClickActivator;
 import pl.betoncraft.flier.api.Action;
 import pl.betoncraft.flier.api.Activator;
 import pl.betoncraft.flier.api.Bonus;
@@ -92,6 +93,7 @@ public class Flier extends JavaPlugin {
 		registerAction("money", s -> new MoneyAction(s));
 		registerAction("restoreWings", s -> new EmergencyWingsAction(s));
 		registerActivator("leftClick", s -> new LeftClickActivator(s));
+		registerActivator("rightClick", s -> new RightClickActivator(s));
 
 		loadLobbies();
 		
