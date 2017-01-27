@@ -16,7 +16,7 @@ import java.util.List;
 public interface UsableItem extends Item {
 
 	public enum Where {
-		GROUND, AIR, FALL, NO_GROUND, NO_AIR, NO_FALL, EVERYWHERE
+		GROUND, AIR, FALL, NO_GROUND, NO_AIR, NO_FALL, EVERYWHERE, NOWHERE
 	}
 
 	/**
@@ -43,7 +43,7 @@ public interface UsableItem extends Item {
 	public int getWholeCooldown();
 
 	/**
-	 * @return the current remaining cooldown time();
+	 * @return the current remaining cooldown time
 	 */
 	public int getCooldown();
 
@@ -76,5 +76,13 @@ public interface UsableItem extends Item {
 	 * @return where this item can be used
 	 */
 	public Where where();
+
+	/**
+	 * Checks if the player is in a correct position to use this item.
+	 * 
+	 * @param player player to check
+	 * @return whenever it's possible to use this item in player's position
+	 */
+	public boolean canUse(InGamePlayer player);
 
 }

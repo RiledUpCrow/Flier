@@ -103,6 +103,24 @@ public class DefaultUsableItem extends DefaultItem implements UsableItem {
 	}
 
 	@Override
+	public boolean canUse(InGamePlayer player) {
+		boolean air = player.getPlayer().isGliding();
+		boolean ground = !air && Utils.getAltitude(player.getPlayer().getLocation(), 4) < 4;
+		boolean fall = !ground && !air;
+		switch (where) {
+		case GROUND:	 return ground;
+		case AIR:		 return air;
+		case FALL:		 return fall;
+		case NO_GROUND:	 return !ground;
+		case NO_AIR:	 return !air;
+		case NO_FALL:	 return !fall;
+		case EVERYWHERE: return true;
+		case NOWHERE:    return false;
+		}
+		return false;
+	}
+
+	@Override
 	public List<Usage> getUsages() {
 		return usages;
 	}
@@ -143,21 +161,5 @@ public class DefaultUsableItem extends DefaultItem implements UsableItem {
 		} catch (LoadingException e) {
 			return null; // dead code
 		}
-	}
-
-	private boolean canUse(InGamePlayer player) {
-		boolean ground = Utils.getAltitude(player.getPlayer().getLocation(), 4) < 4;
-		boolean air = player.getPlayer().isGliding();
-		boolean fall = !ground && !air;
-		switch (where) {
-		case GROUND:	 return ground;
-		case AIR:		 return air;
-		case FALL:		 return fall;
-		case NO_GROUND:	 return !ground;
-		case NO_AIR:	 return !air;
-		case NO_FALL:	 return !fall;
-		case EVERYWHERE: return true;
-		}
-		return false;
 	}
 }
