@@ -11,7 +11,6 @@ import org.bukkit.configuration.ConfigurationSection;
 import pl.betoncraft.flier.Flier;
 import pl.betoncraft.flier.api.Engine;
 import pl.betoncraft.flier.exception.LoadingException;
-import pl.betoncraft.flier.util.ValueLoader;
 
 /**
  * Default Engine implementation.
@@ -29,11 +28,10 @@ public abstract class DefaultEngine extends DefaultItem implements Engine {
 
 	public DefaultEngine(ConfigurationSection section) throws LoadingException {
 		super(section);
-		maxFuel = ValueLoader.loadPositiveDouble(section, "max_fuel");
-		consumption = ValueLoader.loadNonNegativeDouble(section, "consumption");
-		regeneration = ValueLoader.loadNonNegativeDouble(section, "regeneration");
-		glowTime = ValueLoader.loadNonNegativeInt(section, "glow_time");
-		
+		maxFuel = loader.loadPositiveDouble("max_fuel");
+		consumption = loader.loadNonNegativeDouble("consumption");
+		regeneration = loader.loadNonNegativeDouble("regeneration");
+		glowTime = loader.loadNonNegativeInt("glow_time");
 		fuel = maxFuel;
 	}
 

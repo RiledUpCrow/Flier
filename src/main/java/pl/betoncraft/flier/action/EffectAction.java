@@ -18,7 +18,6 @@ import pl.betoncraft.flier.api.Effect;
 import pl.betoncraft.flier.api.InGamePlayer;
 import pl.betoncraft.flier.core.defaults.DefaultAction;
 import pl.betoncraft.flier.exception.LoadingException;
-import pl.betoncraft.flier.util.ValueLoader;
 
 /**
  * An action type which adds a specified effect.
@@ -34,8 +33,8 @@ public class EffectAction extends DefaultAction {
 
 	public EffectAction(ConfigurationSection section) throws LoadingException {
 		super(section);
-		effect = ValueLoader.loadEffect(section, "effect");
-		duration = ValueLoader.loadPositiveInt(section, "duration");
+		effect = loader.loadEffect("effect");
+		duration = loader.loadPositiveInt("duration");
 	}
 
 	@Override

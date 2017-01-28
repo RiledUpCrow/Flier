@@ -31,6 +31,8 @@ import pl.betoncraft.flier.util.ValueLoader;
  * @author Jakub Sapalski
  */
 public class DefaultSet implements ItemSet {
+	
+	protected ValueLoader loader;
 
 	protected final AddType addType;
 	protected String name;
@@ -46,12 +48,13 @@ public class DefaultSet implements ItemSet {
 	}
 
 	public DefaultSet(ConfigurationSection section) throws LoadingException {
-		addType = ValueLoader.loadEnum(section, "type", AddType.class);
+		loader = new ValueLoader(section);
+		addType = loader.loadEnum("type", AddType.class);
 		if (addType == AddType.RESET) {
 			return;
 		}
 		name = section.getString("name");
-		saving = section.getBoolean("saving", true);
+		saving = loader.loadBoolean("saving", true);
 		String engineName = section.getString("engine");
 		if (engineName == null) {
 			engine = null;

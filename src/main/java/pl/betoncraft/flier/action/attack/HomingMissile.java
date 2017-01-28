@@ -18,10 +18,9 @@ import org.bukkit.util.Vector;
 import pl.betoncraft.flier.Flier;
 import pl.betoncraft.flier.api.Damager;
 import pl.betoncraft.flier.api.Game.Attitude;
-import pl.betoncraft.flier.core.defaults.DefaultAttack;
 import pl.betoncraft.flier.api.InGamePlayer;
+import pl.betoncraft.flier.core.defaults.DefaultAttack;
 import pl.betoncraft.flier.exception.LoadingException;
-import pl.betoncraft.flier.util.ValueLoader;
 import pl.betoncraft.flier.util.Utils.ImmutableVector;
 
 /**
@@ -42,12 +41,12 @@ public class HomingMissile extends DefaultAttack {
 
 	public HomingMissile(ConfigurationSection section) throws LoadingException {
 		super(section);
-		entity = ValueLoader.loadEnum(section, "entity", EntityType.class);
-		searchRange = ValueLoader.loadPositiveInt(section, "search_range");
-		searchRadius = ValueLoader.loadPositiveDouble(section, "search_radius");
-		speed = ValueLoader.loadPositiveDouble(section, "speed");
-		lifetime = ValueLoader.loadPositiveInt(section, "lifetime");
-		maneuverability = ValueLoader.loadPositiveDouble(section, "maneuverability");
+		entity = loader.loadEnum("entity", EntityType.class);
+		searchRange = loader.loadPositiveInt("search_range");
+		searchRadius = loader.loadPositiveDouble("search_radius");
+		speed = loader.loadPositiveDouble("speed");
+		lifetime = loader.loadPositiveInt("lifetime");
+		maneuverability = loader.loadPositiveDouble("maneuverability");
 		radius = searchRange / 2;
 		radiusSqr = radius * radius;
 	}

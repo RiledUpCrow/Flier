@@ -28,6 +28,8 @@ import pl.betoncraft.flier.util.ValueLoader;
  */
 public class DefaultUsage implements Usage {
 	
+	protected ValueLoader loader;
+	
 	protected int cooldown;
 	protected int ammoUse;
 	protected final Where where;
@@ -35,9 +37,10 @@ public class DefaultUsage implements Usage {
 	protected List<Action> actions = new ArrayList<>();
 	
 	public DefaultUsage(ConfigurationSection section) throws LoadingException {
-		cooldown = ValueLoader.loadNonNegativeInt(section, "cooldown");
-		ammoUse = ValueLoader.loadInt(section, "ammo_use");
-		where = ValueLoader.loadEnum(section, "where", Where.class);
+		loader = new ValueLoader(section);
+		cooldown = loader.loadNonNegativeInt("cooldown", 0);
+		ammoUse = loader.loadInt("ammo_use", 0);
+		where = loader.loadEnum("where", Where.EVERYWHERE, Where.class);
 		for (String activator : section.getStringList("activators")) {
 			activators.add(Flier.getInstance().getActivator(activator));
 		}

@@ -66,9 +66,10 @@ public class TeamDeathMatch extends DefaultGame {
 		private ChatColor color;
 		
 		public SimpleTeam(ConfigurationSection section) throws LoadingException {
-			spawn = ValueLoader.loadLocation(section, "location");
-			color = ValueLoader.loadEnum(section, "color", ChatColor.class);
-			name = ChatColor.translateAlternateColorCodes('&', ValueLoader.loadString(section, "name"));
+			ValueLoader loader = new ValueLoader(section);
+			spawn = loader.loadLocation("location");
+			color = loader.loadEnum("color", ChatColor.class);
+			name = ChatColor.translateAlternateColorCodes('&', loader.loadString("name"));
 		}
 
 		public int getScore() {

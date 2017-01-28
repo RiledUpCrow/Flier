@@ -28,6 +28,8 @@ import pl.betoncraft.flier.util.ValueLoader;
  * @author Jakub Sapalski
  */
 public abstract class DefaultItem implements Item {
+
+	protected final ValueLoader loader;
 	
 	protected final String id;
 
@@ -39,8 +41,9 @@ public abstract class DefaultItem implements Item {
 
 	public DefaultItem(ConfigurationSection section) throws LoadingException {
 		id = section.getName();
-		Material type = ValueLoader.loadEnum(section, "material", Material.class);
-		String name = ChatColor.translateAlternateColorCodes('&', ValueLoader.loadString(section, "name"));
+		loader = new ValueLoader(section);
+		Material type = loader.loadEnum("material", Material.class);
+		String name = ChatColor.translateAlternateColorCodes('&', loader.loadString("name"));
 		List<String> lore = section.getStringList("lore");
 		for (int i = 0; i < lore.size(); i++) {
 			lore.set(i, ChatColor.translateAlternateColorCodes('&', lore.get(i)));
@@ -51,8 +54,8 @@ public abstract class DefaultItem implements Item {
 		meta.setLore(lore);
 		meta.spigot().setUnbreakable(true);
 		item.setItemMeta(meta);
-		weight = ValueLoader.loadDouble(section, "weight");
-		slot = section.getInt("slot", -1);
+		weight = loader.loadDouble("weight", 0.0);
+		slot = loader.loadInt("slot", -1);
 		for (String effect : section.getStringList("passive_effects")) {
 			try {
 				Effect eff = Flier.getInstance().getEffect(effect);

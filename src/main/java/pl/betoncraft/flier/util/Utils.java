@@ -127,6 +127,9 @@ public class Utils {
 	 * @throws LoadingException 
 	 */
 	public static Location parseLocation(String string) throws LoadingException {
+		if (string == null) {
+			throw new LoadingException("Location is not defined.");
+		}
 		String[] parts = string.split(";");
 		if (parts.length >= 4) {
 			World world = Bukkit.getWorld(parts[3]);

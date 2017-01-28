@@ -15,7 +15,6 @@ import pl.betoncraft.flier.Flier;
 import pl.betoncraft.flier.api.InGamePlayer;
 import pl.betoncraft.flier.core.defaults.DefaultAction;
 import pl.betoncraft.flier.exception.LoadingException;
-import pl.betoncraft.flier.util.ValueLoader;
 
 /**
  * Launches players in the direction of looking.
@@ -28,7 +27,7 @@ public class LaunchAction extends DefaultAction {
 
 	public LaunchAction(ConfigurationSection section) throws LoadingException {
 		super(section);
-		speed = ValueLoader.loadPositiveDouble(section, "speed");
+		speed = loader.loadPositiveDouble("speed");
 	}
 
 	@Override

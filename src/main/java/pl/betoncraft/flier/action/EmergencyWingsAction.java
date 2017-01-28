@@ -12,7 +12,6 @@ import pl.betoncraft.flier.api.InGamePlayer;
 import pl.betoncraft.flier.api.Wings;
 import pl.betoncraft.flier.core.defaults.DefaultAction;
 import pl.betoncraft.flier.exception.LoadingException;
-import pl.betoncraft.flier.util.ValueLoader;
 
 /**
  * An item which can raise wings' health above 0, thus recreating them.
@@ -25,7 +24,7 @@ public class EmergencyWingsAction extends DefaultAction {
 
 	public EmergencyWingsAction(ConfigurationSection section) throws LoadingException {
 		super(section);
-		amount = ValueLoader.loadNonNegativeDouble(section, "amount");
+		amount = loader.loadNonNegativeDouble("amount");
 	}
 
 	@Override

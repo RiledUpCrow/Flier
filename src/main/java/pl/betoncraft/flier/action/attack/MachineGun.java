@@ -24,7 +24,6 @@ import pl.betoncraft.flier.api.Damager;
 import pl.betoncraft.flier.api.InGamePlayer;
 import pl.betoncraft.flier.core.defaults.DefaultAttack;
 import pl.betoncraft.flier.exception.LoadingException;
-import pl.betoncraft.flier.util.ValueLoader;
 
 /**
  * Burst shooting weapon with unguided projectiles.
@@ -41,10 +40,10 @@ public class MachineGun extends DefaultAttack {
 	
 	public MachineGun(ConfigurationSection section) throws LoadingException {
 		super(section);
-		entity = ValueLoader.loadEnum(section, "entity", EntityType.class);
-		burstAmount = ValueLoader.loadPositiveInt(section, "burst_amount");
-		burstTicks = ValueLoader.loadPositiveInt(section, "burst_ticks");
-		projectileSpeed = ValueLoader.loadPositiveDouble(section, "projectile_speed");
+		entity = loader.loadEnum("entity", EntityType.class);
+		burstAmount = loader.loadPositiveInt("burst_amount");
+		burstTicks = loader.loadPositiveInt("burst_ticks");
+		projectileSpeed = loader.loadPositiveDouble("projectile_speed");
 	}
 	
 	@Override

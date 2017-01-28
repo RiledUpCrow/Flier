@@ -11,7 +11,6 @@ import org.bukkit.configuration.ConfigurationSection;
 import pl.betoncraft.flier.api.InGamePlayer;
 import pl.betoncraft.flier.core.defaults.DefaultAction;
 import pl.betoncraft.flier.exception.LoadingException;
-import pl.betoncraft.flier.util.ValueLoader;
 
 /**
  * Adds or removes money from player.
@@ -24,7 +23,7 @@ public class MoneyAction extends DefaultAction {
 
 	public MoneyAction(ConfigurationSection section) throws LoadingException {
 		super(section);
-		money = ValueLoader.loadInt(section, "money");
+		money = loader.loadInt("money");
 	}
 
 	@Override

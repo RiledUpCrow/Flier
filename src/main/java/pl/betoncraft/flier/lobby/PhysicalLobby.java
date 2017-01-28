@@ -68,18 +68,19 @@ public class PhysicalLobby implements Lobby, Listener {
 	private List<UUID> blocked = new LinkedList<>();
 
 	public PhysicalLobby(ConfigurationSection section) throws LoadingException {
-		respawnAction = ValueLoader.loadEnum(section, "respawn_action", RespawnAction.class);
-		spawn = ValueLoader.loadLocation(section, "spawn");
+		ValueLoader loader = new ValueLoader(section);
+		respawnAction = loader.loadEnum("respawn_action", RespawnAction.class);
+		spawn = loader.loadLocation("spawn");
 		for (String loc : section.getStringList("join")) {
 			join.add(Utils.parseLocation(loc).getBlock());
 		}
-		start = ValueLoader.loadLocation(section, "start").getBlock();
-		leave = ValueLoader.loadLocation(section, "leave").getBlock();
+		start = loader.loadLocation("start").getBlock();
+		leave = loader.loadLocation("leave").getBlock();
 		ConfigurationSection itemsSection = section.getConfigurationSection("items");
 		if (itemsSection != null) for (String i : itemsSection.getKeys(false)) {
 			ConfigurationSection itemSection = itemsSection.getConfigurationSection(i);
 			try {
-				blocks.put(ValueLoader.loadLocation(itemSection, "block").getBlock(), new ItemBlock(itemSection));
+				blocks.put(Utils.parseLocation(itemSection.getString("block")).getBlock(), new ItemBlock(itemSection));
 			} catch (LoadingException e) {
 				throw (LoadingException) new LoadingException(String.format("Error in '%s' item set.", i)).initCause(e);
 			}

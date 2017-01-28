@@ -20,7 +20,6 @@ import pl.betoncraft.flier.api.UsableItem;
 import pl.betoncraft.flier.api.Usage;
 import pl.betoncraft.flier.core.defaults.DefaultItem;
 import pl.betoncraft.flier.exception.LoadingException;
-import pl.betoncraft.flier.util.ValueLoader;
 
 /**
  * Default implementation of UsableItem.
@@ -39,8 +38,8 @@ public class DefaultUsableItem extends DefaultItem implements UsableItem {
 
 	public DefaultUsableItem(ConfigurationSection section) throws LoadingException {
 		super(section);
-		consumable = ValueLoader.loadBoolean(section, "consumable");
-		maxAmmo = ValueLoader.loadNonNegativeInt(section, "ammo");
+		consumable = loader.loadBoolean("consumable", false);
+		maxAmmo = loader.loadNonNegativeInt("ammo", 0);
 		ammo = maxAmmo;
 		ConfigurationSection usagesSection = section.getConfigurationSection("usages");
 		if (usagesSection != null) for (String id : usagesSection.getKeys(false)) {

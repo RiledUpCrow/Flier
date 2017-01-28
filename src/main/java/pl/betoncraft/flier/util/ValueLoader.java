@@ -10,6 +10,8 @@ import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 
 import pl.betoncraft.flier.Flier;
+import pl.betoncraft.flier.api.Action;
+import pl.betoncraft.flier.api.Activator;
 import pl.betoncraft.flier.api.Effect;
 import pl.betoncraft.flier.api.Engine;
 import pl.betoncraft.flier.api.Wings;
@@ -23,7 +25,13 @@ import pl.betoncraft.flier.exception.LoadingException;
  */
 public class ValueLoader {
 	
-	public static String loadString(ConfigurationSection section, String address) throws LoadingException {
+	private ConfigurationSection section;
+	
+	public ValueLoader(ConfigurationSection section) {
+		this.section = section;
+	}
+	
+	public String loadString(String address) throws LoadingException {
 		String value = section.getString(address, null);
 		if (value == null) {
 			throw new LoadingException(String.format("'%s' must be specified.", address));
@@ -31,98 +39,167 @@ public class ValueLoader {
 		return value;
 	}
 	
-	public static double loadDouble(ConfigurationSection section, String address) throws LoadingException {
-		if (!section.contains(address) || !(section.isDouble(address) || section.isInt(address))) {
-			throw new LoadingException(String.format("'%s' must be specified decimal.", address));
-		}
-		return section.getDouble(address);
+	public String loadString(String address, String def) {
+		return section.getString(address, def);
 	}
 	
-	public static double loadPositiveDouble(ConfigurationSection section, String address) throws LoadingException {
-		double value = loadDouble(section, address);
+	private Object get(String address, Object def) throws LoadingException {
+		if (section.contains(address)) {
+			return section.get(address);
+		} else if (def == null) {
+			throw new LoadingException(String.format("'%s' must be specified.", address));
+		} else {
+			return def;
+		}
+	}
+	
+	public double loadDouble(String address, Double def) throws LoadingException {
+		Object obj = get(address, def);
+		if (obj instanceof Number) {
+			return ((Number) obj).doubleValue();
+		} else {
+			throw new LoadingException(String.format("'%s' must be a decimal.", address));
+		}
+	}
+	
+	public double loadDouble(String address) throws LoadingException {
+		return loadDouble(address, null);
+	}
+	
+	public double loadPositiveDouble(String address, Double def) throws LoadingException {
+		double value = loadDouble(address, def);
 		if (value <= 0) {
 			throw new LoadingException(String.format("'%s' must be a positive decimal.", address));
 		}
 		return value;
 	}
 	
-	public static double loadNonNegativeDouble(ConfigurationSection section, String address) throws LoadingException {
-		double value = loadDouble(section, address);
+	public double loadPositiveDouble(String address) throws LoadingException {
+		return loadPositiveDouble(address, null);
+	}
+	
+	public double loadNonNegativeDouble(String address, Double def) throws LoadingException {
+		double value = loadDouble(address, def);
 		if (value < 0) {
 			throw new LoadingException(String.format("'%s' must not be a negative decimal.", address));
 		}
 		return value;
 	}
 	
-	public static int loadInt(ConfigurationSection section, String address) throws LoadingException {
-		if (!section.contains(address) || !section.isInt(address)) {
-			throw new LoadingException(String.format("'%s' must be specified integer.", address));
-		}
-		return section.getInt(address);
+	public double loadNonNegativeDouble(String address) throws LoadingException {
+		return loadNonNegativeDouble(address, null);
 	}
 	
-	public static int loadPositiveInt(ConfigurationSection section, String address) throws LoadingException {
-		int value = loadInt(section, address);
+	public int loadInt(String address, Integer def) throws LoadingException {
+		Object obj = get(address, def);
+		if (obj instanceof Number) {
+			return ((Number) obj).intValue();
+		} else {
+			throw new LoadingException(String.format("'%s' must be an integer.", address));
+		}
+	}
+	
+	public int loadInt(String address) throws LoadingException {
+		return loadInt(address, null);
+	}
+	
+	public int loadPositiveInt(String address, Integer def) throws LoadingException {
+		int value = loadInt(address, def);
 		if (value <= 0) {
 			throw new LoadingException(String.format("'%s' must be a positive integer.", address));
 		}
 		return value;
 	}
 	
-	public static int loadNonNegativeInt(ConfigurationSection section, String address) throws LoadingException {
-		int value = loadInt(section, address);
+	public int loadPositiveInt(String address) throws LoadingException {
+		return loadPositiveInt(address, null);
+	}
+	
+	public int loadNonNegativeInt(String address, Integer def) throws LoadingException {
+		int value = loadInt(address, def);
 		if (value < 0) {
 			throw new LoadingException(String.format("'%s' must not be a negative integer.", address));
 		}
 		return value;
 	}
 	
-	public static boolean loadBoolean(ConfigurationSection section, String address) throws LoadingException {
-		if (!section.contains(address) || !section.isBoolean(address)) {
-			throw new LoadingException(String.format("'%s' must be either true or false.", address));
-		}
-		return section.getBoolean(address);
+	public int loadNonNegativeInt(String address) throws LoadingException {
+		return loadNonNegativeInt(address, null);
 	}
 	
-	public static Location loadLocation(ConfigurationSection section, String address) throws LoadingException {
-		try {
-			String string = loadString(section, address);
-			return Utils.parseLocation(string);
-		} catch (LoadingException e) {
-			throw (LoadingException) new LoadingException(String.format("Error in '%s' location.", address))
-					.initCause(e);
+	public boolean loadBoolean(String address, Boolean def) throws LoadingException {
+		Object obj = get(address, def);
+		if (obj instanceof Boolean) {
+			return (Boolean) obj;
+		} else {
+			throw new LoadingException(String.format("'%s' must be either `true` or `false`.", address));
 		}
 	}
 	
-	public static <T extends Enum<T>> T loadEnum(ConfigurationSection section, String address, Class<T> enumClass)
-			throws LoadingException {
-		try {
-			String enumName = loadString(section, address);
+	public boolean loadBoolean(String address) throws LoadingException {
+		return loadBoolean(address, null);
+	}
+	
+	public Location loadLocation(String address, Location def) throws LoadingException {
+		Object obj = get(address, def);
+		if (obj instanceof Location) {
+			return (Location) obj;
+		} else if (obj instanceof String) {
 			try {
-				return Enum.valueOf(enumClass, enumName.toUpperCase().replace(' ', '_'));
-			} catch (IllegalArgumentException e) {
-				throw new LoadingException(String.format("%s '%s' does not exist.", enumClass.getSimpleName(), enumName));
+				return Utils.parseLocation((String) obj);
+			} catch (LoadingException e) {
+				throw (LoadingException) new LoadingException(String.format("Error in '%s' location.", address))
+						.initCause(e);
 			}
-		} catch (LoadingException e) {
-			throw (LoadingException) new LoadingException(String.format("Error in '%s' %s.", address,
-					enumClass.getSimpleName())).initCause(e);
+		} else {
+			throw new LoadingException(String.format("'%s' must be a location.", address));
 		}
 	}
 	
-	public static Effect loadEffect(ConfigurationSection section, String address) throws LoadingException {
-		String effectName = loadString(section, address);
-		return Flier.getInstance().getEffect(effectName);
+	public Location loadLocation(String address) throws LoadingException {
+		return loadLocation(address, null);
 	}
 	
-	public static Engine loadEngine(ConfigurationSection section, String address) throws LoadingException {
-		String engineName = loadString(section, address);
-		return Flier.getInstance().getEngine(engineName);
+	@SuppressWarnings("unchecked")
+	public <T extends Enum<T>> T loadEnum(String address, T def, Class<T> enumClass) throws LoadingException {
+		Object obj = get(address, def);
+		if (enumClass.isInstance(obj)) {
+			return (T) obj;
+		} else if (obj instanceof String) {
+			try {
+				return Enum.valueOf(enumClass, ((String) obj).toUpperCase().replace(' ', '_'));
+			} catch (IllegalArgumentException e) {
+				Exception detail = new LoadingException(String.format("%s '%s' does not exist.", enumClass.getSimpleName(), ((String) obj)));
+				Exception error  = new LoadingException(String.format("'%s' must be a valid type.", address));
+				throw (LoadingException) error.initCause(detail);
+			}
+		} else {
+			throw new LoadingException(String.format("'%s' must be a valid type.", address, enumClass.getSimpleName()));
+		}
 	}
 	
-	public static Wings loadWings(ConfigurationSection section, String address) throws LoadingException {
-		String wingsName = loadString(section, address);
-		return Flier.getInstance().getWing(wingsName);
+	public <T extends Enum<T>> T loadEnum(String address, Class<T> enumClass) throws LoadingException {
+		return loadEnum(address, null, enumClass);
 	}
 	
+	public Effect loadEffect(String address) throws LoadingException {
+		return Flier.getInstance().getEffect(loadString(address));
+	}
+	
+	public Action loadAction(String address) throws LoadingException {
+		return Flier.getInstance().getAction(loadString(address));
+	}
+	
+	public Activator loadActivator(String address) throws LoadingException {
+		return Flier.getInstance().getActivator(loadString(address));
+	}
+	
+	public Engine loadEngine(String address) throws LoadingException {
+		return Flier.getInstance().getEngine(loadString(address));
+	}
+	
+	public Wings loadWings(String address) throws LoadingException {
+		return Flier.getInstance().getWing(loadString(address));
+	}
 
 }

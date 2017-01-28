@@ -10,7 +10,6 @@ import org.bukkit.configuration.ConfigurationSection;
 
 import pl.betoncraft.flier.core.defaults.DefaultEngine;
 import pl.betoncraft.flier.exception.LoadingException;
-import pl.betoncraft.flier.util.ValueLoader;
 import pl.betoncraft.flier.util.Utils.ImmutableVector;
 
 /**
@@ -26,9 +25,9 @@ public class MultiplyingEngine extends DefaultEngine {
 	
 	public MultiplyingEngine(ConfigurationSection section) throws LoadingException {
 		super(section);
-		maxSpeed = ValueLoader.loadNonNegativeDouble(section, "max_speed");
-		minSpeed = ValueLoader.loadNonNegativeDouble(section, "min_speed");
-		acceleration = ValueLoader.loadNonNegativeDouble(section, "acceleration");
+		maxSpeed = loader.loadNonNegativeDouble("max_speed");
+		minSpeed = loader.loadNonNegativeDouble("min_speed");
+		acceleration = loader.loadNonNegativeDouble("acceleration");
 	}
 	
 	@Override

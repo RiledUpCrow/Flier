@@ -61,24 +61,27 @@ import pl.betoncraft.flier.util.ValueLoader;
  */
 public abstract class DefaultGame implements Listener, Game {
 
+	protected final ValueLoader loader;
+
 	protected GameHeartBeat heartBeat;
 	protected Map<UUID, InGamePlayer> dataMap = new HashMap<>();
 	protected List<Bonus> bonuses = new ArrayList<>();
 	
 	protected int heightLimit;
 	protected double heightDamage;
-	protected boolean useMoney = false;
-	protected int enemyKillMoney = 0;
-	protected int enemyHitMoney = 0;
-	protected int friendlyKillMoney = 0;
-	protected int friendlyHitMoney = 0;
-	protected int byEnemyDeathMoney = 0;
-	protected int byEnemyHitMoney = 0;
-	protected int byFriendlyDeathMoney = 0;
-	protected int byFriendlyHitMoney = 0;
-	protected int suicideMoney = 0;
+	protected boolean useMoney;
+	protected int enemyKillMoney;
+	protected int enemyHitMoney;
+	protected int friendlyKillMoney;
+	protected int friendlyHitMoney;
+	protected int byEnemyDeathMoney;
+	protected int byEnemyHitMoney;
+	protected int byFriendlyDeathMoney;
+	protected int byFriendlyHitMoney;
+	protected int suicideMoney;
 	
 	public DefaultGame(ConfigurationSection section) throws LoadingException {
+		loader = new ValueLoader(section);
 		for (String bonusName : section.getStringList("bonuses")) {
 			try {
 				bonuses.add(Flier.getInstance().getBonus(bonusName));
@@ -87,18 +90,18 @@ public abstract class DefaultGame implements Listener, Game {
 						.initCause(e);
 			}
 		}
-		heightLimit = ValueLoader.loadInt(section, "height_limit");
-		heightDamage = ValueLoader.loadNonNegativeDouble(section, "height_damage");
-		useMoney = section.getBoolean("money.enabled", useMoney);
-		enemyKillMoney = section.getInt("money.enemy_kill", enemyKillMoney);
-		enemyHitMoney = section.getInt("money.enemy_hit", enemyHitMoney);
-		friendlyKillMoney = section.getInt("money.friendly_kill", friendlyKillMoney);
-		friendlyHitMoney = section.getInt("money.friendly_hit", friendlyHitMoney);
-		byEnemyDeathMoney = section.getInt("money.by_enemy_death", byEnemyDeathMoney);
-		byEnemyHitMoney = section.getInt("money.by_enemy_hit", byEnemyHitMoney);
-		byFriendlyDeathMoney = section.getInt("money.by_friendly_death", byFriendlyDeathMoney);
-		byFriendlyHitMoney = section.getInt("money.by_friendly_hit", byFriendlyHitMoney);
-		suicideMoney = section.getInt("money.suicide", suicideMoney);
+		heightLimit = loader.loadInt("height_limit", 512);
+		heightDamage = loader.loadNonNegativeDouble("height_damage", 0.5);
+		useMoney = loader.loadBoolean("money.enabled", false);
+		enemyKillMoney = loader.loadInt("money.enemy_kill", 0);
+		enemyHitMoney = loader.loadInt("money.enemy_hit", 0);
+		friendlyKillMoney = loader.loadInt("money.friendly_kill", 0);
+		friendlyHitMoney = loader.loadInt("money.friendly_hit", 0);
+		byEnemyDeathMoney = loader.loadInt("money.by_enemy_death", 0);
+		byEnemyHitMoney = loader.loadInt("money.by_enemy_hit", 0);
+		byFriendlyDeathMoney = loader.loadInt("money.by_friendly_death", 0);
+		byFriendlyHitMoney = loader.loadInt("money.by_friendly_hit", 0);
+		suicideMoney = loader.loadInt("money.suicide", 0);
 	}
 	
 	public class GameHeartBeat extends BukkitRunnable {

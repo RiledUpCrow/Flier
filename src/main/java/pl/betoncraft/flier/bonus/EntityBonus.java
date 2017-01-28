@@ -49,12 +49,13 @@ public class EntityBonus implements Bonus {
 	
 	public EntityBonus(ConfigurationSection section) throws LoadingException {
 		id = section.getName();
-		distance = ValueLoader.loadPositiveDouble(section, "distance");
-		consumable = ValueLoader.loadBoolean(section, "consumable");
-		cooldown = ValueLoader.loadNonNegativeInt(section, "cooldown");
-		respawn = ValueLoader.loadNonNegativeInt(section, "respawn");
-		type = ValueLoader.loadEnum(section, "entity", EntityType.class);
-		location = ValueLoader.loadLocation(section, "location");
+		ValueLoader loader = new ValueLoader(section);
+		distance = loader.loadPositiveDouble("distance");
+		consumable = loader.loadBoolean("consumable");
+		cooldown = loader.loadNonNegativeInt("cooldown");
+		respawn = loader.loadNonNegativeInt("respawn");
+		type = loader.loadEnum("entity", EntityType.class);
+		location = loader.loadLocation("location");
 		for (String id : section.getStringList("actions")) {
 			actions.add(Flier.getInstance().getAction(id));
 		}

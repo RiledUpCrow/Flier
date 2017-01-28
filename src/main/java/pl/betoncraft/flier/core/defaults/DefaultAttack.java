@@ -10,7 +10,6 @@ import org.bukkit.configuration.ConfigurationSection;
 
 import pl.betoncraft.flier.api.Attack;
 import pl.betoncraft.flier.exception.LoadingException;
-import pl.betoncraft.flier.util.ValueLoader;
 
 /**
  * A default Weapon implementation.
@@ -29,13 +28,13 @@ public abstract class DefaultAttack extends DefaultAction implements Attack {
 	
 	public DefaultAttack(ConfigurationSection section) throws LoadingException {
 		super(section);
-		suicidal = ValueLoader.loadBoolean(section, "suicidal");
-		friendlyFire = ValueLoader.loadBoolean(section, "friendly_fire");
-		damage = ValueLoader.loadDouble(section, "damage");
-		wingsOff = ValueLoader.loadBoolean(section, "wings_off");
-		killsOnGround = ValueLoader.loadBoolean(section, "kills_on_ground");
-		physicalDamage = ValueLoader.loadDouble(section, "physical_damage");
-		isExploding = ValueLoader.loadBoolean(section, "exploding");
+		suicidal = loader.loadBoolean("suicidal", false);
+		friendlyFire = loader.loadBoolean("friendly_fire", true);
+		damage = loader.loadDouble("damage");
+		wingsOff = loader.loadBoolean("wings_off", false);
+		killsOnGround = loader.loadBoolean("kills_on_ground", false);
+		physicalDamage = loader.loadDouble("physical_damage");
+		isExploding = loader.loadBoolean("exploding", false);
 	}
 	
 	@Override

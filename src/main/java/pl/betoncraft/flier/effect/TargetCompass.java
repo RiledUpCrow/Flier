@@ -24,7 +24,7 @@ public class TargetCompass implements Effect {
 	private final Attitude target;
 	
 	public TargetCompass(ConfigurationSection section) throws LoadingException {
-		this.target = ValueLoader.loadEnum(section, "target", Attitude.class);
+		this.target = new ValueLoader(section).loadEnum("target", Attitude.HOSTILE, Attitude.class);
 	}
 
 	@Override
