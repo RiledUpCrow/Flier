@@ -32,28 +32,30 @@ import pl.betoncraft.flier.util.ValueLoader;
  */
 public class TeamDeathMatch extends DefaultGame {
 	
-	private Map<String, SimpleTeam> teams = new HashMap<>();
-	private Map<String, TeamLine> lines = new HashMap<>();
-	private Map<UUID, SimpleTeam> players = new HashMap<>();
+	protected final Map<String, SimpleTeam> teams = new HashMap<>();
+	protected final Map<String, TeamLine> lines = new HashMap<>();
+	protected final Map<UUID, SimpleTeam> players = new HashMap<>();
 	
-	private int suicideScore = -1;
-	private int friendlyKillScore = -1;
-	private int enemyKillScore = 1;
+	protected final int suicideScore;
+	protected final int friendlyKillScore;
+	protected final int enemyKillScore;
 	
 	public TeamDeathMatch(ConfigurationSection section) throws LoadingException {
 		super(section);
+		suicideScore = loader.loadInt("suicide_score", 0);
+		friendlyKillScore = loader.loadInt("friendly_kill_score", 0);
+		enemyKillScore = loader.loadInt("enemy_kill_score", 1);
 		ConfigurationSection teams = section.getConfigurationSection("teams");
-		if (teams != null) {
-			for (String t : teams.getKeys(false)) {
-				try {
-					SimpleTeam team = new SimpleTeam(teams.getConfigurationSection(t));
-					this.teams.put(t, team);
-					this.lines.put(t, new TeamLine(team));
-				} catch (LoadingException e) {
-					throw (LoadingException) new LoadingException(String.format("Error in '%s' team.", t)).initCause(e);
-				}
+		if (teams != null) for (String t : teams.getKeys(false)) {
+			try {
+				SimpleTeam team = new SimpleTeam(teams.getConfigurationSection(t));
+				this.teams.put(t, team);
+				this.lines.put(t, new TeamLine(team));
+			} catch (LoadingException e) {
+				throw (LoadingException) new LoadingException(String.format("Error in '%s' team.", t)).initCause(e);
 			}
-		} else {
+		}
+		if (this.teams.isEmpty()) {
 			throw new LoadingException("Teams must be defined.");
 		}
 	}
