@@ -164,15 +164,6 @@ public class EntityBonus implements Bonus {
 		return actions;
 	}
 	
-	@Override
-	public Bonus replicate() {
-		try {
-			return Flier.getInstance().getBonus(id);
-		} catch (LoadingException e) {
-			return null; // dead code
-		}
-	}
-	
 	private boolean use(InGamePlayer player) {
 		boolean used = false;
 		for (Action action : actions) {

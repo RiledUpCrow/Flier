@@ -8,9 +8,7 @@ package pl.betoncraft.flier.core.defaults;
 
 import org.bukkit.configuration.ConfigurationSection;
 
-import pl.betoncraft.flier.Flier;
 import pl.betoncraft.flier.api.Action;
-import pl.betoncraft.flier.exception.LoadingException;
 import pl.betoncraft.flier.util.ValueLoader;
 
 /**
@@ -26,15 +24,6 @@ public abstract class DefaultAction implements Action {
 	public DefaultAction(ConfigurationSection section) {
 		id = section.getName();
 		loader = new ValueLoader(section);
-	}
-
-	@Override
-	public Action replicate() {
-		try {
-			return Flier.getInstance().getAction(id);
-		} catch (LoadingException e) {
-			return null; // dead code
-		}
 	}
 
 }

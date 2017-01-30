@@ -11,7 +11,7 @@ package pl.betoncraft.flier.api;
  *
  * @author Jakub Sapalski
  */
-public interface Action extends Replicable {
+public interface Action {
 	
 	/**
 	 * Performs the action on specified player.

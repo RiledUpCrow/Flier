@@ -8,9 +8,7 @@ package pl.betoncraft.flier.core.defaults;
 
 import org.bukkit.configuration.ConfigurationSection;
 
-import pl.betoncraft.flier.Flier;
 import pl.betoncraft.flier.api.Activator;
-import pl.betoncraft.flier.exception.LoadingException;
 import pl.betoncraft.flier.util.ValueLoader;
 
 /**
@@ -26,15 +24,6 @@ public abstract class DefaultActivator implements Activator {
 	public DefaultActivator(ConfigurationSection section) {
 		id = section.getName();
 		loader = new ValueLoader(section);
-	}
-
-	@Override
-	public Activator replicate() {
-		try {
-			return Flier.getInstance().getActivator(id);
-		} catch (LoadingException e) {
-			return null; // dead code
-		}
 	}
 
 }
