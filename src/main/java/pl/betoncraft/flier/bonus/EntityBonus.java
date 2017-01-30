@@ -18,6 +18,9 @@ import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.world.ChunkUnloadEvent;
 
 import pl.betoncraft.flier.Flier;
 import pl.betoncraft.flier.api.Action;
@@ -59,6 +62,14 @@ public class EntityBonus implements Bonus {
 		for (String id : section.getStringList("actions")) {
 			actions.add(Flier.getInstance().getAction(id));
 		}
+		Bukkit.getPluginManager().registerEvents(new Listener() {
+			@EventHandler
+			public void onChunkUnload(ChunkUnloadEvent event) {
+				if (entity != null && entity.getLocation().getChunk().equals(event.getChunk())) {
+					entity.remove();
+				}
+			}
+		}, Flier.getInstance());
 	}
 	
 	@Override
