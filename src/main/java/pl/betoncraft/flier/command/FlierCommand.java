@@ -31,6 +31,7 @@ public class FlierCommand implements CommandExecutor {
 		arguments.add(new JoinLobbyArgument());
 		arguments.add(new LeaveLobbyArgument());
 		arguments.add(new SetGameArgument());
+		arguments.add(new MoneyArgument());
 		arguments.add(new ReloadArgument());
 		Flier.getInstance().getCommand("flier").setExecutor(this);
 	}
