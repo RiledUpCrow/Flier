@@ -23,15 +23,16 @@ import pl.betoncraft.flier.action.EffectAction;
 import pl.betoncraft.flier.action.EmergencyWingsAction;
 import pl.betoncraft.flier.action.LaunchAction;
 import pl.betoncraft.flier.action.MoneyAction;
+import pl.betoncraft.flier.action.TargetAction;
 import pl.betoncraft.flier.action.attack.HomingMissile;
 import pl.betoncraft.flier.action.attack.MachineGun;
 import pl.betoncraft.flier.activator.LeftClickActivator;
 import pl.betoncraft.flier.activator.RightClickActivator;
+import pl.betoncraft.flier.activator.SlowTickActivator;
 import pl.betoncraft.flier.api.Action;
 import pl.betoncraft.flier.api.Activator;
 import pl.betoncraft.flier.api.Bonus;
 import pl.betoncraft.flier.api.Damager;
-import pl.betoncraft.flier.api.Effect;
 import pl.betoncraft.flier.api.Engine;
 import pl.betoncraft.flier.api.Game;
 import pl.betoncraft.flier.api.Lobby;
@@ -40,7 +41,6 @@ import pl.betoncraft.flier.api.Wings;
 import pl.betoncraft.flier.bonus.EntityBonus;
 import pl.betoncraft.flier.command.FlierCommand;
 import pl.betoncraft.flier.core.DefaultUsableItem;
-import pl.betoncraft.flier.effect.TargetCompass;
 import pl.betoncraft.flier.engine.MultiplyingEngine;
 import pl.betoncraft.flier.exception.LoadingException;
 import pl.betoncraft.flier.game.TeamDeathMatch;
@@ -55,7 +55,6 @@ public class Flier extends JavaPlugin {
 	private Map<String, Factory<Engine>> engineTypes = new HashMap<>();
 	private Map<String, Factory<Wings>> wingTypes = new HashMap<>();
 	private Map<String, Factory<Game>> gameTypes = new HashMap<>();
-	private Map<String, Factory<Effect>> effectTypes = new HashMap<>();
 	private Map<String, Factory<Lobby>> lobbyTypes = new HashMap<>();
 	private Map<String, Factory<Bonus>> bonusTypes = new HashMap<>();
 	private Map<String, Factory<Action>> actionTypes = new HashMap<>();
@@ -84,7 +83,6 @@ public class Flier extends JavaPlugin {
 		registerWings("simpleWings", s -> new SimpleWings(s));
 		registerLobby("fixedPhysicalLobby", s -> new PhysicalLobby(s));
 		registerGame("teamDeathMatch", s -> new TeamDeathMatch(s));
-		registerEffect("targetCompass", s -> new TargetCompass(s));
 		registerBonus("entity", s -> new EntityBonus(s));
 		registerAction("machineGun", s -> new MachineGun(s));
 		registerAction("homingMissile", s -> new HomingMissile(s));
@@ -92,8 +90,10 @@ public class Flier extends JavaPlugin {
 		registerAction("effect", s -> new EffectAction(s));
 		registerAction("money", s -> new MoneyAction(s));
 		registerAction("restoreWings", s -> new EmergencyWingsAction(s));
+		registerAction("targetCompass", s -> new TargetAction(s));
 		registerActivator("leftClick", s -> new LeftClickActivator(s));
 		registerActivator("rightClick", s -> new RightClickActivator(s));
+		registerActivator("slowTick", s -> new SlowTickActivator(s));
 
 		loadLobbies();
 		
@@ -191,16 +191,6 @@ public class Flier extends JavaPlugin {
 	 */
 	public Wings getWing(String id) throws LoadingException {
 		return getObject(id, "wing", "wings", wingTypes);
-	}
-
-	/**
-	 * @param id ID of the Effect
-	 * @return the Effect with specified name, never null
-	 * @throws LoadingException
-	 *             when the Effect cannot be created due to an error
-	 */
-	public Effect getEffect(String id) throws LoadingException {
-		return getObject(id, "effect", "effects", effectTypes);
 	}
 	
 	/**
@@ -312,19 +302,6 @@ public class Flier extends JavaPlugin {
 	 */
 	public void registerGame(String name, Factory<Game> factory) {
 		gameTypes.put(name, factory);
-	}
-
-	/**
-	 * Registers a new Effect type with specified name. The factory will be used
-	 * to obtain copies of the Effect.
-	 * 
-	 * @param name
-	 *            name of the type
-	 * @param factory
-	 *            factory which creates instances of that type
-	 */
-	public void registerEffect(String name, Factory<Effect> factory) {
-		effectTypes.put(name, factory);
 	}
 	
 	/**

@@ -158,22 +158,4 @@ public interface InGamePlayer {
 	 */
 	public void exitLobby();
 
-	/**
-	 * Adds an effect to the list of active effects. This is independent of item
-	 * effects.
-	 * 
-	 * @param effect
-	 *            the effect to add
-	 */
-	public void addEffect(Effect effect);
-
-	/**
-	 * Removes an effect from the list of active effects. This is independent of
-	 * item effects.
-	 * 
-	 * @param effect
-	 *            the effect to remove
-	 */
-	public void removeEffect(Effect effect);
-
 }

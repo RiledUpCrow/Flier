@@ -6,15 +6,14 @@
  */
 package pl.betoncraft.flier.action;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.ArrayList;
+import java.util.List;
 
-import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import pl.betoncraft.flier.Flier;
-import pl.betoncraft.flier.api.Effect;
+import pl.betoncraft.flier.api.Action;
 import pl.betoncraft.flier.api.InGamePlayer;
 import pl.betoncraft.flier.core.defaults.DefaultAction;
 import pl.betoncraft.flier.exception.LoadingException;
@@ -26,29 +25,32 @@ import pl.betoncraft.flier.exception.LoadingException;
  */
 public class EffectAction extends DefaultAction {
 	
-	private final Effect effect;
+	private final List<Action> actions = new ArrayList<>();
 	private final int duration;
-	
-	private Set<UUID> players = new HashSet<>();
 
 	public EffectAction(ConfigurationSection section) throws LoadingException {
 		super(section);
-		effect = loader.loadEffect("effect");
+		for (String actionName : section.getStringList("actions")) {
+			Action action = Flier.getInstance().getAction(actionName);
+			actions.add(action);
+		}
 		duration = loader.loadPositiveInt("duration");
 	}
 
 	@Override
 	public boolean act(InGamePlayer player) {
-		UUID uuid = player.getPlayer().getUniqueId();
-		if (players.contains(uuid)) {
-			return false;
-		}
-		players.add(uuid);
-		player.addEffect(effect);
-		Bukkit.getScheduler().scheduleSyncDelayedTask(Flier.getInstance(), () -> {
-			player.removeEffect(effect);
-			players.remove(uuid);
-		}, duration);
+		new BukkitRunnable() {
+			private int i = duration;
+			@Override
+			public void run() {
+				if (i-- == 0) {
+					cancel();
+				}
+				for (Action action : actions) {
+					action.act(player);
+				}
+			}
+		}.runTaskTimer(Flier.getInstance(), 0, 1);
 		return true;
 	}
 

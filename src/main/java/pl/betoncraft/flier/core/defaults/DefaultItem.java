@@ -6,8 +6,6 @@
  */
 package pl.betoncraft.flier.core.defaults;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.bukkit.ChatColor;
@@ -16,8 +14,6 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import pl.betoncraft.flier.Flier;
-import pl.betoncraft.flier.api.Effect;
 import pl.betoncraft.flier.api.Item;
 import pl.betoncraft.flier.exception.LoadingException;
 import pl.betoncraft.flier.util.ValueLoader;
@@ -35,9 +31,7 @@ public abstract class DefaultItem implements Item {
 
 	protected final ItemStack item;
 	protected final double weight;
-	protected final int slot;
-	protected final List<Effect> passive = new ArrayList<>();
-	protected final List<Effect> inHand = new ArrayList<>();
+	protected final int slot;	
 
 	public DefaultItem(ConfigurationSection section) throws LoadingException {
 		id = section.getName();
@@ -56,23 +50,6 @@ public abstract class DefaultItem implements Item {
 		item.setItemMeta(meta);
 		weight = loader.loadDouble("weight", 0.0);
 		slot = loader.loadInt("slot", -1);
-		for (String effect : section.getStringList("passive_effects")) {
-			try {
-				Effect eff = Flier.getInstance().getEffect(effect);
-				passive.add(eff);
-			} catch (LoadingException e) {
-				throw (LoadingException) new LoadingException(String.format("Error in '%s' passive effect.", effect))
-						.initCause(e);
-			}
-		}
-		for (String effect : section.getStringList("in_hand_effects")) {
-			try {
-				inHand.add(Flier.getInstance().getEffect(effect));
-			} catch (LoadingException e) {
-				throw (LoadingException) new LoadingException(String.format("Error in '%s' in-hand effect.", effect))
-						.initCause(e);
-			}
-		}
 	}
 
 	@Override
@@ -88,16 +65,6 @@ public abstract class DefaultItem implements Item {
 	@Override
 	public int slot() {
 		return slot;
-	}
-
-	@Override
-	public List<Effect> getPassiveEffects() {
-		return Collections.unmodifiableList(passive);
-	}
-
-	@Override
-	public List<Effect> getInHandEffects() {
-		return Collections.unmodifiableList(inHand);
 	}
 	
 	@Override

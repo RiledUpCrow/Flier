@@ -30,7 +30,6 @@ import com.google.common.collect.Lists;
 import pl.betoncraft.flier.api.Bonus;
 import pl.betoncraft.flier.api.Damager;
 import pl.betoncraft.flier.api.Damager.DamageResult;
-import pl.betoncraft.flier.api.Effect;
 import pl.betoncraft.flier.api.Engine;
 import pl.betoncraft.flier.api.InGamePlayer;
 import pl.betoncraft.flier.api.Item;
@@ -62,7 +61,6 @@ public class DefaultPlayer implements InGamePlayer {
 	private InGamePlayer lastHit = null;
 	private ChatColor color;
 	private long glowTimer;
-	private List<Effect> activeEffects = new LinkedList<>();
 	private int money;
 	
 	public DefaultPlayer(Player player, Lobby lobby, PlayerClass clazz) {
@@ -84,7 +82,6 @@ public class DefaultPlayer implements InGamePlayer {
 			boolean hasWings = hasWings();
 			boolean wingsDead = clazz.getCurrentWings().getHealth() == 0;
 			boolean wingsDisabled = clazz.getCurrentWings().areDisabled();
-			boolean fastTick = true;
 
 			if (hasWings) { // has wings
 				if (wingsDead) { // wings should be dead, destroying
@@ -111,7 +108,6 @@ public class DefaultPlayer implements InGamePlayer {
 			if (!isAccelerating()) { // is not accelerating
 				regenerateFuel();
 			}
-			applyEffects(fastTick);
 			checkBonuses();
 			
 			// manage UsableItems
@@ -124,9 +120,6 @@ public class DefaultPlayer implements InGamePlayer {
 
 	@Override
 	public void slowTick() {
-		if (isPlaying()) {
-			applyEffects(false);
-		}
 		stopGlowing();
 		updateStats();
 	}
@@ -296,16 +289,6 @@ public class DefaultPlayer implements InGamePlayer {
 			money = 0;
 		}
 	}
-
-	@Override
-	public void addEffect(Effect effect) {
-		activeEffects.add(effect);
-	}
-
-	@Override
-	public void removeEffect(Effect effect) {
-		activeEffects.remove(effect);
-	}
 	
 	@Override
 	public ChatColor getColor() {
@@ -351,7 +334,6 @@ public class DefaultPlayer implements InGamePlayer {
 		player.setFoodLevel(40);
 		player.setExhaustion(0);
 		player.setVelocity(new Vector());
-		activeEffects.clear();
 		money = 0;
 		clazz.reset();
 		updateClass();
@@ -466,32 +448,6 @@ public class DefaultPlayer implements InGamePlayer {
 			team.setPrefix(string);
 		} else {
 			sb.resetScores(name);
-		}
-	}
-	
-	private void applyEffects(boolean fastTick) {
-		ItemStack heldItem = player.getInventory().getItemInMainHand();
-		for (Item item : clazz.getCurrentItems().keySet()) {
-			if (item == null) {
-				continue;
-			}
-			if (heldItem != null && item.getItem().isSimilar(heldItem)) {
-				for (Effect effect : item.getInHandEffects()) {
-					applyEffect(effect, fastTick);
-				}
-			}
-			for (Effect effect : item.getPassiveEffects()) {
-				applyEffect(effect, fastTick);
-			}
-		}
-		for (Effect effect : activeEffects) {
-			applyEffect(effect, fastTick);
-		}
-	}
-	
-	private void applyEffect(Effect effect, boolean fastTick) {
-		if (effect != null && effect.fast() == fastTick) {
-			effect.apply(this);
 		}
 	}
 

@@ -4,31 +4,32 @@
  * To Public License, Version 2, as published by Sam Hocevar. See
  * http://www.wtfpl.net/ for more details.
  */
-package pl.betoncraft.flier.effect;
+package pl.betoncraft.flier.action;
 
 import org.bukkit.configuration.ConfigurationSection;
 
-import pl.betoncraft.flier.api.Effect;
-import pl.betoncraft.flier.api.InGamePlayer;
 import pl.betoncraft.flier.api.Game.Attitude;
+import pl.betoncraft.flier.api.InGamePlayer;
+import pl.betoncraft.flier.core.defaults.DefaultAction;
 import pl.betoncraft.flier.exception.LoadingException;
 import pl.betoncraft.flier.util.ValueLoader;
 
 /**
- * Targets hostile players.
+ * Targets other players with a compass.
  *
  * @author Jakub Sapalski
  */
-public class TargetCompass implements Effect {
+public class TargetAction extends DefaultAction {
 	
 	private final Attitude target;
 	
-	public TargetCompass(ConfigurationSection section) throws LoadingException {
+	public TargetAction(ConfigurationSection section) throws LoadingException {
+		super(section);
 		this.target = new ValueLoader(section).loadEnum("target", Attitude.HOSTILE, Attitude.class);
 	}
 
 	@Override
-	public void apply(InGamePlayer data) {
+	public boolean act(InGamePlayer data) {
 		if (data.isPlaying()) {
 			InGamePlayer nearest = null;
 			double distance = 0;
@@ -45,11 +46,7 @@ public class TargetCompass implements Effect {
 				data.getPlayer().setCompassTarget(nearest.getPlayer().getLocation());
 			}
 		}
-	}
-	
-	@Override
-	public boolean fast() {
-		return false;
+		return true;
 	}
 
 }
