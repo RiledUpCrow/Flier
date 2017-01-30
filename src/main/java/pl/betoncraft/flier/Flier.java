@@ -20,7 +20,7 @@ import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import pl.betoncraft.flier.action.EffectAction;
-import pl.betoncraft.flier.action.EmergencyWingsAction;
+import pl.betoncraft.flier.action.WingsHealthAction;
 import pl.betoncraft.flier.action.LaunchAction;
 import pl.betoncraft.flier.action.MoneyAction;
 import pl.betoncraft.flier.action.TargetAction;
@@ -29,6 +29,7 @@ import pl.betoncraft.flier.action.attack.MachineGun;
 import pl.betoncraft.flier.activator.LeftClickActivator;
 import pl.betoncraft.flier.activator.RightClickActivator;
 import pl.betoncraft.flier.activator.SlowTickActivator;
+import pl.betoncraft.flier.activator.WingsHealthActivator;
 import pl.betoncraft.flier.api.Action;
 import pl.betoncraft.flier.api.Activator;
 import pl.betoncraft.flier.api.Bonus;
@@ -89,11 +90,12 @@ public class Flier extends JavaPlugin {
 		registerAction("launcher", s -> new LaunchAction(s));
 		registerAction("effect", s -> new EffectAction(s));
 		registerAction("money", s -> new MoneyAction(s));
-		registerAction("restoreWings", s -> new EmergencyWingsAction(s));
+		registerAction("wingsHealth", s -> new WingsHealthAction(s));
 		registerAction("targetCompass", s -> new TargetAction(s));
 		registerActivator("leftClick", s -> new LeftClickActivator(s));
 		registerActivator("rightClick", s -> new RightClickActivator(s));
 		registerActivator("slowTick", s -> new SlowTickActivator(s));
+		registerActivator("wingsHealth", s -> new WingsHealthActivator(s));
 
 		loadLobbies();
 		

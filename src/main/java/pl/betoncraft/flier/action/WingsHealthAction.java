@@ -14,28 +14,26 @@ import pl.betoncraft.flier.core.defaults.DefaultAction;
 import pl.betoncraft.flier.exception.LoadingException;
 
 /**
- * An item which can raise wings' health above 0, thus recreating them.
+ * Changes wings health.
  *
  * @author Jakub Sapalski
  */
-public class EmergencyWingsAction extends DefaultAction {
+public class WingsHealthAction extends DefaultAction {
 	
 	private double amount;
 
-	public EmergencyWingsAction(ConfigurationSection section) throws LoadingException {
+	public WingsHealthAction(ConfigurationSection section) throws LoadingException {
 		super(section);
-		amount = loader.loadNonNegativeDouble("amount");
+		amount = loader.loadDouble("amount");
 	}
 
 	@Override
 	public boolean act(InGamePlayer player) {
 		Wings wings = player.getClazz().getCurrentWings();
-		if (wings.getHealth() == 0) {
-			wings.addHealth(amount);
-			return true;
+		if (amount >= 0) {
+			return wings.addHealth(amount);
 		} else {
-			// can't be used if wings have health (are not destroyed)
-			return false;
+			return wings.removeHealth(-amount);
 		}
 	}
 

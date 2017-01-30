@@ -64,13 +64,15 @@ public abstract class DefaultWings extends DefaultItem implements Wings {
 
 	@Override
 	public boolean removeHealth(double amount) {
-		if (health <= amount) {
-			health = 0;
-			return true;
-		} else {
-			health -= amount;
+		if (health == 0) {
 			return false;
 		}
+		if (health <= amount) {
+			health = 0;
+		} else {
+			health -= amount;
+		}
+		return true;
 	}
 
 	@Override

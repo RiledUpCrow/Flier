@@ -47,7 +47,7 @@ public interface Wings extends Item {
 	
 	/**
 	 * @param amount of health to remove from these Wings; must be positive
-	 * @return whenever the health of these Wings dropped to zero or not
+	 * @return whenever the wings were damaged (true) or were already destroyed (false)
 	 */
 	public boolean removeHealth(double amount);
 	
