@@ -20,6 +20,7 @@ import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import pl.betoncraft.flier.action.EffectAction;
+import pl.betoncraft.flier.action.FuelAction;
 import pl.betoncraft.flier.action.WingsHealthAction;
 import pl.betoncraft.flier.action.LaunchAction;
 import pl.betoncraft.flier.action.MoneyAction;
@@ -91,6 +92,7 @@ public class Flier extends JavaPlugin {
 		registerAction("effect", s -> new EffectAction(s));
 		registerAction("money", s -> new MoneyAction(s));
 		registerAction("wingsHealth", s -> new WingsHealthAction(s));
+		registerAction("fuel", s -> new FuelAction(s));
 		registerAction("targetCompass", s -> new TargetAction(s));
 		registerActivator("leftClick", s -> new LeftClickActivator(s));
 		registerActivator("rightClick", s -> new RightClickActivator(s));
