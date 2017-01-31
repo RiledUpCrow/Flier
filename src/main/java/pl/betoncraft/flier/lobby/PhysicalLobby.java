@@ -7,213 +7,70 @@
 package pl.betoncraft.flier.lobby;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
-import org.bukkit.event.HandlerList;
-import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.Vector;
 
-import net.md_5.bungee.api.ChatColor;
 import pl.betoncraft.flier.Flier;
-import pl.betoncraft.flier.api.Game;
 import pl.betoncraft.flier.api.InGamePlayer;
-import pl.betoncraft.flier.api.Lobby;
-import pl.betoncraft.flier.api.PlayerClass;
-import pl.betoncraft.flier.api.PlayerClass.RespawnAction;
-import pl.betoncraft.flier.core.DefaultClass;
-import pl.betoncraft.flier.core.DefaultPlayer;
-import pl.betoncraft.flier.core.DefaultSet;
+import pl.betoncraft.flier.core.defaults.DefaultLobby;
 import pl.betoncraft.flier.exception.LoadingException;
 import pl.betoncraft.flier.util.Utils;
-import pl.betoncraft.flier.util.ValueLoader;
 
 /**
  * Physical lobby with fixed classes selected by clicking on blocks.
  *
  * @author Jakub Sapalski
  */
-public class PhysicalLobby implements Lobby, Listener {
-	
-	private PlayerClass defClass;
-	private RespawnAction respawnAction = RespawnAction.RESET;
-	private Map<UUID, InGamePlayer> players = new HashMap<>();
-
-	private Map<String, Game> games = new HashMap<>();
-	private Game currentGame;
+public class PhysicalLobby extends DefaultLobby {
 
 	private List<Block> join = new ArrayList<>();
-	private Location spawn;
 	private Block start;
 	private Block leave;
 	private Map<Block, ItemBlock> blocks = new HashMap<>();
-	private Map<InGamePlayer, List<ItemBlock>> unlocked = new HashMap<>();
 
 	private List<UUID> blocked = new LinkedList<>();
 
 	public PhysicalLobby(ConfigurationSection section) throws LoadingException {
-		ValueLoader loader = new ValueLoader(section);
-		respawnAction = loader.loadEnum("respawn_action", RespawnAction.class);
-		spawn = loader.loadLocation("spawn");
+		super(section);
 		for (String loc : section.getStringList("join")) {
 			join.add(Utils.parseLocation(loc).getBlock());
 		}
 		start = loader.loadLocation("start").getBlock();
 		leave = loader.loadLocation("leave").getBlock();
-		ConfigurationSection itemsSection = section.getConfigurationSection("items");
-		if (itemsSection != null) for (String i : itemsSection.getKeys(false)) {
-			ConfigurationSection itemSection = itemsSection.getConfigurationSection(i);
+		ConfigurationSection blocksSection = section.getConfigurationSection("blocks");
+		if (blocksSection != null) for (String i : blocksSection.getKeys(false)) {
+			ConfigurationSection blockSection = blocksSection.getConfigurationSection(i);
 			try {
-				blocks.put(Utils.parseLocation(itemSection.getString("block")).getBlock(), new ItemBlock(itemSection));
+				ItemBlock itemBlock = new ItemBlock(blockSection);
+				blocks.put(itemBlock.block, itemBlock);
 			} catch (LoadingException e) {
-				throw (LoadingException) new LoadingException(String.format("Error in '%s' item set.", i)).initCause(e);
+				throw (LoadingException) new LoadingException(String.format("Error in '%s' block.", i)).initCause(e);
 			}
 		}
-		try {
-			List<String> playerClass = section.getStringList("default_class");
-			defClass = new DefaultClass(
-					playerClass.stream().map(
-							name -> blocks.values().stream().filter(
-									itemBlock -> itemBlock.name.equals(name)
-							).findFirst().orElse(null)
-					).collect(Collectors.toList())
-			);
-		} catch (LoadingException e) {
-			throw (LoadingException) new LoadingException("Error in player class.").initCause(e);
-		}
-		List<String> gameNames = section.getStringList("games");
-		for (String gameName : gameNames) {
-			try {
-				Game game = Flier.getInstance().getGame(gameName);
-				games.put(gameName, game);
-			} catch (LoadingException e) {
-				throw (LoadingException) new LoadingException(String.format("Error in '%s' game.", gameName))
-						.initCause(e);
-			}
-		}
-		if (games.isEmpty()) {
-			throw new LoadingException("Game list is empty.");
-		}
-		currentGame = games.get(gameNames.get(0));
-		Bukkit.getPluginManager().registerEvents(this, Flier.getInstance());
 	}
 
-	private class ItemBlock extends DefaultSet {
+	private class ItemBlock {
 
-		private String name;
-		private int buyCost = 0;
-		private int unlockCost = 0;
+		private Block block;
+		private CostlySet set;
 
 		private ItemBlock(ConfigurationSection section) throws LoadingException {
-			super(section);
-			name = section.getName();
-			buyCost = section.getInt("buy_cost", buyCost);
-			unlockCost = section.getInt("unlock_cost", unlockCost);
+			block = Utils.parseLocation(section.getString("block")).getBlock();
+			set = items.get(section.getString("item"));
 		}
 
-		private int getBuyCost() {
-			return buyCost;
-		}
-
-		private int getUnlockCost() {
-			return unlockCost;
-		}
-
-	}
-
-	@Override
-	public void addPlayer(Player player) {
-		UUID uuid = player.getUniqueId();
-		if (players.containsKey(uuid)) {
-			return;
-		}
-		InGamePlayer data = new DefaultPlayer(player, this, (DefaultClass) defClass.replicate());
-		players.put(uuid, data);
-		player.teleport(spawn);
-		currentGame.addPlayer(data);
-	}
-
-	@Override
-	public void removePlayer(Player player) {
-		UUID uuid = player.getUniqueId();
-		InGamePlayer data = players.remove(uuid);
-		if (data != null) {
-			data.exitLobby();
-		}
-	}
-	
-	@Override
-	public void respawnPlayer(InGamePlayer player) {
-		PlayerClass clazz = player.getClazz();
-		switch (respawnAction) {
-		case LOAD:
-			clazz.load();
-			break;
-		case SAVE:
-			clazz.save();
-			clazz.load();
-			break;
-		case RESET:
-			clazz.reset();
-			break;
-		case NOTHING:
-			break;
-		}
-		player.updateClass();
-		player.getPlayer().setVelocity(new Vector());
-		if (player.getPlayer().getLocation().distanceSquared(spawn) > 1) {
-			player.getPlayer().teleport(spawn);
-		}
-	}
-
-	@Override
-	public void stop() {
-		for (Player player : players.values().stream().map(data -> data.getPlayer()).collect(Collectors.toList())) {
-			removePlayer(player);
-		}
-		// no need to stop the game, it's not running without players
-		HandlerList.unregisterAll(this);
-	}
-
-	@Override
-	public void setGame(Game game) {
-		currentGame.stop();
-		currentGame = game;
-		for (InGamePlayer player : players.values()) {
-			currentGame.addPlayer(player);
-		}
-		// no need to start the game, it's running if there were players
-	}
-
-	@Override
-	public Game getGame() {
-		return currentGame;
-	}
-	
-	@Override
-	public Map<String, Game> getGames() {
-		return Collections.unmodifiableMap(games);
-	}
-	
-	@Override
-	public Location getSpawn() {
-		return spawn;
 	}
 
 	@EventHandler(priority = EventPriority.HIGH)
@@ -255,51 +112,8 @@ public class PhysicalLobby implements Lobby, Listener {
 				if (block.equals(start)) {
 					currentGame.startPlayer(data);
 				} else {
-					handleItems(data, block);
+					handleItems(data, blocks.get(block).set);
 				}
-			}
-		}
-	}
-	
-	@EventHandler
-	public void onLeave(PlayerQuitEvent event) {
-		InGamePlayer player = players.remove(event.getPlayer().getUniqueId());
-		if (player != null) {
-			player.exitLobby();
-		}
-	}
-
-	private void handleItems(InGamePlayer player, Block block) {
-		PlayerClass c = player.getClazz();
-		ItemBlock b = blocks.get(block);
-		if (b != null) {
-			List<ItemBlock> ul = unlocked.get(player);
-			if (ul == null) {
-				ul = new LinkedList<>();
-				unlocked.put(player, ul);
-			}
-			if (!ul.contains(b)) {
-				if (b.getUnlockCost() <= player.getMoney()) {
-					ul.add(b);
-					player.setMoney(player.getMoney() - b.getUnlockCost());
-					if (b.getUnlockCost() != 0) {
-						player.getPlayer().sendMessage(ChatColor.GREEN + "Unlocked!");
-					}
-				} else {
-					player.getPlayer().sendMessage(ChatColor.RED + "Not enough money to unlock.");
-					return;
-				}
-			}
-			if (b.getBuyCost() <= player.getMoney()) {
-				if (b.apply(c)) {
-					player.setMoney(player.getMoney() - b.getBuyCost());
-					player.updateClass();
-					player.getPlayer().sendMessage(ChatColor.GREEN + "Class updated!");
-				} else {
-					player.getPlayer().sendMessage(ChatColor.RED + "You can't use this right now.");
-				}
-			} else {
-				player.getPlayer().sendMessage(ChatColor.RED + "Not enough money.");
 			}
 		}
 	}
