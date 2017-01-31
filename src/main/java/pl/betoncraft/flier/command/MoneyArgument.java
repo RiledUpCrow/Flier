@@ -55,22 +55,22 @@ public class MoneyArgument implements CommandArgument {
 	}
 
 	@Override
-	public String name() {
+	public String getName() {
 		return "money";
 	}
 
 	@Override
-	public List<String> aliases() {
+	public List<String> getAliases() {
 		return Arrays.asList(new String[]{"money", "m"});
 	}
 
 	@Override
-	public String description() {
+	public String getDescription() {
 		return "Sets player's money in the game.";
 	}
 
 	@Override
-	public String help() {
+	public String getHelp() {
 		return "<player> <money>";
 	}
 

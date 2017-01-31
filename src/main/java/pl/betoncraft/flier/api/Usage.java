@@ -16,22 +16,22 @@ import pl.betoncraft.flier.api.UsableItem.Where;
  * @author Jakub Sapalski
  */
 public interface Usage {
-	
+
 	/**
 	 * @return the list of Activators in this Usage
 	 */
 	public List<Activator> getActivators();
-	
+
 	/**
 	 * @return the list of Actions in this Usage
 	 */
 	public List<Action> getActions();
-	
+
 	/**
 	 * @return the cooldown time this Usage takes
 	 */
 	public int getCooldown();
-	
+
 	/**
 	 * @return the amount of ammo this Usage uses per use
 	 */
@@ -45,7 +45,8 @@ public interface Usage {
 	/**
 	 * Checks if the player is in a correct position to use this item.
 	 * 
-	 * @param player player to check
+	 * @param player
+	 *            player to check
 	 * @return whenever it's possible to use this item in player's position
 	 */
 	public boolean canUse(InGamePlayer player);

@@ -12,11 +12,12 @@ package pl.betoncraft.flier.api;
  * @author Jakub Sapalski
  */
 public interface Action {
-	
+
 	/**
 	 * Performs the action on specified player.
 	 * 
-	 * @param player the player on which the action needs to be performed
+	 * @param player
+	 *            the player on which the action needs to be performed
 	 * @return whenever the action was performed or not
 	 */
 	public boolean act(InGamePlayer player);

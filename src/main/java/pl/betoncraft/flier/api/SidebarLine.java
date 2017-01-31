@@ -12,7 +12,7 @@ package pl.betoncraft.flier.api;
  * @author Jakub Sapalski
  */
 public interface SidebarLine {
-	
+
 	/**
 	 * @return the text of this line
 	 */

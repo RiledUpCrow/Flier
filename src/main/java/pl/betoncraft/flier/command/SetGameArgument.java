@@ -48,22 +48,22 @@ class SetGameArgument implements CommandArgument {
 	}
 
 	@Override
-	public String name() {
+	public String getName() {
 		return "setgame";
 	}
 
 	@Override
-	public List<String> aliases() {
+	public List<String> getAliases() {
 		return Arrays.asList(new String[]{"setgame", "s"});
 	}
 
 	@Override
-	public String description() {
+	public String getDescription() {
 		return "Set current game.";
 	}
 
 	@Override
-	public String help() {
+	public String getHelp() {
 		return "<lobby> <game>";
 	}
 }

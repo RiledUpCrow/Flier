@@ -42,14 +42,14 @@ public interface Game {
 	 *            player to start
 	 */
 	void startPlayer(InGamePlayer data);
-	
+
 	/**
 	 * Returns the map containing players by their UUID.
 	 * 
 	 * @return the map of players
 	 */
 	public Map<UUID, InGamePlayer> getPlayers();
-	
+
 	/**
 	 * This method will be called when the game needs to be started.
 	 */
@@ -60,15 +60,18 @@ public interface Game {
 	 * clean up all its data so it can be freshly started again.
 	 */
 	public void stop();
-	
+
 	/**
-	 * Returns the Attitude of one player towards another. The game should
-	 * tell if these players are enemies or friends, so other components
-	 * can behave accordingly.
+	 * Returns the Attitude of one player towards another. The game should tell
+	 * if these players are enemies or friends, so other components can behave
+	 * accordingly.
 	 * 
 	 * @param toThisOne
+	 *            the attitude towards this player will be returned
 	 * @param ofThisOne
-	 * @return the attitude
+	 *            this player's attitude will be returned
+	 * @return the attitude of the second player to the first one (this relation
+	 *         is usually symmetric)
 	 */
 	public Attitude getAttitude(InGamePlayer toThisOne, InGamePlayer ofThisOne);
 
@@ -80,17 +83,17 @@ public interface Game {
 	 * @return the map with colors assigned to player names
 	 */
 	public Map<String, ChatColor> getColors();
-	
+
 	/**
 	 * @return the list of Bonuses in this Game
 	 */
 	public List<Bonus> getBonuses();
-	
+
 	/**
 	 * @return the height limit in this game; 0 and less means no limit
 	 */
 	public int getHeightLimit();
-	
+
 	/**
 	 * Attitude of one player to another.
 	 *

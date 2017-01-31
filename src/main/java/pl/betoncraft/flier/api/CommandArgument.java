@@ -19,40 +19,98 @@ import org.bukkit.command.CommandSender;
  * @author Jakub Sapalski
  */
 public interface CommandArgument {
-	
-	public String name();
-	
-	public List<String> aliases();
-	
-	public String description();
-	
-	public String help();
-	
+
+	/**
+	 * @return the name of this argument (the default alias)
+	 */
+	public String getName();
+
+	/**
+	 * @return the list of aliases which can be used instead of the name
+	 */
+	public List<String> getAliases();
+
+	/**
+	 * @return the description of this argument's behavior
+	 */
+	public String getDescription();
+
+	/**
+	 * @return the help string which shows how to use the command
+	 */
+	public String getHelp();
+
+	/**
+	 * Parses the argument. Extracts all information from the argument iterator.
+	 * It may pass the iterator to another CommandArgument if it wishes so.
+	 * 
+	 * @param sender
+	 *            the sender of the command
+	 * @param currentCommand
+	 *            the command string parsed so far
+	 * @param it
+	 *            iterator over next arguments
+	 */
 	public void parse(CommandSender sender, String currentCommand, Iterator<String> it);
-	
+
+	/**
+	 * Parses the next argument. Call it if you're finished with the current
+	 * argument and there are more arguments to be parsed.
+	 * 
+	 * @param sender
+	 *            the sender of the command
+	 * @param currentCommand
+	 *            the command string parsed so far
+	 * @param it
+	 *            iterator over next arguments (it should be already incremented
+	 *            to the next argument, see {@code name} argument)
+	 * @param name
+	 *            name of the next argument (you should get it by calling
+	 *            {@code it.next()})
+	 * @param arguments
+	 *            the list of CommandArguments which are valid in this context
+	 */
 	public static void nextArgument(CommandSender sender, String currentCommand, Iterator<String> it, String name,
 			List<CommandArgument> arguments) {
 		for (CommandArgument a : arguments) {
-			if (a.aliases().contains(name)) {
+			if (a.getAliases().contains(name)) {
 				a.parse(sender, currentCommand + " " + name, it);
 				return;
 			}
 		}
 		displayHelp(sender, arguments);
 	}
-	
+
+	/**
+	 * Displays the help for the currently parsed argument.
+	 * 
+	 * @param sender
+	 *            sender of the command, it will receive the message
+	 * @param currentCommand
+	 *            the command string parsed to this point
+	 * @param argument
+	 *            the argument which is being used incorrectly
+	 */
 	public static void displayHelp(CommandSender sender, String currentCommand, CommandArgument argument) {
 		sender.sendMessage(ChatColor.RED + "Wrong use of a command. Correct syntax:");
-		sender.sendMessage(ChatColor.DARK_GREEN + "/" + currentCommand + " " + argument.help());
+		sender.sendMessage(ChatColor.DARK_GREEN + "/" + currentCommand + " " + argument.getHelp());
 	}
-	
+
+	/**
+	 * Displays all available arguments at this point.
+	 * 
+	 * @param sender
+	 *            sender of the command, it will receive the message
+	 * @param arguments
+	 *            list of arguments which are available in this context
+	 */
 	public static void displayHelp(CommandSender sender, List<CommandArgument> arguments) {
 		sender.sendMessage(ChatColor.RED + "Available arguments:");
 		for (CommandArgument a : arguments) {
 			String aliases;
-			if (a.aliases().size() > 1) {
+			if (a.getAliases().size() > 1) {
 				StringBuilder builder = new StringBuilder();
-				for (String alias : a.aliases().subList(1, a.aliases().size())) {
+				for (String alias : a.getAliases().subList(1, a.getAliases().size())) {
 					builder.append(ChatColor.LIGHT_PURPLE + alias + ChatColor.WHITE + ", ");
 				}
 				aliases = ChatColor.WHITE + "(" + builder.toString().trim().substring(0, builder.lastIndexOf(","))
@@ -60,11 +118,25 @@ public interface CommandArgument {
 			} else {
 				aliases = "";
 			}
-			sender.sendMessage(ChatColor.YELLOW + "- " + ChatColor.DARK_AQUA + a.name() + " " + aliases
-					+ ChatColor.YELLOW + ": " + ChatColor.GREEN + a.description());
+			sender.sendMessage(ChatColor.YELLOW + "- " + ChatColor.DARK_AQUA + a.getName() + " " + aliases
+					+ ChatColor.YELLOW + ": " + ChatColor.GREEN + a.getDescription());
 		}
 	}
 
+	/**
+	 * Displays a list of available objects of some type.
+	 * 
+	 * @param sender
+	 *            sender of the command, it will receive the message
+	 * @param type
+	 *            name of the type of the object, it will be displayed to the
+	 *            sender
+	 * @param name
+	 *            the user have tried to use this object in the command but it
+	 *            doesn't exist; this is its name
+	 * @param available
+	 *            a set of available object names
+	 */
 	public static void displayObjects(CommandSender sender, String type, String name, Set<String> available) {
 		sender.sendMessage(ChatColor.RED + "No such " + type + ": " + ChatColor.DARK_RED + name);
 		StringBuilder builder = new StringBuilder();

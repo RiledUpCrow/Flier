@@ -32,22 +32,22 @@ class ReloadArgument implements CommandArgument {
 	}
 
 	@Override
-	public String name() {
+	public String getName() {
 		return "reload";
 	}
 
 	@Override
-	public List<String> aliases() {
+	public List<String> getAliases() {
 		return Arrays.asList(new String[]{"reload"});
 	}
 
 	@Override
-	public String description() {
+	public String getDescription() {
 		return "Reloads the plugin.";
 	}
 
 	@Override
-	public String help() {
+	public String getHelp() {
 		return "";
 	}
 }

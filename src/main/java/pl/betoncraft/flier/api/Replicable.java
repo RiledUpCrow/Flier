@@ -13,11 +13,11 @@ package pl.betoncraft.flier.api;
  * @author Jakub Sapalski
  */
 public interface Replicable {
-	
+
 	/**
-	 * Replicates the object. All default values must be the same
-	 * in both objects, and all modifiable values must be clean in
-	 * the replicated object. This method must return "self" type.
+	 * Replicates the object. All default values must be the same in both
+	 * objects, and all modifiable values must be clean in the replicated
+	 * object. This method must return "self" type.
 	 * 
 	 * @return replicated object of the same type.
 	 */

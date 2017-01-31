@@ -16,10 +16,11 @@ import pl.betoncraft.flier.util.Utils.ImmutableVector;
 public interface Wings extends Item {
 
 	/**
-	 * Applies modifications to player's velocity vector. Use this method to apply your wings'
-	 * flight model.
+	 * Applies modifications to player's velocity vector. Use this method to
+	 * apply your wings' flight model.
 	 * 
-	 * @param velocity player's velocity Vector
+	 * @param velocity
+	 *            player's velocity Vector
 	 * @return the same Vector, modified
 	 */
 	public ImmutableVector applyFlightModifications(InGamePlayer data);
@@ -40,24 +41,28 @@ public interface Wings extends Item {
 	public double getHealth();
 
 	/**
-	 * @param amount of health to add to these Wings; must be positive
+	 * @param amount
+	 *            of health to add to these Wings; must be positive
 	 * @return whenever the Wings were fixed or were already at full HP
 	 */
 	public boolean addHealth(double amount);
-	
+
 	/**
-	 * @param amount of health to remove from these Wings; must be positive
-	 * @return whenever the wings were damaged (true) or were already destroyed (false)
+	 * @param amount
+	 *            of health to remove from these Wings; must be positive
+	 * @return whenever the wings were damaged (true) or were already destroyed
+	 *         (false)
 	 */
 	public boolean removeHealth(double amount);
-	
+
 	/**
 	 * @return whenever the wings are disabled
 	 */
 	public boolean areDisabled();
-	
+
 	/**
-	 * @param disabled whenever the wings should be disabled
+	 * @param disabled
+	 *            whenever the wings should be disabled
 	 */
 	public void setDisabled(boolean disabled);
 

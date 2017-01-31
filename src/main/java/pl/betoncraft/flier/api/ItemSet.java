@@ -15,8 +15,13 @@ import java.util.Map;
  */
 public interface ItemSet {
 
+	/**
+	 * Type of applying operation.
+	 *
+	 * @author Jakub Sapalski
+	 */
 	public enum AddType {
-		RESET, CLEAR, REPLACE, ADD, TAKE // TODO add "SINGLE" for a single item
+		RESET, CLEAR, REPLACE, ADD, TAKE
 	}
 
 	/**
@@ -30,12 +35,24 @@ public interface ItemSet {
 	 */
 	public boolean apply(PlayerClass clazz);
 
+	/**
+	 * @return the Engine in this ItemSet
+	 */
 	public Engine getEngine();
 
+	/**
+	 * @return the Wings in this ItemSet
+	 */
 	public Wings getWings();
 
+	/**
+	 * @return the map of UsableItems and their amounts in this ItemSet
+	 */
 	public Map<UsableItem, Integer> getItems();
 
+	/**
+	 * @return the type of applying operation
+	 */
 	public AddType getType();
 
 }

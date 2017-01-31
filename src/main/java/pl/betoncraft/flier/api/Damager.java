@@ -141,16 +141,25 @@ public interface Damager {
 		return null;
 	}
 	
+	/**
+	 * Represents an Entity which is a Damager and was launched by InGamePlayer.
+	 *
+	 * @author Jakub Sapalski
+	 */
 	public class Attacker {
+
 		private Damager damager;
 		private InGamePlayer attacker;
+
 		public Attacker(Damager damager, InGamePlayer attacker) {
 			this.damager = damager;
 			this.attacker = attacker;
 		}
+
 		public Damager getDamager() {
 			return damager;
 		}
+
 		public InGamePlayer getAttacker() {
 			return attacker;
 		}

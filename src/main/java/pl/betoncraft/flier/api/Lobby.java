@@ -17,7 +17,7 @@ import org.bukkit.entity.Player;
  * @author Jakub Sapalski
  */
 public interface Lobby {
-	
+
 	/**
 	 * Adds player to the lobby. Creates an InGamePlayer instance and adds the
 	 * player to the current Game.
@@ -35,7 +35,7 @@ public interface Lobby {
 	 *            the player to remove from this lobby
 	 */
 	public void removePlayer(Player player);
-	
+
 	/**
 	 * Teleports the player to the lobby spawn and prepares him for further
 	 * playing, according to RespawnAction. It does not actually respawns the
@@ -46,7 +46,7 @@ public interface Lobby {
 	 *            player to respawn in the lobby
 	 */
 	public void respawnPlayer(InGamePlayer player);
-	
+
 	/**
 	 * Called when the game ends.
 	 */

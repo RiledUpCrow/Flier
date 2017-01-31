@@ -15,6 +15,11 @@ import java.util.List;
  */
 public interface UsableItem extends Item {
 
+	/**
+	 * Represents a location where the item can be used.
+	 *
+	 * @author Jakub Sapalski
+	 */
 	public enum Where {
 		GROUND, AIR, FALL, NO_GROUND, NO_AIR, NO_FALL, EVERYWHERE
 	}
@@ -23,7 +28,8 @@ public interface UsableItem extends Item {
 	 * Uses this item once.
 	 * 
 	 * @param player
-	 * @return if the item was used
+	 *            the player for which the item will be used
+	 * @return if the item was used or not
 	 */
 	public boolean use(InGamePlayer player);
 

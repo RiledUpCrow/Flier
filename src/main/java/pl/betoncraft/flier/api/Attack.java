@@ -7,8 +7,9 @@
 package pl.betoncraft.flier.api;
 
 /**
- * Represents a weapon item.
+ * Represents an action which attacks another player with a Damager.
  *
  * @author Jakub Sapalski
  */
-public interface Attack extends Action, Damager {}
+public interface Attack extends Action, Damager {
+}

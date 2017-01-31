@@ -12,7 +12,7 @@ package pl.betoncraft.flier.api;
  * @author Jakub Sapalski
  */
 public interface Activator {
-	
+
 	/**
 	 * @return whenever the Activator is active for this player
 	 */

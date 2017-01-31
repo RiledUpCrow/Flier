@@ -47,22 +47,22 @@ class JoinLobbyArgument implements CommandArgument {
 	}
 
 	@Override
-	public String name() {
+	public String getName() {
 		return "join";
 	}
 
 	@Override
-	public List<String> aliases() {
+	public List<String> getAliases() {
 		return Arrays.asList(new String[]{"join", "j"});
 	}
 
 	@Override
-	public String description() {
+	public String getDescription() {
 		return "Join a lobby.";
 	}
 
 	@Override
-	public String help() {
+	public String getHelp() {
 		return "<lobby>";
 	}
 }

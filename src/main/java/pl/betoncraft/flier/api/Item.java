@@ -14,12 +14,12 @@ import org.bukkit.inventory.ItemStack;
  * @author Jakub Sapalski
  */
 public interface Item extends Replicable {
-	
+
 	/**
 	 * @return the ItemStack equal to this item
 	 */
 	public ItemStack getItem();
-	
+
 	/**
 	 * @return weight of an item
 	 */
@@ -31,10 +31,11 @@ public interface Item extends Replicable {
 	public int slot();
 
 	/**
-	 * Compares two items by the default values (ignores mutable values).
-	 * This returns true for replicated items.
+	 * Compares two items by the default values (ignores mutable values). This
+	 * returns true for replicated items.
 	 * 
-	 * @param key another item to compare
+	 * @param key
+	 *            another item to compare
 	 * @return true if the item was replicated from this one, false if not
 	 */
 	public boolean isSameAs(Item key);

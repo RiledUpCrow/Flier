@@ -40,22 +40,22 @@ class LeaveLobbyArgument implements CommandArgument {
 	}
 
 	@Override
-	public String name() {
+	public String getName() {
 		return "leave";
 	}
 
 	@Override
-	public List<String> aliases() {
+	public List<String> getAliases() {
 		return Arrays.asList(new String[]{"leave", "l"});
 	}
 
 	@Override
-	public String description() {
+	public String getDescription() {
 		return "Leave current lobby.";
 	}
 
 	@Override
-	public String help() {
+	public String getHelp() {
 		return "";
 	}
 }
