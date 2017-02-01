@@ -69,6 +69,8 @@ public abstract class DefaultGame implements Listener, Game {
 	
 	protected int heightLimit;
 	protected double heightDamage;
+	protected Location center;
+	protected int radius;
 	protected boolean useMoney;
 	protected int enemyKillMoney;
 	protected int enemyHitMoney;
@@ -79,6 +81,8 @@ public abstract class DefaultGame implements Listener, Game {
 	protected int byFriendlyDeathMoney;
 	protected int byFriendlyHitMoney;
 	protected int suicideMoney;
+	
+	private int minX, minZ, maxX, maxZ;
 	
 	public DefaultGame(ConfigurationSection section) throws LoadingException {
 		loader = new ValueLoader(section);
@@ -92,6 +96,12 @@ public abstract class DefaultGame implements Listener, Game {
 		}
 		heightLimit = loader.loadInt("height_limit", 512);
 		heightDamage = loader.loadNonNegativeDouble("height_damage", 0.5);
+		center = loader.loadLocation("center");
+		radius = loader.loadPositiveInt("radius");
+		minX = center.getBlockX() - radius;
+		maxX = center.getBlockX() + radius;
+		minZ = center.getBlockZ() - radius;
+		maxZ = center.getBlockZ() + radius;
 		useMoney = loader.loadBoolean("money.enabled", false);
 		enemyKillMoney = loader.loadInt("money.enemy_kill", 0);
 		enemyHitMoney = loader.loadInt("money.enemy_hit", 0);
@@ -122,6 +132,11 @@ public abstract class DefaultGame implements Listener, Game {
 			game.fastTick();
 			for (InGamePlayer data : getPlayers().values()) {
 				data.fastTick();
+				Location loc = data.getPlayer().getLocation();
+				if (loc.getBlockX() < minX || loc.getBlockX() > maxX ||
+						loc.getBlockZ() < minZ || loc.getBlockZ() > maxZ) {
+					data.getPlayer().damage(data.getPlayer().getHealth() + 1);
+				}
 			}
 			if (i % 4 == 0) {
 				game.slowTick();
