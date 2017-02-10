@@ -27,6 +27,7 @@ import pl.betoncraft.flier.api.InGamePlayer;
 import pl.betoncraft.flier.core.defaults.DefaultLobby;
 import pl.betoncraft.flier.exception.LoadingException;
 import pl.betoncraft.flier.util.Utils;
+import pl.betoncraft.flier.util.ValueLoader;
 
 /**
  * Physical lobby with fixed classes selected by clicking on blocks.
@@ -67,8 +68,13 @@ public class PhysicalLobby extends DefaultLobby {
 		private CostlySet set;
 
 		private ItemBlock(ConfigurationSection section) throws LoadingException {
-			block = Utils.parseLocation(section.getString("block")).getBlock();
-			set = items.get(section.getString("item"));
+			ValueLoader loader = new ValueLoader(section);
+			block = loader.loadLocation("block").getBlock();
+			String name = loader.loadString("item");
+			set = items.get(name);
+			if (set == null) {
+				throw new LoadingException(String.format("Item '%s' does not exist.", name));
+			}
 		}
 
 	}
@@ -112,7 +118,10 @@ public class PhysicalLobby extends DefaultLobby {
 				if (block.equals(start)) {
 					currentGame.startPlayer(data);
 				} else {
-					handleItems(data, blocks.get(block).set);
+					ItemBlock itemBlock = blocks.get(block);
+					if (itemBlock != null) {
+						handleItems(data, itemBlock.set);
+					}
 				}
 			}
 		}
