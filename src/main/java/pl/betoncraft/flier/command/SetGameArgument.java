@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 import org.bukkit.command.CommandSender;
+import org.bukkit.permissions.Permission;
 
 import pl.betoncraft.flier.Flier;
 import pl.betoncraft.flier.api.CommandArgument;
@@ -19,11 +20,13 @@ import pl.betoncraft.flier.api.Game;
 import pl.betoncraft.flier.api.Lobby;
 
 /**
- * 
+ * Sets the Game in the Lobby.
  *
  * @author Jakub Sapalski
  */
 class SetGameArgument implements CommandArgument {
+	
+	private Permission permission = new Permission("flier.admin.setgame");
 
 	@Override
 	public void parse(CommandSender sender, String currentCommand, Iterator<String> it) {
@@ -66,4 +69,15 @@ class SetGameArgument implements CommandArgument {
 	public String getHelp() {
 		return "<lobby> <game>";
 	}
+
+	@Override
+	public Permission getPermission() {
+		return permission;
+	}
+
+	@Override
+	public User getUser() {
+		return User.ANYONE;
+	}
+
 }

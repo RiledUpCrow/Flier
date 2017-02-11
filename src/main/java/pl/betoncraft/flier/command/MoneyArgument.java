@@ -14,6 +14,7 @@ import java.util.NoSuchElementException;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.permissions.Permission;
 
 import net.md_5.bungee.api.ChatColor;
 import pl.betoncraft.flier.Flier;
@@ -27,6 +28,8 @@ import pl.betoncraft.flier.api.Lobby;
  * @author Jakub Sapalski
  */
 public class MoneyArgument implements CommandArgument {
+	
+	private Permission permission = new Permission("flier.admin.setmoney");
 
 	@Override
 	public void parse(CommandSender sender, String currentCommand, Iterator<String> it) {
@@ -72,6 +75,16 @@ public class MoneyArgument implements CommandArgument {
 	@Override
 	public String getHelp() {
 		return "<player> <money>";
+	}
+
+	@Override
+	public Permission getPermission() {
+		return permission;
+	}
+
+	@Override
+	public User getUser() {
+		return User.ANYONE;
 	}
 
 }

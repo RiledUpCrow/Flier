@@ -12,6 +12,7 @@ import java.util.List;
 
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.permissions.Permission;
 
 import net.md_5.bungee.api.ChatColor;
 import pl.betoncraft.flier.api.CommandArgument;
@@ -23,6 +24,8 @@ import pl.betoncraft.flier.util.PlayerBackup;
  * @author Jakub Sapalski
  */
 public class SaveArgument implements CommandArgument {
+	
+	private Permission permission = new Permission("flier.dev.save");
 
 	@Override
 	public String getName() {
@@ -56,6 +59,16 @@ public class SaveArgument implements CommandArgument {
 		} else {
 			sender.sendMessage(String.format("%sCould not save to a file.", ChatColor.RED));
 		}
+	}
+
+	@Override
+	public Permission getPermission() {
+		return permission;
+	}
+
+	@Override
+	public User getUser() {
+		return User.PLAYER;
 	}
 
 }

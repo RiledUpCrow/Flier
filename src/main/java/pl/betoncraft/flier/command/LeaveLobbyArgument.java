@@ -13,17 +13,20 @@ import java.util.List;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.permissions.Permission;
 
 import pl.betoncraft.flier.Flier;
 import pl.betoncraft.flier.api.CommandArgument;
 import pl.betoncraft.flier.api.Lobby;
 
 /**
- * 
+ * Moves the player out of the lobby.
  *
  * @author Jakub Sapalski
  */
 class LeaveLobbyArgument implements CommandArgument {
+	
+	private Permission permission = new Permission("flier.player.leave");
 
 	@Override
 	public void parse(CommandSender sender, String currentCommand, Iterator<String> it) {
@@ -58,4 +61,15 @@ class LeaveLobbyArgument implements CommandArgument {
 	public String getHelp() {
 		return "";
 	}
+
+	@Override
+	public Permission getPermission() {
+		return permission;
+	}
+
+	@Override
+	public User getUser() {
+		return User.PLAYER;
+	}
+
 }

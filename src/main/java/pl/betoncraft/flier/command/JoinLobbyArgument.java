@@ -11,9 +11,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.permissions.Permission;
 
 import pl.betoncraft.flier.Flier;
 import pl.betoncraft.flier.api.CommandArgument;
@@ -25,19 +25,16 @@ import pl.betoncraft.flier.api.Lobby;
  * @author Jakub Sapalski
  */
 class JoinLobbyArgument implements CommandArgument {
+	
+	private Permission permission = new Permission("flier.player.join");
 
 	@Override
 	public void parse(CommandSender sender, String currentCommand, Iterator<String> it) {
-		if (!(sender instanceof Player)) {
-			sender.sendMessage(ChatColor.DARK_RED + "Must be a player to use this argument!");
-			return;
-		}
-		Flier f = Flier.getInstance();
 		try {
 			String lobbyName = it.next();
-			Lobby lobby = f.getLobbies().get(lobbyName);
+			Lobby lobby = Flier.getInstance().getLobbies().get(lobbyName);
 			if (lobby == null) {
-				CommandArgument.displayObjects(sender, "lobby", lobbyName, f.getLobbies().keySet());
+				CommandArgument.displayObjects(sender, "lobby", lobbyName, Flier.getInstance().getLobbies().keySet());
 				return;
 			}
 			lobby.addPlayer((Player) sender);
@@ -64,5 +61,15 @@ class JoinLobbyArgument implements CommandArgument {
 	@Override
 	public String getHelp() {
 		return "<lobby>";
+	}
+
+	@Override
+	public Permission getPermission() {
+		return permission;
+	}
+
+	@Override
+	public User getUser() {
+		return User.PLAYER;
 	}
 }

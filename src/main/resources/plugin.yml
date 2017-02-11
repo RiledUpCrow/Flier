@@ -1,11 +1,36 @@
 name: Flier
 main: pl.betoncraft.flier.Flier
-description: Elytra fighting minigame
+description: Elytra air combat minigame for Spigot
 authors: [Co0sh]
 version: 0.3.0
 commands:
   flier:
     description: Gives you flying items
     usage: /<command>
-    permission: flier.items
+    permission: flier.command
     aliases: [f, fl]
+permissions:
+  flier.command:
+    default: true
+    description: Allows using the main Flier command.
+  flier.player.join:
+    default: true
+    description: Allows joining Lobbies with a command.
+  flier.player.leave:
+    default: true
+    description: Allows leaving Lobbies with a command.
+  flier.admin.reload:
+    default: op
+    description: Allows reloading the Flier plugin.
+  flier.admin.setgame:
+    default: op
+    description: Allows setting an active Game in a Lobby.
+  flier.admin.setmoney:
+    default: op
+    description: Allows setting money for in-game players.
+  flier.dev.save:
+    default: false
+    description: Allows saving players to a file.
+  flier.dev.load:
+    default: false
+    description: Allows loading players from a file.

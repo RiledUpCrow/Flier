@@ -12,6 +12,9 @@ import java.util.Set;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.ConsoleCommandSender;
+import org.bukkit.entity.Player;
+import org.bukkit.permissions.Permission;
 
 /**
  * An argument in the Flier command.
@@ -39,6 +42,25 @@ public interface CommandArgument {
 	 * @return the help string which shows how to use the command
 	 */
 	public String getHelp();
+	
+	/**
+	 * @return the list of Permissions which enable using this Argument
+	 */
+	public Permission getPermission();
+	
+	/**
+	 * The user of an Argument.
+	 *
+	 * @author Jakub Sapalski
+	 */
+	public enum User {
+		CONSOLE, PLAYER, ANYONE
+	}
+	
+	/**
+	 * @return who can use this Argument
+	 */
+	public User getUser();
 
 	/**
 	 * Parses the argument. Extracts all information from the argument iterator.
@@ -73,10 +95,16 @@ public interface CommandArgument {
 	public static void nextArgument(CommandSender sender, String currentCommand, Iterator<String> it, String name,
 			List<CommandArgument> arguments) {
 		for (CommandArgument a : arguments) {
-			if (a.getAliases().contains(name)) {
+			if (!a.getAliases().contains(name)) {
+				continue;
+			} else if (!checkUser(sender, a.getUser())) {
+				wrongUser(sender);
+			} else if (!sender.hasPermission(a.getPermission())) {
+				noPermission(sender);
+			} else {
 				a.parse(sender, currentCommand + " " + name, it);
-				return;
 			}
+			return;
 		}
 		displayHelp(sender, arguments);
 	}
@@ -107,6 +135,13 @@ public interface CommandArgument {
 	public static void displayHelp(CommandSender sender, List<CommandArgument> arguments) {
 		sender.sendMessage(ChatColor.RED + "Available arguments:");
 		for (CommandArgument a : arguments) {
+			// skip the argument if the sender can't use it
+			if (!checkUser(sender, a.getUser())) {
+				continue;
+			} else if (!sender.hasPermission(a.getPermission())) {
+				continue;
+			}
+			// get all aliases
 			String aliases;
 			if (a.getAliases().size() > 1) {
 				StringBuilder builder = new StringBuilder();
@@ -118,6 +153,7 @@ public interface CommandArgument {
 			} else {
 				aliases = "";
 			}
+			// display a message
 			sender.sendMessage(ChatColor.YELLOW + "- " + ChatColor.DARK_AQUA + a.getName() + " " + aliases
 					+ ChatColor.YELLOW + ": " + ChatColor.GREEN + a.getDescription());
 		}
@@ -138,13 +174,49 @@ public interface CommandArgument {
 	 *            a set of available object names
 	 */
 	public static void displayObjects(CommandSender sender, String type, String name, Set<String> available) {
-		sender.sendMessage(ChatColor.RED + "No such " + type + ": " + ChatColor.DARK_RED + name);
+		sender.sendMessage(String.format("%sNo such %s: %s%s", ChatColor.RED, type, ChatColor.DARK_RED, name));
 		StringBuilder builder = new StringBuilder();
 		for (String g : available) {
-			builder.append(ChatColor.YELLOW + g + ChatColor.GREEN + ", ");
+			builder.append(String.format("%s%s%s, ", ChatColor.YELLOW, g, ChatColor.GREEN));
 		}
-		sender.sendMessage(ChatColor.GREEN + "Available names: "
-				+ builder.toString().trim().substring(0, builder.lastIndexOf(",")));
+		sender.sendMessage(String.format("%sAvailable names: %s",
+				ChatColor.GREEN, builder.toString().trim().substring(0, builder.lastIndexOf(","))));
+	}
+	
+	/**
+	 * Displays the information about lack of permission to use an Argument.
+	 * 
+	 * @param sender the sender of this command
+	 */
+	public static void noPermission(CommandSender sender) {
+		sender.sendMessage(String.format("%sYou don't have permission to use this command.", ChatColor.RED));
+	}
+	
+	/**
+	 * Displays the information about being a wrong user type of an Argument.
+	 * 
+	 * @param sender the sender of this command
+	 */
+	public static void wrongUser(CommandSender sender) {
+		sender.sendMessage(String.format("%sThis command cannot be used from here.", ChatColor.RED));
+	}
+	
+	/**
+	 * Checks if the sender is of matching type.
+	 * 
+	 * @param sender
+	 *            the sender of this command
+	 * @param target
+	 *            the required type of the command sender
+	 * @return whenever this sender has a required type
+	 */
+	public static boolean checkUser(CommandSender sender, User target) {
+		switch (target) {
+		case ANYONE: return true;
+		case PLAYER: return sender instanceof Player;
+		case CONSOLE: return sender instanceof ConsoleCommandSender;
+		default: return false;
+		}
 	}
 
 }

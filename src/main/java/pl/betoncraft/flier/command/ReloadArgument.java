@@ -12,16 +12,19 @@ import java.util.List;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.permissions.Permission;
 
 import pl.betoncraft.flier.Flier;
 import pl.betoncraft.flier.api.CommandArgument;
 
 /**
- * 
+ * Reloads the plugin.
  *
  * @author Jakub Sapalski
  */
 class ReloadArgument implements CommandArgument {
+	
+	private Permission permission = new Permission("flier.admin.reload");
 
 	@Override
 	public void parse(CommandSender sender, String currentCommand, Iterator<String> it) {
@@ -50,4 +53,15 @@ class ReloadArgument implements CommandArgument {
 	public String getHelp() {
 		return "";
 	}
+
+	@Override
+	public Permission getPermission() {
+		return permission;
+	}
+
+	@Override
+	public User getUser() {
+		return User.ANYONE;
+	}
+
 }
