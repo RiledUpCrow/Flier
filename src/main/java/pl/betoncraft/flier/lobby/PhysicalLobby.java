@@ -111,20 +111,23 @@ public class PhysicalLobby extends DefaultLobby {
 			removePlayer(player);
 		} else {
 			InGamePlayer data = players.get(player.getUniqueId());
-			if (data != null) {
-				if (data.isPlaying()) {
+			if (data == null) {
+				return;
+			}
+			if (data.isPlaying()) {
+				return;
+			}
+			if (block.equals(start)) {
+				currentGame.startPlayer(data);
+			} else {
+				ItemBlock itemBlock = blocks.get(block);
+				if (itemBlock == null) {
 					return;
 				}
-				if (block.equals(start)) {
-					currentGame.startPlayer(data);
-				} else {
-					ItemBlock itemBlock = blocks.get(block);
-					if (itemBlock != null) {
-						handleItems(data, itemBlock.set);
-					}
-				}
+				handleItems(data, itemBlock.set);
 			}
 		}
+		event.setCancelled(true);
 	}
 
 }
