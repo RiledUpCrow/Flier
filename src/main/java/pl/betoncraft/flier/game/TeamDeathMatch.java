@@ -145,11 +145,6 @@ public class TeamDeathMatch extends DefaultGame {
 	public void handleHit(DamageResult result, InGamePlayer attacker, InGamePlayer attacked, Damager damager) {}
 	
 	@Override
-	public Location getRespawnLocation(InGamePlayer player) {
-		return player.getLobby().getSpawn();
-	}
-	
-	@Override
 	public void afterRespawn(InGamePlayer player) {
 		player.getLobby().respawnPlayer(player);
 	}

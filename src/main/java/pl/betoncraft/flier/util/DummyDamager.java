@@ -30,11 +30,6 @@ public class DummyDamager implements Damager {
 	}
 
 	@Override
-	public boolean killsOnGround() {
-		return false;
-	}
-
-	@Override
 	public boolean friendlyFire() {
 		return false;
 	}

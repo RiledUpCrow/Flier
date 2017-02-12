@@ -77,7 +77,7 @@ public class DefaultPlayer implements InGamePlayer {
 		stats.setDisplaySlot(DisplaySlot.SIDEBAR);
 		stats.setDisplayName("Stats");
 		player.setScoreboard(sb);
-		clearPlayer();
+		clear();
 		updateClass();
 	}
 
@@ -186,18 +186,7 @@ public class DefaultPlayer implements InGamePlayer {
 			clazz.getCurrentWings().removeHealth(damager.getDamage());
 		} else if (Utils.getAltitude(getPlayer().getLocation(), 4) != 4) { // in general proximity of the ground,
 			setAttacker(attacker);                                         // handle ground attack
-			if (damager.killsOnGround()) {
-				notify = false;
-				getPlayer().damage(player.getHealth() + 1);
-				result = DamageResult.INSTANT_KILL;
-			} else {
-				double damage = damager.getPhysical();
-				if (player.getPlayer().getHealth() <= damage) {
-					notify = false;
-				}
-				player.getPlayer().damage(damage);
-				result = DamageResult.REGULAR_DAMAGE;
-			}
+			result = DamageResult.REGULAR_DAMAGE;
 		} else { // falling from a high place, do not attack
 			notify = false;
 			sound = false;
@@ -250,7 +239,8 @@ public class DefaultPlayer implements InGamePlayer {
 		return clazz;
 	}
 	
-	private void clearPlayer() {
+	@Override
+	public void clear() {
 		player.getInventory().clear();
 		player.setGameMode(GameMode.SURVIVAL);
 		player.resetMaxHealth();
@@ -361,12 +351,7 @@ public class DefaultPlayer implements InGamePlayer {
 		lastHit = null;
 		color = null;
 		glowTimer = 0;
-		player.setGlowing(false);
-		player.getActivePotionEffects().clear();
-		player.setHealth(player.getMaxHealth());
-		player.setFoodLevel(40);
-		player.setExhaustion(0);
-		player.setVelocity(new Vector());
+		clear();
 		money = 0;
 		clazz.reset();
 		updateClass();

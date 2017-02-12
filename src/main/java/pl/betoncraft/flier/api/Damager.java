@@ -30,11 +30,6 @@ public interface Damager {
 	public enum DamageResult {
 
 		/**
-		 * When the player is on ground and Damager has instant killing option
-		 */
-		INSTANT_KILL,
-
-		/**
 		 * When the player is gliding and Damager has "wings off" option
 		 */
 		WINGS_OFF,
@@ -71,14 +66,6 @@ public interface Damager {
 	 * @return whenever wings should fall off on hit
 	 */
 	public boolean wingsOff();
-
-	/**
-	 * Some weapons are powerful enough to kill with one hit players who are on
-	 * the ground.
-	 * 
-	 * @return whenever the player on ground should be instantly killed
-	 */
-	public boolean killsOnGround();
 	
 	/**
 	 * @return true if this damager should damage players in the same team in

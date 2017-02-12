@@ -22,7 +22,6 @@ public abstract class DefaultAttack extends DefaultAction implements Attack {
 	protected final boolean friendlyFire;
 	protected final double damage;
 	protected final boolean wingsOff;
-	protected final boolean killsOnGround;
 	protected final double physicalDamage;
 	protected final boolean isExploding;
 	
@@ -32,7 +31,6 @@ public abstract class DefaultAttack extends DefaultAction implements Attack {
 		friendlyFire = loader.loadBoolean("friendly_fire", true);
 		damage = loader.loadDouble("damage");
 		wingsOff = loader.loadBoolean("wings_off", false);
-		killsOnGround = loader.loadBoolean("kills_on_ground", false);
 		physicalDamage = loader.loadDouble("physical_damage");
 		isExploding = loader.loadBoolean("exploding", false);
 	}
@@ -45,11 +43,6 @@ public abstract class DefaultAttack extends DefaultAction implements Attack {
 	@Override
 	public boolean wingsOff() {
 		return wingsOff;
-	}
-	
-	@Override
-	public boolean killsOnGround() {
-		return killsOnGround;
 	}
 
 	@Override

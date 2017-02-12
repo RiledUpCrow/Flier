@@ -23,7 +23,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.util.Vector;
 
 import net.md_5.bungee.api.ChatColor;
 import pl.betoncraft.flier.Flier;
@@ -158,10 +157,7 @@ public abstract class DefaultLobby implements Lobby, Listener {
 			break;
 		}
 		player.updateClass();
-		player.getPlayer().setVelocity(new Vector());
-		if (player.getPlayer().getLocation().distanceSquared(spawn) > 1) {
-			player.getPlayer().teleport(spawn);
-		}
+		player.getPlayer().teleport(spawn);
 	}
 
 	@Override

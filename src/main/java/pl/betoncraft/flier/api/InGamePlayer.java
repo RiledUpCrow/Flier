@@ -105,6 +105,11 @@ public interface InGamePlayer {
 	 * Updates the player with his class items.
 	 */
 	public void updateClass();
+	
+	/**
+	 * Clears the player, resetting all properties like health, food level, velocity etc.
+	 */
+	public void clear();
 
 	/**
 	 * @return the player who last attacked this player

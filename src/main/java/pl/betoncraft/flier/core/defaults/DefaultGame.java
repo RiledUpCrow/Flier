@@ -27,17 +27,15 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.ExplosionPrimeEvent;
-import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
-import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.Vector;
 
 import pl.betoncraft.flier.Flier;
 import pl.betoncraft.flier.api.Bonus;
@@ -192,17 +190,6 @@ public abstract class DefaultGame implements Listener, Game {
 	public abstract void handleHit(DamageResult result, InGamePlayer attacker, InGamePlayer attacked, Damager damager);
 	
 	/**
-	 * Should return the exact place to respawn the player. Use it if you want
-	 * to do something special after respawning the player, or just return
-	 * lobby.getSpawn().
-	 * 
-	 * @param player
-	 *            player who is about to be respawned
-	 * @return the location where the player will be respawned
-	 */
-	public abstract Location getRespawnLocation(InGamePlayer player);
-	
-	/**
 	 * This method is called for the respawned player. Use it if you want to do
 	 * something special after respawning the player, or just pass him to
 	 * lobby.respawnPlayer().
@@ -318,7 +305,7 @@ public abstract class DefaultGame implements Listener, Game {
 		}
 	}
 	
-	@EventHandler
+	@EventHandler(priority=EventPriority.LOW)
 	public void onHit(EntityDamageByEntityEvent event) {
 		// if the damager is another player, cancel the event - melee not allowed
 		if (event.getDamager() instanceof Player && getPlayers().containsKey(event.getDamager().getUniqueId())) {
@@ -354,6 +341,61 @@ public abstract class DefaultGame implements Listener, Game {
 				pay(player, byEnemyHitMoney);
 			}
 		}
+		// allow physical damage if it's a direct hit
+		if (result == DamageResult.REGULAR_DAMAGE) {
+			event.setCancelled(false);
+			event.setDamage(weapon.getDamager().getPhysical());
+		}
+	}
+	
+	@EventHandler(priority=EventPriority.HIGH)
+	public void onDamage(EntityDamageEvent event) {
+		if (event.isCancelled()) {
+			return;
+		}
+		// handle death
+		InGamePlayer killed = getPlayers().get(event.getEntity().getUniqueId());
+		if (killed != null && killed.getPlayer().getHealth() - event.getFinalDamage() <= 0) {
+			event.setCancelled(true);
+			killed.clear();
+			killed.setPlaying(false);
+			InGamePlayer lastHit = killed.getAttacker();
+			InGamePlayer killer = lastHit == null ? null : getPlayers().get(lastHit.getPlayer().getUniqueId());
+			killed.setAttacker(null);
+			killed.getPlayer().setGlowing(false);
+			if (killer != null) {
+				switch (event.getEntity().getLastDamageCause().getCause()) {
+				case FALL:
+					notifyAllPlayers(String.format("%s was shot down by %s!",
+							Utils.formatPlayer(killed), Utils.formatPlayer(killer)));
+					break;
+				default:
+					notifyAllPlayers(String.format("%s was killed by %s!",
+							Utils.formatPlayer(killed), Utils.formatPlayer(killer)));
+					break;
+				}
+				handleKill(killer, killed);
+				Attitude a = getAttitude(killer, killed);
+				if (a == Attitude.FRIENDLY) {
+					pay(killer, friendlyKillMoney);
+					pay(killed, byFriendlyDeathMoney);
+				} else if (a == Attitude.HOSTILE) {
+					pay(killer, enemyKillMoney);
+					pay(killed, byEnemyDeathMoney);
+				}
+			} else {
+				notifyAllPlayers(String.format("%s commited suicide...", Utils.formatPlayer(killed)));
+				handleKill(null, killed);
+				pay(killed, suicideMoney);
+			}
+			afterRespawn(killed);
+		}
+	}
+	
+	private void notifyAllPlayers(String message) {
+		for (InGamePlayer player : dataMap.values()) {
+			player.getPlayer().sendMessage(message);
+		}
 	}
 	
 	private void pay(InGamePlayer player, int amount) {
@@ -372,53 +414,6 @@ public abstract class DefaultGame implements Listener, Game {
 		if (!weapon.getDamager().isExploding()) {
 			event.setCancelled(true);
 		}
-	}
-	
-	@EventHandler
-	public void onDeath(PlayerDeathEvent event) {
-		InGamePlayer killed = getPlayers().get(event.getEntity().getUniqueId());
-		if (killed != null) {
-			killed.setPlaying(false);
-			event.getDrops().clear();
-			InGamePlayer lastHit = killed.getAttacker();
-			InGamePlayer killer = lastHit == null ? null : getPlayers().get(lastHit.getPlayer().getUniqueId());
-			killed.setAttacker(null);
-			killed.getPlayer().setGlowing(false);
-			if (killer != null) {
-				switch (event.getEntity().getLastDamageCause().getCause()) {
-				case FALL:
-					event.setDeathMessage(Utils.formatPlayer(killed) + " was shot down by " + Utils.formatPlayer(killer) + "!");
-					break;
-				default:
-					event.setDeathMessage(Utils.formatPlayer(killed) + " was killed by " + Utils.formatPlayer(killer) + "!");
-					break;
-				}
-				handleKill(killer, killed);
-				Attitude a = getAttitude(killer, killed);
-				if (a == Attitude.FRIENDLY) {
-					pay(killer, friendlyKillMoney);
-					pay(killed, byFriendlyDeathMoney);
-				} else if (a == Attitude.HOSTILE) {
-					pay(killer, enemyKillMoney);
-					pay(killed, byEnemyDeathMoney);
-				}
-			} else {
-				event.setDeathMessage(Utils.formatPlayer(killed) + " commited suicide...");
-				handleKill(null, killed);
-				pay(killed, suicideMoney);
-			}
-		}
-	}
-	
-	@EventHandler
-	public void onRespawn(PlayerRespawnEvent event) {
-		InGamePlayer player = getPlayers().get(event.getPlayer().getUniqueId());
-		if (player == null) {
-			return;
-		}
-		event.getPlayer().setVelocity(new Vector());
-		event.setRespawnLocation(getRespawnLocation(player));
-		Bukkit.getScheduler().runTask(Flier.getInstance(), () -> afterRespawn(player));
 	}
 	
 	@EventHandler

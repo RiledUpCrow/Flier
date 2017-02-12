@@ -204,7 +204,7 @@ public class DefaultClass implements PlayerClass {
 	
 	@Override
 	public DefaultClass replicate() {
-		return new DefaultClass(defaultName, defaultEngine, defaultWings, defaultItems);
+		return new DefaultClass(getDefaultName(), getDefaultEngine(), getDefaultWings(), getDefaultItems());
 	}
 
 }
