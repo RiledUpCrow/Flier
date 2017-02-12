@@ -79,7 +79,7 @@ public class PhysicalLobby extends DefaultLobby {
 
 	}
 
-	@EventHandler(priority = EventPriority.HIGH)
+	@EventHandler(priority = EventPriority.LOW)
 	public void onClick(PlayerInteractEvent event) {
 		if (event.isCancelled()) {
 			return;

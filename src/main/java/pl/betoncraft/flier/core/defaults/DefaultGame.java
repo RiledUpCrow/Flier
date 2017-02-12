@@ -17,6 +17,7 @@ import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Sound;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -34,6 +35,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
@@ -44,6 +46,7 @@ import pl.betoncraft.flier.api.Damager.Attacker;
 import pl.betoncraft.flier.api.Damager.DamageResult;
 import pl.betoncraft.flier.api.Game;
 import pl.betoncraft.flier.api.InGamePlayer;
+import pl.betoncraft.flier.api.Wings;
 import pl.betoncraft.flier.exception.LoadingException;
 import pl.betoncraft.flier.sidebar.Altitude;
 import pl.betoncraft.flier.sidebar.Ammo;
@@ -284,21 +287,33 @@ public abstract class DefaultGame implements Listener, Game {
 		return heightLimit;
 	}
 	
-	@EventHandler(priority=EventPriority.LOW)
+	@EventHandler(priority=EventPriority.HIGH)
 	public void onClick(PlayerInteractEvent event) {
 		InGamePlayer data = getPlayers().get(event.getPlayer().getUniqueId());
 		if (data != null) {
-			switch (event.getAction()) {
-			case LEFT_CLICK_AIR:
-			case LEFT_CLICK_BLOCK:
-				data.leftClick();
-				break;
-			case RIGHT_CLICK_AIR:
-			case RIGHT_CLICK_BLOCK:
-				data.rightClick();
-				break;
-			default:
-				break;
+			event.setCancelled(true);
+			ItemStack item = event.getPlayer().getInventory().getItemInMainHand();
+			Wings wings = data.getClazz().getCurrentWings();
+			if (item != null && wings != null && item.isSimilar(wings.getItem())) {
+				// handle wearing wings
+				event.getPlayer().getInventory().setChestplate(item);
+				event.getPlayer().getInventory().setItemInMainHand(null);
+				event.getPlayer().getWorld().playSound(
+						event.getPlayer().getLocation(), Sound.ITEM_ARMOR_EQUIP_GENERIC, 1, 1);
+			} else {
+				// handle a click
+				switch (event.getAction()) {
+				case LEFT_CLICK_AIR:
+				case LEFT_CLICK_BLOCK:
+					data.leftClick();
+					break;
+				case RIGHT_CLICK_AIR:
+				case RIGHT_CLICK_BLOCK:
+					data.rightClick();
+					break;
+				default:
+					break;
+				}
 			}
 		}
 	}
