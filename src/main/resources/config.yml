@@ -402,6 +402,7 @@ lobbies:
 games:
   default:
     type: teamDeathMatch
+    points_to_win: 25
     teams:
       blue:
         name: 'Blue'

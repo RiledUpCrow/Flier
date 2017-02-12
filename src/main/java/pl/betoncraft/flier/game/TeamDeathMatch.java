@@ -18,9 +18,11 @@ import org.bukkit.configuration.ConfigurationSection;
 
 import pl.betoncraft.flier.api.Damager;
 import pl.betoncraft.flier.api.Damager.DamageResult;
-import pl.betoncraft.flier.core.defaults.DefaultGame;
+import pl.betoncraft.flier.api.Game;
 import pl.betoncraft.flier.api.InGamePlayer;
+import pl.betoncraft.flier.api.Lobby;
 import pl.betoncraft.flier.api.SidebarLine;
+import pl.betoncraft.flier.core.defaults.DefaultGame;
 import pl.betoncraft.flier.exception.LoadingException;
 import pl.betoncraft.flier.util.Utils;
 import pl.betoncraft.flier.util.ValueLoader;
@@ -40,11 +42,14 @@ public class TeamDeathMatch extends DefaultGame {
 	protected final int friendlyKillScore;
 	protected final int enemyKillScore;
 	
+	protected final int pointsToWin;
+	
 	public TeamDeathMatch(ConfigurationSection section) throws LoadingException {
 		super(section);
 		suicideScore = loader.loadInt("suicide_score", 0);
 		friendlyKillScore = loader.loadInt("friendly_kill_score", 0);
 		enemyKillScore = loader.loadInt("enemy_kill_score", 1);
+		pointsToWin = loader.loadPositiveInt("points_to_win");
 		ConfigurationSection teams = section.getConfigurationSection("teams");
 		if (teams != null) for (String t : teams.getKeys(false)) {
 			try {
@@ -211,8 +216,9 @@ public class TeamDeathMatch extends DefaultGame {
 	private void setTeam(InGamePlayer data, SimpleTeam team) {
 		players.put(data.getPlayer().getUniqueId(), team);
 		data.setColor(team.getColor());
-		Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "title " + data.getPlayer().getName()
-				+ " title {\"text\":\"" + team.getColor() + Utils.capitalize(team.getName()) + "\"}");
+		String title = String.format("title %s title {\"text\":\"%s%s\"}",
+				data.getPlayer().getName(), team.getColor(), Utils.capitalize(team.getName()));
+		Bukkit.dispatchCommand(Bukkit.getConsoleSender(), title);
 		Map<String, ChatColor> colors = getColors();
 		for (InGamePlayer g : dataMap.values()) {
 			g.updateColors(colors);
@@ -239,7 +245,38 @@ public class TeamDeathMatch extends DefaultGame {
 	}
 	
 	private void score(SimpleTeam team, int amount) {
-		team.setScore(team.getScore() + amount);
+		int newScore = team.getScore() + amount;
+		team.setScore(newScore);
+		if (newScore >= pointsToWin) {
+			// display message about winning
+			for (Entry<UUID, SimpleTeam> entry : players.entrySet()) {
+				String name = Bukkit.getPlayer(entry.getKey()).getName();
+				String word;
+				if (entry.getValue().equals(team)) {
+					word = "You win!";
+				} else {
+					word = "You lose!";
+				}
+				String title = String.format("title %s title {\"text\":\"%sTeam %s wins!\"}",
+						name, team.getColor(), Utils.capitalize(team.getName()));
+				String subTitle = String.format("title %s subtitle {\"text\":\"%s%s\"}",
+						name, entry.getValue().getColor(), word);
+				Bukkit.dispatchCommand(Bukkit.getConsoleSender(), title);
+				Bukkit.dispatchCommand(Bukkit.getConsoleSender(), subTitle);
+			}
+			// start next game
+			Lobby lobby = dataMap.values().iterator().next().getLobby();
+			Game[] games = new Game[lobby.getGames().size()];
+			games = lobby.getGames().values().toArray(games);
+			Game game = null;
+			for (int i = 0; i < games.length; i++) {
+				if (games[i].equals(this)) {
+					game = games[(i+1) % games.length];
+					break;
+				}
+			}
+			lobby.setGame(game);
+		}
 	}
 
 }
