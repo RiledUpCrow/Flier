@@ -16,9 +16,9 @@ import pl.betoncraft.flier.api.Action;
 import pl.betoncraft.flier.api.Activator;
 import pl.betoncraft.flier.api.InGamePlayer;
 import pl.betoncraft.flier.api.Usage;
-import pl.betoncraft.flier.api.UsableItem.Where;
 import pl.betoncraft.flier.exception.LoadingException;
-import pl.betoncraft.flier.util.Utils;
+import pl.betoncraft.flier.util.Position;
+import pl.betoncraft.flier.util.Position.Where;
 import pl.betoncraft.flier.util.ValueLoader;
 
 /**
@@ -76,19 +76,7 @@ public class DefaultUsage implements Usage {
 
 	@Override
 	public boolean canUse(InGamePlayer player) {
-		boolean air = player.getPlayer().isGliding();
-		boolean ground = !air && Utils.getAltitude(player.getPlayer().getLocation(), 4) < 4;
-		boolean fall = !ground && !air;
-		switch (where) {
-		case GROUND:	 return ground;
-		case AIR:		 return air;
-		case FALL:		 return fall;
-		case NO_GROUND:	 return !ground;
-		case NO_AIR:	 return !air;
-		case NO_FALL:	 return !fall;
-		case EVERYWHERE: return true;
-		}
-		return false;
+		return Position.check(player.getPlayer(), where);
 	}
 
 }

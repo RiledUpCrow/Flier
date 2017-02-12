@@ -16,15 +16,6 @@ import java.util.List;
 public interface UsableItem extends Item {
 
 	/**
-	 * Represents a location where the item can be used.
-	 *
-	 * @author Jakub Sapalski
-	 */
-	public enum Where {
-		GROUND, AIR, FALL, NO_GROUND, NO_AIR, NO_FALL, EVERYWHERE
-	}
-
-	/**
 	 * Uses this item once.
 	 * 
 	 * @param player

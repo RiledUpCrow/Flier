@@ -18,20 +18,22 @@ import pl.betoncraft.flier.exception.LoadingException;
  */
 public abstract class DefaultAttack extends DefaultAction implements Attack {
 
+	protected final double damage;
+	protected final double physicalDamage;
+	protected final boolean wingsOff;
+	protected final boolean midAirPhysicalDamage;
 	protected final boolean suicidal;
 	protected final boolean friendlyFire;
-	protected final double damage;
-	protected final boolean wingsOff;
-	protected final double physicalDamage;
 	protected final boolean isExploding;
 	
 	public DefaultAttack(ConfigurationSection section) throws LoadingException {
 		super(section);
+		damage = loader.loadDouble("damage");
+		physicalDamage = loader.loadDouble("physical_damage");
+		wingsOff = loader.loadBoolean("wings_off", false);
+		midAirPhysicalDamage = loader.loadBoolean("midair_physical_damage", false);
 		suicidal = loader.loadBoolean("suicidal", false);
 		friendlyFire = loader.loadBoolean("friendly_fire", true);
-		damage = loader.loadDouble("damage");
-		wingsOff = loader.loadBoolean("wings_off", false);
-		physicalDamage = loader.loadDouble("physical_damage");
 		isExploding = loader.loadBoolean("exploding", false);
 	}
 	
@@ -39,15 +41,20 @@ public abstract class DefaultAttack extends DefaultAction implements Attack {
 	public double getDamage() {
 		return damage;
 	}
+
+	@Override
+	public double getPhysical() {
+		return physicalDamage;
+	}
 	
 	@Override
 	public boolean wingsOff() {
 		return wingsOff;
 	}
-
+	
 	@Override
-	public double getPhysical() {
-		return physicalDamage;
+	public boolean midAirPhysicalDamage() {
+		return midAirPhysicalDamage;
 	}
 	
 	@Override

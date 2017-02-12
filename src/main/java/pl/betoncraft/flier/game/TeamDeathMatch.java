@@ -7,6 +7,7 @@
 package pl.betoncraft.flier.game;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
@@ -142,7 +143,7 @@ public class TeamDeathMatch extends DefaultGame {
 	}
 
 	@Override
-	public void handleHit(DamageResult result, InGamePlayer attacker, InGamePlayer attacked, Damager damager) {}
+	public void handleHit(List<DamageResult> result, InGamePlayer attacker, InGamePlayer attacked, Damager damager) {}
 	
 	@Override
 	public void afterRespawn(InGamePlayer player) {

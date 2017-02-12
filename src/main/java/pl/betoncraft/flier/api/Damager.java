@@ -23,7 +23,7 @@ import pl.betoncraft.flier.util.DummyDamager;
 public interface Damager {
 
 	/**
-	 * Represents a result of player being hit by Damager.
+	 * Represents a result of player being hit by Damager. There can be multiple results.
 	 *
 	 * @author Jakub Sapalski
 	 */
@@ -43,11 +43,12 @@ public interface Damager {
 		 * When the player is on ground and was not instantly killed.
 		 */
 		REGULAR_DAMAGE,
-
+		
 		/**
-		 * When the player is falling.
+		 * When a hit is accepted at all.
 		 */
-		NOTHING
+		HIT,
+		
 
 	}
 
@@ -60,12 +61,28 @@ public interface Damager {
 	public double getDamage();
 
 	/**
+	 * If this weapon does not kill instantly, it can inflict physical damage to
+	 * player's health.
+	 * 
+	 * @return the amount of physical damage dealt to the player
+	 */
+	public double getPhysical();
+
+	/**
 	 * Some weapons can make the wings fall of into the player's inventory. It's
 	 * possible to get them back on quickly and avoid death from falling.
 	 * 
 	 * @return whenever wings should fall off on hit
 	 */
 	public boolean wingsOff();
+	
+	/**
+	 * Some weapons can deal physical damage even if the player is flying.
+	 * The usual wing damage is also applied.
+	 * 
+	 * @return whenever this damager deals physical damage mid-air
+	 */
+	public boolean midAirPhysicalDamage();
 	
 	/**
 	 * @return true if this damager should damage players in the same team in
@@ -82,14 +99,6 @@ public interface Damager {
 	 * @return true if the damager can explode and deal damage that way
 	 */
 	public boolean isExploding();
-
-	/**
-	 * If this weapon does not kill instantly, it can inflict physical damage to
-	 * player's health.
-	 * 
-	 * @return the amount of physical damage dealt to the player
-	 */
-	public double getPhysical();
 
 	/**
 	 * Adds Damager to metadata of the projectile, so Flier can handle it once

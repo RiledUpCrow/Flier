@@ -16,7 +16,6 @@ import java.util.stream.Collectors;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
-import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
@@ -30,8 +29,6 @@ import org.bukkit.util.Vector;
 import com.google.common.collect.Lists;
 
 import pl.betoncraft.flier.api.Bonus;
-import pl.betoncraft.flier.api.Damager;
-import pl.betoncraft.flier.api.Damager.DamageResult;
 import pl.betoncraft.flier.api.Engine;
 import pl.betoncraft.flier.api.InGamePlayer;
 import pl.betoncraft.flier.api.Item;
@@ -41,7 +38,6 @@ import pl.betoncraft.flier.api.SidebarLine;
 import pl.betoncraft.flier.api.UsableItem;
 import pl.betoncraft.flier.api.Wings;
 import pl.betoncraft.flier.util.PlayerBackup;
-import pl.betoncraft.flier.util.Utils;
 import pl.betoncraft.flier.util.Utils.ImmutableVector;
 
 /**
@@ -97,7 +93,7 @@ public class DefaultPlayer implements InGamePlayer {
 						takeWingsOff();
 						enableWings();
 					} else { // wings are not disabled
-						if (isFlying()) { // the player is flying
+						if (player.isGliding()) { // the player is flying
 							modifyFlight();
 							if (isAccelerating()) { // the player is accelerating
 								speedUp();
@@ -157,50 +153,6 @@ public class DefaultPlayer implements InGamePlayer {
 	public boolean isHolding(UsableItem item) {
 		ItemStack stack = player.getInventory().getItemInMainHand();
 		return item == null && stack == null || item != null && stack != null && item.getItem().isSimilar(stack);
-	}
-	
-	@Override
-	public DamageResult damage(InGamePlayer attacker, Damager damager) {
-		DamageResult result = DamageResult.NOTHING;
-		if (!isPlaying()) {
-			return result;
-		}
-		Player shooter = attacker == null ? null : attacker.getPlayer();
-		// was hit by himself
-		if (shooter != null && shooter.equals(player)) {
-			// ignore if you can's commit suicide with this weapon
-			if (!damager.suicidal()) {
-				return result;
-			}
-		}
-		boolean notify = true;
-		boolean sound = true;
-		if (isFlying()) { // flying, handle air attack
-			setAttacker(attacker);
-			if (damager.wingsOff()) {
-				takeWingsOff();
-				result = DamageResult.WINGS_OFF;
-			} else {
-				result = DamageResult.WINGS_DAMAGE;
-			}
-			clazz.getCurrentWings().removeHealth(damager.getDamage());
-		} else if (Utils.getAltitude(getPlayer().getLocation(), 4) != 4) { // in general proximity of the ground,
-			setAttacker(attacker);                                         // handle ground attack
-			result = DamageResult.REGULAR_DAMAGE;
-		} else { // falling from a high place, do not attack
-			notify = false;
-			sound = false;
-		}
-		if (shooter != null && notify && !shooter.equals(player)) {
-			shooter.sendMessage(ChatColor.YELLOW + "You managed to hit " + Utils.formatPlayer(this) + "!");
-		}
-		if (sound) {
-			if (shooter != null) {
-				shooter.playSound(shooter.getLocation(), Sound.BLOCK_DISPENSER_DISPENSE, 1, 1);
-			}
-			player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_HURT, 1, 1);
-		}
-		return result;
 	}
 
 	@Override
@@ -370,10 +322,6 @@ public class DefaultPlayer implements InGamePlayer {
 		return player.isGliding() && player.isSneaking();
 	}
 	
-	private boolean isFlying() {
-		return player.isGliding();
-	}
-	
 	private void startGlowing(int ticks) {
 		player.setGlowing(true);
 		glowTimer = System.currentTimeMillis() + 50*ticks;
@@ -414,7 +362,8 @@ public class DefaultPlayer implements InGamePlayer {
 		wings.addHealth(wings.getRegeneration());
 	}
 	
-	private void takeWingsOff() {
+	@Override
+	public void takeWingsOff() {
 		ItemStack elytra = player.getInventory().getChestplate();
 		if (elytra != null) {
 			player.getInventory().setChestplate(null);

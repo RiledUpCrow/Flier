@@ -25,7 +25,17 @@ public class DummyDamager implements Damager {
 	}
 
 	@Override
+	public double getPhysical() {
+		return 0;
+	}
+
+	@Override
 	public boolean wingsOff() {
+		return false;
+	}
+
+	@Override
+	public boolean midAirPhysicalDamage() {
 		return false;
 	}
 
@@ -42,11 +52,6 @@ public class DummyDamager implements Damager {
 	@Override
 	public boolean isExploding() {
 		return false;
-	}
-
-	@Override
-	public double getPhysical() {
-		return 0;
 	}
 
 }

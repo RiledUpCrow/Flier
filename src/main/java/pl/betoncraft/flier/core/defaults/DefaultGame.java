@@ -16,6 +16,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.configuration.ConfigurationSection;
@@ -54,8 +55,10 @@ import pl.betoncraft.flier.sidebar.Health;
 import pl.betoncraft.flier.sidebar.Money;
 import pl.betoncraft.flier.sidebar.Reload;
 import pl.betoncraft.flier.sidebar.Speed;
+import pl.betoncraft.flier.util.Position;
 import pl.betoncraft.flier.util.Utils;
 import pl.betoncraft.flier.util.ValueLoader;
+import pl.betoncraft.flier.util.Position.Where;
 
 /**
  * Basic rules of a game.
@@ -188,7 +191,7 @@ public abstract class DefaultGame implements Listener, Game {
 	 * @param attacked the attacked player
 	 * @param damager the Damager used in the hit
 	 */
-	public abstract void handleHit(DamageResult result, InGamePlayer attacker, InGamePlayer attacked, Damager damager);
+	public abstract void handleHit(List<DamageResult> result, InGamePlayer attacker, InGamePlayer attacked, Damager damager);
 	
 	/**
 	 * This method is called for the respawned player. Use it if you want to do
@@ -329,10 +332,12 @@ public abstract class DefaultGame implements Listener, Game {
 			return;
 		}
 		// weapon was used on in-game player, process the attack
-		DamageResult result = player.damage(weapon.getAttacker(), weapon.getDamager());
+		List<DamageResult> result = damage(player, weapon.getAttacker(), weapon.getDamager());
 		handleHit(result, weapon.getAttacker(), player, weapon.getDamager());
 		InGamePlayer shooter = weapon.getAttacker();
-		if (result != DamageResult.NOTHING && shooter != null) {
+		// handle a general hit
+		if (result.contains(DamageResult.HIT) && shooter != null) {
+			// pay money for a hit
 			Attitude a = getAttitude(shooter, player);
 			if (a == Attitude.FRIENDLY) {
 				pay(shooter, friendlyHitMoney);
@@ -341,12 +346,56 @@ public abstract class DefaultGame implements Listener, Game {
 				pay(shooter, enemyHitMoney);
 				pay(player, byEnemyHitMoney);
 			}
+			// display a message about the hit and play the sound to the shooter if he exists and if he hit someone else
+			if (shooter != null && !shooter.equals(player)) {
+				shooter.getPlayer().sendMessage(ChatColor.YELLOW + "You managed to hit " + Utils.formatPlayer(player) + "!");
+				shooter.getPlayer().playSound(shooter.getPlayer().getLocation(), Sound.BLOCK_DISPENSER_DISPENSE, 1, 1);
+			}
+			// play being hit sound to the victim
+			player.getPlayer().playSound(player.getPlayer().getLocation(), Sound.ENTITY_VILLAGER_HURT, 1, 1);
 		}
-		// allow physical damage if it's a direct hit
-		if (result == DamageResult.REGULAR_DAMAGE) {
+		// handle physical damage
+		if (result.contains(DamageResult.REGULAR_DAMAGE)) {
 			event.setCancelled(false);
 			event.setDamage(weapon.getDamager().getPhysical());
 		}
+		// handle taking wings off
+		if (result.contains(DamageResult.WINGS_OFF)) {
+			player.takeWingsOff();
+		}
+		// handle wing damage
+		if (result.contains(DamageResult.WINGS_DAMAGE)) {
+			player.getClazz().getCurrentWings().removeHealth(weapon.getDamager().getDamage());
+		}
+	}
+
+	public List<DamageResult> damage(InGamePlayer attacked, InGamePlayer attacker, Damager damager) {
+		List<DamageResult> list = new ArrayList<>(3);
+		// player is not playing, nothing happens
+		if (!attacked.isPlaying()) {
+			return list;
+		}
+		Player shooter = attacker == null ? null : attacker.getPlayer();
+		// ignore if you can's commit suicide with this weapon
+		if (shooter != null && shooter.equals(attacked) && !damager.suicidal()) {
+			return list;
+		}
+		// flying, handle air attack
+		if (Position.check(attacked.getPlayer(), Where.NO_FALL)) {
+			list.add(DamageResult.HIT);
+			if (Position.check(attacked.getPlayer(), Where.AIR)) {
+				if (damager.wingsOff()) {
+					list.add(DamageResult.WINGS_OFF);
+				}
+				if (damager.midAirPhysicalDamage()) {
+					list.add(DamageResult.REGULAR_DAMAGE);
+				}
+				list.add(DamageResult.WINGS_DAMAGE);
+			} else if (Position.check(attacked.getPlayer(), Where.GROUND)) {
+				list.add(DamageResult.REGULAR_DAMAGE);
+			}
+		}
+		return list;
 	}
 	
 	@EventHandler(priority=EventPriority.HIGH)

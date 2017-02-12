@@ -12,8 +12,6 @@ import java.util.Map;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
-import pl.betoncraft.flier.api.Damager.DamageResult;
-
 /**
  * Represents a player who is in a Game.
  *
@@ -59,16 +57,9 @@ public interface InGamePlayer {
 	public boolean isHolding(UsableItem item);
 
 	/**
-	 * Called when the Game decides the player was damaged by a Damager object,
-	 * optionally fired by attacker.
-	 * 
-	 * @param attacker
-	 *            the player who fired the damager
-	 * @param damager
-	 *            the Damager object (for example Weapon)
-	 * @return the result of damage
+	 * Takes wings off the player.
 	 */
-	public DamageResult damage(InGamePlayer attacker, Damager damager);
+	public void takeWingsOff();
 
 	/**
 	 * @return the the lobby this player is in

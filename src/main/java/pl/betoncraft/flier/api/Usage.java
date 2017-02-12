@@ -8,7 +8,7 @@ package pl.betoncraft.flier.api;
 
 import java.util.List;
 
-import pl.betoncraft.flier.api.UsableItem.Where;
+import pl.betoncraft.flier.util.Position.Where;
 
 /**
  * Represents a set of Activators which can activate a set of Actions.
