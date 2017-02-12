@@ -107,7 +107,7 @@ public class Flier extends JavaPlugin {
 		registerActivator("wingsHealth", s -> new WingsHealthActivator(s));
 
 		// load stuff
-		loadLobbies();
+		reload();
 		
 		// add projectile cleanup listener
 		Bukkit.getPluginManager().registerEvents(new Listener() {
@@ -125,7 +125,12 @@ public class Flier extends JavaPlugin {
 		// TODO add after-crash player restore
 	}
 
-	private void loadLobbies() {
+	public void reload() {
+		reloadConfig();
+		configManager = new ConfigManager();
+		for (Lobby lobby : lobbies.values()) {
+			lobby.stop();
+		}
 		lobbies.clear();
 		ConfigurationSection lobbySection = configManager.getLobbies();
 		if (lobbySection != null) {

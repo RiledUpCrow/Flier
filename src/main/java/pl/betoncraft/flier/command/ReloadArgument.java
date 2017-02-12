@@ -29,8 +29,7 @@ class ReloadArgument implements CommandArgument {
 	@Override
 	public void parse(CommandSender sender, String currentCommand, Iterator<String> it) {
 		Flier f = Flier.getInstance();
-		f.onDisable();
-		f.onEnable();
+		f.reload();
 		sender.sendMessage(ChatColor.DARK_GREEN + "Reloaded!");
 	}
 
