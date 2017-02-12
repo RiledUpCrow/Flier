@@ -28,6 +28,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.ExplosionPrimeEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
@@ -363,8 +364,8 @@ public abstract class DefaultGame implements Listener, Game {
 			InGamePlayer killer = lastHit == null ? null : getPlayers().get(lastHit.getPlayer().getUniqueId());
 			killed.setAttacker(null);
 			killed.getPlayer().setGlowing(false);
-			if (killer != null) {
-				switch (event.getEntity().getLastDamageCause().getCause()) {
+			if (killer != null && !killer.equals(killed)) {
+				switch (event.getCause()) {
 				case FALL:
 					notifyAllPlayers(String.format("%s was shot down by %s!",
 							Utils.formatPlayer(killed), Utils.formatPlayer(killer)));
@@ -413,6 +414,13 @@ public abstract class DefaultGame implements Listener, Game {
 		}
 		if (!weapon.getDamager().isExploding()) {
 			event.setCancelled(true);
+		}
+	}
+	
+	@EventHandler
+	public void onBlockExplode(EntityExplodeEvent event) {
+		if (Damager.getDamager(event.getEntity()) != null) {
+			event.blockList().clear();
 		}
 	}
 	

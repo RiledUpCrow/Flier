@@ -191,7 +191,7 @@ public class DefaultPlayer implements InGamePlayer {
 			notify = false;
 			sound = false;
 		}
-		if (shooter != null && notify) {
+		if (shooter != null && notify && !shooter.equals(player)) {
 			shooter.sendMessage(ChatColor.YELLOW + "You managed to hit " + Utils.formatPlayer(this) + "!");
 		}
 		if (sound) {

@@ -25,6 +25,7 @@ import pl.betoncraft.flier.action.WingsHealthAction;
 import pl.betoncraft.flier.action.LaunchAction;
 import pl.betoncraft.flier.action.MoneyAction;
 import pl.betoncraft.flier.action.TargetAction;
+import pl.betoncraft.flier.action.attack.AutoDestruction;
 import pl.betoncraft.flier.action.attack.HomingMissile;
 import pl.betoncraft.flier.action.attack.MachineGun;
 import pl.betoncraft.flier.activator.LeftClickActivator;
@@ -88,6 +89,7 @@ public class Flier extends JavaPlugin {
 		registerBonus("entity", s -> new EntityBonus(s));
 		registerAction("machineGun", s -> new MachineGun(s));
 		registerAction("homingMissile", s -> new HomingMissile(s));
+		registerAction("autoDestruction", s -> new AutoDestruction(s));
 		registerAction("launcher", s -> new LaunchAction(s));
 		registerAction("effect", s -> new EffectAction(s));
 		registerAction("money", s -> new MoneyAction(s));
