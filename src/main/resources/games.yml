@@ -1,0 +1,26 @@
+default:
+  type: teamDeathMatch
+  points_to_win: 25
+  teams:
+    blue:
+      name: 'Blue'
+      location: -5194.5;200;4665.5;void;180;0
+      color: blue
+    red:
+      name: 'Red'
+      location: -5194.5;200;4409.5;void;0;0
+      color: red
+  money:
+    enabled: true
+    enemy_hit: 1
+    enemy_kill: 5
+    friendly_kill: -2
+    by_friendly_death: 2
+    suicide: -1
+  height_limit: 512
+  height_damage: 0.5
+  bonuses:
+  - money
+  - fix
+  center: -5194.5;200;4537.5;void
+  radius: 1000

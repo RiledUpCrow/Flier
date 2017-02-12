@@ -1,0 +1,9 @@
+left:
+  type: leftClick
+right:
+  type: rightClick
+slow:
+  type: slowTick
+wingsDead:
+  type: wingsHealth
+  min: 0

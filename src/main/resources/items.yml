@@ -1,0 +1,167 @@
+balancedWeapon:
+  material: bone
+  name: '&4Balanced Weapon'
+  lore:
+  - '&bMedium burst length, low damage.'
+  - '&bDisables wings.'
+  - '&aLeft click to shoot, right click to reload.'
+  slot: 0
+  ammo: 10
+  usages:
+    shoot:
+      where: air
+      cooldown: 30
+      ammo_use: 1
+      activators:
+      - left
+      actions:
+      - balancedShot
+    reload:
+      where: no fall
+      cooldown: 150
+      ammo_use: -10
+      activators:
+      - right
+strongWeapon:
+  material: blaze rod
+  name: '&4Strong Weapon'
+  lore:
+  - '&bShort burst length, high damage.'
+  - '&bDisables wings, kills on ground.'
+  - '&aLeft click to shoot, right click to reload.'
+  slot: 0
+  ammo: 15
+  usages:
+    shoot:
+      where: air
+      cooldown: 40
+      ammo_use: 1
+      activators:
+      - left
+      actions:
+      - strongShot
+    reload:
+      where: no fall
+      cooldown: 200
+      ammo_use: -15
+      activators:
+      - right
+fastWeapon:
+  material: stick
+  name: '&4Fast Weapon'
+  lore:
+  - '&bLong burst length, medium damage.'
+  - '&aLeft click to shoot, right click to reload.'
+  slot: 0
+  ammo: 5
+  usages:
+    shoot:
+      where: air
+      cooldown: 20
+      ammo_use: 1
+      activators:
+      - left
+      actions:
+      - fastShot
+    reload:
+      where: no fall
+      cooldown: 100
+      ammo_use: -5
+      activators:
+      - right
+gun:
+  material: torch
+  name: '&4Gun'
+  lore:
+  - '&bCan shoot from the ground.'
+  - '&aLeft click to shoot, right click to reload.'
+  slot: 2
+  ammo: 10
+  usages:
+    shoot:
+      where: no air
+      cooldown: 5
+      ammo_use: 1
+      activators:
+      - left
+      actions:
+      - gunShot
+    reload:
+      where: no fall
+      cooldown: 50
+      ammo_use: -10
+      activators:
+      - right
+bomb:
+  material: tnt
+  name: '&cAutoDestruct Button'
+  lore:
+  - '&bExplodes. Only usable on the ground.'
+  - '&aLeft click to set off.'
+  slot: 7
+  usages:
+    prime:
+      activators:
+      - left
+      actions:
+      - autodestruct
+rocket:
+  material: arrow
+  name: '&eRocket'
+  lore:
+  - '&bTracks players. Disables wings. High damage.'
+  - '&aLeft click to launch.'
+  slot: 3
+  consumable: true
+  usages:
+    shoot:
+      where: air
+      cooldown: 100
+      activators:
+      - left
+      actions:
+      - missile
+radar:
+  material: compass
+  name: '&aRadar'
+  lore:
+  - '&bShows nearby hostiles.'
+  - '&aNo need to hold or click it.'
+  slot: 8
+  usages:
+    passive:
+      activators:
+      - slow
+      actions:
+      - target
+launcher:
+  material: firework
+  name: '&5Launcher'
+  lore:
+  - '&bLaunches you in the direction you''re looking.'
+  - '&aLeft click to use.'
+  slot: 4
+  consumable: true
+  usages:
+    shoot:
+      cooldown: 50
+      activators:
+      - left
+      actions:
+      - launch
+wings:
+  material: water lily
+  name: '&dEmergency Wings'
+  lore:
+  - '&bRestores destroyed wings.'
+  - '&aLeft click to use.'
+  slot: 5
+  consumable: true
+  usages:
+    use:
+      where: ground
+      activators:
+      - left
+      - wingsDead
+      actions:
+      - repair

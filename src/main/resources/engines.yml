@@ -1,0 +1,44 @@
+balancedEngine:
+  type: multiplyingEngine
+  material: sugar cane
+  name: '&2Balanced Engine'
+  lore:
+  - '&bMedium speed, acceleration and fuel.'
+  - '&aHold shift to accelerate.'
+  max_speed: 1.5
+  min_speed: 0.75
+  acceleration: 0.025
+  max_fuel: 750
+  consumption: 2
+  regeneration: 1
+  glow_time: 100
+fastEngine:
+  type: multiplyingEngine
+  material: feather
+  name: '&2Fast Engine'
+  lore:
+  - '&bHigh maximum speed and fuel regeneration.'
+  - '&bLow acceleration and fuel reserves.'
+  - '&aHold shift to accelerate.'
+  max_speed: 2.5
+  min_speed: 0.5
+  acceleration: 0.0125
+  max_fuel: 500
+  consumption: 2.5
+  regeneration: 1.5
+  glow_time: 50
+strongEngine:
+  type: multiplyingEngine
+  material: wheat
+  name: '&2Strong Engine'
+  lore:
+  - '&bLow speed and fuel regeneration.'
+  - '&bHigh acceleration and fuel reserves.'
+  - '&aHold shift to accelerate.'
+  max_speed: 1
+  min_speed: 1
+  acceleration: 0.05
+  max_fuel: 1500
+  consumption: 2
+  regeneration: 1
+  glow_time: 200

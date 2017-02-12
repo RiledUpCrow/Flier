@@ -21,10 +21,10 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import pl.betoncraft.flier.action.EffectAction;
 import pl.betoncraft.flier.action.FuelAction;
-import pl.betoncraft.flier.action.WingsHealthAction;
 import pl.betoncraft.flier.action.LaunchAction;
 import pl.betoncraft.flier.action.MoneyAction;
 import pl.betoncraft.flier.action.TargetAction;
+import pl.betoncraft.flier.action.WingsHealthAction;
 import pl.betoncraft.flier.action.attack.AutoDestruction;
 import pl.betoncraft.flier.action.attack.HomingMissile;
 import pl.betoncraft.flier.action.attack.MachineGun;
@@ -48,12 +48,16 @@ import pl.betoncraft.flier.engine.MultiplyingEngine;
 import pl.betoncraft.flier.exception.LoadingException;
 import pl.betoncraft.flier.game.TeamDeathMatch;
 import pl.betoncraft.flier.lobby.PhysicalLobby;
+import pl.betoncraft.flier.util.ConfigManager;
 import pl.betoncraft.flier.util.Utils;
 import pl.betoncraft.flier.wings.SimpleWings;
 
 public class Flier extends JavaPlugin {
 
 	private static Flier instance;
+	
+	private ConfigManager configManager;
+	private FlierCommand flierCommand;
 
 	private Map<String, Factory<Engine>> engineTypes = new HashMap<>();
 	private Map<String, Factory<Wings>> wingTypes = new HashMap<>();
@@ -79,7 +83,8 @@ public class Flier extends JavaPlugin {
 	public void onEnable() {
 		instance = this;
 		saveDefaultConfig();
-		new FlierCommand();
+		configManager = new ConfigManager();
+		flierCommand = new FlierCommand();
 
 		// register new types
 		registerEngine("multiplyingEngine", s -> new MultiplyingEngine(s));
@@ -101,6 +106,7 @@ public class Flier extends JavaPlugin {
 		registerActivator("slowTick", s -> new SlowTickActivator(s));
 		registerActivator("wingsHealth", s -> new WingsHealthActivator(s));
 
+		// load stuff
 		loadLobbies();
 		
 		// add projectile cleanup listener
@@ -115,15 +121,17 @@ public class Flier extends JavaPlugin {
 				}
 			}
 		}, this);
+		
+		// TODO add after-crash player restore
 	}
 
 	private void loadLobbies() {
 		lobbies.clear();
-		ConfigurationSection lobbySection = getConfig().getConfigurationSection("lobbies");
+		ConfigurationSection lobbySection = configManager.getLobbies();
 		if (lobbySection != null) {
 			for (String section : lobbySection.getKeys(false)) {
 				try {
-					lobbies.put(section, getObject(section, "lobby", "lobbies", lobbyTypes));
+					lobbies.put(section, getObject(section, "lobby", lobbySection, lobbyTypes));
 				} catch (LoadingException e) {
 					getLogger().severe(String.format("Error while loading lobby '%s':", section));
 					getLogger().severe(String.format("    - %s", e.getMessage()));
@@ -151,11 +159,23 @@ public class Flier extends JavaPlugin {
 	public static Flier getInstance() {
 		return instance;
 	}
+	
+	/**
+	 * @return the instance of ConfigManager
+	 */
+	public ConfigManager getConfigManager() {
+		return configManager;
+	}
+	
+	/**
+	 * @return the instance of Flier command
+	 */
+	public FlierCommand getFlierCommand() {
+		return flierCommand;
+	}
 
 	/**
-	 * Returns an immutable view of the lobbies map.
-	 * 
-	 * @return the lobbies
+	 * @return an immutable view of the lobbies map
 	 */
 	public Map<String, Lobby> getLobbies() {
 		return Collections.unmodifiableMap(lobbies);
@@ -168,7 +188,7 @@ public class Flier extends JavaPlugin {
 	 *             when the Engine cannot be created due to an error
 	 */
 	public Engine getEngine(String id) throws LoadingException {
-		return getObject(id, "engine", "engines", engineTypes);
+		return getObject(id, "engine", configManager.getEngines(), engineTypes);
 	}
 
 	/**
@@ -178,7 +198,7 @@ public class Flier extends JavaPlugin {
 	 *             when the Item cannot be created due to an error
 	 */
 	public UsableItem getItem(String id) throws LoadingException {
-		ConfigurationSection section = getConfig().getConfigurationSection("items").getConfigurationSection(id);
+		ConfigurationSection section = configManager.getItems().getConfigurationSection(id);
 		if (section == null) {
 			throw new LoadingException(String.format("Item with ID '%s' does not exist.", id));
 		}
@@ -196,7 +216,7 @@ public class Flier extends JavaPlugin {
 	 *             when the Wings cannot be created due to an error
 	 */
 	public Wings getWing(String id) throws LoadingException {
-		return getObject(id, "wing", "wings", wingTypes);
+		return getObject(id, "wing", configManager.getWings(), wingTypes);
 	}
 	
 	/**
@@ -206,7 +226,7 @@ public class Flier extends JavaPlugin {
 	 *             when the Game cannot be created due to an error
 	 */
 	public Game getGame(String id) throws LoadingException {
-		return getObject(id, "game", "games", gameTypes);
+		return getObject(id, "game", configManager.getGames(), gameTypes);
 	}
 	
 	/**
@@ -216,7 +236,7 @@ public class Flier extends JavaPlugin {
 	 *             when the Action cannot be created due to an error
 	 */
 	public Action getAction(String id) throws LoadingException {
-		return getObject(id, "action", "actions", actionTypes);
+		return getObject(id, "action", configManager.getActions(), actionTypes);
 	}
 	
 	/**
@@ -226,7 +246,7 @@ public class Flier extends JavaPlugin {
 	 *             when the Activator cannot be created due to an error
 	 */
 	public Activator getActivator(String id) throws LoadingException {
-		return getObject(id, "activator", "activators", activatorTypes);
+		return getObject(id, "activator", configManager.getActivators(), activatorTypes);
 	}
 	
 	/**
@@ -236,13 +256,13 @@ public class Flier extends JavaPlugin {
 	 *             when the Bonus cannot be created due to an error, type is not defined or Bonus is not defined
 	 */
 	public Bonus getBonus(String id) throws LoadingException {
-		return getObject(id, "bonus", "bonuses", bonusTypes);
+		return getObject(id, "bonus", configManager.getBonuses(), bonusTypes);
 	}
 
-	private <T> T getObject(String id, String name, String section, Map<String, Factory<T>> factories)
+	private <T> T getObject(String id, String name, ConfigurationSection section, Map<String, Factory<T>> factories)
 			throws LoadingException {
 		name = Utils.capitalize(name);
-		ConfigurationSection config = getConfig().getConfigurationSection(String.format("%s.%s", section, id));
+		ConfigurationSection config = section.getConfigurationSection(id);
 		if (config == null || config.getKeys(false).size() == 0) {
 			throw new LoadingException(String.format("%s with ID '%s' does not exist.", name, id));
 		}

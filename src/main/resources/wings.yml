@@ -1,0 +1,40 @@
+balancedWings:
+  type: simpleWings
+  material: elytra
+  name: '&3Balanced Wings'
+  lore:
+  - '&bDefault Elytra fight.'
+  - '&bMedium durability.'
+  - '&aPress space while falling to fly.'
+  max_health: 2800
+  regeneration: 0.5
+  aerodynamics: 0
+  liftingforce: 0
+  maxLift: 0
+lightWings:
+  type: simpleWings
+  material: elytra
+  name: '&3Light Wings'
+  lore:
+  - '&bFast wings with strong lifting force.'
+  - '&bQuite fragile.'
+  - '&aPress space while falling to fly.'
+  max_health: 2000
+  regeneration: 0.5
+  aerodynamics: 0.002
+  liftingforce: 0.001
+  maxLift: 0.01
+heavyWings:
+  type: simpleWings
+  material: elytra
+  name: '&3Heavy Wings'
+  lore:
+  - '&bSlow, heavy wings.'
+  - '&bVery sturdy.'
+  - '&aPress space while falling to fly.'
+  max_health: 3600
+  regeneration: 0.5
+  aerodynamics: -0.0025
+  liftingforce: 0
+  maxLift: 0
+  weight: 0.01
