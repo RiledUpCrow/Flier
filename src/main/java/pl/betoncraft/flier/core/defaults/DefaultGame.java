@@ -18,6 +18,7 @@ import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.HandlerList;
@@ -304,18 +305,27 @@ public abstract class DefaultGame implements Listener, Game {
 	
 	@EventHandler
 	public void onHit(EntityDamageByEntityEvent event) {
-		// the damaged player is in game
+		// if the damager is another player, cancel the event - melee not allowed
+		if (event.getDamager() instanceof Player && getPlayers().containsKey(event.getDamager().getUniqueId())) {
+			event.setCancelled(true);
+			return;
+		}
+		// get stuff involved in the attack
 		InGamePlayer player = getPlayers().get(event.getEntity().getUniqueId());
-		if (player == null) {
-			return;
-		}
-		event.setCancelled(true);
-		event.getDamager().remove();
-		// the damage was done with a Damager
 		Attacker weapon = Damager.getDamager(event.getDamager());
-		if (weapon == null) {
+		// it's a weapon, so remove the attacking entity
+		if (weapon != null) {
+			event.getDamager().remove();
+		}
+		// cancel event if it's involved in the game
+		if (weapon != null || player != null) {
+			event.setCancelled(true);
+		}
+		// stop if the weapon was not used or in-game player was not attacked
+		if (weapon == null || player == null) {
 			return;
 		}
+		// weapon was used on in-game player, process the attack
 		DamageResult result = player.damage(weapon.getAttacker(), weapon.getDamager());
 		handleHit(result, weapon.getAttacker(), player, weapon.getDamager());
 		InGamePlayer shooter = weapon.getAttacker();
