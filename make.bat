@@ -45,7 +45,7 @@ pandoc^
  docs\Bonus.md^
  -f markdown_github -t html5^
  -V margin-top=2cm -V margin-bottom=2cm -V margin-left=2cm -V margin-right=2cm^
- --css ..\style.css^
+ --css style.css^
  -o target\Documentation.pdf >nul 2>nul
 if %ERRORLEVEL% NEQ 0 (
   echo Error: could not generate documentation
