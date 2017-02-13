@@ -1,26 +1,33 @@
+### Games
+#
+# In this file you can specify different types, places and rules of your games.
+# Here is an example Game for you to use and modify.
+# A list of all Game types and their configurations can be found in the documentation.
+#
+
 default:
-  type: teamDeathMatch
-  points_to_win: 25
-  teams:
+  type: teamDeathMatch                 # type of the Game
+  points_to_win: 25                    # points required to win the Game
+  teams:                               # list of teams
     blue:
-      name: 'Blue'
-      location: -5194.5;200;4665.5;void;180;0
-      color: blue
+      name: 'Blue'                     # name of the team
+      location: 100;200;300;world;0;0  # spawn location for the team, **EDIT THIS BEFORE USING!**
+      color: blue                      # color of the team
     red:
       name: 'Red'
-      location: -5194.5;200;4409.5;void;0;0
+      location: 100;200;300;world;0;0  # **EDIT THIS BEFORE USING!**
       color: red
-  money:
-    enabled: true
-    enemy_hit: 1
-    enemy_kill: 5
-    friendly_kill: -2
-    by_friendly_death: 2
-    suicide: -1
-  height_limit: 512
-  height_damage: 0.5
-  bonuses:
+  money:                               # money settings for the Game
+    enabled: true                      # whenever the money system is enabled at all
+    enemy_hit: 1                       # amount of money players get of different actions
+    enemy_kill: 5                      #
+    friendly_kill: -2                  #
+    by_friendly_death: 2               #
+    suicide: -1                        #
+  height_limit: 512                    # maximum height of the map
+  height_damage: 0.5                   # damage taken when flying above the height limit
+  bonuses:                             # list of Bonuses in this Game
   - money
   - fix
-  center: -5194.5;200;4537.5;void
-  radius: 1000
+  center: 100;200;300;world            # center of the map, **EDIT THIS BEFORE USING!**
+  radius: 1000                         # the radius defining map borders

@@ -1,16 +1,24 @@
+### Bonuses
+#
+# Bonuses are collectible objects in the Game. They can run Actions upon being
+# collected by a player, for example giving them money or repairing their wings.
+# Here are some example Actions for you to use and modify.
+# A list of all Bonus types can be found in the documentation.
+#
+
 money:
-  type: entity
-  location: -5167.5;125.5;4537.5;void
-  entity: sheep
-  distance: 2
-  consumable: true
-  cooldown: 600
-  respawn: 600
-  actions:
-  - giveMoney
+  type: entity                  # type of the Bonus
+  location: 100;200;300;world   # location of the Entity, **EDIT THIS BEFORE USING!**
+  entity: sheep                 # type of the Entity
+  distance: 2                   # radius where it can be collected
+  consumable: true              # whenever the Entity disappears when collected
+  cooldown: 600                 # ticks before it can be collected again
+  respawn: 600                  # ticks before it is respawned after collecting
+  actions:                      # list of Actions to run when it's collected
+  - giveMoney                   # this Action gives money, see actions.yml file
 fix:
   type: entity
-  location: -5282.5;159;4537.5;void
+  location: 100;200;300;world   # **EDIT THIS BEFORE USING!**
   entity: chicken
   distance: 2.5
   consumable: true

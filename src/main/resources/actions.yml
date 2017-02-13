@@ -1,15 +1,21 @@
+### Actions
+#
+# Actions represent some events that can happen, for example shooting a gun or healing someone.
+# Here are some example Actions for you to use and modify.
+# A list of all Action types and their configurations can be found in the documentation.
+#
+
 balancedShot:
-  type: machineGun
-  entity: small fireball
-  burst_amount: 10
-  burst_ticks: 1
-  projectile_speed: 5.75
-  damage: 1200
-  wings_off: true
-  kills_on_ground: false
-  friendly_fire: true
-  suicidal: false
-  physical_damage: 7.5
+  type: machineGun          # type of the Action
+  entity: small fireball    # entity used as a projectile
+  burst_amount: 10          # amount of projectiles in a burst
+  burst_ticks: 1            # ticks between shots
+  projectile_speed: 5.75    # speed of projectiles
+  damage: 1200              # damage to wings
+  physical_damage: 7.5      # damage to player's health
+  wings_off: true           # whenever wings are taken off on hit
+  friendly_fire: true       # whenever it can damage friendly players
+  suicidal: false           # whenever it can damage the shooter
 strongShot:
   type: machineGun
   entity: fireball
@@ -17,11 +23,10 @@ strongShot:
   burst_ticks: 1
   projectile_speed: 5
   damage: 2800
+  physical_damage: 20
   wings_off: true
-  kills_on_ground: true
   friendly_fire: true
   suicidal: false
-  physical_damage: 10
 fastShot:
   type: machineGun
   entity: snowball
@@ -29,11 +34,10 @@ fastShot:
   burst_ticks: 2
   projectile_speed: 50
   damage: 700
+  physical_damage: 5
   wings_off: false
-  kills_on_ground: false
   friendly_fire: true
   suicidal: false
-  physical_damage: 5
 gunShot:
   type: machineGun
   entity: snowball
@@ -41,20 +45,19 @@ gunShot:
   burst_ticks: 1
   projectile_speed: 5
   damage: 1000
+  physical_damage: 5
   wings_off: false
-  kills_on_ground: false
   friendly_fire: true
   suicidal: false
-  physical_damage: 5
 autodestruct:
   type: autoDestruction
   power: 5
   damage: 5000
+  physical_damage: 1000
   wings_off: false
   midair_physical_damage: true
   friendly_fire: true
   suicidal: true
-  physical_damage: 1000
   exploding: true
 missile:
   type: homingMissile
@@ -65,11 +68,10 @@ missile:
   lifetime: 600
   maneuverability: 1
   damage: 2000
+  physical_damage: 18
   wings_off: true
-  kills_on_ground: false
   friendly_fire: true
   suicidal: true
-  physical_damage: 18
 launch:
   type: launcher
   speed: 2

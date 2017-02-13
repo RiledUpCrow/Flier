@@ -1,9 +1,17 @@
+### Activators
+#
+# Activators represent conditions under which an item is used,
+# for example after left clicking or when fuel is full.
+# Here are some example Activators for you to use and modify.
+# A list of all Activator types can be found in the documentation.
+#
+
+wingsDead:
+  type: wingsHealth     # type of the Activator
+  min: 0                # minimum health of wings
 left:
-  type: leftClick
+  type: leftClick       # this type does not have any additional options
 right:
   type: rightClick
 slow:
   type: slowTick
-wingsDead:
-  type: wingsHealth
-  min: 0

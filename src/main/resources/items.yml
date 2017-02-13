@@ -1,22 +1,29 @@
+### Items
+#
+# Items are regular Minecraft items which can run Actions.
+# Here are some example Items for you to use and modify.
+# A list of all Item types and their configurations can be found in the documentation.
+#
+
 balancedWeapon:
-  material: bone
-  name: '&4Balanced Weapon'
-  lore:
+  material: bone                                    # material of the item
+  name: '&4Balanced Weapon'                         # name of the item
+  lore:                                             # lore (text under item's name)
   - '&bMedium burst length, low damage.'
   - '&bDisables wings.'
   - '&aLeft click to shoot, right click to reload.'
-  slot: 0
-  ammo: 10
-  usages:
-    shoot:
-      where: air
-      cooldown: 30
-      ammo_use: 1
-      activators:
-      - left
-      actions:
-      - balancedShot
-    reload:
+  slot: 0                                           # slot in which the item is placed
+  ammo: 10                                          # ammunition in this item
+  usages:                                           # list  of usages
+    shoot:                                          # one of the usages
+      where: air                                    # where it can be used
+      cooldown: 30                                  # cooldown after this usage
+      ammo_use: 1                                   # amount of ammunition taken
+      activators:                                   # list of Activators
+      - left                                        # this usage is activated after left click
+      actions:                                      # list of Actions
+      - balancedShot                                # this usage will shoot a balanced machine gun
+    reload:                                         # another usage
       where: no fall
       cooldown: 150
       ammo_use: -10

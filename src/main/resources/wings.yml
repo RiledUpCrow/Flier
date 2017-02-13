@@ -1,16 +1,23 @@
+### Wings
+#
+# Wings are Items which allow players to fly.
+# Here are some example Wings for you to use and modify.
+# A list of all Wing types and their configurations can be found in the documentation.
+#
+
 balancedWings:
-  type: simpleWings
-  material: elytra
-  name: '&3Balanced Wings'
-  lore:
+  type: simpleWings                             # type of the Wings
+  material: elytra                              # material of the item
+  name: '&3Balanced Wings'                      # name of the item
+  lore:                                         # lore (text under item's name)
   - '&bDefault Elytra fight.'
   - '&bMedium durability.'
   - '&aPress space while falling to fly.'
-  max_health: 2800
-  regeneration: 0.5
-  aerodynamics: 0
-  liftingforce: 0
-  maxLift: 0
+  max_health: 2800                              # health of these Wings
+  regeneration: 0.5                             # regeneration per tick
+  aerodynamics: 0                               # air resistance factor of these Wings
+  liftingforce: 0                               # lifting force factor of these Wings
+  maxLift: 0                                    # maximum lifting force after applying weight (see docs)
 lightWings:
   type: simpleWings
   material: elytra
