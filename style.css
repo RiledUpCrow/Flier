@@ -1,0 +1,65 @@
+body {
+    line-height: 30px;
+    font-size: 20px;
+    font-family: Roboto;
+    text-align: left;
+}
+
+img {
+    width: 100%;
+}
+
+h1 {
+    margin-top: 100px;
+    page-break-before: never;
+}
+
+code {
+    background-color: rgba(245,245,245,1);
+    padding: 3px 8px 3px 8px;
+    border-radius: 5px;
+    font-family: Consolas;
+}
+
+pre {
+    background-color: rgba(245,245,245,1);
+    border-radius: 8px;
+    margin: 0 10px 0 10px;
+    padding: 5px 10px 5px 10px;
+}
+
+pre code {
+    background-color: inherit;
+    padding: 0;
+    border-radius: 0;
+}
+
+a {
+    color: #4078c0;
+    text-decoration: none;
+}
+
+table, th, td {
+    border: 2px solid gray;
+}
+
+thead {
+    background-color: lightgray;
+    display: table-header-group;
+}
+
+tfoot {
+    display: table-row-group;
+}
+
+table {
+    border-collapse: collapse;
+}
+
+tr {
+    page-break-inside: avoid
+}
+
+th, td {
+    padding: 5px;
+}
