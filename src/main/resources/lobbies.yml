@@ -7,7 +7,7 @@
 #
 
 #default:
-#  type: fixedPhysicalLobby       # type of the Lobby
+#  type: physicalLobby            # type of the Lobby
 #  join:                          # list of "join" blocks
 #  - 100;200;300;world            # **EDIT THIS BEFORE USING!**
 #  spawn: 100;200;300;world;0;0   # spawn location of the Lobby, **EDIT THIS BEFORE USING!**

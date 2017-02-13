@@ -89,7 +89,7 @@ public class Flier extends JavaPlugin {
 		// register new types
 		registerEngine("multiplyingEngine", s -> new MultiplyingEngine(s));
 		registerWings("simpleWings", s -> new SimpleWings(s));
-		registerLobby("fixedPhysicalLobby", s -> new PhysicalLobby(s));
+		registerLobby("physicalLobby", s -> new PhysicalLobby(s));
 		registerGame("teamDeathMatch", s -> new TeamDeathMatch(s));
 		registerBonus("entity", s -> new EntityBonus(s));
 		registerAction("machineGun", s -> new MachineGun(s));
