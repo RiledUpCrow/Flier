@@ -26,8 +26,8 @@ public class SimpleWings extends DefaultWings {
 	
 	public SimpleWings(ConfigurationSection section) throws LoadingException {
 		super(section);
-		aerodynamics = loader.loadDouble("aerodynamics");
-		liftingForce = loader.loadDouble("liftingforce");
+		aerodynamics = loader.loadDouble("aerodynamics", 0.0);
+		liftingForce = loader.loadDouble("liftingforce", 0.0);
 		maxLift = loader.loadDouble("maxLift");
 	}
 	
