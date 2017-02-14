@@ -12,9 +12,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import pl.betoncraft.flier.Flier;
 import pl.betoncraft.flier.api.Action;
@@ -41,6 +41,7 @@ public abstract class DefaultBonus implements Bonus {
 
 	protected boolean available = false;
 	protected Map<UUID, Long> cooldowns = new HashMap<>();
+	protected BukkitRunnable starter;
 	
 	public DefaultBonus(ConfigurationSection section) throws LoadingException {
 		loader = new ValueLoader(section);
@@ -110,8 +111,29 @@ public abstract class DefaultBonus implements Bonus {
 			}
 			if (consumable) {
 				stop();
-				Bukkit.getScheduler().scheduleSyncDelayedTask(Flier.getInstance(), () -> start(), respawn);
+				starter = new BukkitRunnable() {
+					@Override
+					public void run() {
+						start();
+					}
+				};
+				starter.runTaskLater(Flier.getInstance(), respawn);
 			}
+		}
+	}
+	
+	@Override
+	public void start() {
+		stop();
+		available = true;
+	}
+	
+	@Override
+	public void stop() {
+		available = false;
+		if (starter != null) {
+			starter.cancel();
+			starter = null;
 		}
 	}
 	

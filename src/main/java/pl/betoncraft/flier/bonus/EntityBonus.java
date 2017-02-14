@@ -67,8 +67,7 @@ public class EntityBonus extends DefaultBonus {
 	
 	@Override
 	public void start() {
-		stop();
-		available = true;
+		super.start();
 		entity = location.getWorld().spawnEntity(location, type);
 		entity.setGravity(false);
 		entity.setInvulnerable(true);
@@ -78,8 +77,8 @@ public class EntityBonus extends DefaultBonus {
 	
 	@Override
 	public void stop() {
+		super.stop();
 		if (entity != null) {
-			available = false;
 			entity.remove();
 			entity = null;
 		}
