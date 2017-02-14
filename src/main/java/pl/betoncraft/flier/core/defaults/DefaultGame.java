@@ -382,6 +382,7 @@ public abstract class DefaultGame implements Listener, Game {
 		}
 		// flying, handle air attack
 		if (Position.check(attacked.getPlayer(), Where.NO_FALL)) {
+			attacked.setAttacker(attacker);
 			list.add(DamageResult.HIT);
 			if (Position.check(attacked.getPlayer(), Where.AIR)) {
 				if (damager.wingsOff()) {
