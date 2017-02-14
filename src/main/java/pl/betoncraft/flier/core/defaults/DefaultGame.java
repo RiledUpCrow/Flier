@@ -408,7 +408,7 @@ public abstract class DefaultGame implements Listener, Game {
 		InGamePlayer killed = getPlayers().get(event.getEntity().getUniqueId());
 		if (killed != null && killed.getPlayer().getHealth() - event.getFinalDamage() <= 0) {
 			event.setCancelled(true);
-			killed.clear();
+			Utils.clearPlayer(killed.getPlayer());
 			killed.setPlaying(false);
 			InGamePlayer lastHit = killed.getAttacker();
 			InGamePlayer killer = lastHit == null ? null : getPlayers().get(lastHit.getPlayer().getUniqueId());

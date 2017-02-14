@@ -51,6 +51,7 @@ public class PlayerBackup {
 			e.printStackTrace();
 			return false;
 		}
+		Utils.clearPlayer(player);
 		return true;
 	}
 	

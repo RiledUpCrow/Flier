@@ -6,11 +6,16 @@
  */
 package pl.betoncraft.flier.util;
 
+import java.util.stream.Collectors;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
 import pl.betoncraft.flier.api.InGamePlayer;
@@ -156,6 +161,39 @@ public class Utils {
 			return new Location(world, x, y, z, yaw, pitch);
 		} else {
 			throw new LoadingException("Incorrect location format.");
+		}
+	}
+	
+	/**
+	 * Clears all player's stuff.
+	 * 
+	 * @param player
+	 */
+	public static void clearPlayer(Player player) {
+		player.getInventory().clear();
+		player.setGameMode(GameMode.SURVIVAL);
+		player.resetMaxHealth();
+		player.setHealth(player.getMaxHealth());
+		player.setExp(0);
+		player.setLevel(0);
+		player.setExhaustion(0);
+		player.setFireTicks(0);
+		player.setFallDistance(0);
+		player.eject();
+		player.setAllowFlight(false);
+		player.setCanPickupItems(false);
+		player.setCollidable(true);
+		player.setFlying(false);
+		player.setGliding(false);
+		player.setVelocity(new Vector());
+		player.setFoodLevel(20);
+		player.setGlowing(false);
+		player.setGravity(true);
+		player.setInvulnerable(false);
+		player.setSaturation(20);
+		for (PotionEffectType type : player.getActivePotionEffects().stream()
+				.map(effect -> effect.getType()).collect(Collectors.toList())) {
+			player.removePotionEffect(type);
 		}
 	}
 

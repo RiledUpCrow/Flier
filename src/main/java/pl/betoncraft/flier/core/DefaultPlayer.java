@@ -11,20 +11,16 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Score;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
-import org.bukkit.util.Vector;
 
 import com.google.common.collect.Lists;
 
@@ -38,6 +34,7 @@ import pl.betoncraft.flier.api.SidebarLine;
 import pl.betoncraft.flier.api.UsableItem;
 import pl.betoncraft.flier.api.Wings;
 import pl.betoncraft.flier.util.PlayerBackup;
+import pl.betoncraft.flier.util.Utils;
 import pl.betoncraft.flier.util.Utils.ImmutableVector;
 
 /**
@@ -73,7 +70,7 @@ public class DefaultPlayer implements InGamePlayer {
 		stats.setDisplaySlot(DisplaySlot.SIDEBAR);
 		stats.setDisplayName("Stats");
 		player.setScoreboard(sb);
-		clear();
+		Utils.clearPlayer(player);
 		updateClass();
 	}
 
@@ -192,35 +189,6 @@ public class DefaultPlayer implements InGamePlayer {
 	}
 	
 	@Override
-	public void clear() {
-		player.getInventory().clear();
-		player.setGameMode(GameMode.SURVIVAL);
-		player.resetMaxHealth();
-		player.setHealth(player.getMaxHealth());
-		player.setExp(0);
-		player.setLevel(0);
-		player.setExhaustion(0);
-		player.setFireTicks(0);
-		player.setFallDistance(0);
-		player.eject();
-		player.setAllowFlight(false);
-		player.setCanPickupItems(false);
-		player.setCollidable(true);
-		player.setFlying(false);
-		player.setGliding(false);
-		player.setVelocity(new Vector());
-		player.setFoodLevel(20);
-		player.setGlowing(false);
-		player.setGravity(true);
-		player.setInvulnerable(false);
-		player.setSaturation(20);
-		for (PotionEffectType type : player.getActivePotionEffects().stream()
-				.map(effect -> effect.getType()).collect(Collectors.toList())) {
-			player.removePotionEffect(type);
-		}
-	}
-	
-	@Override
 	public void updateClass() {
 		Engine engine = clazz.getCurrentEngine();
 		Wings wings = clazz.getCurrentWings();
@@ -303,9 +271,9 @@ public class DefaultPlayer implements InGamePlayer {
 		lastHit = null;
 		color = null;
 		glowTimer = 0;
-		clear();
 		money = 0;
 		clazz.reset();
+		Utils.clearPlayer(player);
 		updateClass();
 		getPlayer().teleport(lobby.getSpawn());
 	}
