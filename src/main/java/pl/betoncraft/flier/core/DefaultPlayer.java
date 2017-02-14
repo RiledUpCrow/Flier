@@ -21,6 +21,7 @@ import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Score;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
+import org.bukkit.util.Vector;
 
 import com.google.common.collect.Lists;
 
@@ -408,7 +409,11 @@ public class DefaultPlayer implements InGamePlayer {
 	}
 
 	private void modifyFlight() {
-		player.setVelocity(clazz.getCurrentWings().applyFlightModifications(this).toVector());
+		Vector velocity = clazz.getCurrentWings().applyFlightModifications(this).toVector();
+		if (Double.isNaN(velocity.length())) {
+			velocity = new Vector();
+		}
+		player.setVelocity(velocity);
 	}
 	
 	private void use() {
