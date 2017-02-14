@@ -50,6 +50,7 @@ public class DefaultPlayer implements InGamePlayer {
 	private PlayerClass clazz;
 	private PlayerBackup backup;
 	private Scoreboard sb;
+	private Scoreboard oldSb;
 
 	private boolean isPlaying;
 	private boolean leftClicked = false;
@@ -67,10 +68,10 @@ public class DefaultPlayer implements InGamePlayer {
 		backup = new PlayerBackup(player);
 		backup.save();
 		sb = Bukkit.getScoreboardManager().getNewScoreboard();
+		oldSb = player.getScoreboard();
 		Objective stats = sb.registerNewObjective("stats", "dummy");
 		stats.setDisplaySlot(DisplaySlot.SIDEBAR);
 		stats.setDisplayName("Stats");
-		player.setScoreboard(sb);
 		Utils.clearPlayer(player);
 		updateClass();
 	}
@@ -121,6 +122,9 @@ public class DefaultPlayer implements InGamePlayer {
 	public void slowTick() {
 		stopGlowing();
 		updateStats();
+		if (!sb.equals(player.getScoreboard())) {
+			player.setScoreboard(sb);
+		}
 	}
 	
 	@Override
@@ -282,7 +286,7 @@ public class DefaultPlayer implements InGamePlayer {
 	@Override
 	public void exitLobby() {
 		exitGame();
-		player.setScoreboard(Bukkit.getScoreboardManager().getMainScoreboard());
+		player.setScoreboard(oldSb);
 		player.getInventory().clear();
 		backup.load();
 	}
