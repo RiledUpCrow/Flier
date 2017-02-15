@@ -6,7 +6,7 @@
  */
 package pl.betoncraft.flier.api;
 
-import pl.betoncraft.flier.util.Utils.ImmutableVector;
+import org.bukkit.util.Vector;
 
 /**
  * Represents wings - elytra item with statistics.
@@ -23,7 +23,7 @@ public interface Wings extends Item {
 	 *            player's velocity Vector
 	 * @return the same Vector, modified
 	 */
-	public ImmutableVector applyFlightModifications(InGamePlayer data);
+	public Vector applyFlightModifications(InGamePlayer data);
 
 	/**
 	 * @return maximum health of the wings

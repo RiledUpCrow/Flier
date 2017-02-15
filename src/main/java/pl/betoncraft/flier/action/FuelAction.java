@@ -10,8 +10,8 @@ import org.bukkit.configuration.ConfigurationSection;
 
 import pl.betoncraft.flier.api.Engine;
 import pl.betoncraft.flier.api.InGamePlayer;
+import pl.betoncraft.flier.api.LoadingException;
 import pl.betoncraft.flier.core.defaults.DefaultAction;
-import pl.betoncraft.flier.exception.LoadingException;
 
 /**
  * Adds fuel to the player's engine.

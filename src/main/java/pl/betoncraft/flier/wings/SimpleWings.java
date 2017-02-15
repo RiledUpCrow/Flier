@@ -7,11 +7,12 @@
 package pl.betoncraft.flier.wings;
 
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.util.Vector;
 
 import pl.betoncraft.flier.api.InGamePlayer;
+import pl.betoncraft.flier.api.LoadingException;
 import pl.betoncraft.flier.core.defaults.DefaultWings;
-import pl.betoncraft.flier.exception.LoadingException;
-import pl.betoncraft.flier.util.Utils.ImmutableVector;
+import pl.betoncraft.flier.util.ImmutableVector;
 
 /**
  * Simple wings with scalable lifting force and air resistance.
@@ -32,14 +33,14 @@ public class SimpleWings extends DefaultWings {
 	}
 	
 	@Override
-	public ImmutableVector applyFlightModifications(InGamePlayer data) {
+	public Vector applyFlightModifications(InGamePlayer data) {
 		ImmutableVector velocity = ImmutableVector.fromVector(data.getPlayer().getVelocity());
 		double lift = (liftingForce * velocity.length() * velocity.length() * 0.5) - data.getWeight();
 		lift = lift >= maxLift ? maxLift : lift;
 		velocity = velocity.add(new ImmutableVector(0, lift, 0));
 		double drag = velocity.length() * velocity.length() * 0.5 * aerodynamics;
 		ImmutableVector airResistance = velocity.normalize().multiply(drag);
-		return velocity.add(airResistance);
+		return velocity.add(airResistance).toVector();
 	}
 
 }

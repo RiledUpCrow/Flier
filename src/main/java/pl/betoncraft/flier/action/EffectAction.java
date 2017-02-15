@@ -12,11 +12,11 @@ import java.util.List;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import pl.betoncraft.flier.Flier;
 import pl.betoncraft.flier.api.Action;
+import pl.betoncraft.flier.api.Flier;
 import pl.betoncraft.flier.api.InGamePlayer;
+import pl.betoncraft.flier.api.LoadingException;
 import pl.betoncraft.flier.core.defaults.DefaultAction;
-import pl.betoncraft.flier.exception.LoadingException;
 
 /**
  * An action type which adds a specified effect.

@@ -8,9 +8,9 @@ package pl.betoncraft.flier.core.defaults;
 
 import org.bukkit.configuration.ConfigurationSection;
 
-import pl.betoncraft.flier.Flier;
 import pl.betoncraft.flier.api.Engine;
-import pl.betoncraft.flier.exception.LoadingException;
+import pl.betoncraft.flier.api.Flier;
+import pl.betoncraft.flier.api.LoadingException;
 
 /**
  * Default Engine implementation.

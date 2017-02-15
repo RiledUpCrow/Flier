@@ -39,15 +39,15 @@ import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import pl.betoncraft.flier.Flier;
 import pl.betoncraft.flier.api.Bonus;
 import pl.betoncraft.flier.api.Damager;
-import pl.betoncraft.flier.api.Damager.Attacker;
 import pl.betoncraft.flier.api.Damager.DamageResult;
+import pl.betoncraft.flier.api.Flier;
 import pl.betoncraft.flier.api.Game;
 import pl.betoncraft.flier.api.InGamePlayer;
+import pl.betoncraft.flier.api.LoadingException;
+import pl.betoncraft.flier.api.Usage;
 import pl.betoncraft.flier.api.Wings;
-import pl.betoncraft.flier.exception.LoadingException;
 import pl.betoncraft.flier.sidebar.Altitude;
 import pl.betoncraft.flier.sidebar.Ammo;
 import pl.betoncraft.flier.sidebar.Fuel;
@@ -58,7 +58,6 @@ import pl.betoncraft.flier.sidebar.Speed;
 import pl.betoncraft.flier.util.Position;
 import pl.betoncraft.flier.util.Utils;
 import pl.betoncraft.flier.util.ValueLoader;
-import pl.betoncraft.flier.util.Position.Where;
 
 /**
  * Basic rules of a game.
@@ -318,7 +317,7 @@ public abstract class DefaultGame implements Listener, Game {
 		}
 		// get stuff involved in the attack
 		InGamePlayer player = getPlayers().get(event.getEntity().getUniqueId());
-		Attacker weapon = Damager.getDamager(event.getDamager());
+		Utils.Attacker weapon = Utils.getDamager(event.getDamager());
 		// it's a weapon, so remove the attacking entity
 		if (weapon != null) {
 			event.getDamager().remove();
@@ -381,10 +380,10 @@ public abstract class DefaultGame implements Listener, Game {
 			return list;
 		}
 		// flying, handle air attack
-		if (Position.check(attacked.getPlayer(), Where.NO_FALL)) {
+		if (Position.check(attacked.getPlayer(), Usage.Where.NO_FALL)) {
 			attacked.setAttacker(attacker);
 			list.add(DamageResult.HIT);
-			if (Position.check(attacked.getPlayer(), Where.AIR)) {
+			if (Position.check(attacked.getPlayer(), Usage.Where.AIR)) {
 				if (damager.wingsOff()) {
 					list.add(DamageResult.WINGS_OFF);
 				}
@@ -392,7 +391,7 @@ public abstract class DefaultGame implements Listener, Game {
 					list.add(DamageResult.REGULAR_DAMAGE);
 				}
 				list.add(DamageResult.WINGS_DAMAGE);
-			} else if (Position.check(attacked.getPlayer(), Where.GROUND)) {
+			} else if (Position.check(attacked.getPlayer(), Usage.Where.GROUND)) {
 				list.add(DamageResult.REGULAR_DAMAGE);
 			}
 		}
@@ -458,7 +457,7 @@ public abstract class DefaultGame implements Listener, Game {
 		if (event.isCancelled()) {
 			return;
 		}
-		Attacker weapon = Damager.getDamager(event.getEntity());
+		Utils.Attacker weapon = Utils.getDamager(event.getEntity());
 		if (weapon == null) {
 			return;
 		}
@@ -469,7 +468,7 @@ public abstract class DefaultGame implements Listener, Game {
 	
 	@EventHandler
 	public void onBlockExplode(EntityExplodeEvent event) {
-		if (Damager.getDamager(event.getEntity()) != null) {
+		if (Utils.getDamager(event.getEntity()) != null) {
 			event.blockList().clear();
 		}
 	}

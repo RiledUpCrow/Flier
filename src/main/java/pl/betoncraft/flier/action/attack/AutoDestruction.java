@@ -10,10 +10,10 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.TNTPrimed;
 
-import pl.betoncraft.flier.api.Damager;
 import pl.betoncraft.flier.api.InGamePlayer;
+import pl.betoncraft.flier.api.LoadingException;
 import pl.betoncraft.flier.core.defaults.DefaultAttack;
-import pl.betoncraft.flier.exception.LoadingException;
+import pl.betoncraft.flier.util.Utils;
 
 /**
  * Spawns a TNT which explodes immediately.
@@ -33,7 +33,7 @@ public class AutoDestruction extends DefaultAttack {
 	public boolean act(InGamePlayer player) {
 		TNTPrimed tnt = (TNTPrimed) player.getPlayer().getWorld().spawnEntity(
 				player.getPlayer().getLocation(), EntityType.PRIMED_TNT);
-		Damager.saveDamager(tnt, this, player);
+		Utils.saveDamager(tnt, this, player);
 		tnt.setIsIncendiary(false);
 		tnt.setYield(yield);
 		tnt.setGravity(false);

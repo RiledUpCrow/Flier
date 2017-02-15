@@ -36,7 +36,6 @@ import pl.betoncraft.flier.api.UsableItem;
 import pl.betoncraft.flier.api.Wings;
 import pl.betoncraft.flier.util.PlayerBackup;
 import pl.betoncraft.flier.util.Utils;
-import pl.betoncraft.flier.util.Utils.ImmutableVector;
 
 /**
  * Stores data about the player.
@@ -314,8 +313,7 @@ public class DefaultPlayer implements InGamePlayer {
 		if (!engine.removeFuel(engine.getConsumption())) {
 			return;
 		}
-		getPlayer().setVelocity(engine.launch(ImmutableVector.fromVector(getPlayer().getVelocity()),
-				ImmutableVector.fromVector(getPlayer().getLocation().getDirection())).toVector());
+		getPlayer().setVelocity(engine.launch(getPlayer().getVelocity(), getPlayer().getLocation().getDirection()));
 		startGlowing(engine.getGlowTime());
 	}
 	
@@ -413,7 +411,7 @@ public class DefaultPlayer implements InGamePlayer {
 	}
 
 	private void modifyFlight() {
-		Vector velocity = clazz.getCurrentWings().applyFlightModifications(this).toVector();
+		Vector velocity = clazz.getCurrentWings().applyFlightModifications(this);
 		if (Double.isNaN(velocity.length())) {
 			velocity = new Vector();
 		}

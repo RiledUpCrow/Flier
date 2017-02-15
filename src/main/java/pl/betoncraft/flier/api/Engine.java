@@ -6,7 +6,7 @@
  */
 package pl.betoncraft.flier.api;
 
-import pl.betoncraft.flier.util.Utils.ImmutableVector;
+import org.bukkit.util.Vector;
 
 /**
  * Represents an engine, which speeds players up.
@@ -25,7 +25,7 @@ public interface Engine extends Item {
 	 *            direction Vector where the player is looking
 	 * @return the modified velocity Vector
 	 */
-	public ImmutableVector launch(ImmutableVector velocity, ImmutableVector direction);
+	public Vector launch(Vector velocity, Vector direction);
 
 	/**
 	 * @return the maximum amount of stored fuel

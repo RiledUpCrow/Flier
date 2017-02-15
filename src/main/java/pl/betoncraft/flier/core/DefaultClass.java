@@ -14,10 +14,10 @@ import java.util.stream.Collectors;
 import javafx.util.Pair;
 import pl.betoncraft.flier.api.Engine;
 import pl.betoncraft.flier.api.ItemSet;
+import pl.betoncraft.flier.api.LoadingException;
 import pl.betoncraft.flier.api.PlayerClass;
 import pl.betoncraft.flier.api.UsableItem;
 import pl.betoncraft.flier.api.Wings;
-import pl.betoncraft.flier.exception.LoadingException;
 
 /**
  * Default implementation of PlayerClass.

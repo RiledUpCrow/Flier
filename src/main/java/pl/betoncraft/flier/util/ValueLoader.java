@@ -9,12 +9,12 @@ package pl.betoncraft.flier.util;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 
-import pl.betoncraft.flier.Flier;
 import pl.betoncraft.flier.api.Action;
 import pl.betoncraft.flier.api.Activator;
 import pl.betoncraft.flier.api.Engine;
+import pl.betoncraft.flier.api.Flier;
+import pl.betoncraft.flier.api.LoadingException;
 import pl.betoncraft.flier.api.Wings;
-import pl.betoncraft.flier.exception.LoadingException;
 
 /**
  * Contains functions used to load various values from the ConfigurationSection

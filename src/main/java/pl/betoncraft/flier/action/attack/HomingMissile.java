@@ -15,13 +15,13 @@ import org.bukkit.entity.Projectile;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import pl.betoncraft.flier.Flier;
-import pl.betoncraft.flier.api.Damager;
+import pl.betoncraft.flier.api.Flier;
 import pl.betoncraft.flier.api.Game.Attitude;
 import pl.betoncraft.flier.api.InGamePlayer;
+import pl.betoncraft.flier.api.LoadingException;
 import pl.betoncraft.flier.core.defaults.DefaultAttack;
-import pl.betoncraft.flier.exception.LoadingException;
-import pl.betoncraft.flier.util.Utils.ImmutableVector;
+import pl.betoncraft.flier.util.ImmutableVector;
+import pl.betoncraft.flier.util.Utils;
 
 /**
  * A homing missile which targets flying players.
@@ -62,7 +62,7 @@ public class HomingMissile extends DefaultAttack {
 		missile.setShooter(player);
 		missile.setGravity(false);
 		missile.setGlowing(true);
-		Damager.saveDamager(missile, HomingMissile.this, data);
+		Utils.saveDamager(missile, HomingMissile.this, data);
 		new BukkitRunnable() {
 			int i = 0;
 			Location lastLoc;

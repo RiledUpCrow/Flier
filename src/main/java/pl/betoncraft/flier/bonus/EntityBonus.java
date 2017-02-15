@@ -16,9 +16,9 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.world.ChunkUnloadEvent;
 
-import pl.betoncraft.flier.Flier;
+import pl.betoncraft.flier.api.Flier;
+import pl.betoncraft.flier.api.LoadingException;
 import pl.betoncraft.flier.core.defaults.DefaultBonus;
-import pl.betoncraft.flier.exception.LoadingException;
 
 /**
  * A default Bonus implementation.

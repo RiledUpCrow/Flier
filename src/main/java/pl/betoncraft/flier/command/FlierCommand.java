@@ -15,7 +15,6 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
-import pl.betoncraft.flier.Flier;
 import pl.betoncraft.flier.api.CommandArgument;
 
 /**
@@ -35,7 +34,6 @@ public class FlierCommand implements CommandExecutor {
 		arguments.add(new SaveArgument());
 		arguments.add(new LoadArgument());
 		arguments.add(new ReloadArgument());
-		Flier.getInstance().getCommand("flier").setExecutor(this);
 	}
 	
 	@Override

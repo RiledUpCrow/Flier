@@ -8,14 +8,21 @@ package pl.betoncraft.flier.api;
 
 import java.util.List;
 
-import pl.betoncraft.flier.util.Position.Where;
-
 /**
  * Represents a set of Activators which can activate a set of Actions.
  *
  * @author Jakub Sapalski
  */
 public interface Usage {
+
+	/**
+	 * Represents a location where the player can be.
+	 *
+	 * @author Jakub Sapalski
+	 */
+	enum Where {
+		GROUND, AIR, FALL, NO_GROUND, NO_AIR, NO_FALL, EVERYWHERE
+	}
 
 	/**
 	 * @return the list of Activators in this Usage

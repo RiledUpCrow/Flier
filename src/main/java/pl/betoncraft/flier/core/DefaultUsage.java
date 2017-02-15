@@ -11,14 +11,13 @@ import java.util.List;
 
 import org.bukkit.configuration.ConfigurationSection;
 
-import pl.betoncraft.flier.Flier;
 import pl.betoncraft.flier.api.Action;
 import pl.betoncraft.flier.api.Activator;
+import pl.betoncraft.flier.api.Flier;
 import pl.betoncraft.flier.api.InGamePlayer;
+import pl.betoncraft.flier.api.LoadingException;
 import pl.betoncraft.flier.api.Usage;
-import pl.betoncraft.flier.exception.LoadingException;
 import pl.betoncraft.flier.util.Position;
-import pl.betoncraft.flier.util.Position.Where;
 import pl.betoncraft.flier.util.ValueLoader;
 
 /**
@@ -32,7 +31,7 @@ public class DefaultUsage implements Usage {
 	
 	protected int cooldown;
 	protected int ammoUse;
-	protected final Where where;
+	protected final Usage.Where where;
 	protected List<Activator> activators = new ArrayList<>();
 	protected List<Action> actions = new ArrayList<>();
 	
@@ -40,7 +39,7 @@ public class DefaultUsage implements Usage {
 		loader = new ValueLoader(section);
 		cooldown = loader.loadNonNegativeInt("cooldown", 0);
 		ammoUse = loader.loadInt("ammo_use", 0);
-		where = loader.loadEnum("where", Where.EVERYWHERE, Where.class);
+		where = loader.loadEnum("where", Usage.Where.EVERYWHERE, Usage.Where.class);
 		for (String activator : section.getStringList("activators")) {
 			activators.add(Flier.getInstance().getActivator(activator));
 		}
@@ -70,7 +69,7 @@ public class DefaultUsage implements Usage {
 	}
 	
 	@Override
-	public Where where() {
+	public Usage.Where where() {
 		return where;
 	}
 

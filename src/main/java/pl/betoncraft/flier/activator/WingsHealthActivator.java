@@ -9,10 +9,10 @@ package pl.betoncraft.flier.activator;
 import org.bukkit.configuration.ConfigurationSection;
 
 import pl.betoncraft.flier.api.InGamePlayer;
+import pl.betoncraft.flier.api.LoadingException;
 import pl.betoncraft.flier.api.UsableItem;
 import pl.betoncraft.flier.api.Wings;
 import pl.betoncraft.flier.core.defaults.DefaultActivator;
-import pl.betoncraft.flier.exception.LoadingException;
 
 /**
  * Activates if wings health is in range.

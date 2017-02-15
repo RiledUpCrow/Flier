@@ -11,15 +11,15 @@ import java.util.List;
 
 import org.bukkit.configuration.ConfigurationSection;
 
-import pl.betoncraft.flier.Flier;
 import pl.betoncraft.flier.api.Action;
 import pl.betoncraft.flier.api.Activator;
+import pl.betoncraft.flier.api.Flier;
 import pl.betoncraft.flier.api.InGamePlayer;
 import pl.betoncraft.flier.api.Item;
+import pl.betoncraft.flier.api.LoadingException;
 import pl.betoncraft.flier.api.UsableItem;
 import pl.betoncraft.flier.api.Usage;
 import pl.betoncraft.flier.core.defaults.DefaultItem;
-import pl.betoncraft.flier.exception.LoadingException;
 
 /**
  * Default implementation of UsableItem.

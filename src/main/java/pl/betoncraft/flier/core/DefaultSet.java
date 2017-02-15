@@ -16,13 +16,13 @@ import java.util.stream.Collectors;
 
 import org.bukkit.configuration.ConfigurationSection;
 
-import pl.betoncraft.flier.Flier;
 import pl.betoncraft.flier.api.Engine;
+import pl.betoncraft.flier.api.Flier;
 import pl.betoncraft.flier.api.ItemSet;
+import pl.betoncraft.flier.api.LoadingException;
 import pl.betoncraft.flier.api.PlayerClass;
 import pl.betoncraft.flier.api.UsableItem;
 import pl.betoncraft.flier.api.Wings;
-import pl.betoncraft.flier.exception.LoadingException;
 import pl.betoncraft.flier.util.ValueLoader;
 
 /**

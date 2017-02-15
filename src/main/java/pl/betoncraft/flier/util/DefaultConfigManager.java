@@ -14,14 +14,15 @@ import java.io.InputStream;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
-import pl.betoncraft.flier.Flier;
+import pl.betoncraft.flier.api.ConfigManager;
+import pl.betoncraft.flier.api.Flier;
 
 /**
  * Manages different configuration files.
  *
  * @author Jakub Sapalski
  */
-public class ConfigManager {
+public class DefaultConfigManager implements ConfigManager {
 
 	private static final String LOBBIES = "lobbies.yml",
 								GAMES = "games.yml",
@@ -42,7 +43,7 @@ public class ConfigManager {
 	private Config activators;
 	
 	
-	public ConfigManager() {
+	public DefaultConfigManager() {
 		lobbies = new Config(LOBBIES);
 		games = new Config(GAMES);
 		bonuses = new Config(BONUSES);
@@ -81,38 +82,47 @@ public class ConfigManager {
 		
 	}
 	
+	@Override
 	public FileConfiguration getLobbies() {
 		return lobbies.config;
 	}
 	
+	@Override
 	public FileConfiguration getGames() {
 		return games.config;
 	}
 	
+	@Override
 	public FileConfiguration getBonuses() {
 		return bonuses.config;
 	}
 	
+	@Override
 	public FileConfiguration getEngines() {
 		return engines.config;
 	}
 	
+	@Override
 	public FileConfiguration getWings() {
 		return wings.config;
 	}
 	
+	@Override
 	public FileConfiguration getItems() {
 		return items.config;
 	}
 	
+	@Override
 	public FileConfiguration getActions() {
 		return actions.config;
 	}
 	
+	@Override
 	public FileConfiguration getActivators() {
 		return activators.config;
 	}
 	
+	@Override
 	public void saveLobbies() {
 		try {
 			lobbies.config.save(lobbies.file);
@@ -121,6 +131,7 @@ public class ConfigManager {
 		}
 	}
 	
+	@Override
 	public void saveGames() {
 		try {
 			games.config.save(games.file);
@@ -129,6 +140,7 @@ public class ConfigManager {
 		}
 	}
 	
+	@Override
 	public void saveBonuses() {
 		try {
 			bonuses.config.save(bonuses.file);
@@ -137,6 +149,7 @@ public class ConfigManager {
 		}
 	}
 	
+	@Override
 	public void saveEngines() {
 		try {
 			engines.config.save(engines.file);
@@ -145,6 +158,7 @@ public class ConfigManager {
 		}
 	}
 	
+	@Override
 	public void saveWings() {
 		try {
 			wings.config.save(wings.file);
@@ -153,6 +167,7 @@ public class ConfigManager {
 		}
 	}
 	
+	@Override
 	public void saveItems() {
 		try {
 			items.config.save(items.file);
@@ -161,6 +176,7 @@ public class ConfigManager {
 		}
 	}
 	
+	@Override
 	public void saveActions() {
 		try {
 			actions.config.save(actions.file);
@@ -169,6 +185,7 @@ public class ConfigManager {
 		}
 	}
 	
+	@Override
 	public void saveActivators() {
 		try {
 			activators.config.save(activators.file);

@@ -14,8 +14,8 @@ import java.util.NoSuchElementException;
 import org.bukkit.command.CommandSender;
 import org.bukkit.permissions.Permission;
 
-import pl.betoncraft.flier.Flier;
 import pl.betoncraft.flier.api.CommandArgument;
+import pl.betoncraft.flier.api.Flier;
 import pl.betoncraft.flier.api.Game;
 import pl.betoncraft.flier.api.Lobby;
 

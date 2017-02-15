@@ -6,6 +6,7 @@
  */
 package pl.betoncraft.flier.util;
 
+import java.util.List;
 import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
@@ -14,13 +15,18 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.metadata.MetadataValue;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
+import pl.betoncraft.flier.api.Damager;
+import pl.betoncraft.flier.api.Flier;
 import pl.betoncraft.flier.api.InGamePlayer;
+import pl.betoncraft.flier.api.LoadingException;
 import pl.betoncraft.flier.api.PlayerClass;
-import pl.betoncraft.flier.exception.LoadingException;
 
 /**
  * Various static utility methods.
@@ -72,59 +78,6 @@ public class Utils {
 		PlayerClass clazz = player.getClazz();
 		String name = player.getPlayer().getName();
 		return player.getColor() + name + ChatColor.WHITE + " (" + ChatColor.AQUA + clazz.getCurrentName() + ChatColor.WHITE + ")";
-	}
-	
-	public static class ImmutableVector {
-		private final double x, y, z;
-		private Double length;
-		public ImmutableVector(double x, double y, double z) {
-			this.x = x;
-			this.y = y;
-			this.z = z;
-		}
-		public static ImmutableVector fromVector(Vector vec) {
-			return new ImmutableVector(vec.getX(), vec.getY(), vec.getZ());
-		}
-		public double getX() {
-			return x;
-		}
-		public double getY() {
-			return y;
-		}
-		public double getZ() {
-			return z;
-		}
-		public ImmutableVector add(ImmutableVector vec) {
-			return new ImmutableVector(x + vec.x, y + vec.y, z + vec.z);
-		}
-		public ImmutableVector subtract(ImmutableVector vec) {
-			return new ImmutableVector(x - vec.x, y - vec.y, z - vec.z);
-		}
-		public ImmutableVector multiply(double m) {
-			ImmutableVector result = new ImmutableVector(x*m, y*m, z*m);
-			if (length != null) {
-				result.length = length * m;
-			}
-			return result;
-		}
-		public double length() {
-			if (length == null) {
-				length = Math.sqrt(x*x + y*y + z*z);
-			}
-			return length;
-		}
-		public ImmutableVector normalize() {
-			ImmutableVector result = new ImmutableVector(x / length(), y / length(), z / length());
-			result.length = 1.0;
-			return result;
-		}
-		public Vector toVector() {
-			return new Vector(x, y, z);
-		}
-		@Override
-		public String toString() {
-			return String.format("[%.3f,%.3f,%.3f]", x, y, z);
-		}
 	}
 
 	/**
@@ -194,6 +147,67 @@ public class Utils {
 		for (PotionEffectType type : player.getActivePotionEffects().stream()
 				.map(effect -> effect.getType()).collect(Collectors.toList())) {
 			player.removePotionEffect(type);
+		}
+	}
+
+	/**
+	 * Adds Damager to metadata of the projectile, so Flier can handle it once
+	 * it hits someone.
+	 * 
+	 * @param entity
+	 *            projectile which was launched by Damager
+	 * @param damager
+	 *            Damager which is the source of that projectile
+	 */
+	public static void saveDamager(Entity entity, Damager damager, InGamePlayer attacker) {
+		entity.setMetadata("flier-damager", new FixedMetadataValue(Flier.getInstance(), damager));
+		entity.setMetadata("flier-attacker", new FixedMetadataValue(Flier.getInstance(), attacker));
+	}
+
+	/**
+	 * Reads the Damager from the projectile. It will return null if the
+	 * projectile source is not a Damager.
+	 * 
+	 * @param entity
+	 *            projectile which was launched by Damager
+	 * @return Attacker or null
+	 */
+	public static Attacker getDamager(Entity entity) {
+		List<MetadataValue> listD = entity.getMetadata("flier-damager");
+		List<MetadataValue> listA = entity.getMetadata("flier-attacker");
+		if (!listD.isEmpty() && !listA.isEmpty()) {
+			Object d = listD.get(0).value();
+			Object a = listA.get(0).value();
+			if (d instanceof Damager && a instanceof InGamePlayer) {
+				return new Attacker((Damager) d, (InGamePlayer) a);
+			} else {
+				return new Attacker(DummyDamager.DUMMY, null);
+			}
+		}
+		return null;
+	}
+	
+	/**
+	 * Represents an Entity which is a Damager and was launched by InGamePlayer.
+	 *
+	 * @author Jakub Sapalski
+	 */
+	public static class Attacker {
+	
+		private Damager damager;
+		private InGamePlayer attacker;
+	
+		public Attacker(Damager damager, InGamePlayer attacker) {
+			this.damager = damager;
+			this.attacker = attacker;
+		}
+	
+		public Damager getDamager() {
+			return damager;
+		}
+	
+		public InGamePlayer getAttacker() {
+			return attacker;
 		}
 	}
 

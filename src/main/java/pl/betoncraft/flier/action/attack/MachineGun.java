@@ -19,11 +19,11 @@ import org.bukkit.entity.Projectile;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import pl.betoncraft.flier.Flier;
-import pl.betoncraft.flier.api.Damager;
+import pl.betoncraft.flier.api.Flier;
 import pl.betoncraft.flier.api.InGamePlayer;
+import pl.betoncraft.flier.api.LoadingException;
 import pl.betoncraft.flier.core.defaults.DefaultAttack;
-import pl.betoncraft.flier.exception.LoadingException;
+import pl.betoncraft.flier.util.Utils;
 
 /**
  * Burst shooting weapon with unguided projectiles.
@@ -68,7 +68,7 @@ public class MachineGun extends DefaultAttack {
 					explosive.setIsIncendiary(false);
 					explosive.setYield(0);
 				}
-				Damager.saveDamager(projectile, MachineGun.this, data);
+				Utils.saveDamager(projectile, MachineGun.this, data);
 				projectiles.put(projectile, velocity);
 				counter --;
 				if (counter <= 0) {

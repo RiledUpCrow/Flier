@@ -11,10 +11,10 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Entity;
 import org.bukkit.util.Vector;
 
-import pl.betoncraft.flier.Flier;
+import pl.betoncraft.flier.api.Flier;
 import pl.betoncraft.flier.api.InGamePlayer;
+import pl.betoncraft.flier.api.LoadingException;
 import pl.betoncraft.flier.core.defaults.DefaultAction;
-import pl.betoncraft.flier.exception.LoadingException;
 
 /**
  * Launches players in the direction of looking.

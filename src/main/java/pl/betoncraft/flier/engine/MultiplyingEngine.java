@@ -7,10 +7,10 @@
 package pl.betoncraft.flier.engine;
 
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.util.Vector;
 
+import pl.betoncraft.flier.api.LoadingException;
 import pl.betoncraft.flier.core.defaults.DefaultEngine;
-import pl.betoncraft.flier.exception.LoadingException;
-import pl.betoncraft.flier.util.Utils.ImmutableVector;
 
 /**
  * Engine which multiplies speed instead of adding a fixed acceleration.
@@ -31,7 +31,7 @@ public class MultiplyingEngine extends DefaultEngine {
 	}
 	
 	@Override
-	public ImmutableVector launch(ImmutableVector velocity, ImmutableVector direction) {
+	public Vector launch(Vector velocity, Vector direction) {
 		double speed = velocity.length();
 		if (speed > maxSpeed) {
 			speed = 0;

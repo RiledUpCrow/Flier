@@ -8,6 +8,8 @@ package pl.betoncraft.flier.util;
 
 import org.bukkit.entity.Player;
 
+import pl.betoncraft.flier.api.Usage;
+
 /**
  * Utility class for checking player's position
  *
@@ -15,16 +17,7 @@ import org.bukkit.entity.Player;
  */
 public class Position {
 
-	/**
-	 * Represents a location where the player can be.
-	 *
-	 * @author Jakub Sapalski
-	 */
-	public enum Where {
-		GROUND, AIR, FALL, NO_GROUND, NO_AIR, NO_FALL, EVERYWHERE
-	}
-	
-	public static boolean check(Player player, Where position) {
+	public static boolean check(Player player, Usage.Where position) {
 		boolean air = player.getPlayer().isGliding();
 		boolean ground = !air && Utils.getAltitude(player.getPlayer().getLocation(), 4) < 4;
 		boolean fall = !ground && !air;
@@ -40,15 +33,15 @@ public class Position {
 		return false;
 	}
 	
-	public static Where get(Player player) {
+	public static Usage.Where get(Player player) {
 		boolean air = player.getPlayer().isGliding();
 		boolean ground = !air && Utils.getAltitude(player.getPlayer().getLocation(), 4) < 4;
 		if (air) {
-			return Where.AIR;
+			return Usage.Where.AIR;
 		} else if (ground) {
-			return Where.GROUND;
+			return Usage.Where.GROUND;
 		} else {
-			return Where.FALL;
+			return Usage.Where.FALL;
 		}
 	}
 

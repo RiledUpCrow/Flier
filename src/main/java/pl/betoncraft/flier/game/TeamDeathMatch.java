@@ -21,10 +21,10 @@ import pl.betoncraft.flier.api.Damager;
 import pl.betoncraft.flier.api.Damager.DamageResult;
 import pl.betoncraft.flier.api.Game;
 import pl.betoncraft.flier.api.InGamePlayer;
+import pl.betoncraft.flier.api.LoadingException;
 import pl.betoncraft.flier.api.Lobby;
 import pl.betoncraft.flier.api.SidebarLine;
 import pl.betoncraft.flier.core.defaults.DefaultGame;
-import pl.betoncraft.flier.exception.LoadingException;
 import pl.betoncraft.flier.util.Utils;
 import pl.betoncraft.flier.util.ValueLoader;
 

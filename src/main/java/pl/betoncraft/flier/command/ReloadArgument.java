@@ -14,8 +14,8 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.permissions.Permission;
 
-import pl.betoncraft.flier.Flier;
 import pl.betoncraft.flier.api.CommandArgument;
+import pl.betoncraft.flier.api.Flier;
 
 /**
  * Reloads the plugin.

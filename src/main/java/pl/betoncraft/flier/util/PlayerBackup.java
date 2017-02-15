@@ -14,7 +14,7 @@ import org.bukkit.entity.Player;
 
 import com.google.common.io.Files;
 
-import pl.betoncraft.flier.Flier;
+import pl.betoncraft.flier.api.Flier;
 
 /**
  * Manages the backup of player's data.
