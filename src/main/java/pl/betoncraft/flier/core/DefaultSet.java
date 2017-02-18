@@ -166,7 +166,7 @@ public class DefaultSet implements ItemSet {
 						si.remove();
 					}
 				}
-				storedItems1.put(e.item, e.amount);
+				storedItems1.put((UsableItem) e.item.replicate(), e.amount);
 			}
 			setItems(c, storedItems1);
 			break;
@@ -197,7 +197,7 @@ public class DefaultSet implements ItemSet {
 						}
 					}
 				}
-				storedItems2.put(e.item, e.amount);
+				storedItems2.put((UsableItem) e.item.replicate(), e.amount);
 			}
 			setItems(c, storedItems2);
 			break;
