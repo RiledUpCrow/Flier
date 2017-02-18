@@ -155,7 +155,7 @@ public class DefaultPlayer implements InGamePlayer {
 	@Override
 	public boolean isHolding(UsableItem item) {
 		ItemStack stack = player.getInventory().getItemInMainHand();
-		return item == null && stack == null || item != null && stack != null && item.getItem().isSimilar(stack);
+		return item == null && stack == null || (item != null && stack != null && item.getItem().isSimilar(stack));
 	}
 
 	@Override

@@ -7,12 +7,11 @@
 package pl.betoncraft.flier.core.defaults;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
@@ -224,6 +223,7 @@ public abstract class DefaultGame implements Listener, Game {
 	
 	@Override
 	public void startPlayer(InGamePlayer data) {
+		data.getPlayer().getInventory().setHeldItemSlot(0);
 		new BukkitRunnable() {
 			@Override
 			public void run() {
@@ -258,7 +258,7 @@ public abstract class DefaultGame implements Listener, Game {
 	public void stop() {
 		HandlerList.unregisterAll(this);
 		heartBeat.cancel();
-		Set<InGamePlayer> copy = new HashSet<>(dataMap.values());
+		Collection<InGamePlayer> copy = new ArrayList<>(dataMap.values());
 		for (InGamePlayer data : copy) {
 			data.exitGame();
 		}
