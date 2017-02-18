@@ -222,17 +222,23 @@ public class TeamDeathMatch extends DefaultGame {
 	}
 	
 	private SimpleTeam chooseTeam() {
+		// looking for a rarest team
 		SimpleTeam rarest = null;
+		// prepare all teams with 0 points
 		HashMap<SimpleTeam, Integer> map = new HashMap<>();
 		for (SimpleTeam team : teams.values()) {
 			map.put(team, 0);
 		}
+		// each point will mean a player in that team
 		for (SimpleTeam team : players.values()) {
-			map.put(team, map.get(team) + 1);
+			if (team != null) { // team is null if the player does not have a team yet
+				map.put(team, map.get(team) + 1);
+			}
 		}
-		Integer lowest = teams.size();
+		// maximum points for a team is the total amount of players in the game, we're looking for less
+		Integer lowest = players.size();
 		for (Entry<SimpleTeam, Integer> e : map.entrySet()) {
-			if (e.getValue() < lowest) {
+			if (e.getValue() <= lowest) { // (this is less)
 				rarest = e.getKey();
 				lowest = e.getValue();
 			}
