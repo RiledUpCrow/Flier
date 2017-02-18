@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import javafx.util.Pair;
 import pl.betoncraft.flier.api.Engine;
 import pl.betoncraft.flier.api.ItemSet;
 import pl.betoncraft.flier.api.LoadingException;
@@ -123,9 +122,9 @@ public class DefaultClass implements PlayerClass {
 
 	@Override
 	public Map<UsableItem, Integer> getStoredItems() {
-		return storedItems.entrySet().stream().map(
-				entry -> new Pair<>((UsableItem) entry.getKey().replicate(), entry.getValue())
-			).collect(Collectors.toMap(pair -> pair.getKey(), pair -> pair.getValue()));
+		return storedItems.entrySet().stream().collect(Collectors.toMap(
+				e -> (UsableItem) e.getKey().replicate(), e -> e.getValue()
+		));
 	}
 
 	@Override
