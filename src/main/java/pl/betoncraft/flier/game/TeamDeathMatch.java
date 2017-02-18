@@ -171,6 +171,7 @@ public class TeamDeathMatch extends DefaultGame {
 	public void removePlayer(InGamePlayer data) {
 		super.removePlayer(data);
 		players.remove(data.getPlayer().getUniqueId());
+		updateColors();
 	}
 	
 	@Override
@@ -215,6 +216,10 @@ public class TeamDeathMatch extends DefaultGame {
 		String title = String.format("title %s title {\"text\":\"%s%s\"}",
 				data.getPlayer().getName(), team.getColor(), Utils.capitalize(team.getName()));
 		Bukkit.dispatchCommand(Bukkit.getConsoleSender(), title);
+		updateColors();
+	}
+
+	private void updateColors() {
 		Map<String, ChatColor> colors = getColors();
 		for (InGamePlayer g : dataMap.values()) {
 			g.updateColors(colors);

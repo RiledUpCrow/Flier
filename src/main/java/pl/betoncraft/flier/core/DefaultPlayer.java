@@ -6,11 +6,13 @@
  */
 package pl.betoncraft.flier.core;
 
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -249,11 +251,18 @@ public class DefaultPlayer implements InGamePlayer {
 	
 	@Override
 	public void updateColors(Map<String, ChatColor> map) {
+		List<String> colors = Arrays.asList(ChatColor.values()).stream()
+				.map(color -> color.name().toLowerCase()).collect(Collectors.toList());
+		for (Team team : sb.getTeams()) {
+			if (colors.contains(team.getName())) {
+				team.unregister();
+			}
+		}
 		for (Entry<String, ChatColor> e : map.entrySet()) {
 			String player = e.getKey();
 			ChatColor color = e.getValue();
 			String colorName = color.name().toLowerCase();
-			org.bukkit.scoreboard.Team team = sb.getTeam(colorName);
+			Team team = sb.getTeam(colorName);
 			if (team == null) {
 				team = sb.registerNewTeam(colorName);
 			}
