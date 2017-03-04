@@ -283,7 +283,7 @@ public abstract class DefaultGame implements Listener, Game {
 		if (data != null) {
 			event.setCancelled(true);
 			ItemStack item = event.getPlayer().getInventory().getItemInMainHand();
-			Wings wings = data.getClazz().getCurrentWings();
+			Wings wings = data.getClazz().getWings();
 			if (item != null && wings != null && item.isSimilar(wings.getItem())) {
 				// handle wearing wings
 				event.getPlayer().getInventory().setChestplate(item);
@@ -364,7 +364,7 @@ public abstract class DefaultGame implements Listener, Game {
 		}
 		// handle wing damage
 		if (result.contains(DamageResult.WINGS_DAMAGE)) {
-			player.getClazz().getCurrentWings().removeHealth(weapon.getDamager().getDamage());
+			player.getClazz().getWings().removeHealth(weapon.getDamager().getDamage());
 		}
 	}
 

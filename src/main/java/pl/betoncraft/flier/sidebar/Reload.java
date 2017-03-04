@@ -11,6 +11,7 @@ import org.bukkit.ChatColor;
 import pl.betoncraft.flier.api.InGamePlayer;
 import pl.betoncraft.flier.api.SidebarLine;
 import pl.betoncraft.flier.api.UsableItem;
+import pl.betoncraft.flier.api.UsableItemStack;
 
 /**
  * A sidebar line showing cooldown progress for currently held item.
@@ -31,9 +32,9 @@ public class Reload implements SidebarLine {
 	public String getText() {
 		int slot = player.getPlayer().getInventory().getHeldItemSlot();
 		UsableItem item = null;
-		for (UsableItem i : player.getClazz().getCurrentItems().keySet()) {
-			if (i.slot() == slot) {
-				item = i;
+		for (UsableItemStack i : player.getClazz().getItems()) {
+			if (i.getItem().slot() == slot) {
+				item = i.getItem();
 				break;
 			}
 		}

@@ -39,7 +39,7 @@ public class PhysicalLobby extends DefaultLobby {
 	private List<Block> join = new ArrayList<>();
 	private Block start;
 	private Block leave;
-	private Map<Block, ItemBlock> blocks = new HashMap<>();
+	private Map<Block, Button> blocks = new HashMap<>();
 
 	private List<UUID> blocked = new LinkedList<>();
 
@@ -50,33 +50,17 @@ public class PhysicalLobby extends DefaultLobby {
 		}
 		start = loader.loadLocation("start").getBlock();
 		leave = loader.loadLocation("leave").getBlock();
-		ConfigurationSection blocksSection = section.getConfigurationSection("blocks");
-		if (blocksSection != null) for (String i : blocksSection.getKeys(false)) {
-			ConfigurationSection blockSection = blocksSection.getConfigurationSection(i);
+		ConfigurationSection buttonsSection = section.getConfigurationSection("buttons");
+		if (buttonsSection != null) for (String i : buttonsSection.getKeys(false)) {
+			ConfigurationSection blockSection = buttonsSection.getConfigurationSection(i);
 			try {
-				ItemBlock itemBlock = new ItemBlock(blockSection);
-				blocks.put(itemBlock.block, itemBlock);
+				ValueLoader loader = new ValueLoader(blockSection);
+				Block block = loader.loadLocation("block").getBlock();
+				blocks.put(block, buttons.get(i));
 			} catch (LoadingException e) {
-				throw (LoadingException) new LoadingException(String.format("Error in '%s' block.", i)).initCause(e);
+				throw (LoadingException) new LoadingException(String.format("Error in '%s' button.", i)).initCause(e);
 			}
 		}
-	}
-
-	private class ItemBlock {
-
-		private Block block;
-		private CostlySet set;
-
-		private ItemBlock(ConfigurationSection section) throws LoadingException {
-			ValueLoader loader = new ValueLoader(section);
-			block = loader.loadLocation("block").getBlock();
-			String name = loader.loadString("item");
-			set = items.get(name);
-			if (set == null) {
-				throw new LoadingException(String.format("Item '%s' does not exist.", name));
-			}
-		}
-
 	}
 
 	@EventHandler(priority = EventPriority.LOW)
@@ -84,7 +68,7 @@ public class PhysicalLobby extends DefaultLobby {
 		if (event.isCancelled()) {
 			return;
 		}
-		if (event.getAction() != Action.LEFT_CLICK_BLOCK) {
+		if (event.getAction() != Action.LEFT_CLICK_BLOCK && event.getAction() != Action.RIGHT_CLICK_BLOCK) {
 			return;
 		}
 		Player player = event.getPlayer();
@@ -120,11 +104,11 @@ public class PhysicalLobby extends DefaultLobby {
 			if (block.equals(start)) {
 				currentGame.startPlayer(data);
 			} else {
-				ItemBlock itemBlock = blocks.get(block);
-				if (itemBlock == null) {
+				Button button = blocks.get(block);
+				if (button == null) {
 					return;
 				}
-				handleItems(data, itemBlock.set);
+				handleItems(data, button, event.getAction() == Action.LEFT_CLICK_BLOCK);
 			}
 		}
 		event.setCancelled(true);

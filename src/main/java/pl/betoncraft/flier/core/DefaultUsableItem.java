@@ -138,4 +138,15 @@ public class DefaultUsableItem extends DefaultItem implements UsableItem {
 			return null; // dead code
 		}
 	}
+	
+	@Override
+	public boolean isSimilar(Item item) {
+		if (item instanceof DefaultUsableItem && super.isSimilar(item)) {
+			DefaultUsableItem usable = (DefaultUsableItem) item;
+			return usable.consumable == consumable &&
+					usable.ammo == ammo &&
+					usable.usages.stream().allMatch(thatUsage -> usages.stream().anyMatch(thisUsage -> thatUsage.equals(thisUsage)));
+		}
+		return false;
+	}
 }

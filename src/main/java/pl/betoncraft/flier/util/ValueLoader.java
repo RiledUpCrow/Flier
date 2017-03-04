@@ -28,6 +28,9 @@ public class ValueLoader {
 	
 	public ValueLoader(ConfigurationSection section) {
 		this.section = section;
+		if (section == null) {
+			throw new NullPointerException("ConfigurationSection is null");
+		}
 	}
 	
 	public String loadString(String address) throws LoadingException {

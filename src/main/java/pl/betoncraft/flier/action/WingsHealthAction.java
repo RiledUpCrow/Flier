@@ -29,7 +29,7 @@ public class WingsHealthAction extends DefaultAction {
 
 	@Override
 	public boolean act(InGamePlayer player) {
-		Wings wings = player.getClazz().getCurrentWings();
+		Wings wings = player.getClazz().getWings();
 		if (amount >= 0) {
 			return wings.addHealth(amount);
 		} else {

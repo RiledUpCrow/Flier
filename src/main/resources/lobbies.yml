@@ -15,80 +15,114 @@
 #  leave: 100;200;300;world       # "leave" block, **EDIT THIS BEFORE USING!**
 #  default_class:                 # list of item sets for default class
 #  - balanced
-#  blocks:                        # list of blocks with item sets
-#    addRocket:
-#      item: addRocket            # ID of the item set
-#      block: 100;200;300;world   # location of the block giving this set, **EDIT THIS BEFORE USING!**
-#    addLauncher:
-#      item: addLauncher
+#  buttons:                       # list of buttons with item sets
+#    rocket_button:
+#      buy_cost: 15               # cost of buying this item set
+#      on_buy:                    # items to apply when buying
+#        item: the_rocket         # ID of the item set
+#        add_type: increase       # how it's added, see docs
+#        conflict_action: skip    # what happens, when there already is something of that category
+#      sell_cost: -15             # negative, because we're giving the money back
+#      on_sell:                   # items to apply when selling
+#        item: addRocket          # it's the same as above
+#        add_type: decrease       # but we're decreasing instead of increasing
+#        conflict_action: skip
+#      block: 100;200;300;world   # location of the block to click, **EDIT THIS BEFORE USING!**
+#    launcher_button:
+#      buy_cost: 10
+#      on_buy:
+#        item: the_launcher
+#        add_type: increase
+#        conflict_action: skip
+#      sell_cost: -10
+#      on_sell:
+#        item: the_launcher
+#        add_type: decrease
+#        conflict_action: skip
 #      block: 100;200;300;world   # **EDIT THIS BEFORE USING!**
-#    addComppass:
-#      item: addCompass
+#    compass_button:
+#      buy_cost: 5
+#      on_buy:
+#        item: the_compass
+#        add_type: increase
+#        conflict_action: skip
+#      sell_cost: -5
+#      on_sell:
+#        item: the_compass
+#        add_type: decrease
+#        conflict_action: skip
 #      block: 100;200;300;world   # **EDIT THIS BEFORE USING!**
-#    emergencyWings:
-#      item: emergencyWings
+#    repair_kit_button:
+#      buy_cost: 20
+#      on_buy:
+#        item: the_repair_kit
+#        add_type: increase
+#        conflict_action: skip
+#      sell_cost: -20
+#      on_sell:
+#        item: the_repair_kit
+#        add_type: decrease
+#        conflict_action: skip
 #      block: 100;200;300;world   # **EDIT THIS BEFORE USING!**
-#    fast:
-#      item: fast
+#    fast_button:
+#      on_buy:
+#        item: fast_class
+#        add_type: fill
+#        conflict_action: replace
 #      block: 100;200;300;world   # **EDIT THIS BEFORE USING!**
-#    balanced:
-#      item: balanced
+#    balanced_button:
+#      on_buy:
+#        item: balanced_class
+#        add_type: fill
+#        conflict_action: replace
 #      block: 100;200;300;world   # **EDIT THIS BEFORE USING!**
-#    strong:
-#      item: strong
+#    strong_button:
+#      on_buy:
+#        item: strong_class
+#        add_type: fill
+#        conflict_action: replace
 #      block: 100;200;300;world   # **EDIT THIS BEFORE USING!**
 #  items:                         # list of item sets
-#    addRocket:                   # ID of the item set (used in the `blocks` section)
-#      type: add                  # type of the item set (specifically how it's added, see docs)
-#      buy_cost: 15               # cost of buying this item set
+#    the_rocket:                  # ID of the item set (used in the `buttons` section)
 #      items:                     # list of items received when buying
 #      - item: rocket             # ID of the item (from "items.yml")
-#        max: 6                   # maximum amount of these items a player can have
-#    addLauncher:
-#      type: add
-#      buy_cost: 10
+#        max: 3                   # maximum amount of these items a player can have
+#    the_launcher:
 #      items:
 #      - item: launcher
-#        max: 3
-#    addCompass:
-#      type: add
-#      buy_cost: 5
+#        max: 5
+#    the_compass:
 #      items:
 #      - item: radar
 #        max: 1
-#    emergencyWings:
-#      type: add
-#      buy_cost: 20
+#    the_repair_kit:
 #      items:
 #      - item: wings
-#        max: 1
-#    fast:
+#        max: 2
+#    fast_class:
 #      name: Fast
-#      type: replace
 #      engine: fastEngine         # Engine added in this item set
 #      wings: lightWings          # Wings added in this item set
 #      items:
 #      - item: fastWeapon
 #      - item: gun
 #      - item: bomb
-#    balanced:
+#    balanced_class:
 #      name: Balanced
-#      type: replace
 #      engine: balancedEngine
 #      wings: balancedWings
 #      items:
 #      - item: balancedWeapon
 #      - item: gun
 #      - item: bomb
-#    strong:
+#    strong_class:
 #      name: Strong
-#      type: replace
 #      engine: strongEngine
 #      wings: heavyWings
 #      items:
 #      - item: strongWeapon
 #      - item: gun
 #      - item: bomb
-#  respawn_action: save           # what happens with items after respawn (see docs)
+#  respawn_action: nothing        # what happens with items after respawn (see docs)
 #  games:                         # list of Games in this Lobby
 #  - default

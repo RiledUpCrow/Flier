@@ -38,6 +38,6 @@ public interface Item extends Replicable {
 	 *            another item to compare
 	 * @return true if the item was replicated from this one, false if not
 	 */
-	public boolean isSameAs(Item key);
+	public boolean isSimilar(Item key);
 
 }

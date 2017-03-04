@@ -25,5 +25,14 @@ public abstract class DefaultAction implements Action {
 		id = section.getName();
 		loader = new ValueLoader(section);
 	}
+	
+	@Override
+	public boolean equals(Object o) {
+		if (o instanceof DefaultAction) {
+			DefaultAction action = (DefaultAction) o;
+			return action.id == id;
+		}
+		return false;
+	}
 
 }

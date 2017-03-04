@@ -31,7 +31,7 @@ public class Health implements SidebarLine {
 	@Override
 	public String getText() {
 		PlayerClass c = player.getClazz();
-		Wings wings = c == null ? null : c.getCurrentWings();
+		Wings wings = c == null ? null : c.getWings();
 		double h = wings == null ? 0 : 100 * wings.getHealth() / wings.getMaxHealth();
 		if (lastString == null || h != lastValue) {
 			String color;

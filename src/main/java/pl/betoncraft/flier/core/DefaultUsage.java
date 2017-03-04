@@ -78,4 +78,31 @@ public class DefaultUsage implements Usage {
 		return Position.check(player.getPlayer(), where);
 	}
 
+	@Override
+	public boolean equals(Object usage) {
+		if (usage instanceof DefaultUsage) {
+			DefaultUsage def = (DefaultUsage) usage;
+			boolean actionsMatch = true;
+			boolean activatorsMatch = true;
+			if (def.actions.size() == actions.size()) for (int i = 0; i < actions.size(); i++) {
+				if (!actions.get(i).equals(def.actions.get(i))) {
+					actionsMatch = false;
+					break;
+				}
+			}
+			if (def.activators.size() == activators.size()) for (int i = 0; i < activators.size(); i++) {
+				if (!activators.get(i).equals(def.activators.get(i))) {
+					activatorsMatch = false;
+					break;
+				}
+			}
+			return def.cooldown == cooldown &&
+					def.ammoUse == ammoUse &&
+					actionsMatch &&
+					activatorsMatch;
+					
+		}
+		return false;
+	}
+
 }

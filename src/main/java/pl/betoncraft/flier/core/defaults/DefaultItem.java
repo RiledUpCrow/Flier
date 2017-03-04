@@ -68,10 +68,12 @@ public abstract class DefaultItem implements Item {
 	}
 	
 	@Override
-	public boolean isSameAs(Item item) {
+	public boolean isSimilar(Item item) {
 		if (item instanceof DefaultItem) {
 			DefaultItem defItem = (DefaultItem) item;
-			return defItem.id.equals(id);
+			return defItem.item.isSimilar(this.item) &&
+					defItem.weight == weight &&
+					defItem.slot == slot;
 		}
 		return false;
 	}

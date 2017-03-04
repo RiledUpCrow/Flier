@@ -13,6 +13,8 @@ engine_name:
   [type specific settings]
 ```
 
+## Engine settings
+
 * `max_fuel` (**required**) is the amount of fuel the engine has.
 * `consumption` (**required**) is the amount of fuel consumed every tick while accelerating (20 times per second). Set it to 0 if you want your fuel to be unlimited.
 * `regeneration` (**required**) is the amount of fuel regenerated every tick while _not_ accelerating. Set it to 0 if you want to restore fuel some other way than via regeneration.

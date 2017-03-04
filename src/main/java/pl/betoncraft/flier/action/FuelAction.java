@@ -29,7 +29,7 @@ public class FuelAction extends DefaultAction {
 
 	@Override
 	public boolean act(InGamePlayer player) {
-		Engine engine = player.getClazz().getCurrentEngine();
+		Engine engine = player.getClazz().getEngine();
 		if (amount >= 0) {
 			return engine.addFuel(amount);
 		} else {

@@ -28,6 +28,8 @@ item_name:
       - some_action
 ```
 
+## Item settings
+
 * `material` (**required**) is the type ([material](https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html)) of an item.
 * `name` (**required**) is the name of the item. It accepts color codes (`&`).
 * `lore` is a list of lore lines. Lore is that text under item's name. It's italic purple by default.

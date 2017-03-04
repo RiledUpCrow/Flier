@@ -25,5 +25,14 @@ public abstract class DefaultActivator implements Activator {
 		id = section.getName();
 		loader = new ValueLoader(section);
 	}
+	
+	@Override
+	public boolean equals(Object o) {
+		if (o instanceof DefaultActivator) {
+			DefaultActivator activator = (DefaultActivator) o;
+			return activator.id == id;
+		}
+		return false;
+	}
 
 }

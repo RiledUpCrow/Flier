@@ -6,6 +6,7 @@
  */
 package pl.betoncraft.flier.core;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -30,11 +31,11 @@ import com.google.common.collect.Lists;
 import pl.betoncraft.flier.api.Bonus;
 import pl.betoncraft.flier.api.Engine;
 import pl.betoncraft.flier.api.InGamePlayer;
-import pl.betoncraft.flier.api.Item;
 import pl.betoncraft.flier.api.Lobby;
 import pl.betoncraft.flier.api.PlayerClass;
 import pl.betoncraft.flier.api.SidebarLine;
 import pl.betoncraft.flier.api.UsableItem;
+import pl.betoncraft.flier.api.UsableItemStack;
 import pl.betoncraft.flier.api.Wings;
 import pl.betoncraft.flier.util.PlayerBackup;
 import pl.betoncraft.flier.util.Utils;
@@ -81,8 +82,8 @@ public class DefaultPlayer implements InGamePlayer {
 	public void fastTick() {
 		if (isPlaying()) {
 			boolean hasWings = hasWings();
-			boolean wingsDead = clazz.getCurrentWings().getHealth() == 0;
-			boolean wingsDisabled = clazz.getCurrentWings().areDisabled();
+			boolean wingsDead = clazz.getWings().getHealth() == 0;
+			boolean wingsDisabled = clazz.getWings().areDisabled();
 
 			if (hasWings) { // has wings
 				if (wingsDead) { // wings should be dead, destroying
@@ -171,10 +172,10 @@ public class DefaultPlayer implements InGamePlayer {
 	@Override
 	public double getWeight() {
 		double weight = 0;
-		weight += clazz.getCurrentEngine().getWeight();
-		weight += clazz.getCurrentWings().getWeight();
-		for (Item item : clazz.getCurrentItems().keySet()) {
-			weight += item.getWeight();
+		weight += clazz.getEngine().getWeight();
+		weight += clazz.getWings().getWeight();
+		for (UsableItemStack stack : clazz.getItems()) {
+			weight += stack.getItem().getWeight();
 		}
 		return weight;
 	}
@@ -196,15 +197,15 @@ public class DefaultPlayer implements InGamePlayer {
 	
 	@Override
 	public void updateClass() {
-		Engine engine = clazz.getCurrentEngine();
-		Wings wings = clazz.getCurrentWings();
-		Map<UsableItem, Integer> items = clazz.getCurrentItems();
+		Engine engine = clazz.getEngine();
+		Wings wings = clazz.getWings();
+		List<UsableItemStack> stacks = clazz.getItems();
 		getPlayer().getInventory().clear();
 		getPlayer().getInventory().setItemInOffHand(engine.getItem());
 		getPlayer().getInventory().setChestplate(wings.getItem());
-		for (Entry<UsableItem, Integer> e : items.entrySet()) {
-			UsableItem item = e.getKey();
-			int amount = e.getValue();
+		for (UsableItemStack stack : stacks) {
+			UsableItem item = stack.getItem();
+			int amount = stack.getAmount();
 			int slot = item.slot();
 			ItemStack itemStack = item.getItem();
 			itemStack.setAmount(amount);
@@ -315,7 +316,7 @@ public class DefaultPlayer implements InGamePlayer {
 	}
 	
 	private void speedUp() {
-		Engine engine = clazz.getCurrentEngine();
+		Engine engine = clazz.getEngine();
 		if (engine == null) {
 			return;
 		}
@@ -327,7 +328,7 @@ public class DefaultPlayer implements InGamePlayer {
 	}
 	
 	private void regenerateFuel() {
-		Engine engine = clazz.getCurrentEngine();
+		Engine engine = clazz.getEngine();
 		if (engine == null) {
 			return;
 		}
@@ -335,7 +336,7 @@ public class DefaultPlayer implements InGamePlayer {
 	}
 	
 	private void regenerateWings() {
-		Wings wings = clazz.getCurrentWings();
+		Wings wings = clazz.getWings();
 		if (wings == null) {
 			return;
 		}
@@ -357,7 +358,7 @@ public class DefaultPlayer implements InGamePlayer {
 	}
 	
 	private boolean hasWings() {
-		ItemStack wings = clazz.getCurrentWings().getItem();
+		ItemStack wings = clazz.getWings().getItem();
 		ItemStack chestPlate = player.getInventory().getChestplate();
 		if (chestPlate != null && chestPlate.isSimilar(wings)) {
 			return true;
@@ -412,15 +413,15 @@ public class DefaultPlayer implements InGamePlayer {
 	}
 
 	private void createWings() {
-		player.getInventory().setItem(1, clazz.getCurrentWings().getItem());
+		player.getInventory().setItem(1, clazz.getWings().getItem());
 	}
 
 	private void enableWings() {
-		clazz.getCurrentWings().setDisabled(false);
+		clazz.getWings().setDisabled(false);
 	}
 
 	private void modifyFlight() {
-		Vector velocity = clazz.getCurrentWings().applyFlightModifications(this);
+		Vector velocity = clazz.getWings().applyFlightModifications(this);
 		if (Double.isNaN(velocity.length())) {
 			velocity = new Vector();
 		}
@@ -431,22 +432,40 @@ public class DefaultPlayer implements InGamePlayer {
 		if (!isPlaying()) {
 			return;
 		}
-		for (Iterator<Entry<UsableItem, Integer>> it = clazz.getCurrentItems().entrySet().iterator(); it.hasNext();) {
-			Entry<UsableItem, Integer> entry = it.next();
-			UsableItem item = entry.getKey();
-			int amount = entry.getValue();
+		// we can't remove class items while iterating over them, so this list will remember them
+		// it.remove() won't work, removing class item is more complicated than that
+		List<UsableItem> itemsToRemove = new ArrayList<>();
+		for (Iterator<UsableItemStack> it = clazz.getItems().iterator(); it.hasNext();) {
+			UsableItemStack s = it.next();
+			UsableItem item = s.getItem();
+			int amount = s.getAmount();
 			if (item.use(this) && item.getAmmo() == 0 && item.isConsumable()) {
+				int slot = item.slot();
+				ItemStack stack = player.getInventory().getItem(slot);
+				// if the stack was not on the correct slot or there was another item, find the correct one
+				if (stack == null || !stack.isSimilar(item.getItem())) {
+					ItemStack[] inv = player.getInventory().getContents();
+					for (int i = 0; i < inv.length; i++) {
+						if (inv[i] != null && item.getItem().isSimilar(inv[i])) {
+							stack = inv[i];
+							slot = i; // remember the current slot, so we can remove it
+							break;
+						}
+					}
+				}
 				amount--;
-				ItemStack stack = getPlayer().getInventory().getItemInMainHand();
 				if (amount <= 0) { // remove stack
-					it.remove();
-					getPlayer().getInventory().setItemInMainHand(null);
+					player.getInventory().setItem(slot, null); // here the remembered slot is used
 				} else { // decrease stack
-					entry.setValue(amount);
 					stack.setAmount(amount);
 					item.setAmmo(item.getMaxAmmo());
 				}
+				itemsToRemove.add(item); // remember the item to remove from the class
 			}
+		}
+		// remove items from the class
+		for (UsableItem item : itemsToRemove) {
+			clazz.removeItem(item);
 		}
 	}
 

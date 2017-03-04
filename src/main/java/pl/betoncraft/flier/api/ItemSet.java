@@ -6,7 +6,7 @@
  */
 package pl.betoncraft.flier.api;
 
-import java.util.Map;
+import java.util.List;
 
 /**
  * Represents a set of items which can be applied to PlayerClass.
@@ -16,24 +16,9 @@ import java.util.Map;
 public interface ItemSet {
 
 	/**
-	 * Type of applying operation.
-	 *
-	 * @author Jakub Sapalski
+	 * @return the name of the class after applying this ItemSet
 	 */
-	public enum AddType {
-		RESET, CLEAR, REPLACE, ADD, TAKE
-	}
-
-	/**
-	 * Tries to apply this ItemSet to the PlayerClass by setting items in a
-	 * defined way. Returns true if it successfully applied all items, false if
-	 * it wasn't possible.
-	 * 
-	 * @param clazz
-	 *            PlayerClass to apply items to
-	 * @return whenever applying was successful
-	 */
-	public boolean apply(PlayerClass clazz);
+	public String getName();
 
 	/**
 	 * @return the Engine in this ItemSet
@@ -41,18 +26,78 @@ public interface ItemSet {
 	public Engine getEngine();
 
 	/**
+	 * @param engine
+	 *            the Engine to set in this ItemSet
+	 */
+	public void setEngine(Engine engine);
+
+	/**
 	 * @return the Wings in this ItemSet
 	 */
 	public Wings getWings();
 
 	/**
-	 * @return the map of UsableItems and their amounts in this ItemSet
+	 * @param wings
+	 *            the Wings to set in this ItemSet
 	 */
-	public Map<UsableItem, Integer> getItems();
+	public void setWings(Wings wings);
 
 	/**
-	 * @return the type of applying operation
+	 * @return the map of UsableItems and their amounts in this ItemSet
 	 */
-	public AddType getType();
+	public List<UsableItemStack> getItems();
+
+	/**
+	 * Category is used to group the ItemSets together and handle adding new
+	 * ItemSets.
+	 *
+	 * @return the category name of this ItemSet
+	 */
+	public String getCategory();
+
+	/**
+	 * @return whenever this ItemSet is empty.
+	 */
+	public boolean isEmpty();
+
+	/**
+	 * @return whenever these two ItemSets are similar (default values of
+	 *         Engine, Wings and UsableItems)
+	 */
+	public boolean isSimilar(ItemSet set);
+
+	/**
+	 * @return the ItemSet with the same default values as this one
+	 */
+	public ItemSet replicate();
+
+	/**
+	 * Increases the amount of UsableItems in this ItemSet by specified amount
+	 * of these ItemSets (can be negative) If by default there were 3 items
+	 * here, increasing it by 2 will add 2*3=6 items, making it 9. It will not
+	 * increase over the maximum limit, nor decrease below 0.
+	 * 
+	 * @param amount
+	 *            the amount of these ItemSets to add
+	 * @return whenever the ItemSet was increased or not
+	 */
+	public boolean increase(int amount);
+
+	/**
+	 * Fills the ItemSet to the specified amount of these ItemSets. If by
+	 * default there were 3 items here and now there are 2, filling it to 4 will
+	 * add 4*3-2=10, making it 12 (4*3). It will not fill over the maximum
+	 * limit. It never decreases the amount of any item.
+	 * 
+	 * @param amount
+	 *            the amount of ItemSets to fill to
+	 */
+	public void fill(int amount);
+
+	/**
+	 * @return the amount of these ItemSets in this ItemSet (increased by the
+	 *         increase() method).
+	 */
+	public int getAmount();
 
 }

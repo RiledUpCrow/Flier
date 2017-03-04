@@ -6,183 +6,136 @@
  */
 package pl.betoncraft.flier.api;
 
+import java.util.List;
 import java.util.Map;
 
 /**
- * Represents a class, which is basically a container for an engine, wings and
- * items.
- * 
- * The class has 3 separate sets of these items: current, stored and default.
- * 
- * Current are the ones currently on the player. It reflects their inventory and
- * is modified on use.
- * 
- * Stored are items with which the player has entered the game. It is loaded
- * into Current items with `load()` method, should you restore these items. You
- * can also save Current items into Stored with `save()`.
- * 
- * Default is the one with which the PlayerClass is created. It should not
- * change. To change it, create a new PlayerClass object. These can be reset
- * into Current and Stored with `reset()` method.
+ * The player class stores and manages the items for the player.
  *
  * @author Jakub Sapalski
  */
-public interface PlayerClass extends Replicable {
+public interface PlayerClass {
 
 	/**
-	 * Represents what happens with items when the player respawns.
-	 *
-	 * @author Jakub Sapalski
+	 * What happens when the player is respawned. CLEAR will remove all current
+	 * items and give stored ones. COMBINE will apply all stored items on top of
+	 * the current ones and NOTHING will do nothing.
 	 */
 	public enum RespawnAction {
-		SAVE, LOAD, RESET, NOTHING
+		CLEAR, COMBINE, NOTHING,
+	}
+	
+	public enum AddResult {
+		ADDED, REMOVED, ALREADY_MAXED, ALREADY_EMPTIED, FILLED, REPLACED, SKIPPED
 	}
 
 	/**
-	 * @return the current name of this class
-	 */
-	public String getCurrentName();
-
-	/**
-	 * @return engine currently on the player or null if he doesn't have one
-	 */
-	public Engine getCurrentEngine();
-
-	/**
-	 * @return wings currently on the player or null if he doesn't have the
-	 *         wings
-	 */
-	public Wings getCurrentWings();
-
-	/**
-	 * @return mutable map of items and their amounts; the map can be empty if
-	 *         the player doesn't have any items currently
-	 */
-	public Map<UsableItem, Integer> getCurrentItems();
-
-	/**
-	 * Sets the current name of this class.
+	 * Returns the name of the class, as specified by the last applied ItemSet
+	 * with a name.
 	 * 
-	 * @param name
-	 *            string to set as current name
+	 * @return the name of the class
 	 */
-	public void setCurrentName(String name);
+	public String getName();
 
 	/**
-	 * Sets the current engine. It does not modify stored engine.
+	 * Returns the Engine of the player.
 	 * 
-	 * @param engine
-	 *            Engine to set as the current one
+	 * @return the currently equipped engine
 	 */
-	public void setCurrentEngine(Engine engine);
+	public Engine getEngine();
 
 	/**
-	 * Sets the current wings. It does not modify stored wings.
+	 * Removes the Engine completely from the current list of items.
 	 * 
-	 * @param wings
-	 *            Wings to set as the current ones
+	 * @return whenever the engine was removed or was no engine
 	 */
-	public void setCurrentWings(Wings wings);
+	public boolean removeEngine();
 
 	/**
-	 * Sets the current items. It does not modify stored items. The map is not
-	 * copied, so all changes apply.
+	 * Returns the Wings of the player (doesn't matter if they are on or not).
 	 * 
-	 * @param items
-	 *            map of UsableItems and their amounts to set as the current
-	 *            ones
+	 * @return the currently equipped wings
 	 */
-	public void setCurrentItems(Map<UsableItem, Integer> items);
+	public Wings getWings();
 
 	/**
-	 * @return the stored name of this class
-	 */
-	public String getStoredName();
-
-	/**
-	 * @return the stored engine or null if the player doesn't have it
-	 */
-	public Engine getStoredEngine();
-
-	/**
-	 * @return the stored wings or null if the player doesn't have them
-	 */
-	public Wings getStoredWings();
-
-	/**
-	 * @return an immutable map of stored items; the map can be empty if the
-	 *         player doesn't have any stored items
-	 */
-	public Map<UsableItem, Integer> getStoredItems();
-
-	/**
-	 * Sets the stored name of this class.
+	 * Removes the Wings completely from the current list of items.
 	 * 
-	 * @param name
-	 *            string to set as stored name
+	 * @return whenever the wings were removed or there were no wings
 	 */
-	public void setStoredName(String name);
+	public boolean removeWings();
 
 	/**
-	 * Sets the stored engine. It's a shortcut for setting current engine and
-	 * saving.
+	 * @return the list of current item stacks
+	 */
+	public List<UsableItemStack> getItems();
+
+	/**
+	 * Removes one specified UsableItem from the inventory.
 	 * 
-	 * @param engine
-	 *            the Engine to store
+	 * @param item
+	 *            item to remove
+	 * @return whenever the item was removed or there were no items of this type
 	 */
-	public void setStoredEngine(Engine engine);
+	public boolean removeItem(UsableItem item);
 
 	/**
-	 * Sets the stored wings. It's a shortcut for setting current wings and
-	 * saving.
-	 * 
-	 * @param wings
-	 *            the Wings to store
+	 * Performs the RespawnAction.
 	 */
-	public void setStoredWings(Wings wings);
+	public void onRespawn();
 
 	/**
-	 * Sets the stored items. It's a shortcut for setting current items and
-	 * saving. The map is copies, so later changes won't be applied.
-	 * 
-	 * @param items
-	 *            the map of UsableItems and their amounts to store
-	 */
-	public void setStoredItems(Map<UsableItem, Integer> items);
-
-	/**
-	 * @return the default name of this class
-	 */
-	public String getDefaultName();
-
-	/**
-	 * @return the default, unmodifiable engine
-	 */
-	public Engine getDefaultEngine();
-
-	/**
-	 * @return the default, unmodifiable wings
-	 */
-	public Wings getDefaultWings();
-
-	/**
-	 * @return the copy of default items
-	 */
-	public Map<UsableItem, Integer> getDefaultItems();
-
-	/**
-	 * Saves all current items into stored items.
-	 */
-	public void save();
-
-	/**
-	 * Loads all stored items into current items.
-	 */
-	public void load();
-
-	/**
-	 * Resets default items into stored and current items.
+	 * Resets the class to default values.
 	 */
 	public void reset();
+
+	/**
+	 * Returns a map of current ItemSets, where the key is a category, for
+	 * easier browsing.
+	 * 
+	 * @return the map of current ItemSets
+	 */
+	public Map<String, ItemSet> getCurrent();
+
+	/**
+	 * Applies the SetApplier to the current list.
+	 * 
+	 * @param set
+	 *            SetApplier to apply.
+	 * @return whenever the ItemSet was applied or not
+	 */
+	public AddResult addCurrent(SetApplier set);
+
+	/**
+	 * Returns a map of stored SetAppliers, where the key is a category, for easier
+	 * browsing.
+	 * 
+	 * @return the map of stored ItemSets
+	 */
+	public Map<String, List<SetApplier>> getStored();
+
+	/**
+	 * Applies the SetApplier to the stored list.
+	 * 
+	 * @param set
+	 *            SetApplier to apply
+	 * @return whenever the ItemSet was applied or not
+	 */
+	public AddResult addStored(SetApplier set);
+
+	/**
+	 * Returns a map of default SetAppliers, where the key is a category, for
+	 * easier browsing.
+	 * 
+	 * @return the map of default ItemSets
+	 */
+	public Map<String, List<SetApplier>> getDefault();
+
+	/**
+	 * Replicates the current state of this Class.
+	 * 
+	 * @return the copy of this class
+	 */
+	public PlayerClass replicate();
 
 }

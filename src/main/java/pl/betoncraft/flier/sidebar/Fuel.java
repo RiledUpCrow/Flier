@@ -31,7 +31,7 @@ public class Fuel implements SidebarLine {
 	@Override
 	public String getText() {
 		PlayerClass c = player.getClazz();
-		Engine engine = c == null ? null : c.getCurrentEngine();
+		Engine engine = c == null ? null : c.getEngine();
 		double f = engine == null ? 0 : 100 * engine.getFuel() / engine.getMaxFuel();
 		if (lastString == null || f != lastValue) {
 			String color;

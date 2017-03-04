@@ -28,13 +28,17 @@ import net.md_5.bungee.api.ChatColor;
 import pl.betoncraft.flier.api.Flier;
 import pl.betoncraft.flier.api.Game;
 import pl.betoncraft.flier.api.InGamePlayer;
+import pl.betoncraft.flier.api.ItemSet;
 import pl.betoncraft.flier.api.LoadingException;
 import pl.betoncraft.flier.api.Lobby;
 import pl.betoncraft.flier.api.PlayerClass;
+import pl.betoncraft.flier.api.PlayerClass.AddResult;
 import pl.betoncraft.flier.api.PlayerClass.RespawnAction;
+import pl.betoncraft.flier.api.SetApplier;
 import pl.betoncraft.flier.core.DefaultClass;
 import pl.betoncraft.flier.core.DefaultPlayer;
-import pl.betoncraft.flier.core.DefaultSet;
+import pl.betoncraft.flier.core.item.DefaultSet;
+import pl.betoncraft.flier.core.item.DefaultSetApplier;
 import pl.betoncraft.flier.util.ValueLoader;
 
 /**
@@ -46,14 +50,15 @@ public abstract class DefaultLobby implements Lobby, Listener {
 	
 	protected ValueLoader loader;
 
-	protected RespawnAction respawnAction = RespawnAction.RESET;
+	protected RespawnAction respawnAction;
 	protected Map<String, Game> games = new HashMap<>();
 	protected Game currentGame;
 	protected Location spawn;
 	protected Map<UUID, InGamePlayer> players = new HashMap<>();
 	protected PlayerClass defClass;
-	protected Map<String, CostlySet> items = new HashMap<>();
-	protected Map<InGamePlayer, List<CostlySet>> unlocked = new HashMap<>();
+	protected Map<String, ItemSet> items = new HashMap<>();
+	protected Map<String, Button> buttons = new HashMap<>();
+	protected Map<InGamePlayer, List<Button>> unlocked = new HashMap<>();
 
 	public DefaultLobby(ConfigurationSection section) throws LoadingException {
 		loader = new ValueLoader(section);
@@ -62,8 +67,11 @@ public abstract class DefaultLobby implements Lobby, Listener {
 		ConfigurationSection itemsSection = section.getConfigurationSection("items");
 		if (itemsSection != null) for (String i : itemsSection.getKeys(false)) {
 			ConfigurationSection itemSection = itemsSection.getConfigurationSection(i);
+			if (itemSection == null) {
+				throw new LoadingException(String.format("'%s' is not an item set.", i));
+			}
 			try {
-				items.put(i, new CostlySet(itemSection));
+				items.put(i, new DefaultSet(itemSection));
 			} catch (LoadingException e) {
 				throw (LoadingException) new LoadingException(String.format("Error in '%s' item set.", i)).initCause(e);
 			}
@@ -75,10 +83,23 @@ public abstract class DefaultLobby implements Lobby, Listener {
 							name -> items.entrySet().stream().filter(
 									entry -> entry.getKey().equals(name)
 							).findFirst().orElse(null).getValue()
-					).collect(Collectors.toList())
+					).collect(Collectors.toList()),
+					respawnAction
 			);
-		} catch (NullPointerException | LoadingException e) {
+		} catch (NullPointerException e) {
 			throw (LoadingException) new LoadingException("Error in player class.").initCause(e);
+		}
+		ConfigurationSection buttonsSection = section.getConfigurationSection("buttons");
+		if (buttonsSection != null) for (String i : buttonsSection.getKeys(false)) {
+			ConfigurationSection buttonSection = buttonsSection.getConfigurationSection(i);
+			if (buttonSection == null) {
+				throw new LoadingException(String.format("'%s' is not a button.", i));
+			}
+			try {
+				buttons.put(i, new Button(buttonSection));
+			} catch (LoadingException e) {
+				throw (LoadingException) new LoadingException(String.format("Error in '%s' button.", i)).initCause(e);
+			}
 		}
 		List<String> gameNames = section.getStringList("games");
 		for (String gameName : gameNames) {
@@ -97,23 +118,26 @@ public abstract class DefaultLobby implements Lobby, Listener {
 		Bukkit.getPluginManager().registerEvents(this, Flier.getInstance());
 	}
 	
-	protected class CostlySet extends DefaultSet {
+	protected class Button {
 		
-		private int buyCost = 0;
-		private int unlockCost = 0;
+		protected final int buyCost;
+		protected final int sellCost;
+		protected final int unlockCost;
+		protected final SetApplier onBuy;
+		protected final SetApplier onSell;
+		protected final SetApplier onUnlock;
 
-		public CostlySet(ConfigurationSection section) throws LoadingException {
-			super(section);
-			buyCost = section.getInt("buy_cost", buyCost);
-			unlockCost = section.getInt("unlock_cost", unlockCost);
-		}
-
-		public int getBuyCost() {
-			return buyCost;
-		}
-
-		public int getUnlockCost() {
-			return unlockCost;
+		public Button(ConfigurationSection section) throws LoadingException {
+			ValueLoader loader = new ValueLoader(section);
+			buyCost = loader.loadInt("buy_cost", 0);
+			sellCost = loader.loadInt("sell_cost", 0);
+			unlockCost = loader.loadNonNegativeInt("unlock_cost", 0);
+			ConfigurationSection buySection = section.getConfigurationSection("on_buy");
+			onBuy = buySection == null ? null : new DefaultSetApplier(buySection, items);
+			ConfigurationSection sellSection = section.getConfigurationSection("on_sell");
+			onSell = sellSection == null ? null : new DefaultSetApplier(sellSection, items);
+			ConfigurationSection unlockSection = section.getConfigurationSection("on_unlock");
+			onUnlock = unlockSection == null ? null : new DefaultSetApplier(unlockSection, items);
 		}
 		
 	}
@@ -142,20 +166,7 @@ public abstract class DefaultLobby implements Lobby, Listener {
 	@Override
 	public void respawnPlayer(InGamePlayer player) {
 		PlayerClass clazz = player.getClazz();
-		switch (respawnAction) {
-		case LOAD:
-			clazz.load();
-			break;
-		case SAVE:
-			clazz.save();
-			clazz.load();
-			break;
-		case RESET:
-			clazz.reset();
-			break;
-		case NOTHING:
-			break;
-		}
+		clazz.onRespawn();
 		player.updateClass();
 		player.getPlayer().teleport(spawn);
 	}
@@ -203,36 +214,97 @@ public abstract class DefaultLobby implements Lobby, Listener {
 		}
 	}
 
-	protected void handleItems(InGamePlayer player, CostlySet set) {
-		PlayerClass c = player.getClazz();
-		if (set != null) {
-			List<CostlySet> ul = unlocked.get(player);
-			if (ul == null) {
-				ul = new LinkedList<>();
-				unlocked.put(player, ul);
-			}
-			if (!ul.contains(set)) {
-				if (set.getUnlockCost() <= player.getMoney()) {
-					ul.add(set);
-					player.setMoney(player.getMoney() - set.getUnlockCost());
-					if (set.getUnlockCost() != 0) {
-						player.getPlayer().sendMessage(ChatColor.GREEN + "Unlocked!");
+	protected void handleItems(InGamePlayer player, Button button, boolean buy) {
+		if (button != null) {
+			List<Button> ul = unlocked.computeIfAbsent(player, k -> new LinkedList<>());
+			boolean unlocked = button.unlockCost == 0 || ul.contains(button);
+			if (!unlocked) {
+				SetApplier applier = button.onUnlock;
+				if (button.unlockCost <= player.getMoney()) {
+					Runnable run = () -> {
+						ul.add(button);
+						player.setMoney(player.getMoney() - button.unlockCost);
+						player.updateClass();
+					};
+					String message;
+					if (applier == null) {
+						run.run();
+						message = ChatColor.GREEN + "Unlocked!";
+					} else {
+						AddResult result = applier.isSaving() ? player.getClazz().addStored(applier) :
+							player.getClazz().addCurrent(applier);
+						switch (result) {
+						case ADDED:
+						case FILLED:
+						case REPLACED:
+						case REMOVED:
+							run.run();
+							message = ChatColor.GREEN + "Unlocked!";
+							break;
+						default:
+							message = ChatColor.RED + "You can't use this right now.";
+						}
+						player.getPlayer().sendMessage(message);
 					}
 				} else {
-					player.getPlayer().sendMessage(ChatColor.RED + "Not enough money to unlock.");
-					return;
-				}
-			}
-			if (set.getBuyCost() <= player.getMoney()) {
-				if (set.apply(c)) {
-					player.setMoney(player.getMoney() - set.getBuyCost());
-					player.updateClass();
-					player.getPlayer().sendMessage(ChatColor.GREEN + "Class updated!");
-				} else {
-					player.getPlayer().sendMessage(ChatColor.RED + "You can't use this right now.");
+					player.getPlayer().sendMessage(ChatColor.RED + "Not enough money to unlock this.");
 				}
 			} else {
-				player.getPlayer().sendMessage(ChatColor.RED + "Not enough money.");
+				int cost;
+				SetApplier applier;
+				if (buy) {
+					cost = button.buyCost;
+					applier = button.onBuy;
+				} else {
+					cost = button.sellCost;
+					applier = button.onSell;
+				}
+				if (applier != null) {
+					if (cost <= player.getMoney()) {
+						AddResult result = applier.isSaving() ? player.getClazz().addStored(applier) :
+							player.getClazz().addCurrent(applier);
+						Runnable run = () -> {
+							player.setMoney(player.getMoney() - cost);
+							player.updateClass();
+						};
+						String message = null;
+						switch (result) {
+						case ADDED:
+							run.run();
+							message = ChatColor.GREEN + "Items added!";
+							break;
+						case FILLED:
+							run.run();
+							message = ChatColor.GREEN + "Items refilled!";
+							break;
+						case REMOVED:
+							run.run();
+							message = ChatColor.GREEN + "Items removed!";
+							break;
+						case REPLACED:
+							run.run();
+							message = ChatColor.GREEN + "Items replaced!";
+							break;
+						case ALREADY_EMPTIED:
+							// no running, items were not added
+							message = ChatColor.RED + "You can't sell more of these items!";
+							break;
+						case ALREADY_MAXED:
+							// no running, items were not added
+							message = ChatColor.RED + "You have reached a limit!";
+							break;
+						case SKIPPED:
+							// no running, items were not added
+							message = ChatColor.RED + "You already have another item in this category!";
+							break;
+						}
+						player.getPlayer().sendMessage(message);
+					} else {
+						player.getPlayer().sendMessage(ChatColor.RED + "Not enough money to buy this.");
+					}
+				} else {
+					player.getPlayer().sendMessage(ChatColor.RED + "You can't do this.");
+				}
 			}
 		}
 	}

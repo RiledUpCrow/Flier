@@ -38,7 +38,7 @@ public class WingsHealthActivator extends DefaultActivator {
 
 	@Override
 	public boolean isActive(InGamePlayer player, UsableItem item) {
-		Wings wings = player.getClazz().getCurrentWings();
+		Wings wings = player.getClazz().getWings();
 		double health = wings.getHealth();
 		double maxHealth = wings.getMaxHealth();
 		switch (type) {

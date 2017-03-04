@@ -18,6 +18,8 @@ some_bonus:
   [type specific settings]
 ```
 
+## Bonus settings
+
 * `location` (**required**) is the location at which the Bonus is.
 * `distance` (**required**) is the minimum distance from the Bonus where the player will collect it.
 * `consumable` (**required**) whenever the bonus will disappear after collecting

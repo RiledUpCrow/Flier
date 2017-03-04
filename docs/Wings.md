@@ -11,6 +11,8 @@ wings_name:
   [type specific settings]
 ```
 
+## Wings settings
+
 * `max_health` (**required**) is the health of wings.
 * `regeneration` (**required**) is the amount of health regenerated every tick.
 

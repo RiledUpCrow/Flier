@@ -9,6 +9,7 @@ package pl.betoncraft.flier.engine;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.util.Vector;
 
+import pl.betoncraft.flier.api.Item;
 import pl.betoncraft.flier.api.LoadingException;
 import pl.betoncraft.flier.core.defaults.DefaultEngine;
 
@@ -39,6 +40,17 @@ public class MultiplyingEngine extends DefaultEngine {
 			speed = minSpeed;
 		}
 		return velocity.add(direction.multiply(speed * acceleration));
+	}
+	
+	@Override
+	public boolean isSimilar(Item key) {
+		if (key instanceof MultiplyingEngine && super.isSimilar(key)) {
+			MultiplyingEngine engine = (MultiplyingEngine) key;
+			return engine.maxFuel == maxFuel &&
+					engine.maxSpeed == maxSpeed &&
+					engine.acceleration == acceleration;
+		}
+		return false;
 	}
 
 }

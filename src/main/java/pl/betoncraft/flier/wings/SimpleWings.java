@@ -10,6 +10,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.util.Vector;
 
 import pl.betoncraft.flier.api.InGamePlayer;
+import pl.betoncraft.flier.api.Item;
 import pl.betoncraft.flier.api.LoadingException;
 import pl.betoncraft.flier.core.defaults.DefaultWings;
 import pl.betoncraft.flier.util.ImmutableVector;
@@ -41,6 +42,17 @@ public class SimpleWings extends DefaultWings {
 		double drag = velocity.length() * velocity.length() * 0.5 * aerodynamics;
 		ImmutableVector airResistance = velocity.normalize().multiply(drag);
 		return velocity.add(airResistance).toVector();
+	}
+	
+	@Override
+	public boolean isSimilar(Item key) {
+		if (key instanceof SimpleWings && super.isSimilar(key)) {
+			SimpleWings wings = (SimpleWings) key;
+			return wings.aerodynamics == aerodynamics &&
+					wings.liftingForce == liftingForce &&
+					wings.maxLift == maxLift;
+		}
+		return false;
 	}
 
 }

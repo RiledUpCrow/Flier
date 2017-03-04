@@ -1,3 +1,3 @@
 # Flier
 
-_Documentation for 0.4 version._
+_Documentation for 0.5.0 version._
