@@ -44,6 +44,8 @@ public class TargetAction extends DefaultAction {
 			}
 			if (nearest != null) {
 				data.getPlayer().setCompassTarget(nearest.getPlayer().getLocation());
+			} else {
+				data.getPlayer().setCompassTarget(data.getLobby().getSpawn());
 			}
 		}
 		return true;
