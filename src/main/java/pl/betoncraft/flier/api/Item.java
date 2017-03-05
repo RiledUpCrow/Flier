@@ -13,7 +13,7 @@ import org.bukkit.inventory.ItemStack;
  *
  * @author Jakub Sapalski
  */
-public interface Item extends Replicable {
+public interface Item {
 
 	/**
 	 * @return the ItemStack equal to this item

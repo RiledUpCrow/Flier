@@ -13,16 +13,15 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+
+import org.bukkit.configuration.ConfigurationSection;
 
 import pl.betoncraft.flier.api.Engine;
 import pl.betoncraft.flier.api.ItemSet;
 import pl.betoncraft.flier.api.PlayerClass;
 import pl.betoncraft.flier.api.SetApplier;
 import pl.betoncraft.flier.api.UsableItem;
-import pl.betoncraft.flier.api.UsableItemStack;
 import pl.betoncraft.flier.api.Wings;
-import pl.betoncraft.flier.core.item.DefaultSetApplier;
 
 /**
  * Default implementation of PlayerClass.
@@ -39,14 +38,21 @@ public class DefaultClass implements PlayerClass {
 	private final Map<String, List<SetApplier>> stored = new HashMap<>();
 	private final Map<String, List<SetApplier>> def;
 	
-	public DefaultClass(List<ItemSet> sets, RespawnAction respAct) {
+	public DefaultClass(List<ConfigurationSection> sets, RespawnAction respAct) {
 		respawnAction = respAct;
 		HashMap<String, List<SetApplier>> map = new HashMap<>(sets.size());
-		sets.forEach(set -> map.computeIfAbsent(set.getCategory(), k -> new ArrayList<>()).add(new DefaultSetApplier(set)));
+		sets.stream().map(set -> new DefaultSetApplier(set))
+				.forEach(applier -> map.computeIfAbsent(applier.getCategory(), k -> new ArrayList<>()).add(applier));
 		def = Collections.unmodifiableMap(map);
 		reset();
 		load();
-		compile();
+	}
+	
+	private DefaultClass(Map<String, List<SetApplier>> map, RespawnAction respawnAction) {
+		this.respawnAction = respawnAction;
+		def = Collections.unmodifiableMap(map);
+		reset();
+		load();
 	}
 	
 	private class Compiled {
@@ -54,32 +60,31 @@ public class DefaultClass implements PlayerClass {
 		private String name;
 		private Engine engine;
 		private Wings wings;
-		private List<UsableItemStack> items = new ArrayList<>();
+		private List<UsableItem> items = new ArrayList<>();
 		
 		private Compiled(Collection<ItemSet> sets) {
 			for (ItemSet set : sets) {
 				if (set.getName() != null) {
 					name = set.getName();
 				}
-				Engine e = set.getEngine();
-				if (e != null) {
-					engine = (Engine) e.replicate();
-				}
-				Wings w = set.getWings();
-				if (e != null) {
-					wings = (Wings) w.replicate();
-				}
-				List<UsableItemStack> items = set.getItems();
-				loop: for (UsableItemStack newItem : items) {
-					for (UsableItemStack existingItem : this.items) {
+				// don't override existing stuff with nulls!
+				engine = set.getEngine() == null ? engine : set.getEngine();
+				wings = set.getWings() == null ? wings : set.getWings();
+				List<UsableItem> items = set.getItems();
+				loop: for (UsableItem newItem : items) {
+					for (UsableItem existingItem : this.items) {
 						if (existingItem.isSimilar(newItem)) {
 							existingItem.setAmount(existingItem.getAmount() + newItem.getAmount());
 							continue loop;
 						}
 					}
-					this.items.add(newItem.clone());
+					this.items.add(newItem);
 				}
 			}
+			// refill all items
+			engine.refill();
+			wings.refill();
+			items.forEach(item -> item.refill());
 		}
 		
 		public Engine getEngine() {
@@ -90,7 +95,7 @@ public class DefaultClass implements PlayerClass {
 			return wings;
 		}
 		
-		public List<UsableItemStack> getItems() {
+		public List<UsableItem> getItems() {
 			return items;
 		}
 
@@ -98,11 +103,7 @@ public class DefaultClass implements PlayerClass {
 	
 	private void load() {
 		current.clear();
-		List<SetApplier> list = new ArrayList<>();
-		stored.values().forEach(l -> list.addAll(l));
-		for (SetApplier applier : list) {
-			addCurrent(applier);
-		}
+		stored.values().forEach(list -> list.forEach(applier -> addCurrent(applier)));
 	}
 	
 	private void compile() {
@@ -166,23 +167,23 @@ public class DefaultClass implements PlayerClass {
 	}
 
 	@Override
-	public List<UsableItemStack> getItems() {
+	public List<UsableItem> getItems() {
 		return Collections.unmodifiableList(compiled.getItems());
 	}
 	
 	@Override
-	public boolean removeItem(UsableItem item) {
+	public boolean removeItem(UsableItem removeItem) {
 		boolean found = false;
 		// find the item on the compiled list
-		for (Iterator<UsableItemStack> i = compiled.getItems().iterator(); i.hasNext();) {
-			UsableItemStack stack = i.next();
-			if (stack.getItem().isSimilar(item)) {
-				int newAmount = stack.getAmount() - 1;
+		for (Iterator<UsableItem> it = compiled.getItems().iterator(); it.hasNext();) {
+			UsableItem item = it.next();
+			if (item.isSimilar(removeItem)) {
+				int newAmount = item.getAmount() - 1;
 				if (newAmount > 0) {
-					stack.setAmount(newAmount);
+					item.setAmount(newAmount);
 				} else {
-					stack.setAmount(0); // because why not
-					i.remove();
+					item.setAmount(0); // because why not
+					it.remove();
 				}
 				found = true;
 				break;
@@ -190,20 +191,20 @@ public class DefaultClass implements PlayerClass {
 		}
 		// if the item was on the compiled list, remove it from the current ItemSets
 		if (found) {
-			loop: for (Iterator<ItemSet> iSet = current.values().iterator(); iSet.hasNext();) {
-				ItemSet set = iSet.next();
-				for (Iterator<UsableItemStack> iStack = set.getItems().iterator(); iStack.hasNext();) {
-					UsableItemStack stack = iStack.next();
-					if (stack.getItem().isSimilar(item)) {
-						int newAmount = stack.getAmount() - 1;
+			loop: for (Iterator<ItemSet> itSet = current.values().iterator(); itSet.hasNext();) {
+				ItemSet set = itSet.next();
+				for (Iterator<UsableItem> itItem = set.getItems().iterator(); itItem.hasNext();) {
+					UsableItem item = itItem.next();
+					if (item.isSimilar(removeItem)) {
+						int newAmount = item.getAmount() - 1;
 						if (newAmount > 0) {
-							stack.setAmount(newAmount);
+							item.setAmount(newAmount);
 						} else {
-							stack.setAmount(0);
-							iStack.remove();
+							item.setAmount(0);
+							itItem.remove();
 							// empty ItemSets should be removed, no need to keep them
 							if (set.isEmpty()) {
-								iSet.remove();
+								itSet.remove();
 							}
 						}
 						break loop;
@@ -221,27 +222,21 @@ public class DefaultClass implements PlayerClass {
 			load();
 			break;
 		case COMBINE:
-			List<SetApplier> list = new ArrayList<>();
-			stored.values().forEach(l -> list.addAll(l));
-			for (SetApplier applier : list) {
-				 addCurrent(applier);
-			}
+			stored.values().forEach(list -> list.forEach(applier -> addCurrent(applier)));
 			break;
 		case NOTHING: // nothing
 		}
-		compile();
 	}
 	
 	@Override
 	public Map<String, ItemSet> getCurrent() {
-		return copyMap(current);
+		return current;
 	}
 	
 	@Override
 	public AddResult addCurrent(SetApplier applier) {
-		ItemSet set = applier.getItemSet();
 		int amount = applier.getAmount();
-		String category = set.getCategory();
+		String category = applier.getCategory();
 		AddResult result = null;
 		ItemSet c = current.get(category); // current ItemSet
 		if (c == null) { // new set
@@ -249,6 +244,7 @@ public class DefaultClass implements PlayerClass {
 			case INCREASE:
 			case FILL:
 				// in this case these both add in the same way
+				ItemSet set = applier.getItemSet();
 				set.increase(amount - 1);
 				current.put(category, set);
 				result = AddResult.ADDED;
@@ -260,7 +256,7 @@ public class DefaultClass implements PlayerClass {
 			}
 			// no conflict checking - the category was empty
 		} else { // existing set
-			if (c.isSimilar(set)) {
+			if (c.getID().equals(applier.getID())) {
 				switch (applier.getAddType()) {
 				case INCREASE:
 					result = c.increase(amount) ? AddResult.ADDED : AddResult.ALREADY_MAXED;
@@ -280,6 +276,7 @@ public class DefaultClass implements PlayerClass {
 			} else {
 				switch (applier.getConflictAction()) {
 				case REPLACE:
+					ItemSet set = applier.getItemSet();
 					set.increase(amount - 1);
 					current.put(category, set);
 					result = AddResult.REPLACED;
@@ -304,7 +301,7 @@ public class DefaultClass implements PlayerClass {
 	@Override
 	public AddResult addStored(SetApplier applier) {
 		AddResult result = addCurrent(applier);
-		List<SetApplier> list = stored.computeIfAbsent(applier.getItemSet().getCategory(), k -> new ArrayList<>());
+		List<SetApplier> list = stored.computeIfAbsent(applier.getCategory(), k -> new ArrayList<>());
 		switch (result) {
 		case ADDED:
 		case FILLED:
@@ -337,17 +334,10 @@ public class DefaultClass implements PlayerClass {
 	public Map<String, List<SetApplier>> getDefault() {
 		return def;
 	}
-	
-	private static Map<String, ItemSet> copyMap(Map<String, ItemSet> map) {
-		return map.entrySet().stream().collect(Collectors.toMap(
-				entry -> entry.getKey(), entry -> entry.getValue().replicate()));
-	}
 
 	@Override
 	public PlayerClass replicate() {
-		List<ItemSet> list = new ArrayList<>();
-		def.values().forEach(l -> l.forEach(e -> list.add(e.getItemSet())));
-		return new DefaultClass(list, respawnAction);
+		return new DefaultClass(def, respawnAction);
 	}
 
 }

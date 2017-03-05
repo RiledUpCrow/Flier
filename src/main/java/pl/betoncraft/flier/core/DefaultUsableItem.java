@@ -13,7 +13,6 @@ import org.bukkit.configuration.ConfigurationSection;
 
 import pl.betoncraft.flier.api.Action;
 import pl.betoncraft.flier.api.Activator;
-import pl.betoncraft.flier.api.Flier;
 import pl.betoncraft.flier.api.InGamePlayer;
 import pl.betoncraft.flier.api.Item;
 import pl.betoncraft.flier.api.LoadingException;
@@ -35,6 +34,12 @@ public class DefaultUsableItem extends DefaultItem implements UsableItem {
 	protected int time = 0;
 	protected int whole = 0;
 	protected int ammo;
+
+	protected boolean set = false;
+	protected int def;
+	protected int max;
+	protected int min;
+	protected int amount;
 
 	public DefaultUsableItem(ConfigurationSection section) throws LoadingException {
 		super(section);
@@ -131,12 +136,46 @@ public class DefaultUsableItem extends DefaultItem implements UsableItem {
 	}
 	
 	@Override
-	public Item replicate() {
-		try {
-			return Flier.getInstance().getItem(id);
-		} catch (LoadingException e) {
-			return null; // dead code
+	public int getAmount() {
+		return amount;
+	}
+	
+	@Override
+	public boolean setAmount(int amount) {
+		if (amount < 0 || amount > max) {
+			return false;
+		} else {
+			this.amount = amount;
+			return true;
 		}
+	}
+	
+	@Override
+	public int getMax() {
+		return max;
+	}
+	
+	@Override
+	public int getMin() {
+		return min;
+	}
+	
+	@Override
+	public void setDefaultAmounts(int def, int max, int min) throws UnsupportedOperationException {
+		if (!set) {
+			set = true;
+			this.def = def;
+			this.max = max;
+			this.min = min;
+			this.amount = def;
+		} else {
+			throw new UnsupportedOperationException("Cannot set default values twice!");
+		}
+	}
+
+	@Override
+	public int getDefaultAmount() {
+		return def;
 	}
 	
 	@Override
@@ -148,5 +187,12 @@ public class DefaultUsableItem extends DefaultItem implements UsableItem {
 					usable.usages.stream().allMatch(thatUsage -> usages.stream().anyMatch(thisUsage -> thatUsage.equals(thisUsage)));
 		}
 		return false;
+	}
+	
+	@Override
+	public void refill() {
+		ammo = maxAmmo;
+		time = 0;
+		whole = 0;
 	}
 }

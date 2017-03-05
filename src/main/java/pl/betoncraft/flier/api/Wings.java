@@ -66,4 +66,9 @@ public interface Wings extends Item {
 	 */
 	public void setDisabled(boolean disabled);
 
+	/**
+	 * Refills the Wings, making them as new.
+	 */
+	public void refill();
+
 }

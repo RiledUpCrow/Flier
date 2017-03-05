@@ -35,7 +35,6 @@ import pl.betoncraft.flier.api.Lobby;
 import pl.betoncraft.flier.api.PlayerClass;
 import pl.betoncraft.flier.api.SidebarLine;
 import pl.betoncraft.flier.api.UsableItem;
-import pl.betoncraft.flier.api.UsableItemStack;
 import pl.betoncraft.flier.api.Wings;
 import pl.betoncraft.flier.util.PlayerBackup;
 import pl.betoncraft.flier.util.Utils;
@@ -174,8 +173,8 @@ public class DefaultPlayer implements InGamePlayer {
 		double weight = 0;
 		weight += clazz.getEngine().getWeight();
 		weight += clazz.getWings().getWeight();
-		for (UsableItemStack stack : clazz.getItems()) {
-			weight += stack.getItem().getWeight();
+		for (UsableItem item : clazz.getItems()) {
+			weight += item.getWeight();
 		}
 		return weight;
 	}
@@ -199,13 +198,12 @@ public class DefaultPlayer implements InGamePlayer {
 	public void updateClass() {
 		Engine engine = clazz.getEngine();
 		Wings wings = clazz.getWings();
-		List<UsableItemStack> stacks = clazz.getItems();
+		List<UsableItem> items = clazz.getItems();
 		getPlayer().getInventory().clear();
 		getPlayer().getInventory().setItemInOffHand(engine.getItem());
 		getPlayer().getInventory().setChestplate(wings.getItem());
-		for (UsableItemStack stack : stacks) {
-			UsableItem item = stack.getItem();
-			int amount = stack.getAmount();
+		for (UsableItem item : items) {
+			int amount = item.getAmount();
 			int slot = item.slot();
 			ItemStack itemStack = item.getItem();
 			itemStack.setAmount(amount);
@@ -435,10 +433,9 @@ public class DefaultPlayer implements InGamePlayer {
 		// we can't remove class items while iterating over them, so this list will remember them
 		// it.remove() won't work, removing class item is more complicated than that
 		List<UsableItem> itemsToRemove = new ArrayList<>();
-		for (Iterator<UsableItemStack> it = clazz.getItems().iterator(); it.hasNext();) {
-			UsableItemStack s = it.next();
-			UsableItem item = s.getItem();
-			int amount = s.getAmount();
+		for (Iterator<UsableItem> it = clazz.getItems().iterator(); it.hasNext();) {
+			UsableItem item = it.next();
+			int amount = item.getAmount();
 			if (item.use(this) && item.getAmmo() == 0 && item.isConsumable()) {
 				int slot = item.slot();
 				ItemStack stack = player.getInventory().getItem(slot);

@@ -14,6 +14,19 @@ import java.util.List;
  * @author Jakub Sapalski
  */
 public interface ItemSet {
+	
+	/**
+	 * @return the ID of this ItemSet
+	 */
+	public String getID();
+
+	/**
+	 * Category is used to group the ItemSets together and handle adding new
+	 * ItemSets.
+	 *
+	 * @return the category name of this ItemSet
+	 */
+	public String getCategory();
 
 	/**
 	 * @return the name of the class after applying this ItemSet
@@ -45,15 +58,7 @@ public interface ItemSet {
 	/**
 	 * @return the map of UsableItems and their amounts in this ItemSet
 	 */
-	public List<UsableItemStack> getItems();
-
-	/**
-	 * Category is used to group the ItemSets together and handle adding new
-	 * ItemSets.
-	 *
-	 * @return the category name of this ItemSet
-	 */
-	public String getCategory();
+	public List<UsableItem> getItems();
 
 	/**
 	 * @return whenever this ItemSet is empty.
@@ -61,15 +66,10 @@ public interface ItemSet {
 	public boolean isEmpty();
 
 	/**
-	 * @return whenever these two ItemSets are similar (default values of
-	 *         Engine, Wings and UsableItems)
+	 * @return the amount of these ItemSets in this ItemSet (increased by the
+	 *         increase() method).
 	 */
-	public boolean isSimilar(ItemSet set);
-
-	/**
-	 * @return the ItemSet with the same default values as this one
-	 */
-	public ItemSet replicate();
+	public int getAmount();
 
 	/**
 	 * Increases the amount of UsableItems in this ItemSet by specified amount
@@ -93,11 +93,5 @@ public interface ItemSet {
 	 *            the amount of ItemSets to fill to
 	 */
 	public void fill(int amount);
-
-	/**
-	 * @return the amount of these ItemSets in this ItemSet (increased by the
-	 *         increase() method).
-	 */
-	public int getAmount();
 
 }

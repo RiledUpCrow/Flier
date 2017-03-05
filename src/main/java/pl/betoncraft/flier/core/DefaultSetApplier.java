@@ -4,7 +4,7 @@
  * To Public License, Version 2, as published by Sam Hocevar. See
  * http://www.wtfpl.net/ for more details.
  */
-package pl.betoncraft.flier.core.item;
+package pl.betoncraft.flier.core;
 
 import java.util.Map;
 
@@ -24,13 +24,15 @@ public class DefaultSetApplier implements SetApplier {
 	
 	protected ValueLoader loader;
 
+	protected String id;
 	protected AddType addType;
 	protected ConflicAction conflictAction;
 	protected boolean saving;
 	protected int amount;
-	protected ItemSet set;
+	protected String category;
+	protected ConfigurationSection set;
 
-	public DefaultSetApplier(ConfigurationSection section, Map<String, ItemSet> available) throws LoadingException {
+	public DefaultSetApplier(ConfigurationSection section, Map<String, ConfigurationSection> available) throws LoadingException {
 		loader = new ValueLoader(section);
 		addType = loader.loadEnum("add_type", AddType.class);
 		conflictAction = loader.loadEnum("conflict_action", ConflicAction.class);
@@ -41,19 +43,42 @@ public class DefaultSetApplier implements SetApplier {
 		if (set == null) {
 			throw new LoadingException(String.format("Item set '%s' is not defined.", setName));
 		}
+		try {
+			ItemSet s = new DefaultSet(set); // check if everything's fine
+			category = s.getCategory();
+			id = s.getID();
+		} catch (LoadingException e) {
+			throw (LoadingException) new LoadingException(String.format("Error in '%' item set.", setName)).initCause(e);
+		}
 	}
 	
-	public DefaultSetApplier(ItemSet set) {
+	public DefaultSetApplier(ConfigurationSection set) {
+		id = set.getName();
 		addType = AddType.FILL;
 		conflictAction = ConflicAction.REPLACE;
 		saving = true;
 		amount = 1;
+		category = set.getString("category");
 		this.set = set;
 	}
 
 	@Override
 	public ItemSet getItemSet() {
-		return set.replicate();
+		try {
+			return new DefaultSet(set);
+		} catch (LoadingException e) {
+			return null; // won't happen, it's already checked
+		}
+	}
+
+	@Override
+	public String getCategory() {
+		return category;
+	}
+
+	@Override
+	public String getID() {
+		return id;
 	}
 	
 	@Override
@@ -78,11 +103,7 @@ public class DefaultSetApplier implements SetApplier {
 
 	@Override
 	public boolean isSimilar(SetApplier applier) {
-		if (applier instanceof DefaultSetApplier) {
-			DefaultSetApplier def = (DefaultSetApplier) applier;
-			return def.set.isSimilar(set) && def.amount == amount;
-		}
-		return false;
+		return applier.getID().equals(id);
 	}
 
 }

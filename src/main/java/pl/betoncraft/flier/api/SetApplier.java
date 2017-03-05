@@ -34,6 +34,19 @@ public interface SetApplier {
 	public ItemSet getItemSet();
 
 	/**
+	 * Category is used to group the ItemSets together and handle adding new
+	 * ItemSets.
+	 *
+	 * @return the category name of this ItemSet
+	 */
+	public String getCategory();
+	
+	/**
+	 * @return the ID of the ItemSet applied by this SetApplier
+	 */
+	public String getID();
+
+	/**
 	 * Checks whenever this ItemSet is being saved to the "stored" items.
 	 */
 	public boolean isSaving();

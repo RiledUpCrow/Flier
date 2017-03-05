@@ -28,7 +28,6 @@ import net.md_5.bungee.api.ChatColor;
 import pl.betoncraft.flier.api.Flier;
 import pl.betoncraft.flier.api.Game;
 import pl.betoncraft.flier.api.InGamePlayer;
-import pl.betoncraft.flier.api.ItemSet;
 import pl.betoncraft.flier.api.LoadingException;
 import pl.betoncraft.flier.api.Lobby;
 import pl.betoncraft.flier.api.PlayerClass;
@@ -37,8 +36,7 @@ import pl.betoncraft.flier.api.PlayerClass.RespawnAction;
 import pl.betoncraft.flier.api.SetApplier;
 import pl.betoncraft.flier.core.DefaultClass;
 import pl.betoncraft.flier.core.DefaultPlayer;
-import pl.betoncraft.flier.core.item.DefaultSet;
-import pl.betoncraft.flier.core.item.DefaultSetApplier;
+import pl.betoncraft.flier.core.DefaultSetApplier;
 import pl.betoncraft.flier.util.ValueLoader;
 
 /**
@@ -56,7 +54,7 @@ public abstract class DefaultLobby implements Lobby, Listener {
 	protected Location spawn;
 	protected Map<UUID, InGamePlayer> players = new HashMap<>();
 	protected PlayerClass defClass;
-	protected Map<String, ItemSet> items = new HashMap<>();
+	protected Map<String, ConfigurationSection> items = new HashMap<>();
 	protected Map<String, Button> buttons = new HashMap<>();
 	protected Map<InGamePlayer, List<Button>> unlocked = new HashMap<>();
 
@@ -70,11 +68,7 @@ public abstract class DefaultLobby implements Lobby, Listener {
 			if (itemSection == null) {
 				throw new LoadingException(String.format("'%s' is not an item set.", i));
 			}
-			try {
-				items.put(i, new DefaultSet(itemSection));
-			} catch (LoadingException e) {
-				throw (LoadingException) new LoadingException(String.format("Error in '%s' item set.", i)).initCause(e);
-			}
+			items.put(i, itemSection);
 		}
 		try {
 			List<String> playerClass = section.getStringList("default_class");

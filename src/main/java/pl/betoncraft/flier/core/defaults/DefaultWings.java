@@ -9,7 +9,6 @@ package pl.betoncraft.flier.core.defaults;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 
-import pl.betoncraft.flier.api.Flier;
 import pl.betoncraft.flier.api.LoadingException;
 import pl.betoncraft.flier.api.Wings;
 
@@ -86,12 +85,9 @@ public abstract class DefaultWings extends DefaultItem implements Wings {
 	}
 	
 	@Override
-	public Wings replicate() {
-		try {
-			return Flier.getInstance().getWing(id);
-		} catch (LoadingException e) {
-			return null; // dead code
-		}
+	public void refill() {
+		health = maxHealth;
+		disabled = false;
 	}
 
 }

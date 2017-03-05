@@ -4,7 +4,7 @@
  * To Public License, Version 2, as published by Sam Hocevar. See
  * http://www.wtfpl.net/ for more details.
  */
-package pl.betoncraft.flier.core.item;
+package pl.betoncraft.flier.core;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +17,6 @@ import pl.betoncraft.flier.api.Flier;
 import pl.betoncraft.flier.api.ItemSet;
 import pl.betoncraft.flier.api.LoadingException;
 import pl.betoncraft.flier.api.UsableItem;
-import pl.betoncraft.flier.api.UsableItemStack;
 import pl.betoncraft.flier.api.Wings;
 import pl.betoncraft.flier.util.ValueLoader;
 
@@ -30,16 +29,18 @@ public class DefaultSet implements ItemSet {
 	
 	protected ValueLoader loader;
 
+	protected String id;
+	protected String category;
 	protected String name;
 	protected Engine engine;
 	protected Wings wings;
-	protected List<UsableItemStack> items = new ArrayList<>();
-	protected String category;
+	protected List<UsableItem> items = new ArrayList<>();
 
 	public DefaultSet(ConfigurationSection section) throws LoadingException {
+		id = section.getName();
 		loader = new ValueLoader(section);
-		name = section.getString("name");
 		category = loader.loadString("category");
+		name = section.getString("name");
 		String engineName = section.getString("engine");
 		if (engineName == null) {
 			engine = null;
@@ -86,14 +87,22 @@ public class DefaultSet implements ItemSet {
 						min = (Integer) minObject;
 					}
 				}
-				this.items.add(new DefaultUsableItemStack(item, amount, max, min));
+				item.setDefaultAmounts(amount, max, min);
+				items.add(item);
 			}
 		} catch (LoadingException e) {
 			throw (LoadingException) new LoadingException("Error in items.").initCause(e);
 		}
 	}
-	
-	private DefaultSet() {
+
+	@Override
+	public String getID() {
+		return id;
+	}
+
+	@Override
+	public String getCategory() {
+		return category;
 	}
 
 	@Override
@@ -103,7 +112,7 @@ public class DefaultSet implements ItemSet {
 
 	@Override
 	public Engine getEngine() {
-		return engine == null ? engine : (Engine) engine.replicate();
+		return engine;
 	}
 	
 	@Override
@@ -113,7 +122,7 @@ public class DefaultSet implements ItemSet {
 
 	@Override
 	public Wings getWings() {
-		return wings == null ? wings : (Wings) wings.replicate();
+		return wings;
 	}
 	
 	@Override
@@ -122,13 +131,8 @@ public class DefaultSet implements ItemSet {
 	}
 
 	@Override
-	public List<UsableItemStack> getItems() {
+	public List<UsableItem> getItems() {
 		return items;
-	}
-
-	@Override
-	public String getCategory() {
-		return category;
 	}
 	
 	@Override
@@ -137,63 +141,27 @@ public class DefaultSet implements ItemSet {
 	}
 
 	@Override
-	public boolean isSimilar(ItemSet set) {
-		if (set instanceof DefaultSet) {
-			DefaultSet s = (DefaultSet) set;
-			if (!((engine == null && s.engine == null) || (engine != null && s.engine != null && engine.isSimilar(s.engine)))) {
-				return false;
-			}
-			if (!((wings == null && s.wings == null) || (wings != null && s.wings != null && wings.isSimilar(s.wings)))) {
-				return false;
-			}
-			if (items.size() != set.getItems().size()) {
-				return false;
-			}
-			for (int i = 0; i < items.size(); i++) {
-				if (!items.get(i).isSimilar(set.getItems().get(i))) {
-					return false;
-				}
-			}
-		}
-		return true;
-	}
-	
-	@Override
-	public ItemSet replicate() {
-		DefaultSet set = new DefaultSet();
-		set.category = category;
-		set.engine = engine == null ? null : (Engine) engine.replicate();
-		set.wings = wings == null ? null : (Wings) wings.replicate();
-		set.items = new ArrayList<>(items.size());
-		for (UsableItemStack stack : items) {
-			set.items.add(stack.clone());
-		}
-		set.name = name;
-		return set;
-	}
-
-	@Override
 	public boolean increase(int amount) {
-		for (UsableItemStack stack : items) {
-			int newAmount = stack.getAmount() + (stack.getDefaultAmount() * amount);
-			if (newAmount < 0 || newAmount < stack.getMin() || newAmount > stack.getMax()) {
+		for (UsableItem item : items) {
+			int newAmount = item.getAmount() + (item.getDefaultAmount() * amount);
+			if (newAmount < 0 || newAmount < item.getMin() || newAmount > item.getMax()) {
 				return false;
 			}
 		}
-		for (UsableItemStack stack : items) {
-			stack.setAmount(stack.getAmount() + (stack.getDefaultAmount() * amount));
+		for (UsableItem item : items) {
+			item.setAmount(item.getAmount() + (item.getDefaultAmount() * amount));
 		}
 		return true;
 	}
 	
 	@Override
 	public void fill(int amount) {
-		for (UsableItemStack stack : items) {
-			int fullAmount = stack.getDefaultAmount() * amount;
-			if (stack.getAmount() < fullAmount) {
+		for (UsableItem item : items) {
+			int fullAmount = item.getDefaultAmount() * amount;
+			if (item.getAmount() < fullAmount) {
 				// if filling is over the limit, set it to the limit
-				if (!stack.setAmount(stack.getDefaultAmount() * amount)) {
-					stack.setAmount(stack.getMax());
+				if (!item.setAmount(item.getDefaultAmount() * amount)) {
+					item.setAmount(item.getMax());
 				}
 			}
 		}
@@ -202,9 +170,9 @@ public class DefaultSet implements ItemSet {
 	@Override
 	public int getAmount() {
 		int amount = -1;
-		for (UsableItemStack stack : items) {
-			int a = stack.getAmount();
-			int d = stack.getDefaultAmount();
+		for (UsableItem item : items) {
+			int a = item.getAmount();
+			int d = item.getDefaultAmount();
 			int r = (a - (a % d)) / d;
 			if (amount == -1) {
 				amount = r;

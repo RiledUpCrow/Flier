@@ -68,7 +68,7 @@ public interface PlayerClass {
 	/**
 	 * @return the list of current item stacks
 	 */
-	public List<UsableItemStack> getItems();
+	public List<UsableItem> getItems();
 
 	/**
 	 * Removes one specified UsableItem from the inventory.

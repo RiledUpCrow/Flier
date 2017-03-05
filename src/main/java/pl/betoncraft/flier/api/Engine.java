@@ -68,4 +68,9 @@ public interface Engine extends Item {
 	 */
 	public boolean removeFuel(double amount);
 
+	/**
+	 * Refills the Engine, making it as new.
+	 */
+	public void refill();
+
 }

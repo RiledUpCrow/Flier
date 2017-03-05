@@ -9,7 +9,6 @@ package pl.betoncraft.flier.core.defaults;
 import org.bukkit.configuration.ConfigurationSection;
 
 import pl.betoncraft.flier.api.Engine;
-import pl.betoncraft.flier.api.Flier;
 import pl.betoncraft.flier.api.LoadingException;
 
 /**
@@ -87,12 +86,8 @@ public abstract class DefaultEngine extends DefaultItem implements Engine {
 	}
 	
 	@Override
-	public Engine replicate() {
-		try {
-			return Flier.getInstance().getEngine(id);
-		} catch (LoadingException e) {
-			return null; // dead code
-		}
+	public void refill() {
+		fuel = maxFuel;
 	}
 
 }
