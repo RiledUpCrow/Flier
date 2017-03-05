@@ -15,9 +15,9 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permission;
 
-import pl.betoncraft.flier.api.CommandArgument;
 import pl.betoncraft.flier.api.Flier;
-import pl.betoncraft.flier.api.Lobby;
+import pl.betoncraft.flier.api.content.Lobby;
+import pl.betoncraft.flier.api.core.CommandArgument;
 
 /**
  * Moves the player out of the lobby.

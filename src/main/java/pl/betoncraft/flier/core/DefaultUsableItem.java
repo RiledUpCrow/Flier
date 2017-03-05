@@ -11,13 +11,13 @@ import java.util.List;
 
 import org.bukkit.configuration.ConfigurationSection;
 
-import pl.betoncraft.flier.api.Action;
-import pl.betoncraft.flier.api.Activator;
-import pl.betoncraft.flier.api.InGamePlayer;
-import pl.betoncraft.flier.api.Item;
-import pl.betoncraft.flier.api.LoadingException;
-import pl.betoncraft.flier.api.UsableItem;
-import pl.betoncraft.flier.api.Usage;
+import pl.betoncraft.flier.api.content.Action;
+import pl.betoncraft.flier.api.content.Activator;
+import pl.betoncraft.flier.api.core.InGamePlayer;
+import pl.betoncraft.flier.api.core.Item;
+import pl.betoncraft.flier.api.core.LoadingException;
+import pl.betoncraft.flier.api.core.UsableItem;
+import pl.betoncraft.flier.api.core.Usage;
 import pl.betoncraft.flier.core.defaults.DefaultItem;
 
 /**

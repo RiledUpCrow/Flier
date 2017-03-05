@@ -23,8 +23,8 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import pl.betoncraft.flier.api.Flier;
-import pl.betoncraft.flier.api.InGamePlayer;
-import pl.betoncraft.flier.api.LoadingException;
+import pl.betoncraft.flier.api.core.InGamePlayer;
+import pl.betoncraft.flier.api.core.LoadingException;
 import pl.betoncraft.flier.core.defaults.DefaultLobby;
 import pl.betoncraft.flier.util.Utils;
 import pl.betoncraft.flier.util.ValueLoader;

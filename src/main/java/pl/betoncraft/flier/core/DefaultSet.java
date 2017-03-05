@@ -12,12 +12,12 @@ import java.util.Map;
 
 import org.bukkit.configuration.ConfigurationSection;
 
-import pl.betoncraft.flier.api.Engine;
 import pl.betoncraft.flier.api.Flier;
-import pl.betoncraft.flier.api.ItemSet;
-import pl.betoncraft.flier.api.LoadingException;
-import pl.betoncraft.flier.api.UsableItem;
-import pl.betoncraft.flier.api.Wings;
+import pl.betoncraft.flier.api.content.Engine;
+import pl.betoncraft.flier.api.content.Wings;
+import pl.betoncraft.flier.api.core.ItemSet;
+import pl.betoncraft.flier.api.core.LoadingException;
+import pl.betoncraft.flier.api.core.UsableItem;
 import pl.betoncraft.flier.util.ValueLoader;
 
 /**

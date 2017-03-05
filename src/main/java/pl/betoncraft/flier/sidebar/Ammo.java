@@ -8,9 +8,9 @@ package pl.betoncraft.flier.sidebar;
 
 import org.bukkit.ChatColor;
 
-import pl.betoncraft.flier.api.InGamePlayer;
-import pl.betoncraft.flier.api.SidebarLine;
-import pl.betoncraft.flier.api.UsableItem;
+import pl.betoncraft.flier.api.core.InGamePlayer;
+import pl.betoncraft.flier.api.core.SidebarLine;
+import pl.betoncraft.flier.api.core.UsableItem;
 
 /**
  * A sidebar line showing ammunition of currently held UsableItem.

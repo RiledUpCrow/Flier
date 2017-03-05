@@ -9,8 +9,8 @@ package pl.betoncraft.flier.engine;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.util.Vector;
 
-import pl.betoncraft.flier.api.Item;
-import pl.betoncraft.flier.api.LoadingException;
+import pl.betoncraft.flier.api.core.Item;
+import pl.betoncraft.flier.api.core.LoadingException;
 import pl.betoncraft.flier.core.defaults.DefaultEngine;
 
 /**

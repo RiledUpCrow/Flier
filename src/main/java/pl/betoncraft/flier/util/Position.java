@@ -8,7 +8,7 @@ package pl.betoncraft.flier.util;
 
 import org.bukkit.entity.Player;
 
-import pl.betoncraft.flier.api.Usage;
+import pl.betoncraft.flier.api.core.Usage;
 
 /**
  * Utility class for checking player's position

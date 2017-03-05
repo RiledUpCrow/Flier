@@ -8,8 +8,8 @@ package pl.betoncraft.flier.activator;
 
 import org.bukkit.configuration.ConfigurationSection;
 
-import pl.betoncraft.flier.api.InGamePlayer;
-import pl.betoncraft.flier.api.UsableItem;
+import pl.betoncraft.flier.api.core.InGamePlayer;
+import pl.betoncraft.flier.api.core.UsableItem;
 import pl.betoncraft.flier.core.defaults.DefaultActivator;
 
 /**

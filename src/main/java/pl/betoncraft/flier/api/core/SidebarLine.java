@@ -4,22 +4,18 @@
  * To Public License, Version 2, as published by Sam Hocevar. See
  * http://www.wtfpl.net/ for more details.
  */
-package pl.betoncraft.flier.api;
+package pl.betoncraft.flier.api.core;
 
 /**
- * Represents a one time action, as opposed to the repeating Effect.
+ * Represents a line of text on the sidebar.
  *
  * @author Jakub Sapalski
  */
-public interface Action {
+public interface SidebarLine {
 
 	/**
-	 * Performs the action on specified player.
-	 * 
-	 * @param player
-	 *            the player on which the action needs to be performed
-	 * @return whenever the action was performed or not
+	 * @return the text of this line
 	 */
-	public boolean act(InGamePlayer player);
+	public String getText();
 
 }

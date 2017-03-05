@@ -15,7 +15,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permission;
 
 import net.md_5.bungee.api.ChatColor;
-import pl.betoncraft.flier.api.CommandArgument;
+import pl.betoncraft.flier.api.core.CommandArgument;
 import pl.betoncraft.flier.util.PlayerBackup;
 
 /**

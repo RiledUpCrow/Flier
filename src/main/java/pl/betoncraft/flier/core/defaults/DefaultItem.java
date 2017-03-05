@@ -14,8 +14,8 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import pl.betoncraft.flier.api.Item;
-import pl.betoncraft.flier.api.LoadingException;
+import pl.betoncraft.flier.api.core.Item;
+import pl.betoncraft.flier.api.core.LoadingException;
 import pl.betoncraft.flier.util.ValueLoader;
 
 /**

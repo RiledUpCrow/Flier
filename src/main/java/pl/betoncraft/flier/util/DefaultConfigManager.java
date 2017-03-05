@@ -14,8 +14,8 @@ import java.io.InputStream;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
-import pl.betoncraft.flier.api.ConfigManager;
 import pl.betoncraft.flier.api.Flier;
+import pl.betoncraft.flier.api.core.ConfigManager;
 
 /**
  * Manages different configuration files.

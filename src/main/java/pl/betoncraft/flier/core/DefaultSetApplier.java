@@ -10,9 +10,9 @@ import java.util.Map;
 
 import org.bukkit.configuration.ConfigurationSection;
 
-import pl.betoncraft.flier.api.ItemSet;
-import pl.betoncraft.flier.api.LoadingException;
-import pl.betoncraft.flier.api.SetApplier;
+import pl.betoncraft.flier.api.core.ItemSet;
+import pl.betoncraft.flier.api.core.LoadingException;
+import pl.betoncraft.flier.api.core.SetApplier;
 import pl.betoncraft.flier.util.ValueLoader;
 
 /**

@@ -28,14 +28,14 @@ import org.bukkit.util.Vector;
 
 import com.google.common.collect.Lists;
 
-import pl.betoncraft.flier.api.Bonus;
-import pl.betoncraft.flier.api.Engine;
-import pl.betoncraft.flier.api.InGamePlayer;
-import pl.betoncraft.flier.api.Lobby;
-import pl.betoncraft.flier.api.PlayerClass;
-import pl.betoncraft.flier.api.SidebarLine;
-import pl.betoncraft.flier.api.UsableItem;
-import pl.betoncraft.flier.api.Wings;
+import pl.betoncraft.flier.api.content.Bonus;
+import pl.betoncraft.flier.api.content.Engine;
+import pl.betoncraft.flier.api.content.Lobby;
+import pl.betoncraft.flier.api.content.Wings;
+import pl.betoncraft.flier.api.core.InGamePlayer;
+import pl.betoncraft.flier.api.core.PlayerClass;
+import pl.betoncraft.flier.api.core.SidebarLine;
+import pl.betoncraft.flier.api.core.UsableItem;
 import pl.betoncraft.flier.util.PlayerBackup;
 import pl.betoncraft.flier.util.Utils;
 

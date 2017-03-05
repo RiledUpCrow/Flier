@@ -9,8 +9,8 @@ package pl.betoncraft.flier.core.defaults;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 
-import pl.betoncraft.flier.api.LoadingException;
-import pl.betoncraft.flier.api.Wings;
+import pl.betoncraft.flier.api.content.Wings;
+import pl.betoncraft.flier.api.core.LoadingException;
 
 /**
  * Default Wings implementation.

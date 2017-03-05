@@ -14,10 +14,10 @@ import java.util.NoSuchElementException;
 import org.bukkit.command.CommandSender;
 import org.bukkit.permissions.Permission;
 
-import pl.betoncraft.flier.api.CommandArgument;
 import pl.betoncraft.flier.api.Flier;
-import pl.betoncraft.flier.api.Game;
-import pl.betoncraft.flier.api.Lobby;
+import pl.betoncraft.flier.api.content.Game;
+import pl.betoncraft.flier.api.content.Lobby;
+import pl.betoncraft.flier.api.core.CommandArgument;
 
 /**
  * Sets the Game in the Lobby.

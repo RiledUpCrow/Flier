@@ -4,18 +4,14 @@
  * To Public License, Version 2, as published by Sam Hocevar. See
  * http://www.wtfpl.net/ for more details.
  */
-package pl.betoncraft.flier.api;
+package pl.betoncraft.flier.api.content;
+
+import pl.betoncraft.flier.api.core.Damager;
 
 /**
- * Represents a line of text on the sidebar.
+ * Represents an action which attacks another player with a Damager.
  *
  * @author Jakub Sapalski
  */
-public interface SidebarLine {
-
-	/**
-	 * @return the text of this line
-	 */
-	public String getText();
-
+public interface Attack extends Action, Damager {
 }

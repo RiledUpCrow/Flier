@@ -7,8 +7,8 @@
 package pl.betoncraft.flier.sidebar;
 
 import net.md_5.bungee.api.ChatColor;
-import pl.betoncraft.flier.api.InGamePlayer;
-import pl.betoncraft.flier.api.SidebarLine;
+import pl.betoncraft.flier.api.core.InGamePlayer;
+import pl.betoncraft.flier.api.core.SidebarLine;
 
 /**
  * A sidebar line showing amount of money.

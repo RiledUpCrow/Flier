@@ -8,10 +8,10 @@ package pl.betoncraft.flier.sidebar;
 
 import org.bukkit.ChatColor;
 
-import pl.betoncraft.flier.api.InGamePlayer;
-import pl.betoncraft.flier.api.PlayerClass;
-import pl.betoncraft.flier.api.SidebarLine;
-import pl.betoncraft.flier.api.Wings;
+import pl.betoncraft.flier.api.content.Wings;
+import pl.betoncraft.flier.api.core.InGamePlayer;
+import pl.betoncraft.flier.api.core.PlayerClass;
+import pl.betoncraft.flier.api.core.SidebarLine;
 
 /**
  * A sidebar line showing wings health.

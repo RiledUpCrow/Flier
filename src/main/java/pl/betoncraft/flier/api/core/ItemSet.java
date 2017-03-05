@@ -4,9 +4,12 @@
  * To Public License, Version 2, as published by Sam Hocevar. See
  * http://www.wtfpl.net/ for more details.
  */
-package pl.betoncraft.flier.api;
+package pl.betoncraft.flier.api.core;
 
 import java.util.List;
+
+import pl.betoncraft.flier.api.content.Engine;
+import pl.betoncraft.flier.api.content.Wings;
 
 /**
  * Represents a set of items which can be applied to PlayerClass.

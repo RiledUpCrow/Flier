@@ -4,13 +4,15 @@
  * To Public License, Version 2, as published by Sam Hocevar. See
  * http://www.wtfpl.net/ for more details.
  */
-package pl.betoncraft.flier.api;
+package pl.betoncraft.flier.api.content;
 
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 import org.bukkit.ChatColor;
+
+import pl.betoncraft.flier.api.core.InGamePlayer;
 
 /**
  * Represents a game.

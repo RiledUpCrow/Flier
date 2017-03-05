@@ -16,11 +16,11 @@ import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import pl.betoncraft.flier.api.Action;
-import pl.betoncraft.flier.api.Bonus;
 import pl.betoncraft.flier.api.Flier;
-import pl.betoncraft.flier.api.InGamePlayer;
-import pl.betoncraft.flier.api.LoadingException;
+import pl.betoncraft.flier.api.content.Action;
+import pl.betoncraft.flier.api.content.Bonus;
+import pl.betoncraft.flier.api.core.InGamePlayer;
+import pl.betoncraft.flier.api.core.LoadingException;
 import pl.betoncraft.flier.util.ValueLoader;
 
 /**

@@ -6,7 +6,7 @@
  */
 package pl.betoncraft.flier.util;
 
-import pl.betoncraft.flier.api.Damager;
+import pl.betoncraft.flier.api.core.Damager;
 
 /**
  * A dummy Damager.

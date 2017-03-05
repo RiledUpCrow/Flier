@@ -8,7 +8,7 @@ package pl.betoncraft.flier.core.defaults;
 
 import org.bukkit.configuration.ConfigurationSection;
 
-import pl.betoncraft.flier.api.Action;
+import pl.betoncraft.flier.api.content.Action;
 import pl.betoncraft.flier.util.ValueLoader;
 
 /**

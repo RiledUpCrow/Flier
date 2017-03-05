@@ -15,7 +15,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
-import pl.betoncraft.flier.api.CommandArgument;
+import pl.betoncraft.flier.api.core.CommandArgument;
 
 /**
  * The main command.

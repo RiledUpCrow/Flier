@@ -9,9 +9,9 @@ package pl.betoncraft.flier.wings;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.util.Vector;
 
-import pl.betoncraft.flier.api.InGamePlayer;
-import pl.betoncraft.flier.api.Item;
-import pl.betoncraft.flier.api.LoadingException;
+import pl.betoncraft.flier.api.core.InGamePlayer;
+import pl.betoncraft.flier.api.core.Item;
+import pl.betoncraft.flier.api.core.LoadingException;
 import pl.betoncraft.flier.core.defaults.DefaultWings;
 import pl.betoncraft.flier.util.ImmutableVector;
 

@@ -22,11 +22,11 @@ import org.bukkit.metadata.MetadataValue;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
-import pl.betoncraft.flier.api.Damager;
 import pl.betoncraft.flier.api.Flier;
-import pl.betoncraft.flier.api.InGamePlayer;
-import pl.betoncraft.flier.api.LoadingException;
-import pl.betoncraft.flier.api.PlayerClass;
+import pl.betoncraft.flier.api.core.Damager;
+import pl.betoncraft.flier.api.core.InGamePlayer;
+import pl.betoncraft.flier.api.core.LoadingException;
+import pl.betoncraft.flier.api.core.PlayerClass;
 
 /**
  * Various static utility methods.

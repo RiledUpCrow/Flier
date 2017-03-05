@@ -8,8 +8,8 @@ package pl.betoncraft.flier.core.defaults;
 
 import org.bukkit.configuration.ConfigurationSection;
 
-import pl.betoncraft.flier.api.Attack;
-import pl.betoncraft.flier.api.LoadingException;
+import pl.betoncraft.flier.api.content.Attack;
+import pl.betoncraft.flier.api.core.LoadingException;
 
 /**
  * A default Weapon implementation.

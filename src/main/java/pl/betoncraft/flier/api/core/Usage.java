@@ -4,9 +4,12 @@
  * To Public License, Version 2, as published by Sam Hocevar. See
  * http://www.wtfpl.net/ for more details.
  */
-package pl.betoncraft.flier.api;
+package pl.betoncraft.flier.api.core;
 
 import java.util.List;
+
+import pl.betoncraft.flier.api.content.Action;
+import pl.betoncraft.flier.api.content.Activator;
 
 /**
  * Represents a set of Activators which can activate a set of Actions.

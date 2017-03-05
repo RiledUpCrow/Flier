@@ -4,9 +4,11 @@
  * To Public License, Version 2, as published by Sam Hocevar. See
  * http://www.wtfpl.net/ for more details.
  */
-package pl.betoncraft.flier.api;
+package pl.betoncraft.flier.api.content;
 
 import org.bukkit.util.Vector;
+
+import pl.betoncraft.flier.api.core.Item;
 
 /**
  * Represents an engine, which speeds players up.

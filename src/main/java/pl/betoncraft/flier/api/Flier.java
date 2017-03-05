@@ -12,6 +12,17 @@ import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.plugin.Plugin;
 
+import pl.betoncraft.flier.api.content.Action;
+import pl.betoncraft.flier.api.content.Activator;
+import pl.betoncraft.flier.api.content.Bonus;
+import pl.betoncraft.flier.api.content.Engine;
+import pl.betoncraft.flier.api.content.Game;
+import pl.betoncraft.flier.api.content.Lobby;
+import pl.betoncraft.flier.api.content.Wings;
+import pl.betoncraft.flier.api.core.ConfigManager;
+import pl.betoncraft.flier.api.core.LoadingException;
+import pl.betoncraft.flier.api.core.UsableItem;
+
 /**
  * The Flier plugin.
  *
