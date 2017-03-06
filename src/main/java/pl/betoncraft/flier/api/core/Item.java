@@ -16,6 +16,11 @@ import org.bukkit.inventory.ItemStack;
 public interface Item {
 
 	/**
+	 * @return the ID of this Item, which is the section defining it in the file
+	 */
+	public String getID();
+
+	/**
 	 * @return the ItemStack equal to this item
 	 */
 	public ItemStack getItem();
@@ -39,5 +44,19 @@ public interface Item {
 	 * @return true if the item was replicated from this one, false if not
 	 */
 	public boolean isSimilar(Item key);
+	
+	/**
+	 * Applies passed modification to this Item.
+	 * 
+	 * @param mod
+	 */
+	public void addModification(Modification mod);
+	
+	/**
+	 * Removes passed modification from this Item.
+	 * 
+	 * @param mod
+	 */
+	public void removeModification(Modification mod);
 
 }

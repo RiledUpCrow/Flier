@@ -21,6 +21,10 @@ import pl.betoncraft.flier.core.defaults.DefaultActivator;
  */
 public class WingsHealthActivator extends DefaultActivator {
 	
+	private static final String NUMBER_TYPE = "number_type";
+	private static final String MAX = "max";
+	private static final String MIN = "min";
+
 	private double min;
 	private double max;
 	private Type type;
@@ -31,9 +35,9 @@ public class WingsHealthActivator extends DefaultActivator {
 	
 	public WingsHealthActivator(ConfigurationSection section) throws LoadingException {
 		super(section);
-		min = loader.loadNonNegativeDouble("min");
-		max = loader.loadNonNegativeDouble("max", min);
-		type = loader.loadEnum("number_type", Type.ABSOLUTE, Type.class);
+		min = loader.loadNonNegativeDouble(MIN);
+		max = loader.loadNonNegativeDouble(MAX, min);
+		type = loader.loadEnum(NUMBER_TYPE, Type.ABSOLUTE, Type.class);
 	}
 
 	@Override
@@ -41,12 +45,12 @@ public class WingsHealthActivator extends DefaultActivator {
 		Wings wings = player.getClazz().getWings();
 		double health = wings.getHealth();
 		double maxHealth = wings.getMaxHealth();
-		switch (type) {
+		switch (modMan.modifyEnum(NUMBER_TYPE, type)) {
 		case ABSOLUTE:
-			return health >= min && health <= max;
+			return health >= modMan.modifyNumber(MIN, min) && health <= modMan.modifyNumber(MAX, max);
 		case PERCENTAGE:
 			double percentage = health / maxHealth * 100;
-			return percentage >= min && percentage <= max;
+			return percentage >= modMan.modifyNumber(MIN, min) && percentage <= modMan.modifyNumber(MAX, max);
 		}
 		return false;
 	}

@@ -16,6 +16,8 @@ import pl.betoncraft.flier.api.content.Activator;
 import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.Item;
 import pl.betoncraft.flier.api.core.LoadingException;
+import pl.betoncraft.flier.api.core.Modification;
+import pl.betoncraft.flier.api.core.Modification.ModificationTarget;
 import pl.betoncraft.flier.api.core.UsableItem;
 import pl.betoncraft.flier.api.core.Usage;
 import pl.betoncraft.flier.core.defaults.DefaultItem;
@@ -27,6 +29,9 @@ import pl.betoncraft.flier.core.defaults.DefaultItem;
  */
 public class DefaultUsableItem extends DefaultItem implements UsableItem {
 	
+	private static final String AMMO = "ammo";
+	private static final String CONSUMABLE = "consumable";
+
 	protected final boolean consumable;
 	protected final int maxAmmo;
 	protected final List<Usage> usages = new ArrayList<>();
@@ -43,8 +48,8 @@ public class DefaultUsableItem extends DefaultItem implements UsableItem {
 
 	public DefaultUsableItem(ConfigurationSection section) throws LoadingException {
 		super(section);
-		consumable = loader.loadBoolean("consumable", false);
-		maxAmmo = loader.loadNonNegativeInt("ammo", 0);
+		consumable = loader.loadBoolean(CONSUMABLE, false);
+		maxAmmo = loader.loadNonNegativeInt(AMMO, 0);
 		ammo = maxAmmo;
 		ConfigurationSection usagesSection = section.getConfigurationSection("usages");
 		if (usagesSection != null) for (String id : usagesSection.getKeys(false)) {
@@ -74,12 +79,12 @@ public class DefaultUsableItem extends DefaultItem implements UsableItem {
 	
 	@Override
 	public boolean isConsumable() {
-		return consumable;
+		return modMan.modifyBoolean(CONSUMABLE, consumable);
 	}
 
 	@Override
 	public int getMaxAmmo() {
-		return maxAmmo;
+		return (int) modMan.modifyNumber(AMMO, maxAmmo);
 	}
 
 	@Override
@@ -93,6 +98,7 @@ public class DefaultUsableItem extends DefaultItem implements UsableItem {
 		if (this.ammo < 0) {
 			this.ammo = 0;
 		}
+		int maxAmmo = getMaxAmmo();
 		if (this.ammo > maxAmmo) {
 			this.ammo = maxAmmo;
 		}
@@ -115,7 +121,7 @@ public class DefaultUsableItem extends DefaultItem implements UsableItem {
 				if (!usage.canUse(player)) {
 					continue;
 				}
-				if (maxAmmo > 0 && ammo - usage.getAmmoUse() < 0) {
+				if (getMaxAmmo() > 0 && ammo - usage.getAmmoUse() < 0) {
 					continue;
 				}
 				for (Activator activator : usage.getActivators()) {
@@ -183,7 +189,7 @@ public class DefaultUsableItem extends DefaultItem implements UsableItem {
 		if (item instanceof DefaultUsableItem && super.isSimilar(item)) {
 			DefaultUsableItem usable = (DefaultUsableItem) item;
 			return usable.consumable == consumable &&
-					usable.ammo == ammo &&
+					usable.maxAmmo == maxAmmo &&
 					usable.usages.stream().allMatch(thatUsage -> usages.stream().anyMatch(thisUsage -> thatUsage.equals(thisUsage)));
 		}
 		return false;
@@ -191,8 +197,42 @@ public class DefaultUsableItem extends DefaultItem implements UsableItem {
 	
 	@Override
 	public void refill() {
-		ammo = maxAmmo;
+		ammo = getMaxAmmo();
 		time = 0;
 		whole = 0;
+	}
+
+	@Override
+	public void addModification(Modification mod) {
+		if (mod.getTarget() == ModificationTarget.USABLE_ITEM) {
+			modMan.addModification(mod);
+		} else if (mod.getTarget() == ModificationTarget.ACTION) {
+			usages.forEach(usage -> usage.getActions().stream()
+					.filter(action -> mod.getNames().contains(action.getID()))
+					.forEach(action -> action.addModification(mod))
+			);
+		} else if (mod.getTarget() == ModificationTarget.ACTIVATOR) {
+			usages.forEach(usage -> usage.getActivators().stream()
+					.filter(activator -> mod.getNames().contains(activator.getID()))
+					.forEach(activator -> activator.addModification(mod))
+			);
+		}
+	}
+
+	@Override
+	public void removeModification(Modification mod) {
+		if (mod.getTarget() == ModificationTarget.USABLE_ITEM) {
+			modMan.removeModification(mod);
+		} else if (mod.getTarget() == ModificationTarget.ACTION) {
+			usages.forEach(usage -> usage.getActions().stream()
+					.filter(action -> mod.getNames().contains(action.getID()))
+					.forEach(action -> action.removeModification(mod))
+			);
+		} else if (mod.getTarget() == ModificationTarget.ACTIVATOR) {
+			usages.forEach(usage -> usage.getActivators().stream()
+					.filter(activator -> mod.getNames().contains(activator.getID()))
+					.forEach(activator -> activator.removeModification(mod))
+			);
+		}
 	}
 }

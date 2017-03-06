@@ -20,26 +20,33 @@ import pl.betoncraft.flier.core.defaults.DefaultEngine;
  */
 public class MultiplyingEngine extends DefaultEngine {
 	
+	private static final String ACCELERATION = "acceleration";
+	private static final String MIN_SPEED = "min_speed";
+	private static final String MAX_SPEED = "max_speed";
+
 	private final double maxSpeed;
 	private final double minSpeed;
 	private final double acceleration;
 	
 	public MultiplyingEngine(ConfigurationSection section) throws LoadingException {
 		super(section);
-		maxSpeed = loader.loadNonNegativeDouble("max_speed");
-		minSpeed = loader.loadNonNegativeDouble("min_speed");
-		acceleration = loader.loadNonNegativeDouble("acceleration");
+		maxSpeed = loader.loadNonNegativeDouble(MAX_SPEED);
+		minSpeed = loader.loadNonNegativeDouble(MIN_SPEED);
+		acceleration = loader.loadNonNegativeDouble(ACCELERATION);
 	}
 	
 	@Override
 	public Vector launch(Vector velocity, Vector direction) {
 		double speed = velocity.length();
-		if (speed > maxSpeed) {
+		if (speed > modMan.modifyNumber(MAX_SPEED, maxSpeed)) {
 			speed = 0;
-		} else if (speed < minSpeed) {
-			speed = minSpeed;
+		} else {
+			double minSpeed = modMan.modifyNumber(MIN_SPEED, this.minSpeed);
+			if (speed < minSpeed) {
+				speed = minSpeed;
+			}
 		}
-		return velocity.add(direction.multiply(speed * acceleration));
+		return velocity.add(direction.multiply(speed * modMan.modifyNumber(ACCELERATION, acceleration)));
 	}
 	
 	@Override

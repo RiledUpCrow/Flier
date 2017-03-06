@@ -72,16 +72,17 @@ public abstract class DefaultLobby implements Lobby, Listener {
 		}
 		try {
 			List<String> playerClass = section.getStringList("default_class");
-			defClass = new DefaultClass(
-					playerClass.stream().map(
-							name -> items.entrySet().stream().filter(
-									entry -> entry.getKey().equals(name)
-							).findFirst().orElse(null).getValue()
-					).collect(Collectors.toList()),
-					respawnAction
-			);
-		} catch (NullPointerException e) {
-			throw (LoadingException) new LoadingException("Error in player class.").initCause(e);
+			List<ConfigurationSection> sets = new ArrayList<>();
+			for (String set : playerClass) {
+				ConfigurationSection sec = items.get(set);
+				if (sec == null) {
+					throw new LoadingException(String.format("Item set '%s' is not defined.", set));
+				}
+				sets.add(sec);
+			}
+			defClass = new DefaultClass(sets, respawnAction);
+		} catch (LoadingException e) {
+			throw (LoadingException) new LoadingException("Error in default class.").initCause(e);
 		}
 		ConfigurationSection buttonsSection = section.getConfigurationSection("buttons");
 		if (buttonsSection != null) for (String i : buttonsSection.getKeys(false)) {

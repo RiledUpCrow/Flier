@@ -16,6 +16,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import pl.betoncraft.flier.api.core.Item;
 import pl.betoncraft.flier.api.core.LoadingException;
+import pl.betoncraft.flier.util.ModificationManager;
 import pl.betoncraft.flier.util.ValueLoader;
 
 /**
@@ -25,9 +26,11 @@ import pl.betoncraft.flier.util.ValueLoader;
  */
 public abstract class DefaultItem implements Item {
 
-	protected final ValueLoader loader;
-	
+	private static final String WEIGHT = "weight";
+
 	protected final String id;
+	protected final ValueLoader loader;
+	protected final ModificationManager modMan;
 
 	protected final ItemStack item;
 	protected final double weight;
@@ -36,6 +39,7 @@ public abstract class DefaultItem implements Item {
 	public DefaultItem(ConfigurationSection section) throws LoadingException {
 		id = section.getName();
 		loader = new ValueLoader(section);
+		modMan = new ModificationManager();
 		Material type = loader.loadEnum("material", Material.class);
 		String name = ChatColor.translateAlternateColorCodes('&', loader.loadString("name"));
 		List<String> lore = section.getStringList("lore");
@@ -48,8 +52,13 @@ public abstract class DefaultItem implements Item {
 		meta.setLore(lore);
 		meta.spigot().setUnbreakable(true);
 		item.setItemMeta(meta);
-		weight = loader.loadDouble("weight", 0.0);
+		weight = loader.loadDouble(WEIGHT, 0.0);
 		slot = loader.loadInt("slot", -1);
+	}
+
+	@Override
+	public String getID() {
+		return id;
 	}
 
 	@Override
@@ -59,7 +68,7 @@ public abstract class DefaultItem implements Item {
 
 	@Override
 	public double getWeight() {
-		return weight;
+		return modMan.modifyNumber(WEIGHT, weight);
 	}
 
 	@Override

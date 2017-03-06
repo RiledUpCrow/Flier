@@ -14,10 +14,7 @@ balancedWings:
   - '&bMedium durability.'
   - '&aPress space while falling to fly.'
   max_health: 2800                              # health of these Wings
-  regeneration: 0.5                             # regeneration per tick
-  aerodynamics: 0                               # air resistance factor of these Wings
-  liftingforce: 0                               # lifting force factor of these Wings
-  maxLift: 0                                    # maximum lifting force after applying weight (see docs)
+  regeneration: 0.5                             # regeneration per tick                           
 lightWings:
   type: simpleWings
   material: elytra
@@ -28,9 +25,9 @@ lightWings:
   - '&aPress space while falling to fly.'
   max_health: 2000
   regeneration: 0.5
-  aerodynamics: 0.002
-  liftingforce: 0.001
-  maxLift: 0.01
+  aerodynamics: 0.002                           # air resistance factor of these Wings
+  liftingforce: 0.001                           # lifting force factor of these Wings
+  max_lift: 0.01                                # maximum lifting force after applying weight (see docs)
 heavyWings:
   type: simpleWings
   material: elytra
@@ -42,6 +39,4 @@ heavyWings:
   max_health: 3600
   regeneration: 0.5
   aerodynamics: -0.0025
-  liftingforce: 0
-  maxLift: 0
   weight: 0.01

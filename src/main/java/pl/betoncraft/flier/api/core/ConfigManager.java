@@ -56,6 +56,11 @@ public interface ConfigManager {
 	public FileConfiguration getActivators();
 
 	/**
+	 * @return the modifications.yml configuration
+	 */
+	public FileConfiguration getModifications();
+
+	/**
 	 * Saves the lobbies.yml file.
 	 */
 	public void saveLobbies();
@@ -94,5 +99,10 @@ public interface ConfigManager {
 	 * Saves the activators.yml file.
 	 */
 	public void saveActivators();
+	
+	/**
+	 * Saves the modifications.yml file.
+	 */
+	public void saveModifications();
 
 }

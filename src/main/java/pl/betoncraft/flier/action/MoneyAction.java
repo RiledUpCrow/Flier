@@ -18,17 +18,19 @@ import pl.betoncraft.flier.core.defaults.DefaultAction;
  * @author Jakub Sapalski
  */
 public class MoneyAction extends DefaultAction {
-	
+
+	private static final String MONEY = "money";
+
 	private final int money;
 
 	public MoneyAction(ConfigurationSection section) throws LoadingException {
 		super(section);
-		money = loader.loadInt("money");
+		money = loader.loadInt(MONEY);
 	}
 
 	@Override
 	public boolean act(InGamePlayer player) {
-		player.setMoney(player.getMoney() + money);
+		player.setMoney(player.getMoney() + (int) modMan.modifyNumber(MONEY, money));
 		return true;
 	}
 

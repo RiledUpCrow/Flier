@@ -17,6 +17,7 @@ import pl.betoncraft.flier.api.content.Engine;
 import pl.betoncraft.flier.api.content.Wings;
 import pl.betoncraft.flier.api.core.ItemSet;
 import pl.betoncraft.flier.api.core.LoadingException;
+import pl.betoncraft.flier.api.core.Modification;
 import pl.betoncraft.flier.api.core.UsableItem;
 import pl.betoncraft.flier.util.ValueLoader;
 
@@ -35,8 +36,10 @@ public class DefaultSet implements ItemSet {
 	protected Engine engine;
 	protected Wings wings;
 	protected List<UsableItem> items = new ArrayList<>();
+	protected List<Modification> mods = new ArrayList<>();
 
 	public DefaultSet(ConfigurationSection section) throws LoadingException {
+		Flier flier = Flier.getInstance();
 		id = section.getName();
 		loader = new ValueLoader(section);
 		category = loader.loadString("category");
@@ -45,13 +48,13 @@ public class DefaultSet implements ItemSet {
 		if (engineName == null) {
 			engine = null;
 		} else {
-			engine = Flier.getInstance().getEngine(engineName);
+			engine = flier.getEngine(engineName);
 		}
 		String wingsName = section.getString("wings");
 		if (wingsName == null) {
 			wings = null;
 		} else {
-			wings = Flier.getInstance().getWing(wingsName);
+			wings = flier.getWing(wingsName);
 		}
 		try {
 			List<Map<?, ?>> maps = section.getMapList("items");
@@ -62,7 +65,7 @@ public class DefaultSet implements ItemSet {
 				if (itemObject == null || !(itemObject instanceof String)) {
 					throw new LoadingException("Item name is missing.");
 				}
-				item = Flier.getInstance().getItem((String) itemObject);
+				item = flier.getItem((String) itemObject);
 				Object amountObject = map.get("amount");
 				if (amountObject != null) {
 					if (!(amountObject instanceof Integer)) {
@@ -92,6 +95,13 @@ public class DefaultSet implements ItemSet {
 			}
 		} catch (LoadingException e) {
 			throw (LoadingException) new LoadingException("Error in items.").initCause(e);
+		}
+		for (String modName : section.getStringList("modifications")) {
+			try {
+				mods.add(flier.getModification(modName));
+			} catch (LoadingException e) {
+				throw (LoadingException) new LoadingException(String.format("Error in '%s' modification.", modName)).initCause(e);
+			}
 		}
 	}
 
@@ -133,6 +143,11 @@ public class DefaultSet implements ItemSet {
 	@Override
 	public List<UsableItem> getItems() {
 		return items;
+	}
+	
+	@Override
+	public List<Modification> getModifications() {
+		return mods;
 	}
 	
 	@Override

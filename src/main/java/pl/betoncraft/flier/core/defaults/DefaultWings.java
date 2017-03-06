@@ -11,6 +11,7 @@ import org.bukkit.configuration.ConfigurationSection;
 
 import pl.betoncraft.flier.api.content.Wings;
 import pl.betoncraft.flier.api.core.LoadingException;
+import pl.betoncraft.flier.api.core.Modification;
 
 /**
  * Default Wings implementation.
@@ -18,6 +19,9 @@ import pl.betoncraft.flier.api.core.LoadingException;
  * @author Jakub Sapalski
  */
 public abstract class DefaultWings extends DefaultItem implements Wings {
+
+	private static final String REGENERATION = "regeneration";
+	private static final String MAX_HEALTH = "max_health";
 
 	protected final double maxHealth;
 	protected final double regeneration;
@@ -28,19 +32,19 @@ public abstract class DefaultWings extends DefaultItem implements Wings {
 	public DefaultWings(ConfigurationSection section) throws LoadingException {
 		super(section);
 		super.item.setType(Material.ELYTRA);
-		maxHealth = loader.loadPositiveDouble("max_health");
-		regeneration = loader.loadNonNegativeDouble("regeneration");
+		maxHealth = loader.loadPositiveDouble(MAX_HEALTH);
+		regeneration = loader.loadNonNegativeDouble(REGENERATION);
 		health = maxHealth;
 	}
 
 	@Override
 	public double getMaxHealth() {
-		return maxHealth;
+		return modMan.modifyNumber(MAX_HEALTH, maxHealth);
 	}
 
 	@Override
 	public double getRegeneration() {
-		return regeneration;
+		return modMan.modifyNumber(REGENERATION, regeneration);
 	}
 
 	@Override
@@ -50,6 +54,7 @@ public abstract class DefaultWings extends DefaultItem implements Wings {
 
 	@Override
 	public boolean addHealth(double amount) {
+		double maxHealth = getMaxHealth();
 		if (health >= maxHealth) {
 			return false;
 		}
@@ -86,8 +91,18 @@ public abstract class DefaultWings extends DefaultItem implements Wings {
 	
 	@Override
 	public void refill() {
-		health = maxHealth;
+		health = getMaxHealth();
 		disabled = false;
+	}
+	
+	@Override
+	public void addModification(Modification mod) {
+		modMan.addModification(mod);
+	}
+	
+	@Override
+	public void removeModification(Modification mod) {
+		modMan.removeModification(mod);
 	}
 
 }

@@ -40,18 +40,6 @@
 #        add_type: decrease
 #        conflict_action: skip
 #      block: 100;200;300;world   # **EDIT THIS BEFORE USING!**
-#    compass_button:
-#      buy_cost: 5
-#      on_buy:
-#        item: the_compass
-#        add_type: increase
-#        conflict_action: skip
-#      sell_cost: -5
-#      on_sell:
-#        item: the_compass
-#        add_type: decrease
-#        conflict_action: skip
-#      block: 100;200;300;world   # **EDIT THIS BEFORE USING!**
 #    repair_kit_button:
 #      buy_cost: 20
 #      on_buy:
@@ -62,6 +50,13 @@
 #      on_sell:
 #        item: the_repair_kit
 #        add_type: decrease
+#        conflict_action: skip
+#      block: 100;200;300;world   # **EDIT THIS BEFORE USING!**
+#    compass_button:
+#      unlock_cost: 5
+#      on_unlock:
+#        item: the_compass
+#        add_type: fill
 #        conflict_action: skip
 #      block: 100;200;300;world   # **EDIT THIS BEFORE USING!**
 #    fast_button:
@@ -95,6 +90,8 @@
 #      items:
 #      - item: radar
 #        max: 1
+#      modifications:
+#      - bigger_magazine
 #    the_repair_kit:
 #      items:
 #      - item: wings

@@ -21,11 +21,13 @@ import pl.betoncraft.flier.util.ValueLoader;
  */
 public class TargetAction extends DefaultAction {
 	
+	private static final String TARGET = "target";
+
 	private final Attitude target;
 	
 	public TargetAction(ConfigurationSection section) throws LoadingException {
 		super(section);
-		this.target = new ValueLoader(section).loadEnum("target", Attitude.HOSTILE, Attitude.class);
+		this.target = new ValueLoader(section).loadEnum(TARGET, Attitude.HOSTILE, Attitude.class);
 	}
 
 	@Override
@@ -33,6 +35,7 @@ public class TargetAction extends DefaultAction {
 		if (data.isPlaying()) {
 			InGamePlayer nearest = null;
 			double distance = 0;
+			Attitude target = modMan.modifyEnum(TARGET, this.target);
 			for (InGamePlayer d : data.getLobby().getGame().getPlayers().values()) {
 				if (data.getLobby().getGame().getAttitude(d, data) == target) {
 					double dist = data.getPlayer().getLocation().distanceSquared(d.getPlayer().getLocation());

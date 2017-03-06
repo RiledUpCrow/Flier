@@ -30,34 +30,38 @@ import pl.betoncraft.flier.util.Utils;
  */
 public class HomingMissile extends DefaultAttack {
 	
+	private static final String MANEUVERABILITY = "maneuverability";
+	private static final String LIFETIME = "lifetime";
+	private static final String SPEED = "speed";
+	private static final String SEARCH_RADIUS = "search_radius";
+	private static final String SEARCH_RANGE = "search_range";
+	private static final String ENTITY = "entity";
+
 	private final EntityType entity;
 	private final int searchRange;
 	private final double searchRadius;
 	private final double speed;
 	private final int lifetime;
 	private final double maneuverability;
-	private final int radius;
-	private final int radiusSqr;
 
 	public HomingMissile(ConfigurationSection section) throws LoadingException {
 		super(section);
-		entity = loader.loadEnum("entity", EntityType.class);
-		searchRange = loader.loadPositiveInt("search_range");
-		searchRadius = loader.loadPositiveDouble("search_radius");
-		speed = loader.loadPositiveDouble("speed");
-		lifetime = loader.loadPositiveInt("lifetime");
-		maneuverability = loader.loadPositiveDouble("maneuverability");
-		radius = searchRange / 2;
-		radiusSqr = radius * radius;
+		entity = loader.loadEnum(ENTITY, EntityType.class);
+		searchRange = loader.loadPositiveInt(SEARCH_RANGE);
+		searchRadius = loader.loadPositiveDouble(SEARCH_RADIUS);
+		speed = loader.loadPositiveDouble(SPEED);
+		lifetime = loader.loadPositiveInt(LIFETIME);
+		maneuverability = loader.loadPositiveDouble(MANEUVERABILITY);
 	}
 
 	@Override
 	public boolean act(InGamePlayer data) {
 		Player player = data.getPlayer();
+		double speed = modMan.modifyNumber(SPEED, this.speed);
 		Vector velocity = player.getLocation().getDirection().clone().multiply(speed);
 		Vector pointer = player.getLocation().getDirection().clone().multiply(player.getVelocity().length() * 3);
 		Location launch = player.getEyeLocation().clone().add(pointer);
-		Projectile missile = (Projectile) launch.getWorld().spawnEntity(launch, entity);
+		Projectile missile = (Projectile) launch.getWorld().spawnEntity(launch, modMan.modifyEnum(ENTITY, entity));
 		missile.setVelocity(velocity);
 		missile.setShooter(player);
 		missile.setGravity(false);
@@ -69,6 +73,14 @@ public class HomingMissile extends DefaultAttack {
 			Player nearest;
 			boolean foundTarget = false;
 			ImmutableVector vec = null;
+			int lifetime = (int) modMan.modifyNumber(LIFETIME, HomingMissile.this.lifetime);
+			int searchRange = (int) modMan.modifyNumber(SEARCH_RANGE, HomingMissile.this.searchRange);
+			double searchRadius = modMan.modifyNumber(SEARCH_RADIUS, HomingMissile.this.searchRadius);
+			double maneuverability = modMan.modifyNumber(MANEUVERABILITY, HomingMissile.this.maneuverability);
+			int radius = searchRange / 2;
+			int radiusSqr = radius * radius;
+			boolean friendlyFire = friendlyFire();
+			boolean suicidal = suicidal();
 			@Override
 			public void run() {
 				// stop if the missile does not exist
@@ -106,10 +118,10 @@ public class HomingMissile extends DefaultAttack {
 					if (attitude == Attitude.NEUTRAL) {
 						continue;
 					}
-					if (!friendlyFire() && attitude == Attitude.FRIENDLY) {
+					if (!friendlyFire && attitude == Attitude.FRIENDLY) {
 						continue;
 					}
-					if (!suicidal() && data.equals(p)) {
+					if (!suicidal && data.equals(p)) {
 						continue;
 					}
 					// get the nearest player

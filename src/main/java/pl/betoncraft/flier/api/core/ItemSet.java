@@ -59,9 +59,14 @@ public interface ItemSet {
 	public void setWings(Wings wings);
 
 	/**
-	 * @return the map of UsableItems and their amounts in this ItemSet
+	 * @return the list of UsableItems in this ItemSet
 	 */
 	public List<UsableItem> getItems();
+
+	/**
+	 * @return the list of Modifications in this ItemSet
+	 */
+	List<Modification> getModifications();
 
 	/**
 	 * @return whenever this ItemSet is empty.

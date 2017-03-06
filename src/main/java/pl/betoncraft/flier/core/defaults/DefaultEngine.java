@@ -10,6 +10,7 @@ import org.bukkit.configuration.ConfigurationSection;
 
 import pl.betoncraft.flier.api.content.Engine;
 import pl.betoncraft.flier.api.core.LoadingException;
+import pl.betoncraft.flier.api.core.Modification;
 
 /**
  * Default Engine implementation.
@@ -17,7 +18,12 @@ import pl.betoncraft.flier.api.core.LoadingException;
  * @author Jakub Sapalski
  */
 public abstract class DefaultEngine extends DefaultItem implements Engine {
-	
+
+	private static final String GLOW_TIME = "glow_time";
+	private static final String REGENERATION = "regeneration";
+	private static final String CONSUMPTION = "consumption";
+	private static final String MAX_FUEL = "max_fuel";
+
 	protected final double maxFuel;
 	protected final double consumption;
 	protected final double regeneration;
@@ -27,31 +33,31 @@ public abstract class DefaultEngine extends DefaultItem implements Engine {
 
 	public DefaultEngine(ConfigurationSection section) throws LoadingException {
 		super(section);
-		maxFuel = loader.loadPositiveDouble("max_fuel");
-		consumption = loader.loadNonNegativeDouble("consumption");
-		regeneration = loader.loadNonNegativeDouble("regeneration");
-		glowTime = loader.loadNonNegativeInt("glow_time");
+		maxFuel = loader.loadPositiveDouble(MAX_FUEL);
+		consumption = loader.loadNonNegativeDouble(CONSUMPTION);
+		regeneration = loader.loadNonNegativeDouble(REGENERATION);
+		glowTime = loader.loadNonNegativeInt(GLOW_TIME);
 		fuel = maxFuel;
 	}
 
 	@Override
 	public double getMaxFuel() {
-		return maxFuel;
+		return modMan.modifyNumber(MAX_FUEL, maxFuel);
 	}
 
 	@Override
 	public double getConsumption() {
-		return consumption;
+		return modMan.modifyNumber(CONSUMPTION, consumption);
 	}
 
 	@Override
 	public double getRegeneration() {
-		return regeneration;
+		return modMan.modifyNumber(REGENERATION, regeneration);
 	}
 	
 	@Override
 	public int getGlowTime() {
-		return glowTime;
+		return (int) modMan.modifyNumber(GLOW_TIME, glowTime);
 	}
 
 	@Override
@@ -61,6 +67,7 @@ public abstract class DefaultEngine extends DefaultItem implements Engine {
 	
 	@Override
 	public boolean addFuel(double amount) {
+		double maxFuel = getMaxFuel();
 		if (fuel >= maxFuel) {
 			return false;
 		}
@@ -87,7 +94,17 @@ public abstract class DefaultEngine extends DefaultItem implements Engine {
 	
 	@Override
 	public void refill() {
-		fuel = maxFuel;
+		fuel = getMaxFuel();
+	}
+	
+	@Override
+	public void addModification(Modification mod) {
+		modMan.addModification(mod);
+	}
+	
+	@Override
+	public void removeModification(Modification mod) {
+		modMan.removeModification(mod);
 	}
 
 }

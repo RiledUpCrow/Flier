@@ -1,0 +1,8 @@
+bigger_magazine:
+  target: usable item
+  names:
+  - fastWeapon
+  - balancedWeapon
+  - strongWeapon
+  modifiers:
+    ammo: "*(0.5)"

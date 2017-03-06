@@ -18,6 +18,14 @@ import pl.betoncraft.flier.api.core.LoadingException;
  */
 public abstract class DefaultAttack extends DefaultAction implements Attack {
 
+	private static final String EXPLODING = "exploding";
+	private static final String FRIENDLY_FIRE = "friendly_fire";
+	private static final String SUICIDAL = "suicidal";
+	private static final String MIDAIR_PHYSICAL_DAMAGE = "midair_physical_damage";
+	private static final String WINGS_OFF = "wings_off";
+	private static final String PHYSICAL_DAMAGE = "physical_damage";
+	private static final String DAMAGE = "damage";
+
 	protected final double damage;
 	protected final double physicalDamage;
 	protected final boolean wingsOff;
@@ -28,48 +36,48 @@ public abstract class DefaultAttack extends DefaultAction implements Attack {
 	
 	public DefaultAttack(ConfigurationSection section) throws LoadingException {
 		super(section);
-		damage = loader.loadDouble("damage");
-		physicalDamage = loader.loadDouble("physical_damage");
-		wingsOff = loader.loadBoolean("wings_off", false);
-		midAirPhysicalDamage = loader.loadBoolean("midair_physical_damage", false);
-		suicidal = loader.loadBoolean("suicidal", false);
-		friendlyFire = loader.loadBoolean("friendly_fire", true);
-		isExploding = loader.loadBoolean("exploding", false);
+		damage = loader.loadDouble(DAMAGE);
+		physicalDamage = loader.loadDouble(PHYSICAL_DAMAGE);
+		wingsOff = loader.loadBoolean(WINGS_OFF, false);
+		midAirPhysicalDamage = loader.loadBoolean(MIDAIR_PHYSICAL_DAMAGE, false);
+		suicidal = loader.loadBoolean(SUICIDAL, false);
+		friendlyFire = loader.loadBoolean(FRIENDLY_FIRE, true);
+		isExploding = loader.loadBoolean(EXPLODING, false);
 	}
 	
 	@Override
 	public double getDamage() {
-		return damage;
+		return modMan.modifyNumber(DAMAGE, damage);
 	}
 
 	@Override
 	public double getPhysical() {
-		return physicalDamage;
+		return modMan.modifyNumber(PHYSICAL_DAMAGE, physicalDamage);
 	}
 	
 	@Override
 	public boolean wingsOff() {
-		return wingsOff;
+		return modMan.modifyBoolean(WINGS_OFF, wingsOff);
 	}
 	
 	@Override
 	public boolean midAirPhysicalDamage() {
-		return midAirPhysicalDamage;
+		return modMan.modifyBoolean(MIDAIR_PHYSICAL_DAMAGE, midAirPhysicalDamage);
 	}
 	
 	@Override
 	public boolean friendlyFire() {
-		return friendlyFire;
+		return modMan.modifyBoolean(FRIENDLY_FIRE, friendlyFire);
 	}
 
 	@Override
 	public boolean suicidal() {
-		return suicidal;
+		return modMan.modifyBoolean(SUICIDAL, suicidal);
 	}
 	
 	@Override
 	public boolean isExploding() {
-		return isExploding;
+		return modMan.modifyBoolean(EXPLODING, isExploding);
 	}
 
 }

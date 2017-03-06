@@ -7,6 +7,7 @@
 package pl.betoncraft.flier.api.content;
 
 import pl.betoncraft.flier.api.core.InGamePlayer;
+import pl.betoncraft.flier.api.core.Modification;
 import pl.betoncraft.flier.api.core.UsableItem;
 
 /**
@@ -20,5 +21,24 @@ public interface Activator {
 	 * @return whenever the Activator is active for this player
 	 */
 	public boolean isActive(InGamePlayer player, UsableItem item);
+
+	/**
+	 * @return the ID of this Activator, under which it is defined in activators.yml
+	 */
+	public String getID();
+	
+	/**
+	 * Applies passed modification to this Activator.
+	 * 
+	 * @param mod
+	 */
+	public void addModification(Modification mod);
+	
+	/**
+	 * Removes passed modification from this Activator.
+	 * 
+	 * @param mod
+	 */
+	public void removeModification(Modification mod);
 
 }

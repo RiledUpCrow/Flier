@@ -19,17 +19,20 @@ import pl.betoncraft.flier.core.defaults.DefaultAction;
  * @author Jakub Sapalski
  */
 public class FuelAction extends DefaultAction {
-	
+
+	private static final String AMOUNT = "amount";
+
 	private double amount;
 
 	public FuelAction(ConfigurationSection section) throws LoadingException {
 		super(section);
-		amount = loader.loadDouble("amount");
+		amount = loader.loadDouble(AMOUNT);
 	}
 
 	@Override
 	public boolean act(InGamePlayer player) {
 		Engine engine = player.getClazz().getEngine();
+		double amount = modMan.modifyNumber(AMOUNT, this.amount);
 		if (amount >= 0) {
 			return engine.addFuel(amount);
 		} else {

@@ -19,6 +19,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import pl.betoncraft.flier.api.content.Engine;
 import pl.betoncraft.flier.api.content.Wings;
 import pl.betoncraft.flier.api.core.ItemSet;
+import pl.betoncraft.flier.api.core.LoadingException;
 import pl.betoncraft.flier.api.core.PlayerClass;
 import pl.betoncraft.flier.api.core.SetApplier;
 import pl.betoncraft.flier.api.core.UsableItem;
@@ -38,11 +39,17 @@ public class DefaultClass implements PlayerClass {
 	private final Map<String, List<SetApplier>> stored = new HashMap<>();
 	private final Map<String, List<SetApplier>> def;
 	
-	public DefaultClass(List<ConfigurationSection> sets, RespawnAction respAct) {
+	public DefaultClass(List<ConfigurationSection> sets, RespawnAction respAct) throws LoadingException {
 		respawnAction = respAct;
-		HashMap<String, List<SetApplier>> map = new HashMap<>(sets.size());
-		sets.stream().map(set -> new DefaultSetApplier(set))
-				.forEach(applier -> map.computeIfAbsent(applier.getCategory(), k -> new ArrayList<>()).add(applier));
+		Map<String, List<SetApplier>> map = new HashMap<>(sets.size());
+		for (ConfigurationSection set : sets) {
+			try {
+				SetApplier applier = new DefaultSetApplier(set);
+				map.computeIfAbsent(applier.getCategory(), k -> new ArrayList<>()).add(applier);
+			} catch (LoadingException e) {
+				throw (LoadingException) new LoadingException(String.format("Error in '%s' button.", set.getName())).initCause(e);
+			}
+		}
 		def = Collections.unmodifiableMap(map);
 		reset();
 		load();
@@ -61,7 +68,7 @@ public class DefaultClass implements PlayerClass {
 		private Engine engine;
 		private Wings wings;
 		private List<UsableItem> items = new ArrayList<>();
-		
+
 		private Compiled(Collection<ItemSet> sets) {
 			for (ItemSet set : sets) {
 				if (set.getName() != null) {
@@ -81,6 +88,29 @@ public class DefaultClass implements PlayerClass {
 					this.items.add(newItem);
 				}
 			}
+			// apply modifications
+			sets.forEach(set -> set.getModifications().forEach(mod -> {
+				switch (mod.getTarget()) {
+				case ENGINE:
+					if (mod.getNames().contains(engine.getID())) {
+						engine.addModification(mod);
+					}
+					break;
+				case WINGS:
+					if (mod.getNames().contains(wings.getID())) {
+						wings.addModification(mod);
+					}
+					break;
+				case USABLE_ITEM:
+					items.stream()
+							.filter(item -> mod.getNames().contains(item.getID()))
+							.forEach(item -> item.addModification(mod));
+				case ACTION:
+				case ACTIVATOR:
+					items.forEach(item -> item.addModification(mod));
+					break;
+				}
+			}));
 			// refill all items
 			engine.refill();
 			wings.refill();

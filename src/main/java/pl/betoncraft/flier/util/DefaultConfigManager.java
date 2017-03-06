@@ -25,14 +25,15 @@ import pl.betoncraft.flier.api.core.ConfigManager;
 public class DefaultConfigManager implements ConfigManager {
 
 	private static final String LOBBIES = "lobbies.yml",
-								GAMES = "games.yml",
-								BONUSES = "bonuses.yml",
-								ENGINES = "engines.yml",
-								WINGS = "wings.yml",
-								ITEMS = "items.yml",
-								ACTIONS = "actions.yml",
-								ACTIVATORS = "activators.yml";
-	
+	                            GAMES = "games.yml",
+	                            BONUSES = "bonuses.yml",
+	                            ENGINES = "engines.yml",
+	                            WINGS = "wings.yml",
+	                            ITEMS = "items.yml",
+	                            ACTIONS = "actions.yml",
+	                            ACTIVATORS = "activators.yml",
+	                            MODIFICATIONS = "modifications.yml";
+
 	private Config lobbies;
 	private Config games;
 	private Config bonuses;
@@ -41,8 +42,8 @@ public class DefaultConfigManager implements ConfigManager {
 	private Config items;
 	private Config actions;
 	private Config activators;
-	
-	
+	private Config modifications;
+
 	public DefaultConfigManager() {
 		lobbies = new Config(LOBBIES);
 		games = new Config(GAMES);
@@ -52,6 +53,7 @@ public class DefaultConfigManager implements ConfigManager {
 		items = new Config(ITEMS);
 		actions = new Config(ACTIONS);
 		activators = new Config(ACTIVATORS);
+		modifications = new Config(MODIFICATIONS);
 	}
 	
 	private class Config {
@@ -121,6 +123,11 @@ public class DefaultConfigManager implements ConfigManager {
 	public FileConfiguration getActivators() {
 		return activators.config;
 	}
+
+	@Override
+	public FileConfiguration getModifications() {
+		return modifications.config;
+	}
 	
 	@Override
 	public void saveLobbies() {
@@ -189,6 +196,15 @@ public class DefaultConfigManager implements ConfigManager {
 	public void saveActivators() {
 		try {
 			activators.config.save(activators.file);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Override
+	public void saveModifications() {
+		try {
+			modifications.config.save(modifications.file);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

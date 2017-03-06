@@ -9,6 +9,8 @@ package pl.betoncraft.flier.core.defaults;
 import org.bukkit.configuration.ConfigurationSection;
 
 import pl.betoncraft.flier.api.content.Action;
+import pl.betoncraft.flier.api.core.Modification;
+import pl.betoncraft.flier.util.ModificationManager;
 import pl.betoncraft.flier.util.ValueLoader;
 
 /**
@@ -20,19 +22,27 @@ public abstract class DefaultAction implements Action {
 	
 	protected final String id;
 	protected final ValueLoader loader;
+	protected final ModificationManager modMan;
 	
 	public DefaultAction(ConfigurationSection section) {
 		id = section.getName();
 		loader = new ValueLoader(section);
+		modMan = new ModificationManager();
 	}
 	
 	@Override
-	public boolean equals(Object o) {
-		if (o instanceof DefaultAction) {
-			DefaultAction action = (DefaultAction) o;
-			return action.id == id;
-		}
-		return false;
+	public String getID() {
+		return id;
+	}
+	
+	@Override
+	public void addModification(Modification mod) {
+		modMan.addModification(mod);
+	}
+	
+	@Override
+	public void removeModification(Modification mod) {
+		modMan.removeModification(mod);
 	}
 
 }

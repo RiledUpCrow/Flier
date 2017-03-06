@@ -32,6 +32,11 @@ import pl.betoncraft.flier.util.Utils;
  */
 public class MachineGun extends DefaultAttack {
 	
+	private static final String ENTITY = "entity";
+	private static final String BURST_AMOUNT = "burst_amount";
+	private static final String BURST_TICKS = "burst_ticks";
+	private static final String PROJECTILE_SPEED = "projectile_speed";
+
 	private final EntityType entity;
 	private final int burstAmount;
 	private final int burstTicks;
@@ -40,18 +45,21 @@ public class MachineGun extends DefaultAttack {
 	
 	public MachineGun(ConfigurationSection section) throws LoadingException {
 		super(section);
-		entity = loader.loadEnum("entity", EntityType.class);
-		burstAmount = loader.loadPositiveInt("burst_amount");
-		burstTicks = loader.loadPositiveInt("burst_ticks");
-		projectileSpeed = loader.loadPositiveDouble("projectile_speed");
+		entity = loader.loadEnum(ENTITY, EntityType.class);
+		burstAmount = loader.loadPositiveInt(BURST_AMOUNT);
+		burstTicks = loader.loadPositiveInt(BURST_TICKS);
+		projectileSpeed = loader.loadPositiveDouble(PROJECTILE_SPEED);
 	}
 	
 	@Override
 	public boolean act(InGamePlayer data) {
 		Player player = data.getPlayer();
+		int burstAmount = (int) modMan.modifyNumber(BURST_AMOUNT, this.burstAmount);
 		Map<Projectile, Vector> projectiles = new HashMap<>(burstAmount);
 		new BukkitRunnable() {
 			int counter = burstAmount;
+			double projectileSpeed = modMan.modifyNumber(PROJECTILE_SPEED, MachineGun.this.projectileSpeed);
+			EntityType entity = modMan.modifyEnum(ENTITY, MachineGun.this.entity);
 			@Override
 			public void run() {
 				Vector velocity = player.getLocation().getDirection().clone().multiply(projectileSpeed);
@@ -75,7 +83,7 @@ public class MachineGun extends DefaultAttack {
 					cancel();
 				}
 			}
-		}.runTaskTimer(Flier.getInstance(), 0, burstTicks);
+		}.runTaskTimer(Flier.getInstance(), 0, (int) modMan.modifyNumber(BURST_TICKS, burstTicks));
 		new BukkitRunnable() {
 			int life = 0;
 			@Override

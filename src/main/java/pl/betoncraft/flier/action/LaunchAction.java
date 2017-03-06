@@ -23,17 +23,19 @@ import pl.betoncraft.flier.core.defaults.DefaultAction;
  */
 public class LaunchAction extends DefaultAction {
 	
+	private static final String SPEED = "speed";
+
 	private final double speed;
 
 	public LaunchAction(ConfigurationSection section) throws LoadingException {
 		super(section);
-		speed = loader.loadPositiveDouble("speed");
+		speed = loader.loadPositiveDouble(SPEED);
 	}
 
 	@Override
 	public boolean act(InGamePlayer player) {
 		Runnable launch = () -> {
-			Vector vel = player.getPlayer().getLocation().getDirection().multiply(speed);
+			Vector vel = player.getPlayer().getLocation().getDirection().multiply(modMan.modifyNumber(SPEED, speed));
 			player.getPlayer().setVelocity(vel);
 			if (!player.getPlayer().isGliding()) {
 				Bukkit.getScheduler().runTask(Flier.getInstance(), () -> {

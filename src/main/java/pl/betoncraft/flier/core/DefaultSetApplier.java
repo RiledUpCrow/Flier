@@ -48,18 +48,23 @@ public class DefaultSetApplier implements SetApplier {
 			category = s.getCategory();
 			id = s.getID();
 		} catch (LoadingException e) {
-			throw (LoadingException) new LoadingException(String.format("Error in '%' item set.", setName)).initCause(e);
+			throw (LoadingException) new LoadingException(String.format("Error in '%s' item set.", setName)).initCause(e);
 		}
 	}
 	
-	public DefaultSetApplier(ConfigurationSection set) {
-		id = set.getName();
+	public DefaultSetApplier(ConfigurationSection set) throws LoadingException {
 		addType = AddType.FILL;
 		conflictAction = ConflicAction.REPLACE;
 		saving = true;
 		amount = 1;
-		category = set.getString("category");
 		this.set = set;
+		try {
+			ItemSet s = new DefaultSet(set); // check if everything's fine
+			category = s.getCategory();
+			id = s.getID();
+		} catch (LoadingException e) {
+			throw (LoadingException) new LoadingException(String.format("Error in '%s' item set.", set.getName())).initCause(e);
+		}
 	}
 
 	@Override
@@ -67,6 +72,7 @@ public class DefaultSetApplier implements SetApplier {
 		try {
 			return new DefaultSet(set);
 		} catch (LoadingException e) {
+			e.printStackTrace();
 			return null; // won't happen, it's already checked
 		}
 	}

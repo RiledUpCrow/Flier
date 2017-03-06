@@ -7,6 +7,7 @@
 package pl.betoncraft.flier.api.content;
 
 import pl.betoncraft.flier.api.core.InGamePlayer;
+import pl.betoncraft.flier.api.core.Modification;
 
 /**
  * Represents a one time action, as opposed to the repeating Effect.
@@ -23,5 +24,24 @@ public interface Action {
 	 * @return whenever the action was performed or not
 	 */
 	public boolean act(InGamePlayer player);
+
+	/**
+	 * @return the ID of this Action, under which it is defined in actions.yml
+	 */
+	public String getID();
+	
+	/**
+	 * Applies passed modification to this Action.
+	 * 
+	 * @param mod
+	 */
+	public void addModification(Modification mod);
+	
+	/**
+	 * Removes passed modification from this Action.
+	 * 
+	 * @param mod
+	 */
+	public void removeModification(Modification mod);
 
 }
