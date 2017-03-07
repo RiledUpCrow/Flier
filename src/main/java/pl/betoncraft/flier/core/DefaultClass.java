@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.bukkit.configuration.ConfigurationSection;
 
@@ -142,7 +143,7 @@ public class DefaultClass implements PlayerClass {
 	
 	@Override
 	public void reset() {
-		stored.putAll(def);
+		stored.putAll(getDefault());
 	}
 
 	@Override
@@ -362,12 +363,12 @@ public class DefaultClass implements PlayerClass {
 	
 	@Override
 	public Map<String, List<SetApplier>> getDefault() {
-		return def;
+		return def.entrySet().stream().collect(Collectors.toMap(entry -> entry.getKey(), entry -> new ArrayList<>(entry.getValue())));
 	}
 
 	@Override
 	public PlayerClass replicate() {
-		return new DefaultClass(def, respawnAction);
+		return new DefaultClass(getDefault(), respawnAction);
 	}
 
 }
