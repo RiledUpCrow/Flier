@@ -29,5 +29,8 @@ default:
   bonuses:                             # list of Bonuses in this Game
   - money
   - fix
+  effects:                             # list of Effects in this Game
+  - click
+  - shoot
   center: 100;200;300;world            # center of the map, **EDIT THIS BEFORE USING!**
   radius: 1000                         # the radius defining map borders

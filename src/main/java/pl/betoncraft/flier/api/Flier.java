@@ -15,6 +15,7 @@ import org.bukkit.plugin.Plugin;
 import pl.betoncraft.flier.api.content.Action;
 import pl.betoncraft.flier.api.content.Activator;
 import pl.betoncraft.flier.api.content.Bonus;
+import pl.betoncraft.flier.api.content.Effect;
 import pl.betoncraft.flier.api.content.Engine;
 import pl.betoncraft.flier.api.content.Game;
 import pl.betoncraft.flier.api.content.Lobby;
@@ -124,6 +125,14 @@ public interface Flier extends Plugin {
 	public Modification getModification(String id) throws LoadingException;
 
 	/**
+	 * @param id ID of the Effect
+	 * @return the Effect with specified name, never null
+	 * @throws LoadingException
+	 *             when the Effect cannot be created due to an error, type is not defined or Effect is not defined
+	 */
+	public Effect getEffect(String id) throws LoadingException;
+
+	/**
 	 * Registers a new Engine type with specified name. The factory will be used
 	 * to obtain copies of the Engine.
 	 * 
@@ -199,6 +208,17 @@ public interface Flier extends Plugin {
 	 *            factory which creates instances of that type
 	 */
 	public void registerActivator(String name, Factory<Activator> factory);
+
+	/**
+	 * Registers a new Effect type with specified name. The factory will be used
+	 * to obtain copies of the Effect.
+	 * 
+	 * @param name
+	 *            name of the type
+	 * @param factory
+	 *            factory which creates instances of that type
+	 */
+	void registerEffect(String name, Factory<Effect> factory);
 
 	/**
 	 * Factory which creates instances of a type, using ConfigurationSections to

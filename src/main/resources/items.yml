@@ -15,6 +15,10 @@ balancedWeapon:
   slot: 0                                           # slot in which the item is placed
   ammo: 10                                          # ammunition in this item
   usages:                                           # list  of usages
+    click:                                          # empty activator for "click" effect (see effects.yml)
+      where: air
+      activators:
+      - left
     shoot:                                          # one of the usages
       where: air                                    # where it can be used
       cooldown: 30                                  # cooldown after this usage
@@ -39,6 +43,10 @@ strongWeapon:
   slot: 0
   ammo: 15
   usages:
+    click:
+      where: air
+      activators:
+      - left
     shoot:
       where: air
       cooldown: 40
@@ -62,6 +70,10 @@ fastWeapon:
   slot: 0
   ammo: 5
   usages:
+    click:
+      where: air
+      activators:
+      - left
     shoot:
       where: air
       cooldown: 20
@@ -76,6 +88,10 @@ fastWeapon:
       ammo_use: -5
       activators:
       - right
+    click:
+      where: air
+      activators:
+      - left
 gun:
   material: torch
   name: '&4Gun'
@@ -85,6 +101,10 @@ gun:
   slot: 2
   ammo: 10
   usages:
+    click:
+      where: no air
+      activators:
+      - left
     shoot:
       where: no air
       cooldown: 5

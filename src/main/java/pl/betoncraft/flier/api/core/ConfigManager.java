@@ -61,6 +61,11 @@ public interface ConfigManager {
 	public FileConfiguration getModifications();
 
 	/**
+	 * @return the effects.yml configuration
+	 */
+	public FileConfiguration getEffects();
+
+	/**
 	 * Saves the lobbies.yml file.
 	 */
 	public void saveLobbies();
@@ -104,5 +109,10 @@ public interface ConfigManager {
 	 * Saves the modifications.yml file.
 	 */
 	public void saveModifications();
+	
+	/**
+	 * Saves the effects.yml file.
+	 */
+	public void saveEffects();
 
 }

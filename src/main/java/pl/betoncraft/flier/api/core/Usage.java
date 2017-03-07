@@ -26,6 +26,11 @@ public interface Usage {
 	enum Where {
 		GROUND, AIR, FALL, NO_GROUND, NO_AIR, NO_FALL, EVERYWHERE
 	}
+	
+	/**
+	 * @return the ID of this Usage
+	 */
+	public String getID();
 
 	/**
 	 * @return the list of Activators in this Usage

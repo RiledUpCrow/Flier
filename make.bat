@@ -44,6 +44,7 @@ pandoc^
  docs\Activator.md^
  docs\Bonus.md^
  docs\Modifications.md^
+ docs\Effects.md^
  -f markdown_github -t html5^
  -V margin-top=2cm -V margin-bottom=2cm -V margin-left=2cm -V margin-right=2cm^
  --css style.css^

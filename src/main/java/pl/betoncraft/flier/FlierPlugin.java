@@ -37,6 +37,7 @@ import pl.betoncraft.flier.api.Flier;
 import pl.betoncraft.flier.api.content.Action;
 import pl.betoncraft.flier.api.content.Activator;
 import pl.betoncraft.flier.api.content.Bonus;
+import pl.betoncraft.flier.api.content.Effect;
 import pl.betoncraft.flier.api.content.Engine;
 import pl.betoncraft.flier.api.content.Game;
 import pl.betoncraft.flier.api.content.Lobby;
@@ -49,6 +50,7 @@ import pl.betoncraft.flier.bonus.EntityBonus;
 import pl.betoncraft.flier.command.FlierCommand;
 import pl.betoncraft.flier.core.DefaultModification;
 import pl.betoncraft.flier.core.DefaultUsableItem;
+import pl.betoncraft.flier.effect.SoundEffect;
 import pl.betoncraft.flier.engine.MultiplyingEngine;
 import pl.betoncraft.flier.game.TeamDeathMatch;
 import pl.betoncraft.flier.lobby.PhysicalLobby;
@@ -68,6 +70,7 @@ public class FlierPlugin extends JavaPlugin implements Flier {
 	private Map<String, Factory<Bonus>> bonusTypes = new HashMap<>();
 	private Map<String, Factory<Action>> actionTypes = new HashMap<>();
 	private Map<String, Factory<Activator>> activatorTypes = new HashMap<>();
+	private Map<String, Factory<Effect>> effectTypes = new HashMap<>();
 	
 	private Map<String, Lobby> lobbies = new HashMap<>();
 
@@ -97,6 +100,7 @@ public class FlierPlugin extends JavaPlugin implements Flier {
 		registerActivator("rightClick", s -> new RightClickActivator(s));
 		registerActivator("slowTick", s -> new SlowTickActivator(s));
 		registerActivator("wingsHealth", s -> new WingsHealthActivator(s));
+		registerEffect("sound", s -> new SoundEffect(s));
 
 		// load stuff
 		reload();
@@ -217,6 +221,11 @@ public class FlierPlugin extends JavaPlugin implements Flier {
 			throw (LoadingException) new LoadingException(String.format("Error in '%s' modification.", id)).initCause(e);
 		}
 	}
+	
+	@Override
+	public Effect getEffect(String id) throws LoadingException {
+		return getObject(id, "effect", configManager.getEffects(), effectTypes);
+	}
 
 	private <T> T getObject(String id, String name, ConfigurationSection section, Map<String, Factory<T>> factories)
 			throws LoadingException {
@@ -270,6 +279,11 @@ public class FlierPlugin extends JavaPlugin implements Flier {
 	@Override
 	public void registerActivator(String name, Factory<Activator> factory) {
 		activatorTypes.put(name, factory);
+	}
+	
+	@Override
+	public void registerEffect(String name, Factory<Effect> factory) {
+		effectTypes.put(name, factory);
 	}
 
 }

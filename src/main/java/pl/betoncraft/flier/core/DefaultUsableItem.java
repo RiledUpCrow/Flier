@@ -9,6 +9,7 @@ package pl.betoncraft.flier.core;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 
 import pl.betoncraft.flier.api.content.Action;
@@ -21,6 +22,7 @@ import pl.betoncraft.flier.api.core.Modification.ModificationTarget;
 import pl.betoncraft.flier.api.core.UsableItem;
 import pl.betoncraft.flier.api.core.Usage;
 import pl.betoncraft.flier.core.defaults.DefaultItem;
+import pl.betoncraft.flier.event.FlierUseEvent;
 
 /**
  * Default implementation of UsableItem.
@@ -129,10 +131,18 @@ public class DefaultUsableItem extends DefaultItem implements UsableItem {
 						continue usages;
 					}
 				}
+				FlierUseEvent event = new FlierUseEvent(player, this, usage);
+				Bukkit.getPluginManager().callEvent(event);
+				if (event.isCancelled()) {
+					continue;
+				}
 				used = true;
-				time = usage.getCooldown();
+				int cooldown = usage.getCooldown();;
+				if (time < cooldown) {
+					time = cooldown;
+					whole = time;
+				}
 				setAmmo(ammo - usage.getAmmoUse());
-				whole = time;
 				for (Action action : usage.getActions()) {
 					action.act(player);
 				}

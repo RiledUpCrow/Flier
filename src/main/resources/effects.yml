@@ -1,0 +1,14 @@
+click:
+  type: sound                                       # type of the Effect
+  event_type: use                                   # type of the event, which will fire this effect
+  matchers:                                         # list of matchers the event must match
+    usage: click                                    # name of the required usage
+    ammo: 0                                         # ammunition must be empty
+  sound: block anvil place                          # sound to play (because this is a sound effect)
+shoot:
+  type: sound
+  event_type: use
+  matchers:
+    usage: shoot
+    ammo: '>(0)'                                    # (ammunition must not be empty)
+  sound: entity blaze shoot

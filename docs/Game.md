@@ -8,6 +8,9 @@ game_name:
   bonuses:
   - some_bonus
   - other_bonus
+  effects:
+  - some_effect
+  - other_effect
   height_limit: 0
   height_damage: 1
   money:
@@ -30,6 +33,7 @@ These settings apply to every game. Some of them have default values, so if you 
 
 * `type` (**required**) type of the game. The value used here will determine what additional settings are available. Types are listed below.
 * `bonuses` list of bonuses available in the game. You don't have to specify this if you don't want any bonuses.
+* `effects` list of effects available in this game. You don't have to specify this if you don't want any effects.
 * `height_limit` (**default: 0**) a height at which players will receive suffocation damage (kind of simulating low air pressure). If it's 0 or lower, it doesn't apply.
 * `height_damage` (**default: 1**) the amount of suffocation damage per second. It can use fractions.
 * `money` settings responsible for money in the game. If you don't want to use this system you can simply omit this section.

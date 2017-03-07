@@ -43,10 +43,10 @@ import pl.betoncraft.flier.api.content.Bonus;
 import pl.betoncraft.flier.api.content.Game;
 import pl.betoncraft.flier.api.content.Wings;
 import pl.betoncraft.flier.api.core.Damager;
+import pl.betoncraft.flier.api.core.Damager.DamageResult;
 import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.LoadingException;
 import pl.betoncraft.flier.api.core.Usage;
-import pl.betoncraft.flier.api.core.Damager.DamageResult;
 import pl.betoncraft.flier.sidebar.Altitude;
 import pl.betoncraft.flier.sidebar.Ammo;
 import pl.betoncraft.flier.sidebar.Fuel;
@@ -54,6 +54,7 @@ import pl.betoncraft.flier.sidebar.Health;
 import pl.betoncraft.flier.sidebar.Money;
 import pl.betoncraft.flier.sidebar.Reload;
 import pl.betoncraft.flier.sidebar.Speed;
+import pl.betoncraft.flier.util.EffectListener;
 import pl.betoncraft.flier.util.Position;
 import pl.betoncraft.flier.util.Utils;
 import pl.betoncraft.flier.util.ValueLoader;
@@ -70,6 +71,7 @@ public abstract class DefaultGame implements Listener, Game {
 	protected GameHeartBeat heartBeat;
 	protected Map<UUID, InGamePlayer> dataMap = new HashMap<>();
 	protected List<Bonus> bonuses = new ArrayList<>();
+	protected EffectListener listener;
 	
 	protected int heightLimit;
 	protected double heightDamage;
@@ -98,6 +100,7 @@ public abstract class DefaultGame implements Listener, Game {
 						.initCause(e);
 			}
 		}
+		listener = new EffectListener(section.getStringList("effects"), this);
 		heightLimit = loader.loadInt("height_limit", 512);
 		heightDamage = loader.loadNonNegativeDouble("height_damage", 0.5);
 		center = loader.loadLocation("center");
