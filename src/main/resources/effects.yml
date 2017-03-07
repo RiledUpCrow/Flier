@@ -5,6 +5,8 @@ click:
     usage: click                                    # name of the required usage
     ammo: 0                                         # ammunition must be empty
   sound: block anvil place                          # sound to play (because this is a sound effect)
+  volume: 0.25                                      # volume of the sound
+  pitch: 1.5                                        # pitch of the sound
 shoot:
   type: sound
   event_type: use
@@ -12,3 +14,18 @@ shoot:
     usage: shoot
     ammo: '>(0)'                                    # (ammunition must not be empty)
   sound: entity blaze shoot
+  volume: 0.25
+hit:
+  type: sound
+  event_type: hit
+  matchers:
+    hit: true
+    self_hit: false
+  sound: block dispenser dispense
+get_hit:
+  type: sound
+  event_type: get hit
+  matchers:
+    hit: true
+    self_hit: false
+  sound: entity villager hurt

@@ -32,5 +32,7 @@ default:
   effects:                             # list of Effects in this Game
   - click
   - shoot
+  - hit
+  - get_hit
   center: 100;200;300;world            # center of the map, **EDIT THIS BEFORE USING!**
   radius: 1000                         # the radius defining map borders

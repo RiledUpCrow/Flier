@@ -47,6 +47,7 @@ import pl.betoncraft.flier.api.core.Damager.DamageResult;
 import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.LoadingException;
 import pl.betoncraft.flier.api.core.Usage;
+import pl.betoncraft.flier.event.FlierHitPlayerEvent;
 import pl.betoncraft.flier.sidebar.Altitude;
 import pl.betoncraft.flier.sidebar.Ammo;
 import pl.betoncraft.flier.sidebar.Fuel;
@@ -335,8 +336,15 @@ public abstract class DefaultGame implements Listener, Game {
 		}
 		// weapon was used on in-game player, process the attack
 		List<DamageResult> result = damage(player, weapon.getAttacker(), weapon.getDamager());
-		handleHit(result, weapon.getAttacker(), player, weapon.getDamager());
 		InGamePlayer shooter = weapon.getAttacker();
+		// fire an event
+		FlierHitPlayerEvent hitEvent = new FlierHitPlayerEvent(shooter, player, result, weapon.getDamager());
+		Bukkit.getPluginManager().callEvent(hitEvent);
+		if (hitEvent.isCancelled()) {
+			return;
+		}
+		// handle the hit
+		handleHit(result, weapon.getAttacker(), player, weapon.getDamager());
 		// handle a general hit
 		if (result.contains(DamageResult.HIT) && shooter != null) {
 			// pay money for a hit
@@ -351,10 +359,7 @@ public abstract class DefaultGame implements Listener, Game {
 			// display a message about the hit and play the sound to the shooter if he exists and if he hit someone else
 			if (shooter != null && !shooter.equals(player)) {
 				shooter.getPlayer().sendMessage(ChatColor.YELLOW + "You managed to hit " + Utils.formatPlayer(player) + "!");
-				shooter.getPlayer().playSound(shooter.getPlayer().getLocation(), Sound.BLOCK_DISPENSER_DISPENSE, 1, 1);
 			}
-			// play being hit sound to the victim
-			player.getPlayer().playSound(player.getPlayer().getLocation(), Sound.ENTITY_VILLAGER_HURT, 1, 1);
 		}
 		// handle physical damage
 		if (result.contains(DamageResult.REGULAR_DAMAGE)) {
