@@ -9,24 +9,23 @@ package pl.betoncraft.flier.effect;
 import org.bukkit.Sound;
 import org.bukkit.configuration.ConfigurationSection;
 
-import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.LoadingException;
 import pl.betoncraft.flier.core.defaults.DefaultEffect;
 
 /**
- * Plays a sound to a single player.
+ * Plays a sound.
  *
  * @author Jakub Sapalski
  */
-public class SoundEffect extends DefaultEffect {
+public abstract class SoundEffect extends DefaultEffect {
 
 	private static final String SOUND = "sound";
 	private static final String VOLUME = "volume";
 	private static final String PITCH = "pitch";
 	
-	private Sound sound;
-	private float volume;
-	private float pitch;
+	protected Sound sound;
+	protected float volume;
+	protected float pitch;
 
 	public SoundEffect(ConfigurationSection section) throws LoadingException {
 		super(section);
@@ -34,11 +33,6 @@ public class SoundEffect extends DefaultEffect {
 		sound = loader.loadEnum(SOUND, Sound.class);
 		volume = (float) loader.loadPositiveDouble(VOLUME, 1.0);
 		pitch = (float) loader.loadPositiveDouble(PITCH, 1.0);
-	}
-
-	@Override
-	public void fire(InGamePlayer player) {
-		player.getPlayer().playSound(player.getPlayer().getLocation(), sound, volume, pitch);
 	}
 
 }

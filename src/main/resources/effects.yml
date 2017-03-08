@@ -1,5 +1,5 @@
 click:
-  type: sound                                       # type of the Effect
+  type: privateSound                                # type of the Effect
   event_type: use                                   # type of the event, which will fire this effect
   matchers:                                         # list of matchers the event must match
     usage: click                                    # name of the required usage
@@ -8,7 +8,7 @@ click:
   volume: 0.25                                      # volume of the sound
   pitch: 1.5                                        # pitch of the sound
 shoot:
-  type: sound
+  type: publicSound
   event_type: use
   matchers:
     usage: shoot
@@ -16,14 +16,14 @@ shoot:
   sound: entity blaze shoot
   volume: 0.25
 hit:
-  type: sound
+  type: privateSound
   event_type: hit
   matchers:
     hit: true
     self_hit: false
   sound: block dispenser dispense
 get_hit:
-  type: sound
+  type: publicSound
   event_type: get hit
   matchers:
     hit: true

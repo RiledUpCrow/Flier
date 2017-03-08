@@ -50,7 +50,9 @@ import pl.betoncraft.flier.bonus.EntityBonus;
 import pl.betoncraft.flier.command.FlierCommand;
 import pl.betoncraft.flier.core.DefaultModification;
 import pl.betoncraft.flier.core.DefaultUsableItem;
-import pl.betoncraft.flier.effect.SoundEffect;
+import pl.betoncraft.flier.effect.GameSoundEffect;
+import pl.betoncraft.flier.effect.PrivateSoundEffect;
+import pl.betoncraft.flier.effect.PublicSoundEffect;
 import pl.betoncraft.flier.engine.MultiplyingEngine;
 import pl.betoncraft.flier.game.TeamDeathMatch;
 import pl.betoncraft.flier.lobby.PhysicalLobby;
@@ -100,7 +102,9 @@ public class FlierPlugin extends JavaPlugin implements Flier {
 		registerActivator("rightClick", s -> new RightClickActivator(s));
 		registerActivator("slowTick", s -> new SlowTickActivator(s));
 		registerActivator("wingsHealth", s -> new WingsHealthActivator(s));
-		registerEffect("sound", s -> new SoundEffect(s));
+		registerEffect("publicSound", s -> new PublicSoundEffect(s));
+		registerEffect("privateSound", s -> new PrivateSoundEffect(s));
+		registerEffect("gameSound", s -> new GameSoundEffect(s));
 
 		// load stuff
 		reload();

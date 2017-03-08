@@ -47,22 +47,34 @@ All are self-explanatory except for range. It has a special syntax (`>(10)`), wh
 
 ## Sound effect
 
-**`sound`** (player effect)
+All sound effects play a sound, but to a different targets. These settings are available in all of them:
 
-This effect will play a sound to a single player. You can control the volume and pitch.
+* `sound` (**required**) is the type of [the sound](https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Sound.html).
+* `volume` (**default: 1**) is the volume of the sound.
+* `pitch` (**default: 1**) is the pitch of the sound.
 
 ```
 effect_name
-  type: sound
+  type: [type]
   [event settings]
   sound: [sound type]
   volume: [positive decimal ]
   pitch: [positive decimal]
 ```
 
-* `sound` (**required**) is the type of [the sound](https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Sound.html).
-* `volume` (**default: 1**) is the volume of the sound.
-* `pitch` (**default: 1**) is the pitch of the sound.
+### Types:
+
+**`privateSound`** (player effect)
+
+This effect will play a sound only to this player.
+
+**`publicSound`** (player effect)
+
+This effect will play a sound at this player's location to everyone else who can hear it.
+
+**`gameSound`** (player effect)
+
+This effect will play a sound to every player in the Game at their locations.
 
 # Event types
 
