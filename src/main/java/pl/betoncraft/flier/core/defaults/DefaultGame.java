@@ -28,6 +28,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.ExplosionPrimeEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -47,7 +48,9 @@ import pl.betoncraft.flier.api.core.Damager.DamageResult;
 import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.LoadingException;
 import pl.betoncraft.flier.api.core.Usage;
-import pl.betoncraft.flier.event.FlierHitPlayerEvent;
+import pl.betoncraft.flier.event.FlierPlayerHitEvent;
+import pl.betoncraft.flier.event.FlierPlayerKillEvent;
+import pl.betoncraft.flier.event.FlierPlayerKillEvent.Type;
 import pl.betoncraft.flier.sidebar.Altitude;
 import pl.betoncraft.flier.sidebar.Ammo;
 import pl.betoncraft.flier.sidebar.Fuel;
@@ -334,7 +337,7 @@ public abstract class DefaultGame implements Listener, Game {
 		List<DamageResult> result = damage(player, weapon.getAttacker(), weapon.getDamager());
 		InGamePlayer shooter = weapon.getAttacker();
 		// fire an event
-		FlierHitPlayerEvent hitEvent = new FlierHitPlayerEvent(shooter, player, result, weapon.getDamager());
+		FlierPlayerHitEvent hitEvent = new FlierPlayerHitEvent(shooter, player, result, weapon.getDamager());
 		Bukkit.getPluginManager().callEvent(hitEvent);
 		if (hitEvent.isCancelled()) {
 			return;
@@ -411,12 +414,8 @@ public abstract class DefaultGame implements Listener, Game {
 		InGamePlayer killed = getPlayers().get(event.getEntity().getUniqueId());
 		if (killed != null && killed.getPlayer().getHealth() - event.getFinalDamage() <= 0) {
 			event.setCancelled(true);
-			Utils.clearPlayer(killed.getPlayer());
-			killed.setPlaying(false);
 			InGamePlayer lastHit = killed.getAttacker();
 			InGamePlayer killer = lastHit == null ? null : getPlayers().get(lastHit.getPlayer().getUniqueId());
-			killed.setAttacker(null);
-			killed.getPlayer().setGlowing(false);
 			if (killer != null && !killer.equals(killed)) {
 				switch (event.getCause()) {
 				case FALL:
@@ -428,6 +427,10 @@ public abstract class DefaultGame implements Listener, Game {
 							Utils.formatPlayer(killed), Utils.formatPlayer(killer)));
 					break;
 				}
+				// fire an event
+				FlierPlayerKillEvent deathEvent = new FlierPlayerKillEvent(killer, killed,
+						event.getCause() == DamageCause.FALL ? Type.SHOT_DOWN : Type.KILLED);
+				Bukkit.getPluginManager().callEvent(deathEvent);
 				handleKill(killer, killed);
 				Attitude a = getAttitude(killer, killed);
 				if (a == Attitude.FRIENDLY) {
@@ -439,9 +442,16 @@ public abstract class DefaultGame implements Listener, Game {
 				}
 			} else {
 				notifyAllPlayers(String.format("%s commited suicide...", Utils.formatPlayer(killed)));
+				// fire an event
+				FlierPlayerKillEvent deathEvent = new FlierPlayerKillEvent(killed, killed,
+						event.getCause() == DamageCause.FALL ? Type.SHOT_DOWN : Type.KILLED);
+				Bukkit.getPluginManager().callEvent(deathEvent);
 				handleKill(null, killed);
 				pay(killed, suicideMoney);
 			}
+			Utils.clearPlayer(killed.getPlayer());
+			killed.setPlaying(false);
+			killed.setAttacker(null);
 			afterRespawn(killed);
 		}
 	}

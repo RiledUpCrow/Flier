@@ -21,7 +21,7 @@ import pl.betoncraft.flier.core.MatchingTwoPlayersEvent;
  *
  * @author Jakub Sapalski
  */
-public class FlierHitPlayerEvent extends MatchingTwoPlayersEvent implements Cancellable {
+public class FlierPlayerHitEvent extends MatchingTwoPlayersEvent implements Cancellable {
 	
 	private static final List<DamageResult> all = Arrays.asList(DamageResult.values());
 
@@ -34,7 +34,7 @@ public class FlierHitPlayerEvent extends MatchingTwoPlayersEvent implements Canc
 	 * 
 	 * @param player
 	 */
-	public FlierHitPlayerEvent(InGamePlayer player, InGamePlayer target, List<DamageResult> results, Damager damager) {
+	public FlierPlayerHitEvent(InGamePlayer player, InGamePlayer target, List<DamageResult> results, Damager damager) {
 		super(player, target, "target_", "shooter_");
 		this.result = results;
 		this.damager = damager;
@@ -42,7 +42,6 @@ public class FlierHitPlayerEvent extends MatchingTwoPlayersEvent implements Canc
 		for (DamageResult result : all) {
 			setBool(result.toString().toLowerCase(), results.contains(result));
 		}
-		setString("attitude", player.getLobby().getGame().getAttitude(player, target).toString());
 		setNumber("damage_to_wings", damager.getDamage());
 		setNumber("damage_to_health", damager.getPhysical());
 	}

@@ -20,9 +20,9 @@ import pl.betoncraft.flier.api.core.InGamePlayer;
  * @author Jakub Sapalski
  */
 public class MatchingTwoPlayersEvent extends MatchingPlayerEvent {
-	
+
 	protected static final Set<String> playerMatchers = Sets.newHashSet(CLASS, COLOR, MONEY, ENGINE, FUEL, FUEL_RATIO,
-			WINGS, WINGS_HEALTH, WINGS_HEALTH_RATIO); 
+			WINGS, WINGS_HEALTH, WINGS_HEALTH_RATIO);
 
 	protected InGamePlayer other;
 	protected String otherPrefix;
@@ -59,6 +59,7 @@ public class MatchingTwoPlayersEvent extends MatchingPlayerEvent {
 		this.otherPrefix = otherPrefix;
 		this.playerPrefix = playerPrefix;
 		parsePlayer(other, otherPrefix);
+		setString("attitude", player.getLobby().getGame().getAttitude(player, other).toString());
 	}
 
 	/**
@@ -76,6 +77,10 @@ public class MatchingTwoPlayersEvent extends MatchingPlayerEvent {
 		return switched;
 	}
 
+	/**
+	 * @return the main player involved in this event; use {@link #isSwitched()}
+	 *         to ensure that you're getting what you want
+	 */
 	@Override
 	public InGamePlayer getPlayer() {
 		if (switched) {

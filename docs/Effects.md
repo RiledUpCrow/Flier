@@ -78,7 +78,11 @@ Every player event has available these matchers:
 * `wings_health` _(number)_ the amount of health of wings
 * `wings_health_ratio` _(number)_ the ratio wings_health/max as a number between 0 and 1
 
-If the event involves another player (like `hit` event - the shooter is main player, the victim is another player), these settings are also available for them, with a prefix specified by the event type. Non-player events don't have any additional matchers.
+If the event involves another player (like `hit` event - the shooter is main player, the victim is another player), these matchers are also available for them, with a prefix specified by the event type. There's also a special matcher:
+
+* `attitude` _(text)_ the attitude between the two players. Available values are: `friendly`, `neutral` and `hostile`.
+
+Non-player events don't have any additional matchers.
 
 ## Use event
 
@@ -97,7 +101,6 @@ This event fires whenever some player uses an item with a usage.
 
 This event fires when one player hits another one with a weapon. Effects will be fired for the shooter. Matchers for the player who got hit are prefixed with `target_`, for example `target_class`.
 
-* `attitude` _(text)_ the attitude between the two players. Available values are: `friendly`, `neutral` and `hostile`.
 * `hit` _(true/false)_ whenever the hit actually happened (hits when falling don't happen)
 * `wings_off` _(true/false)_ whenever the hit causes the wings to fall of
 * `wings_damage` _(true/false)_ whenever the hit causes any wings damage
@@ -111,4 +114,22 @@ This event fires when one player hits another one with a weapon. Effects will be
 
 This event fires when one player gets hit by another one with a weapon. Effects will be fired for the victim. Matchers for the player who fired the weapon are prefixed with `shooter_`, for example `shooter_money`.
 
-All other matchers like `attitude` and `damage_to_health` are exactly the same as in `hit` event described above.
+All other matchers like `wings_off` and `damage_to_health` are exactly the same as in `hit` event described above.
+
+## Kill event
+
+**`kill`** (two players event, second player has `killed_` prefix)
+
+This event fires when the main player kills the other one. Effects will be fired for the killer. Matches for the player who was killed are prefixed with `killed_`, for example `killed_engine`. The killer and killed are the same player in case of a suicide.
+
+* `suicide` _(true/false)_ whenever this event was fired for a suicide
+* `shot_down` _(true/false)_ whenever the player died because of falling from the sky
+* `killed` _(true/false)_ whenever the player was killed on the ground (not by falling)
+
+## Killed event
+
+**`killed`** (two players event, second player has `killer_` prefix)
+
+This event fires when the main player is killed by the other one. Effects will be fired for the killed. Matches for the player who killed are prefixed with `killer_`, for example `killer_wings`. The killer and killed are the same player in case of a suicide.
+
+All other matches like  `suicide` and `shot_down` are exactly the same as in `kill` event described above.
