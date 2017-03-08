@@ -29,3 +29,15 @@ get_hit:
     hit: true
     self_hit: false
   sound: entity villager hurt
+explode_particle:
+  type: particle
+  event_type: killed
+  particle: explosion huge
+  amount: 3
+  offset: 1.5
+explode_sound:
+  type: publicSound
+  event_type: killed
+  sound: entity generic explode
+  volume: 4
+  pitch: 1.5

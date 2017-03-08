@@ -51,6 +51,7 @@ import pl.betoncraft.flier.command.FlierCommand;
 import pl.betoncraft.flier.core.DefaultModification;
 import pl.betoncraft.flier.core.DefaultUsableItem;
 import pl.betoncraft.flier.effect.GameSoundEffect;
+import pl.betoncraft.flier.effect.ParticleEffect;
 import pl.betoncraft.flier.effect.PrivateSoundEffect;
 import pl.betoncraft.flier.effect.PublicSoundEffect;
 import pl.betoncraft.flier.engine.MultiplyingEngine;
@@ -105,6 +106,7 @@ public class FlierPlugin extends JavaPlugin implements Flier {
 		registerEffect("publicSound", s -> new PublicSoundEffect(s));
 		registerEffect("privateSound", s -> new PrivateSoundEffect(s));
 		registerEffect("gameSound", s -> new GameSoundEffect(s));
+		registerEffect("particle", s -> new ParticleEffect(s));
 
 		// load stuff
 		reload();

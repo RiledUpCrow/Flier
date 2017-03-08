@@ -34,5 +34,7 @@ default:
   - shoot
   - hit
   - get_hit
+  - explode_particle
+  - explode_sound
   center: 100;200;300;world            # center of the map, **EDIT THIS BEFORE USING!**
   radius: 1000                         # the radius defining map borders

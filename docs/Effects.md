@@ -76,6 +76,25 @@ This effect will play a sound at this player's location to everyone else who can
 
 This effect will play a sound to every player in the Game at their locations.
 
+## Particle effect
+
+**`particle`**
+
+This effect spawns a particle at player's location.
+
+* `particle` (**required**) is the type of [the particle](https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Particle.html).
+* `amount` (**default: 1**) is the amount of particles.
+* `offset` (**default: 0**) is distance from the player in which the particles will spawn randomly. If it's 0 the particles will appear exactly at the player's location.
+
+```
+effect_name:
+  type: particle
+  [event settings]
+  particle: [particle type]
+  amount: [positive integer]
+  offset: [non-negative decimal]
+```
+
 # Event types
 
 Every player event has available these matchers:
