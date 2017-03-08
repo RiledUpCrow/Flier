@@ -112,10 +112,6 @@ public class DefaultClass implements PlayerClass {
 					break;
 				}
 			}));
-			// refill all items
-			engine.refill();
-			wings.refill();
-			items.forEach(item -> item.refill());
 		}
 		
 		public Engine getEngine() {
@@ -257,6 +253,14 @@ public class DefaultClass implements PlayerClass {
 			break;
 		case NOTHING: // nothing
 		}
+		refill();
+	}
+	
+	@Override
+	public void refill() {
+		compiled.engine.refill();
+		compiled.wings.refill();
+		compiled.items.forEach(item -> item.refill());
 	}
 	
 	@Override

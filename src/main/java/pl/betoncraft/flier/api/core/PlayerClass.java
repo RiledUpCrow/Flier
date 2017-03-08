@@ -27,7 +27,7 @@ public interface PlayerClass {
 	public enum RespawnAction {
 		CLEAR, COMBINE, NOTHING,
 	}
-	
+
 	public enum AddResult {
 		ADDED, REMOVED, ALREADY_MAXED, ALREADY_EMPTIED, FILLED, REPLACED, SKIPPED
 	}
@@ -88,6 +88,12 @@ public interface PlayerClass {
 	public void onRespawn();
 
 	/**
+	 * Refills the current items to their default inner values (like fuel an
+	 * ammunition).
+	 */
+	public void refill();
+
+	/**
 	 * Resets the class to default values.
 	 */
 	public void reset();
@@ -110,8 +116,8 @@ public interface PlayerClass {
 	public AddResult addCurrent(SetApplier set);
 
 	/**
-	 * Returns a map of stored SetAppliers, where the key is a category, for easier
-	 * browsing.
+	 * Returns a map of stored SetAppliers, where the key is a category, for
+	 * easier browsing.
 	 * 
 	 * @return the map of stored ItemSets
 	 */
