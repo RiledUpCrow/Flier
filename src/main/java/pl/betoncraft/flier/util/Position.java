@@ -6,6 +6,7 @@
  */
 package pl.betoncraft.flier.util;
 
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
 import pl.betoncraft.flier.api.core.Usage;
@@ -16,10 +17,12 @@ import pl.betoncraft.flier.api.core.Usage;
  * @author Jakub Sapalski
  */
 public class Position {
+	
+	private static final int AIR = 2;
 
 	public static boolean check(Player player, Usage.Where position) {
-		boolean air = player.getPlayer().isGliding();
-		boolean ground = !air && Utils.getAltitude(player.getPlayer().getLocation(), 4) < 4;
+		boolean ground = ((Entity) player.getPlayer()).isOnGround();
+		boolean air = !ground && player.getPlayer().isGliding() && Utils.getAltitude(player.getPlayer().getLocation(), AIR) == AIR;
 		boolean fall = !ground && !air;
 		switch (position) {
 		case GROUND:	 return ground;
@@ -34,12 +37,12 @@ public class Position {
 	}
 	
 	public static Usage.Where get(Player player) {
-		boolean air = player.getPlayer().isGliding();
-		boolean ground = !air && Utils.getAltitude(player.getPlayer().getLocation(), 4) < 4;
-		if (air) {
-			return Usage.Where.AIR;
-		} else if (ground) {
+		boolean ground = ((Entity) player.getPlayer()).isOnGround();
+		boolean air = !ground && player.getPlayer().isGliding() && Utils.getAltitude(player.getPlayer().getLocation(), AIR) == AIR;
+		if (ground) {
 			return Usage.Where.GROUND;
+		} else if (air) {
+			return Usage.Where.AIR;
 		} else {
 			return Usage.Where.FALL;
 		}
