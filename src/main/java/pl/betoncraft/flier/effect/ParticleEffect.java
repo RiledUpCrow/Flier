@@ -23,22 +23,25 @@ public class ParticleEffect extends DefaultEffect {
 	private static final String PARTICLE = "particle";
 	private static final String AMOUNT = "amount";
 	private static final String OFFSET = "offset";
+	private static final String SPEED = "speed";
 	
 	private Particle particle;
 	private int amount;
 	private float offset;
+	private double speed;
 
 	public ParticleEffect(ConfigurationSection section) throws LoadingException {
 		super(section);
 		playerOnly();
 		particle = loader.loadEnum(PARTICLE, Particle.class);
-		amount = loader.loadPositiveInt(AMOUNT, 1);
+		amount = loader.loadNonNegativeInt(AMOUNT, 0);
 		offset = (float) loader.loadNonNegativeDouble(OFFSET, 0.0);
+		speed = loader.loadNonNegativeDouble(SPEED, 0.0);
 	}
 
 	@Override
 	public void fire(InGamePlayer player) {
-		player.getPlayer().getWorld().spawnParticle(particle, player.getPlayer().getLocation(), amount, offset, offset, offset);
+		player.getPlayer().getWorld().spawnParticle(particle, player.getPlayer().getLocation(), amount, offset, offset, offset, speed);
 	}
 
 }
