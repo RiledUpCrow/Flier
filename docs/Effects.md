@@ -164,3 +164,9 @@ This event fires when the main player kills the other one. Effects will be fired
 This event fires when the main player is killed by the other one. Effects will be fired for the killed. Matches for the player who killed are prefixed with `killer_`, for example `killer_wings`. The killer and killed are the same player in case of a suicide.
 
 All other matches like  `suicide` and `shot_down` are exactly the same as in `kill` event described above.
+
+## Engine use event
+
+**`engine`** (player event)
+
+This event fires every tick while the player is using the engine. It has no special matchers.

@@ -36,6 +36,7 @@ import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.PlayerClass;
 import pl.betoncraft.flier.api.core.SidebarLine;
 import pl.betoncraft.flier.api.core.UsableItem;
+import pl.betoncraft.flier.event.FlierEngineUseEvent;
 import pl.betoncraft.flier.util.PlayerBackup;
 import pl.betoncraft.flier.util.Utils;
 
@@ -319,6 +320,11 @@ public class DefaultPlayer implements InGamePlayer {
 			return;
 		}
 		if (!engine.removeFuel(engine.getConsumption())) {
+			return;
+		}
+		FlierEngineUseEvent event = new FlierEngineUseEvent(this);
+		Bukkit.getPluginManager().callEvent(event);
+		if (event.isCancelled()) {
 			return;
 		}
 		getPlayer().setVelocity(engine.launch(getPlayer().getVelocity(), getPlayer().getLocation().getDirection()));

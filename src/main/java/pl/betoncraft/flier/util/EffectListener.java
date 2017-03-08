@@ -24,6 +24,7 @@ import pl.betoncraft.flier.api.core.LoadingException;
 import pl.betoncraft.flier.api.core.Matcher;
 import pl.betoncraft.flier.core.MatchingEvent;
 import pl.betoncraft.flier.core.MatchingPlayerEvent;
+import pl.betoncraft.flier.event.FlierEngineUseEvent;
 import pl.betoncraft.flier.event.FlierPlayerHitEvent;
 import pl.betoncraft.flier.event.FlierPlayerKillEvent;
 import pl.betoncraft.flier.event.FlierUseEvent;
@@ -43,7 +44,8 @@ public class EffectListener implements Listener {
 		HIT(true),
 		GET_HIT(true),
 		KILL(true),
-		KILLED(true);
+		KILLED(true),
+		ENGINE(true);
 
 		private boolean player;
 
@@ -111,6 +113,11 @@ public class EffectListener implements Listener {
 		event.setSwitched(true);
 		fireEffects(EventType.KILLED, event);
 		event.setSwitched(org);
+	}
+	
+	@EventHandler(priority = EventPriority.MONITOR)
+	public void onEngine(FlierEngineUseEvent event) {
+		fireEffects(EventType.ENGINE, event);
 	}
 
 	/**

@@ -41,3 +41,12 @@ explode_sound:
   sound: entity generic explode
   volume: 4
   pitch: 1.5
+engine_smoke:
+  type: particle
+  event_type: engine
+  matchers:
+    wings_health_ratio: "<(0.5)"
+  particle: smoke large 
+  amount: 20
+  offset: 0.2
+  speed: 0.1
