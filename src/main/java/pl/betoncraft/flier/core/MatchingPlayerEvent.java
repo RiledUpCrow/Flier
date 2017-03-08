@@ -43,17 +43,17 @@ public class MatchingPlayerEvent extends MatchingEvent {
 	}
 	
 	protected void parsePlayer(InGamePlayer player, String prefix) {
-		strings.put(prefix + CLASS, player.getClazz().getName());
-		strings.put(prefix + COLOR, player.getColor().name());
-		numbers.put(prefix + MONEY, (double) player.getMoney());
+		setString(prefix + CLASS, player.getClazz().getName());
+		setString(prefix + COLOR, player.getColor().name());
+		setNumber(prefix + MONEY, (double) player.getMoney());
 		Engine engine = player.getClazz().getEngine();
-		strings.put(prefix + ENGINE, engine.getID());
-		numbers.put(prefix + FUEL, engine.getFuel());
-		numbers.put(prefix + FUEL_RATIO, engine.getFuel() / engine.getMaxFuel());
+		setString(prefix + ENGINE, engine.getID());
+		setNumber(prefix + FUEL, engine.getFuel());
+		setNumber(prefix + FUEL_RATIO, engine.getFuel() / engine.getMaxFuel());
 		Wings wings = player.getClazz().getWings();
-		strings.put(prefix + WINGS, wings.getID());
-		numbers.put(prefix + WINGS_HEALTH, wings.getHealth());
-		numbers.put(prefix + WINGS_HEALTH_RATIO, wings.getHealth() / wings.getMaxHealth());
+		setString(prefix + WINGS, wings.getID());
+		setNumber(prefix + WINGS_HEALTH, wings.getHealth());
+		setNumber(prefix + WINGS_HEALTH_RATIO, wings.getHealth() / wings.getMaxHealth());
 	}
 
 	/**

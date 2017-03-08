@@ -38,10 +38,10 @@ public class FlierUseEvent extends MatchingPlayerEvent implements Cancellable {
 		super(player);
 		this.item = item;
 		this.usage = usage;
-		strings.put("item", item.getID());
-		numbers.put("ammo", (double) item.getAmmo());
-		numbers.put("amount", (double) item.getAmount());
-		strings.put("usage", usage.getID());
+		setString("item", item.getID());
+		setNumber("ammo", (double) item.getAmmo());
+		setNumber("amount", (double) item.getAmount());
+		setString("usage", usage.getID());
 	}
 
 	/**

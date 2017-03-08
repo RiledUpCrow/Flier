@@ -38,13 +38,13 @@ public class FlierHitPlayerEvent extends MatchingTwoPlayersEvent implements Canc
 		super(player, target, "target_", "shooter_");
 		this.result = results;
 		this.damager = damager;
-		booleans.put("self_hit", player.equals(target));
+		setBool("self_hit", player.equals(target));
 		for (DamageResult result : all) {
-			booleans.put(result.toString().toLowerCase(), results.contains(result));
+			setBool(result.toString().toLowerCase(), results.contains(result));
 		}
-		strings.put("attitude", player.getLobby().getGame().getAttitude(player, target).toString());
-		numbers.put("damage_to_wings", damager.getDamage());
-		numbers.put("damage_to_health", damager.getPhysical());
+		setString("attitude", player.getLobby().getGame().getAttitude(player, target).toString());
+		setNumber("damage_to_wings", damager.getDamage());
+		setNumber("damage_to_health", damager.getPhysical());
 	}
 
 	/**

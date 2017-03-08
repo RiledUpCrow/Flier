@@ -7,6 +7,7 @@
 package pl.betoncraft.flier.core;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import pl.betoncraft.flier.api.core.Matcher;
 
@@ -28,7 +29,7 @@ public class DefaultMatcher implements Matcher {
 	public DefaultMatcher(String name, List<String> list) {
 		this.name = name;
 		type = Type.STRING;
-		this.list = list;
+		this.list = list.stream().map(s -> s.trim().toLowerCase().replace(' ', '_')).collect(Collectors.toList());
 	}
 	
 	public DefaultMatcher(String name, double number) {

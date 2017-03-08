@@ -23,14 +23,26 @@ public abstract class MatchingEvent extends Event {
 	
 	protected final Game game;
 
-	protected final Map<String, Double> numbers = new HashMap<>();
-	protected final Map<String, String> strings = new HashMap<>();
-	protected final Map<String, Boolean> booleans = new HashMap<>();
+	private final Map<String, Double> numbers = new HashMap<>();
+	private final Map<String, String> strings = new HashMap<>();
+	private final Map<String, Boolean> booleans = new HashMap<>();
 
 	private static HandlerList handlerList = new HandlerList();
 	
 	public MatchingEvent(Game game) {
 		this.game = game;
+	}
+	
+	protected void setNumber(String name, double number) {
+		numbers.put(name, number);
+	}
+	
+	protected void setString(String name, String string) {
+		strings.put(name, string.trim().toLowerCase().replace(' ', '_'));
+	}
+	
+	protected void setBool(String name, boolean bool) {
+		booleans.put(name, bool);
 	}
 
 	/**
