@@ -33,9 +33,9 @@ public class EffectAction extends DefaultAction {
 
 	public EffectAction(ConfigurationSection section) throws LoadingException {
 		super(section);
+		Flier flier = Flier.getInstance();
 		for (String actionName : section.getStringList("actions")) {
-			Action action = Flier.getInstance().getAction(actionName);
-			actions.add(action);
+			actions.add(flier.getAction(actionName));
 		}
 		duration = loader.loadPositiveInt(DURATION);
 	}

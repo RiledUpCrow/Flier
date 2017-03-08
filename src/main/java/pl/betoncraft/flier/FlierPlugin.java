@@ -142,7 +142,7 @@ public class FlierPlugin extends JavaPlugin implements Flier {
 				try {
 					lobbies.put(section, getObject(section, "lobby", lobbySection, lobbyTypes));
 				} catch (LoadingException e) {
-					getLogger().severe(String.format("Error while loading lobby '%s':", section));
+					getLogger().severe(String.format("There was an error during loading:", section));
 					getLogger().severe(String.format("    - %s", e.getMessage()));
 					Throwable cause = e.getCause();
 					while (cause != null) {
@@ -229,15 +229,14 @@ public class FlierPlugin extends JavaPlugin implements Flier {
 
 	private <T> T getObject(String id, String name, ConfigurationSection section, Map<String, Factory<T>> factories)
 			throws LoadingException {
-		name = Utils.capitalize(name);
 		ConfigurationSection config = section.getConfigurationSection(id);
 		if (config == null || config.getKeys(false).size() == 0) {
-			throw new LoadingException(String.format("%s with ID '%s' does not exist.", name, id));
+			throw new LoadingException(String.format("%s with ID '%s' does not exist.", Utils.capitalize(name), id));
 		}
 		String type = config.getString("type");
 		Factory<T> factory = factories.get(type);
 		if (factory == null) {
-			throw new LoadingException(String.format("%s type '%s' does not exist.", name, type));
+			throw new LoadingException(String.format("%s type '%s' does not exist.", Utils.capitalize(name), type));
 		}
 		try {
 			return factory.get(config);

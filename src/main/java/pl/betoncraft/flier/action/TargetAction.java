@@ -12,7 +12,6 @@ import pl.betoncraft.flier.api.content.Game.Attitude;
 import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.LoadingException;
 import pl.betoncraft.flier.core.defaults.DefaultAction;
-import pl.betoncraft.flier.util.ValueLoader;
 
 /**
  * Targets other players with a compass.
@@ -27,7 +26,7 @@ public class TargetAction extends DefaultAction {
 	
 	public TargetAction(ConfigurationSection section) throws LoadingException {
 		super(section);
-		this.target = new ValueLoader(section).loadEnum(TARGET, Attitude.HOSTILE, Attitude.class);
+		this.target = loader.loadEnum(TARGET, Attitude.HOSTILE, Attitude.class);
 	}
 
 	@Override

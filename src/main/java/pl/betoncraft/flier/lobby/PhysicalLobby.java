@@ -45,8 +45,14 @@ public class PhysicalLobby extends DefaultLobby {
 
 	public PhysicalLobby(ConfigurationSection section) throws LoadingException {
 		super(section);
+		int index = 0;
 		for (String loc : section.getStringList("join")) {
-			join.add(Utils.parseLocation(loc).getBlock());
+			index++;
+			try {
+				join.add(Utils.parseLocation(loc).getBlock());
+			} catch (LoadingException e) {
+				throw (LoadingException) new LoadingException(String.format("Error in %s join location", index)).initCause(e);
+			}
 		}
 		start = loader.loadLocation("start").getBlock();
 		leave = loader.loadLocation("leave").getBlock();

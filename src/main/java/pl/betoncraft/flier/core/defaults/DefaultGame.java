@@ -93,13 +93,9 @@ public abstract class DefaultGame implements Listener, Game {
 	
 	public DefaultGame(ConfigurationSection section) throws LoadingException {
 		loader = new ValueLoader(section);
+		Flier flier = Flier.getInstance();
 		for (String bonusName : section.getStringList("bonuses")) {
-			try {
-				bonuses.add(Flier.getInstance().getBonus(bonusName));
-			} catch (LoadingException e) {
-				throw (LoadingException) new LoadingException(String.format("Error in '%s' bonus.", bonusName))
-						.initCause(e);
-			}
+			bonuses.add(flier.getBonus(bonusName));
 		}
 		listener = new EffectListener(section.getStringList("effects"), this);
 		heightLimit = loader.loadInt("height_limit", 512);

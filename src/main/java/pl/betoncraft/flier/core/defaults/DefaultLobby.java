@@ -98,13 +98,8 @@ public abstract class DefaultLobby implements Lobby, Listener {
 		}
 		List<String> gameNames = section.getStringList("games");
 		for (String gameName : gameNames) {
-			try {
-				Game game = Flier.getInstance().getGame(gameName);
-				games.put(gameName, game);
-			} catch (LoadingException e) {
-				throw (LoadingException) new LoadingException(String.format("Error in '%s' game.", gameName))
-						.initCause(e);
-			}
+			Game game = Flier.getInstance().getGame(gameName);
+			games.put(gameName, game);
 		}
 		if (games.isEmpty()) {
 			throw new LoadingException("Game list is empty.");
@@ -127,12 +122,24 @@ public abstract class DefaultLobby implements Lobby, Listener {
 			buyCost = loader.loadInt("buy_cost", 0);
 			sellCost = loader.loadInt("sell_cost", 0);
 			unlockCost = loader.loadNonNegativeInt("unlock_cost", 0);
-			ConfigurationSection buySection = section.getConfigurationSection("on_buy");
-			onBuy = buySection == null ? null : new DefaultSetApplier(buySection, items);
-			ConfigurationSection sellSection = section.getConfigurationSection("on_sell");
-			onSell = sellSection == null ? null : new DefaultSetApplier(sellSection, items);
-			ConfigurationSection unlockSection = section.getConfigurationSection("on_unlock");
-			onUnlock = unlockSection == null ? null : new DefaultSetApplier(unlockSection, items);
+			try {
+				ConfigurationSection buySection = section.getConfigurationSection("on_buy");
+				onBuy = buySection == null ? null : new DefaultSetApplier(buySection, items);
+			} catch (LoadingException e) {
+				throw (LoadingException) new LoadingException("Error in 'on_buy' section.").initCause(e);
+			}
+			try {
+				ConfigurationSection sellSection = section.getConfigurationSection("on_sell");
+				onSell = sellSection == null ? null : new DefaultSetApplier(sellSection, items);
+			} catch (LoadingException e) {
+				throw (LoadingException) new LoadingException("Error in 'on_sell' section.").initCause(e);
+			}
+			try {
+				ConfigurationSection unlockSection = section.getConfigurationSection("on_unlock");
+				onUnlock = unlockSection == null ? null : new DefaultSetApplier(unlockSection, items);
+			} catch (LoadingException e) {
+				throw (LoadingException) new LoadingException("Error in 'on_unlock' section.").initCause(e);
+			}
 		}
 		
 	}

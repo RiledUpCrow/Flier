@@ -50,8 +50,9 @@ public abstract class DefaultBonus implements Bonus {
 		cooldown = loader.loadNonNegativeInt("cooldown");
 		respawn = loader.loadNonNegativeInt("respawn");
 		location = loader.loadLocation("location");
+		Flier flier = Flier.getInstance();
 		for (String id : section.getStringList("actions")) {
-			actions.add(Flier.getInstance().getAction(id));
+			actions.add(flier.getAction(id));
 		}
 	}
 

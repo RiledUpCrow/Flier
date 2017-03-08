@@ -80,6 +80,8 @@ public abstract class DefaultEffect implements Effect {
 					} else {
 						matchers.add(new DefaultMatcher(key, Arrays.asList(new String[]{value})));
 					}
+				} else {
+					throw new LoadingException(String.format("Matcher '%s' has incorrect type.", key));
 				}
 			}
 		} else {

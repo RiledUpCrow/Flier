@@ -42,11 +42,12 @@ public class DefaultUsage implements Usage {
 		cooldown = loader.loadNonNegativeInt("cooldown", 0);
 		ammoUse = loader.loadInt("ammo_use", 0);
 		where = loader.loadEnum("where", Usage.Where.EVERYWHERE, Usage.Where.class);
+		Flier flier = Flier.getInstance();
 		for (String activator : section.getStringList("activators")) {
-			activators.add(Flier.getInstance().getActivator(activator));
+			activators.add(flier.getActivator(activator));
 		}
 		for (String action : section.getStringList("actions")) {
-			actions.add(Flier.getInstance().getAction(action));
+			actions.add(flier.getAction(action));
 		}
 	}
 

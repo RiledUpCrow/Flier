@@ -56,9 +56,11 @@ public class DefaultSet implements ItemSet {
 		} else {
 			wings = flier.getWing(wingsName);
 		}
+		int index = 0;
 		try {
 			List<Map<?, ?>> maps = section.getMapList("items");
 			for (Map<?, ?> map : maps) {
+				index++;
 				UsableItem item;
 				int amount = 1, max = 0, min = 0;
 				Object itemObject = map.get("item");
@@ -94,14 +96,10 @@ public class DefaultSet implements ItemSet {
 				items.add(item);
 			}
 		} catch (LoadingException e) {
-			throw (LoadingException) new LoadingException("Error in items.").initCause(e);
+			throw (LoadingException) new LoadingException(String.format("Error in %s item.", index)).initCause(e);
 		}
 		for (String modName : section.getStringList("modifications")) {
-			try {
-				mods.add(flier.getModification(modName));
-			} catch (LoadingException e) {
-				throw (LoadingException) new LoadingException(String.format("Error in '%s' modification.", modName)).initCause(e);
-			}
+			mods.add(flier.getModification(modName));
 		}
 	}
 
