@@ -170,3 +170,9 @@ All other matches like  `suicide` and `shot_down` are exactly the same as in `ki
 **`engine`** (player event)
 
 This event fires every tick while the player is using the engine. It has no special matchers.
+
+## Spawn event
+
+**`spawn`** (player event)
+
+This event fires when the player spawns in the game. It has no special matchers.

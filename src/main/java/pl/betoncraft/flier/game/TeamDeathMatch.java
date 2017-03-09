@@ -25,6 +25,7 @@ import pl.betoncraft.flier.api.core.LoadingException;
 import pl.betoncraft.flier.api.core.SidebarLine;
 import pl.betoncraft.flier.api.core.Damager.DamageResult;
 import pl.betoncraft.flier.core.defaults.DefaultGame;
+import pl.betoncraft.flier.event.FlierPlayerSpawnEvent;
 import pl.betoncraft.flier.util.Utils;
 import pl.betoncraft.flier.util.ValueLoader;
 
@@ -165,6 +166,8 @@ public class TeamDeathMatch extends DefaultGame {
 			setTeam(data, team);
 		}
 		data.getPlayer().teleport(team.getSpawn());
+		FlierPlayerSpawnEvent event = new FlierPlayerSpawnEvent(data);
+		Bukkit.getPluginManager().callEvent(event);
 	}
 	
 	@Override
