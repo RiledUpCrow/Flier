@@ -104,9 +104,6 @@ public class PhysicalLobby extends DefaultLobby {
 			if (data == null) {
 				return;
 			}
-			if (data.isPlaying()) {
-				return;
-			}
 			if (block.equals(start)) {
 				currentGame.startPlayer(data);
 			} else {
