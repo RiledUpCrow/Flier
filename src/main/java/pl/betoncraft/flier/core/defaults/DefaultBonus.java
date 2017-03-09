@@ -31,6 +31,7 @@ import pl.betoncraft.flier.util.ValueLoader;
 public abstract class DefaultBonus implements Bonus {
 	
 	protected final ValueLoader loader;
+	protected final String id;
 	
 	protected final double distance;
 	protected final boolean consumable;
@@ -44,6 +45,7 @@ public abstract class DefaultBonus implements Bonus {
 	protected BukkitRunnable starter;
 	
 	public DefaultBonus(ConfigurationSection section) throws LoadingException {
+		id = section.getName();
 		loader = new ValueLoader(section);
 		distance = loader.loadPositiveDouble("distance");
 		consumable = loader.loadBoolean("consumable");
@@ -54,6 +56,11 @@ public abstract class DefaultBonus implements Bonus {
 		for (String id : section.getStringList("actions")) {
 			actions.add(flier.getAction(id));
 		}
+	}
+	
+	@Override
+	public String getID() {
+		return id;
 	}
 
 	@Override

@@ -24,6 +24,7 @@ import pl.betoncraft.flier.api.core.LoadingException;
 import pl.betoncraft.flier.api.core.Matcher;
 import pl.betoncraft.flier.core.MatchingEvent;
 import pl.betoncraft.flier.core.MatchingPlayerEvent;
+import pl.betoncraft.flier.event.FlierCollectBonusEvent;
 import pl.betoncraft.flier.event.FlierEngineUseEvent;
 import pl.betoncraft.flier.event.FlierPlayerHitEvent;
 import pl.betoncraft.flier.event.FlierPlayerKillEvent;
@@ -47,7 +48,8 @@ public class EffectListener implements Listener {
 		KILL(true),
 		KILLED(true),
 		ENGINE(true),
-		SPAWN(true);
+		SPAWN(true),
+		BONUS(true);
 
 		private boolean player;
 
@@ -125,6 +127,11 @@ public class EffectListener implements Listener {
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void onSpawn(FlierPlayerSpawnEvent event) {
 		fireEffects(EventType.SPAWN, event);
+	}
+	
+	@EventHandler(priority = EventPriority.MONITOR)
+	public void onBonus(FlierCollectBonusEvent event) {
+		fireEffects(EventType.BONUS, event);
 	}
 
 	/**

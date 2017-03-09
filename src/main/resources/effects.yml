@@ -72,6 +72,20 @@ spawn_sound:
   event_type: spawn
   sound: block note pling
   volume: 10
+sheep_sound:
+  type: privateSound
+  event_type: bonus
+  matchers:
+    bonus: money
+  sound: entity sheep ambient
+  volume: 4
+chicken_sound:
+  type: privateSound
+  event_type: bonus
+  matchers:
+    bonus: fix
+  sound: entity chicken ambient
+  volume: 4
 engine_smoke:
   type: particle
   event_type: engine

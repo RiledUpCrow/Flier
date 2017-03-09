@@ -20,6 +20,11 @@ import pl.betoncraft.flier.api.core.InGamePlayer;
 public interface Bonus {
 
 	/**
+	 * @return the ID of this Bonus
+	 */
+	public String getID();
+
+	/**
 	 * @return the location of a Bonus
 	 */
 	public Location getLocation();

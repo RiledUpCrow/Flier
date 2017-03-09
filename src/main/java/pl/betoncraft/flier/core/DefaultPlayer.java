@@ -36,6 +36,7 @@ import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.PlayerClass;
 import pl.betoncraft.flier.api.core.SidebarLine;
 import pl.betoncraft.flier.api.core.UsableItem;
+import pl.betoncraft.flier.event.FlierCollectBonusEvent;
 import pl.betoncraft.flier.event.FlierEngineUseEvent;
 import pl.betoncraft.flier.util.PlayerBackup;
 import pl.betoncraft.flier.util.Utils;
@@ -411,7 +412,11 @@ public class DefaultPlayer implements InGamePlayer {
 			}
 			double distSqrd = bonus.getDistance() * bonus.getDistance();
 			if (bonus.getLocation().distanceSquared(player.getLocation()) <= distSqrd) {
-				bonus.apply(this);
+				FlierCollectBonusEvent event = new FlierCollectBonusEvent(this, bonus);
+				Bukkit.getPluginManager().callEvent(event);
+				if (!event.isCancelled()) {
+					bonus.apply(this);
+				}
 			}
 		}
 	}

@@ -184,3 +184,11 @@ This event fires every tick while the player is using the engine. It has no spec
 **`spawn`** (player event)
 
 This event fires when the player spawns in the game. It has no special matchers.
+
+## Bonus collect event
+
+**`bonus`** (player event)
+
+This event fires when the player collects a bonus.
+
+* `bonus` _(text)_ the ID of the bonus, as defined in _bonuses.yml_ file.
