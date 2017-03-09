@@ -9,9 +9,11 @@ package pl.betoncraft.flier.core.defaults;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -110,6 +112,7 @@ public abstract class DefaultLobby implements Lobby, Listener {
 	
 	public class DefaultButton implements Button {
 		
+		protected final Set<String> requirements;
 		protected final int buyCost;
 		protected final int sellCost;
 		protected final int unlockCost;
@@ -119,6 +122,7 @@ public abstract class DefaultLobby implements Lobby, Listener {
 
 		public DefaultButton(ConfigurationSection section) throws LoadingException {
 			ValueLoader loader = new ValueLoader(section);
+			requirements = new HashSet<>(section.getStringList("required"));
 			buyCost = loader.loadInt("buy_cost", 0);
 			sellCost = loader.loadInt("sell_cost", 0);
 			unlockCost = loader.loadNonNegativeInt("unlock_cost", 0);
@@ -141,27 +145,38 @@ public abstract class DefaultLobby implements Lobby, Listener {
 				throw (LoadingException) new LoadingException("Error in 'on_unlock' section.").initCause(e);
 			}
 		}
+		
+		@Override
+		public Set<String> getRequirements() {
+			return requirements;
+		}
 
+		@Override
 		public int getBuyCost() {
 			return buyCost;
 		}
 
+		@Override
 		public int getSellCost() {
 			return sellCost;
 		}
 
+		@Override
 		public int getUnlockCost() {
 			return unlockCost;
 		}
 
+		@Override
 		public SetApplier getOnBuy() {
 			return onBuy;
 		}
 
+		@Override
 		public SetApplier getOnSell() {
 			return onSell;
 		}
 
+		@Override
 		public SetApplier getOnUnlock() {
 			return onUnlock;
 		}
@@ -220,8 +235,10 @@ public abstract class DefaultLobby implements Lobby, Listener {
 			List<Button> ul = unlocked.computeIfAbsent(player, k -> new LinkedList<>());
 			boolean unlocked = button.getUnlockCost() == 0 || ul.contains(button);
 			if (!unlocked) {
-				SetApplier applier = button.getOnUnlock();
-				if (button.getUnlockCost() <= player.getMoney()) {
+				if (!button.getRequirements().stream().map(name -> buttons.get(name)).allMatch(b -> ul.contains(b))) {
+					if (notify) player.getPlayer().sendMessage(ChatColor.RED + "You need to unlock other buttons first.");
+				} else if (button.getUnlockCost() <= player.getMoney()) {
+					SetApplier applier = button.getOnUnlock();
 					Runnable run = () -> {
 						ul.add(button);
 						player.setMoney(player.getMoney() - button.getUnlockCost());

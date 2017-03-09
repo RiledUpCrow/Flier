@@ -7,6 +7,7 @@
 package pl.betoncraft.flier.api.content;
 
 import java.util.Map;
+import java.util.Set;
 
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -25,6 +26,11 @@ public interface Lobby {
 	 * The Button in a Lobby, which has costs and can be locked.
 	 */
 	public interface Button {
+		
+		/**
+		 * @return the set of Button names required for unlocking this Button
+		 */
+		public Set<String> getRequirements();
 
 		/**
 		 * @return the cost to buy an ItemSet
