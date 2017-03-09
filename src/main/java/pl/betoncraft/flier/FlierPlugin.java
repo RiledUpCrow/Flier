@@ -58,6 +58,7 @@ import pl.betoncraft.flier.effect.PublicSoundEffect;
 import pl.betoncraft.flier.engine.MultiplyingEngine;
 import pl.betoncraft.flier.game.TeamDeathMatch;
 import pl.betoncraft.flier.lobby.PhysicalLobby;
+import pl.betoncraft.flier.util.Coordinator;
 import pl.betoncraft.flier.util.DefaultConfigManager;
 import pl.betoncraft.flier.util.Utils;
 import pl.betoncraft.flier.wings.SimpleWings;
@@ -125,6 +126,8 @@ public class FlierPlugin extends JavaPlugin implements Flier {
 				}
 			}
 		}, this);
+		
+		new Coordinator(); // temporary solution
 		
 		// TODO add after-crash player restore
 	}

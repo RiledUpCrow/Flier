@@ -32,6 +32,7 @@ public class FlierCommand implements CommandExecutor {
 		arguments.add(new MoneyArgument());
 		arguments.add(new SaveArgument());
 		arguments.add(new LoadArgument());
+		arguments.add(new CoordinatorArgument());
 		arguments.add(new ReloadArgument());
 	}
 	
