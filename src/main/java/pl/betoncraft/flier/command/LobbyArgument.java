@@ -11,54 +11,56 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permission;
 
-import net.md_5.bungee.api.ChatColor;
 import pl.betoncraft.flier.api.core.CommandArgument;
-import pl.betoncraft.flier.util.PlayerBackup;
 
 /**
- * Saves the player to the file.
+ * Contains lobby-related commands.
  *
  * @author Jakub Sapalski
  */
-public class SaveArgument implements CommandArgument {
+public class LobbyArgument implements CommandArgument {
 	
-	private Permission permission = new Permission("flier.dev.save");
+	private List<CommandArgument> arguments;
+	private Permission permission = new Permission("flier.player.lobby");
+
+	public LobbyArgument() {
+		arguments = Arrays.asList(new CommandArgument[]{ 
+				new JoinLobbyArgument(),
+				new LeaveLobbyArgument(),
+				new ChooseItemArgument(),
+				new StartGameArgument()
+		});
+	}
+
+	@Override
+	public void parse(CommandSender sender, String currentCommand, Iterator<String> it) {
+		if (!it.hasNext()) {
+			CommandArgument.displayHelp(sender, arguments);
+		} else {
+			CommandArgument.nextArgument(sender, currentCommand, it, it.next(), arguments);
+		}
+	}
 
 	@Override
 	public String getName() {
-		return "save";
+		return "lobby";
 	}
 
 	@Override
 	public List<String> getAliases() {
-		return Arrays.asList(new String[]{getName()});
+		return Arrays.asList(new String[] { getName(), "l" });
 	}
 
 	@Override
 	public String getDescription(CommandSender sender) {
-		return "Saves you to the file.";
+		return "Contains lobby-related commands.";
 	}
 
 	@Override
 	public String getHelp(CommandSender sender) {
 		return "";
-	}
-
-	@Override
-	public void parse(CommandSender sender, String currentCommand, Iterator<String> it) {
-		if (!(sender instanceof Player)) {
-			sender.sendMessage(String.format("%sMust be a player.", ChatColor.RED));
-			return;
-		}
-		Player player = (Player) sender;
-		if (new PlayerBackup(player).save()) {
-			sender.sendMessage(String.format("%sSuccessfully saved to a file.", ChatColor.GREEN));
-		} else {
-			sender.sendMessage(String.format("%sCould not save to a file.", ChatColor.RED));
-		}
 	}
 
 	@Override
@@ -68,7 +70,7 @@ public class SaveArgument implements CommandArgument {
 
 	@Override
 	public User getUser() {
-		return User.PLAYER;
+		return User.ANYONE;
 	}
 
 }

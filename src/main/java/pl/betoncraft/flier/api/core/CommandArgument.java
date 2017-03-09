@@ -34,14 +34,14 @@ public interface CommandArgument {
 	public List<String> getAliases();
 
 	/**
-	 * @return the description of this argument's behavior
+	 * @return the description of this argument's behavior for this sender
 	 */
-	public String getDescription();
+	public String getDescription(CommandSender sender);
 
 	/**
-	 * @return the help string which shows how to use the command
+	 * @return the help string which shows how to use the command for this sender
 	 */
-	public String getHelp();
+	public String getHelp(CommandSender sender);
 	
 	/**
 	 * @return the list of Permissions which enable using this Argument
@@ -121,7 +121,7 @@ public interface CommandArgument {
 	 */
 	public static void displayHelp(CommandSender sender, String currentCommand, CommandArgument argument) {
 		sender.sendMessage(ChatColor.RED + "Wrong use of a command. Correct syntax:");
-		sender.sendMessage(ChatColor.DARK_GREEN + "/" + currentCommand + " " + argument.getHelp());
+		sender.sendMessage(ChatColor.DARK_GREEN + "/" + currentCommand + " " + argument.getHelp(sender));
 	}
 
 	/**
@@ -155,7 +155,7 @@ public interface CommandArgument {
 			}
 			// display a message
 			sender.sendMessage(ChatColor.YELLOW + "- " + ChatColor.DARK_AQUA + a.getName() + " " + aliases
-					+ ChatColor.YELLOW + ": " + ChatColor.GREEN + a.getDescription());
+					+ ChatColor.YELLOW + ": " + ChatColor.GREEN + a.getDescription(sender));
 		}
 	}
 
@@ -198,7 +198,11 @@ public interface CommandArgument {
 	 * @param sender the sender of this command
 	 */
 	public static void wrongUser(CommandSender sender) {
-		sender.sendMessage(String.format("%sThis command cannot be used from here.", ChatColor.RED));
+		if (sender instanceof Player) {
+			sender.sendMessage(String.format("%sThis command must be used by the console.", ChatColor.RED));
+		} else {
+			sender.sendMessage(String.format("%sThis command must be used by a player.", ChatColor.RED));
+		}
 	}
 	
 	/**

@@ -44,12 +44,12 @@ class ReloadArgument implements CommandArgument {
 	}
 
 	@Override
-	public String getDescription() {
+	public String getDescription(CommandSender sender) {
 		return "Reloads the plugin.";
 	}
 
 	@Override
-	public String getHelp() {
+	public String getHelp(CommandSender sender) {
 		return "";
 	}
 

@@ -11,28 +11,29 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permission;
 
+import net.md_5.bungee.api.ChatColor;
 import pl.betoncraft.flier.api.Flier;
 import pl.betoncraft.flier.api.content.Lobby;
 import pl.betoncraft.flier.api.core.CommandArgument;
+import pl.betoncraft.flier.api.core.InGamePlayer;
 
 /**
- * Moves the player out of the lobby.
+ * Moves the player into the game.
  *
  * @author Jakub Sapalski
  */
-class LeaveLobbyArgument implements CommandArgument {
+public class StartGameArgument implements CommandArgument {
 
-	private Permission permission = new Permission("flier.player.leave");
-	private Permission force = new Permission("flier.admin.leave");
+	private Permission permission = new Permission("flier.player.start");
+	private Permission force = new Permission("flier.admin.start");
 
 	@Override
 	public void parse(CommandSender sender, String currentCommand, Iterator<String> it) {
-		Flier f = Flier.getInstance();
+		Flier flier = Flier.getInstance();
 		Player player = null;
 		if (it.hasNext()) {
 			if (!sender.hasPermission(force)) {
@@ -47,36 +48,49 @@ class LeaveLobbyArgument implements CommandArgument {
 			}
 		} else {
 			if (!CommandArgument.checkUser(sender, User.PLAYER)) {
-				CommandArgument.wrongUser(sender);
+				CommandArgument.displayHelp(sender, currentCommand, this);
 				return;
 			} else {
 				player = (Player) sender;
 			}
 		}
-		for (Lobby lobby : f.getLobbies().values()) {
-			lobby.removePlayer(player);
+		boolean found = false;
+		for (Lobby lobby : flier.getLobbies().values()) {
+			InGamePlayer data = lobby.getGame().getPlayers().get(player.getUniqueId());
+			if (data != null) {
+				found = true;
+				lobby.getGame().startPlayer(data);
+				break;
+			}
+		}
+		if (!found) {
+			if (player.equals(sender)) {
+				sender.sendMessage(String.format("%sYou are not in a lobby.", ChatColor.RED));
+			} else {
+				sender.sendMessage(String.format("%s%s is not in a lobby.", ChatColor.RED, player.getName()));
+			}
 		}
 	}
 
 	@Override
 	public String getName() {
-		return "leave";
+		return "start";
 	}
 
 	@Override
 	public List<String> getAliases() {
-		return Arrays.asList(new String[]{"leave", "l"});
+		return Arrays.asList(new String[]{getName(), "s"});
 	}
 
 	@Override
 	public String getDescription(CommandSender sender) {
 		if (CommandArgument.checkUser(sender, User.CONSOLE)) {
-			return "Force the player to leave the lobby.";
+			return "Force a player to start a game.";
 		} else {
 			if (sender.hasPermission(force)) {
-				return "Leave the lobby or force the player to leave the lobby.";
+				return "Start a game or force specified player to start game.";
 			} else {
-				return "Leave the lobby.";
+				return "Start a game.";
 			}
 		}
 	}

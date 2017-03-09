@@ -38,12 +38,12 @@ public class LoadArgument implements CommandArgument {
 	}
 
 	@Override
-	public String getDescription() {
+	public String getDescription(CommandSender sender) {
 		return "Loads you from the file.";
 	}
 
 	@Override
-	public String getHelp() {
+	public String getHelp(CommandSender sender) {
 		return "";
 	}
 

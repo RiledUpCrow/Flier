@@ -111,7 +111,7 @@ public class PhysicalLobby extends DefaultLobby {
 				if (button == null) {
 					return;
 				}
-				handleItems(data, button, event.getAction() == Action.LEFT_CLICK_BLOCK);
+				applyButton(data, button, event.getAction() == Action.LEFT_CLICK_BLOCK, true);
 			}
 		}
 		event.setCancelled(true);

@@ -14,12 +14,33 @@ permissions:
   flier.command:
     default: true
     description: Allows using the main Flier command.
+  flier.player.lobby:
+    default: true
+    description: Allows using the lobby command.
   flier.player.join:
     default: true
     description: Allows joining Lobbies with a command.
   flier.player.leave:
     default: true
     description: Allows leaving Lobbies with a command.
+  flier.player.start:
+    default: true
+    description: Allows starting game with a command.
+  flier.player.item:
+    default: true
+    description: Allows choosing items with a command.
+  flier.admin.join:
+    default: op
+    description: Allows forcing players to join the lobby.
+  flier.admin.leave:
+    default: op
+    description: Allows forcing players to leave the lobby.
+  flier.admin.start:
+    default: op
+    description: Allows forcing players to start game.
+  flier.admin.item:
+    default: op
+    description: Allows forcing players to choose items.
   flier.admin.reload:
     default: op
     description: Allows reloading the Flier plugin.

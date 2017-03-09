@@ -61,12 +61,12 @@ class SetGameArgument implements CommandArgument {
 	}
 
 	@Override
-	public String getDescription() {
+	public String getDescription(CommandSender sender) {
 		return "Set current game.";
 	}
 
 	@Override
-	public String getHelp() {
+	public String getHelp(CommandSender sender) {
 		return "<lobby> <game>";
 	}
 

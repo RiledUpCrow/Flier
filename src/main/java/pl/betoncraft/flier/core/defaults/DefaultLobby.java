@@ -31,9 +31,9 @@ import pl.betoncraft.flier.api.content.Lobby;
 import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.LoadingException;
 import pl.betoncraft.flier.api.core.PlayerClass;
-import pl.betoncraft.flier.api.core.SetApplier;
 import pl.betoncraft.flier.api.core.PlayerClass.AddResult;
 import pl.betoncraft.flier.api.core.PlayerClass.RespawnAction;
+import pl.betoncraft.flier.api.core.SetApplier;
 import pl.betoncraft.flier.core.DefaultClass;
 import pl.betoncraft.flier.core.DefaultPlayer;
 import pl.betoncraft.flier.core.DefaultSetApplier;
@@ -91,7 +91,7 @@ public abstract class DefaultLobby implements Lobby, Listener {
 				throw new LoadingException(String.format("'%s' is not a button.", i));
 			}
 			try {
-				buttons.put(i, new Button(buttonSection));
+				buttons.put(i, new DefaultButton(buttonSection));
 			} catch (LoadingException e) {
 				throw (LoadingException) new LoadingException(String.format("Error in '%s' button.", i)).initCause(e);
 			}
@@ -108,7 +108,7 @@ public abstract class DefaultLobby implements Lobby, Listener {
 		Bukkit.getPluginManager().registerEvents(this, Flier.getInstance());
 	}
 	
-	protected class Button {
+	public class DefaultButton implements Button {
 		
 		protected final int buyCost;
 		protected final int sellCost;
@@ -117,7 +117,7 @@ public abstract class DefaultLobby implements Lobby, Listener {
 		protected final SetApplier onSell;
 		protected final SetApplier onUnlock;
 
-		public Button(ConfigurationSection section) throws LoadingException {
+		public DefaultButton(ConfigurationSection section) throws LoadingException {
 			ValueLoader loader = new ValueLoader(section);
 			buyCost = loader.loadInt("buy_cost", 0);
 			sellCost = loader.loadInt("sell_cost", 0);
@@ -140,6 +140,30 @@ public abstract class DefaultLobby implements Lobby, Listener {
 			} catch (LoadingException e) {
 				throw (LoadingException) new LoadingException("Error in 'on_unlock' section.").initCause(e);
 			}
+		}
+
+		public int getBuyCost() {
+			return buyCost;
+		}
+
+		public int getSellCost() {
+			return sellCost;
+		}
+
+		public int getUnlockCost() {
+			return unlockCost;
+		}
+
+		public SetApplier getOnBuy() {
+			return onBuy;
+		}
+
+		public SetApplier getOnSell() {
+			return onSell;
+		}
+
+		public SetApplier getOnUnlock() {
+			return onUnlock;
 		}
 		
 	}
@@ -183,6 +207,115 @@ public abstract class DefaultLobby implements Lobby, Listener {
 		}
 		// no need to start the game, it's running if there were players
 	}
+	
+	@Override
+	public Map<String, Button> getButtons() {
+		return buttons;
+	}
+
+	@Override
+	public boolean applyButton(InGamePlayer player, Button button, boolean buy, boolean notify) {
+		boolean applied = false;
+		if (button != null) {
+			List<Button> ul = unlocked.computeIfAbsent(player, k -> new LinkedList<>());
+			boolean unlocked = button.getUnlockCost() == 0 || ul.contains(button);
+			if (!unlocked) {
+				SetApplier applier = button.getOnUnlock();
+				if (button.getUnlockCost() <= player.getMoney()) {
+					Runnable run = () -> {
+						ul.add(button);
+						player.setMoney(player.getMoney() - button.getUnlockCost());
+						player.updateClass();
+					};
+					String message;
+					if (applier == null) {
+						run.run();
+						applied = true;
+						message = ChatColor.GREEN + "Unlocked!";
+					} else {
+						AddResult result = applier.isSaving() ? player.getClazz().addStored(applier) :
+							player.getClazz().addCurrent(applier);
+						switch (result) {
+						case ADDED:
+						case FILLED:
+						case REPLACED:
+						case REMOVED:
+							run.run();
+							applied = true;
+							message = ChatColor.GREEN + "Unlocked!";
+							break;
+						default:
+							message = ChatColor.RED + "You can't use this right now.";
+						}
+						if (notify) player.getPlayer().sendMessage(message);
+					}
+				} else {
+					if (notify) player.getPlayer().sendMessage(ChatColor.RED + "Not enough money to unlock this.");
+				}
+			} else {
+				int cost;
+				SetApplier applier;
+				if (buy) {
+					cost = button.getBuyCost();
+					applier = button.getOnBuy();
+				} else {
+					cost = button.getSellCost();
+					applier = button.getOnSell();
+				}
+				if (applier != null) {
+					if (cost <= player.getMoney()) {
+						AddResult result = applier.isSaving() ? player.getClazz().addStored(applier) :
+							player.getClazz().addCurrent(applier);
+						Runnable run = () -> {
+							player.setMoney(player.getMoney() - cost);
+							player.updateClass();
+						};
+						String message = null;
+						switch (result) {
+						case ADDED:
+							run.run();
+							applied = true;
+							message = ChatColor.GREEN + "Items added!";
+							break;
+						case FILLED:
+							run.run();
+							applied = true;
+							message = ChatColor.GREEN + "Items refilled!";
+							break;
+						case REMOVED:
+							run.run();
+							applied = true;
+							message = ChatColor.GREEN + "Items removed!";
+							break;
+						case REPLACED:
+							run.run();
+							applied = true;
+							message = ChatColor.GREEN + "Items replaced!";
+							break;
+						case ALREADY_EMPTIED:
+							// no running, items were not added
+							message = ChatColor.RED + "You can't sell more of these items!";
+							break;
+						case ALREADY_MAXED:
+							// no running, items were not added
+							message = ChatColor.RED + "You have reached a limit!";
+							break;
+						case SKIPPED:
+							// no running, items were not added
+							message = ChatColor.RED + "You already have another item in this category!";
+							break;
+						}
+						if (notify) player.getPlayer().sendMessage(message);
+					} else {
+						if (notify) player.getPlayer().sendMessage(ChatColor.RED + "Not enough money to buy this.");
+					}
+				} else {
+					if (notify) player.getPlayer().sendMessage(ChatColor.RED + "You can't do this.");
+				}
+			}
+		}
+		return applied;
+	}
 
 	@Override
 	public Game getGame() {
@@ -213,101 +346,6 @@ public abstract class DefaultLobby implements Lobby, Listener {
 		InGamePlayer player = players.remove(event.getPlayer().getUniqueId());
 		if (player != null) {
 			player.exitLobby();
-		}
-	}
-
-	protected void handleItems(InGamePlayer player, Button button, boolean buy) {
-		if (button != null) {
-			List<Button> ul = unlocked.computeIfAbsent(player, k -> new LinkedList<>());
-			boolean unlocked = button.unlockCost == 0 || ul.contains(button);
-			if (!unlocked) {
-				SetApplier applier = button.onUnlock;
-				if (button.unlockCost <= player.getMoney()) {
-					Runnable run = () -> {
-						ul.add(button);
-						player.setMoney(player.getMoney() - button.unlockCost);
-						player.updateClass();
-					};
-					String message;
-					if (applier == null) {
-						run.run();
-						message = ChatColor.GREEN + "Unlocked!";
-					} else {
-						AddResult result = applier.isSaving() ? player.getClazz().addStored(applier) :
-							player.getClazz().addCurrent(applier);
-						switch (result) {
-						case ADDED:
-						case FILLED:
-						case REPLACED:
-						case REMOVED:
-							run.run();
-							message = ChatColor.GREEN + "Unlocked!";
-							break;
-						default:
-							message = ChatColor.RED + "You can't use this right now.";
-						}
-						player.getPlayer().sendMessage(message);
-					}
-				} else {
-					player.getPlayer().sendMessage(ChatColor.RED + "Not enough money to unlock this.");
-				}
-			} else {
-				int cost;
-				SetApplier applier;
-				if (buy) {
-					cost = button.buyCost;
-					applier = button.onBuy;
-				} else {
-					cost = button.sellCost;
-					applier = button.onSell;
-				}
-				if (applier != null) {
-					if (cost <= player.getMoney()) {
-						AddResult result = applier.isSaving() ? player.getClazz().addStored(applier) :
-							player.getClazz().addCurrent(applier);
-						Runnable run = () -> {
-							player.setMoney(player.getMoney() - cost);
-							player.updateClass();
-						};
-						String message = null;
-						switch (result) {
-						case ADDED:
-							run.run();
-							message = ChatColor.GREEN + "Items added!";
-							break;
-						case FILLED:
-							run.run();
-							message = ChatColor.GREEN + "Items refilled!";
-							break;
-						case REMOVED:
-							run.run();
-							message = ChatColor.GREEN + "Items removed!";
-							break;
-						case REPLACED:
-							run.run();
-							message = ChatColor.GREEN + "Items replaced!";
-							break;
-						case ALREADY_EMPTIED:
-							// no running, items were not added
-							message = ChatColor.RED + "You can't sell more of these items!";
-							break;
-						case ALREADY_MAXED:
-							// no running, items were not added
-							message = ChatColor.RED + "You have reached a limit!";
-							break;
-						case SKIPPED:
-							// no running, items were not added
-							message = ChatColor.RED + "You already have another item in this category!";
-							break;
-						}
-						player.getPlayer().sendMessage(message);
-					} else {
-						player.getPlayer().sendMessage(ChatColor.RED + "Not enough money to buy this.");
-					}
-				} else {
-					player.getPlayer().sendMessage(ChatColor.RED + "You can't do this.");
-				}
-			}
 		}
 	}
 

@@ -27,8 +27,7 @@ public class FlierCommand implements CommandExecutor {
 	private List<CommandArgument> arguments = new ArrayList<>();
 	
 	public FlierCommand() {
-		arguments.add(new JoinLobbyArgument());
-		arguments.add(new LeaveLobbyArgument());
+		arguments.add(new LobbyArgument());
 		arguments.add(new SetGameArgument());
 		arguments.add(new MoneyArgument());
 		arguments.add(new SaveArgument());
