@@ -121,17 +121,18 @@ gun:
       - right
 bomb:
   material: tnt
-  name: '&cAutoDestruct Button'
+  name: '&cSelfDestruct Button'
   lore:
   - '&bExplodes. Only usable on the ground.'
   - '&aLeft click to set off.'
   slot: 7
   usages:
     prime:
+      where: ground
       activators:
       - left
       actions:
-      - autodestruct
+      - selfdestruct
 rocket:
   material: arrow
   name: '&eRocket'

@@ -20,15 +20,18 @@ import pl.betoncraft.flier.util.Utils;
  *
  * @author Jakub Sapalski
  */
-public class AutoDestruction extends DefaultAttack {
+public class Bomb extends DefaultAttack {
 
 	private static final String POWER = "power";
+	private static final String FUSE = "fuse";
 
 	private final float yield;
+	private final int fuse;
 
-	public AutoDestruction(ConfigurationSection section) throws LoadingException {
+	public Bomb(ConfigurationSection section) throws LoadingException {
 		super(section);
 		yield = (float) loader.loadPositiveDouble(POWER);
+		fuse = loader.loadNonNegativeInt(FUSE, 80);
 	}
 
 	@Override
@@ -37,9 +40,9 @@ public class AutoDestruction extends DefaultAttack {
 				player.getPlayer().getLocation(), EntityType.PRIMED_TNT);
 		Utils.saveDamager(tnt, this, player);
 		tnt.setIsIncendiary(false);
+		tnt.setVelocity(player.getPlayer().getVelocity());
 		tnt.setYield((float) modMan.modifyNumber(POWER, yield));
-		tnt.setGravity(false);
-		tnt.setFuseTicks(0);
+		tnt.setFuseTicks((int) modMan.modifyNumber(FUSE, fuse));
 		return true;
 	}
 

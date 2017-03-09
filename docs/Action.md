@@ -1,6 +1,6 @@
 # Action
 
-Action is something that happens in a Game. It can be simple like restoring fuel in the Engine or more complex like shooting a homing missile. Actions are defined in _actions.yml_ file. Each one has a `type` which specifies what it does and additional options which specify how it does that. All available types are listed below.
+Action is something that happens in a game. It can be simple like restoring fuel in the Engine or more complex like shooting a homing missile. Actions are defined in _actions.yml_ file. Each one has a `type` which specifies what it does and additional options which specify how it does that. All available types are listed below.
 
 ```
 some_action:
@@ -38,7 +38,7 @@ some_attack_action
 
 **`effect`**
 
-This Action runs other Actions 20 times a second for a `duration` measured in ticks. For example if you want to increase Wings regeneration by 1 for a minute, you would run `wingsHealth` action with `1` amount for `duration` 1200 (20 ticks/second times 60 seconds).
+This action runs other Actions 20 times a second for a `duration` measured in ticks. For example if you want to increase Wings regeneration by 1 for a minute, you would run `wingsHealth` action with `1` amount for `duration` 1200 (20 ticks/second times 60 seconds).
 
 ```
 effect_action:
@@ -55,7 +55,7 @@ effect_action:
 
 **`fuel`**
 
-This Action modifies fuel amount of the player's Engine.
+This action modifies fuel amount of the player's Engine.
 
 ```
 fuel_action:
@@ -69,7 +69,7 @@ fuel_action:
 
 **`launch`**
 
-This Action launches you in the direction you're looking. If you're standing on the ground, it will first throw you a few meters up and enable flying.
+This action launches you in the direction you're looking. If you're standing on the ground, it will first throw you a few meters up and enable flying.
 
 ```
 launch_action:
@@ -83,7 +83,7 @@ launch_action:
 
 **`money`**
 
-This Action gives (or removes) money from the player.
+This action gives (or removes) money from the player.
 
 ```
 money_action:
@@ -97,7 +97,7 @@ money_action:
 
 **`targetCompass`**
 
-This Action points player's compass at the closest target of specified type. It's best to run this Action repeatedly, since targets (players) are moving.
+This action points player's compass at the closest target of specified type. It's best to run this Action repeatedly, since targets (players) are moving.
 
 ```
 target_action:
@@ -114,7 +114,7 @@ target_action:
 
 **`wingsHealth`***
 
-This Action modifies the health of Wings. It will break the Wings if their health drops to 0 and restore them if their health goes above 0.
+This action modifies the health of Wings. It will break the Wings if their health drops to 0 and restore them if their health goes above 0.
 
 ```
 wings_health_action:
@@ -124,26 +124,22 @@ wings_health_action:
 
 * `amount` (**required**) is the amount of health added to the Wings. Negative values remove health.
 
-## Autodestruction
+## Suicide
 
-**`autoDestruction`**
+**`suicide`**
 
-This Action is an attack which creates an eplosion at player's location. The `exploding` option should be set to `true` or it won't work. If `suicidal` is set to true, it will damage the player using this Action.
+This action simply kills the player. It works only when the player is not falling due to game mechanics.
 
 ```
-bomb_action:
-  type: autoDestruction
-  [attack specific settings]
-  power: [positive decimal]
+self_destruction:
+  type: suicide
 ```
-
-* `power` (**required**) is the power of the explosion. It doesn't control damage, only the radius of the explosion.
 
 ## Homing missile
 
 **`homingMissile`**
 
-This Action is an attack which shoots a homing projectile. The missile will fly straight at first, and when it finds a target it will fly towards it. If it looses its target for some reason, it will fly in circles until its lifetime passes or it finds another target.
+This action is an attack which shoots a homing projectile. The missile will fly straight at first, and when it finds a target it will fly towards it. If it looses its target for some reason, it will fly in circles until its lifetime passes or it finds another target.
 
 ```
 rocket_action:
@@ -168,7 +164,7 @@ rocket_action:
 
 **`machineGun`**
 
-This Action is an attack which shoots a burst of straight-flying projectiles in the direction the player is looking.
+This action is an attack which shoots a burst of straight-flying projectiles in the direction the player is looking.
 
 ```
 gun_action:
@@ -184,3 +180,18 @@ gun_action:
 * `burst_amount` (**required**) is the amount of projectiles in a burst.
 * `burst_ticks` (**required**) is the amount of ticks between shooting projectiles.
 * `projectile_speed` (**required**) is the speed of the projectiles.
+
+## Bomb
+
+This action is an attack which creates an exploding TNT. The `exploding` option should be set to `true` or it won't work.
+
+```
+bomb_action:
+  type: autoDestruction
+  [attack specific settings]
+  power: [positive decimal]
+  fuse: [non-negative integer]
+```
+
+* `power` (**required**) is the power of the explosion. It doesn't control damage, only the radius of the explosion.
+* `fuse` (**default: 80**) is the amount of ticks before the explosion.

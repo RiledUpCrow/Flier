@@ -49,16 +49,8 @@ gunShot:
   wings_off: false
   friendly_fire: true
   suicidal: false
-autodestruct:
-  type: autoDestruction
-  power: 5
-  damage: 5000
-  physical_damage: 1000
-  wings_off: false
-  midair_physical_damage: true
-  friendly_fire: true
-  suicidal: true
-  exploding: true
+selfdestruct:
+  type: suicide
 missile:
   type: homingMissile
   entity: arrow
