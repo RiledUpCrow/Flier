@@ -135,6 +135,22 @@ self_destruction:
   type: suicide
 ```
 
+## Item set
+
+**`itemSet`**
+
+This action will apply an item set according to the specified rules. The settings available here are exactly the same as in a lobby button. Refer to the _Lobby_ chapter for more details.
+
+```
+apply_set:
+  type: itemSet
+  item_set: [item set name]
+  add_type: [add type]
+  amount: [non-negative integer]
+  conflict_action: [conflict action]
+  saving: [true/false]
+```
+
 ## Homing missile
 
 **`homingMissile`**

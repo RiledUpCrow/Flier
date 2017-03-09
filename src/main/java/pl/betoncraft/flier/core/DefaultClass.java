@@ -194,46 +194,28 @@ public class DefaultClass implements PlayerClass {
 	
 	@Override
 	public boolean removeItem(UsableItem removeItem) {
-		boolean found = false;
-		// find the item on the compiled list
-		for (Iterator<UsableItem> it = compiled.getItems().iterator(); it.hasNext();) {
-			UsableItem item = it.next();
-			if (item.isSimilar(removeItem)) {
-				int newAmount = item.getAmount() - 1;
-				if (newAmount > 0) {
-					item.setAmount(newAmount);
-				} else {
-					item.setAmount(0); // because why not
-					it.remove();
-				}
-				found = true;
-				break;
-			}
-		}
-		// if the item was on the compiled list, remove it from the current ItemSets
-		if (found) {
-			loop: for (Iterator<ItemSet> itSet = current.values().iterator(); itSet.hasNext();) {
-				ItemSet set = itSet.next();
-				for (Iterator<UsableItem> itItem = set.getItems().iterator(); itItem.hasNext();) {
-					UsableItem item = itItem.next();
-					if (item.isSimilar(removeItem)) {
-						int newAmount = item.getAmount() - 1;
-						if (newAmount > 0) {
-							item.setAmount(newAmount);
-						} else {
-							item.setAmount(0);
-							itItem.remove();
-							// empty ItemSets should be removed, no need to keep them
-							if (set.isEmpty()) {
-								itSet.remove();
-							}
+		// removing from the compiled list isn't necessary, it's read-only
+		for (Iterator<ItemSet> itSet = current.values().iterator(); itSet.hasNext();) {
+			ItemSet set = itSet.next();
+			for (Iterator<UsableItem> itItem = set.getItems().iterator(); itItem.hasNext();) {
+				UsableItem item = itItem.next();
+				if (item.isSimilar(removeItem)) {
+					int newAmount = item.getAmount() - 1;
+					if (newAmount > 0) {
+						item.setAmount(newAmount);
+					} else {
+						item.setAmount(0);
+						itItem.remove();
+						// empty ItemSets should be removed, no need to keep them
+						if (set.isEmpty()) {
+							itSet.remove();
 						}
-						break loop;
 					}
+					return true;
 				}
 			}
 		}
-		return found;
+		return false;
 	}
 	
 	@Override
