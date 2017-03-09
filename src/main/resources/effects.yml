@@ -41,6 +41,37 @@ explode_sound:
   sound: entity generic explode
   volume: 4
   pitch: 1.5
+spawn_particle_blue:                                # this is example of tricky Minecraft inner mechanics
+  type: particle                                    #
+  event_type: spawn                                 # displays particles when players spawn
+  matchers:                                         #
+    color: blue                                     # matcher for the blue team
+  particle: redstone                                # redstone is weird, Mojang probably wanted to troll us with it
+  count: 250                                        # server-side spawning multiple particles, slower performance
+  manual_offset: 1                                  # range around the player for server-side spawning
+  amount: 0                                         # when amount is 0, offset changes the color of redstone
+  offset_x: 0.001                                   # Red (0-1), can't be exactly 0 or 1 or colors will get randomized
+  offset_y: 0.001                                   # Green, as above
+  offset_z: 0.999                                   # Blue, as above
+  speed: 1                                          # speed must be 1 for the color to work
+spawn_particle_red:
+  type: particle
+  event_type: spawn
+  matchers:
+    color: red
+  particle: redstone
+  count: 250
+  manual_offset: 1
+  amount: 0
+  offset_x: 0.999
+  offset_y: 0.001
+  offset_z: 0.001
+  speed: 1
+spawn_sound:
+  type: publicSound
+  event_type: spawn
+  sound: block note pling
+  volume: 10
 engine_smoke:
   type: particle
   event_type: engine

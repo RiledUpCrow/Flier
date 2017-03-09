@@ -36,6 +36,9 @@ default:
   - get_hit
   - explode_particle
   - explode_sound
+  - spawn_particle_blue
+  - spawn_particle_red
+  - spawn_sound
   - engine_smoke
   center: 100;200;300;world            # center of the map, **EDIT THIS BEFORE USING!**
   radius: 1000                         # the radius defining map borders

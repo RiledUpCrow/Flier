@@ -80,19 +80,27 @@ This effect will play a sound to every player in the Game at their locations.
 
 **`particle`**
 
-This effect spawns a particle at player's location.
+This effect spawns a particle at player's location. Particles in Minecraft are generally weird to handle.
 
 * `particle` (**required**) is the type of [the particle](https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Particle.html).
-* `amount` (**default: 1**) is the amount of particles.
-* `offset` (**default: 0**) is distance from the player in which the particles will spawn randomly. If it's 0 the particles will appear exactly at the player's location.
+* `amount` (**default: 0**) is the amount of particles. Set it to 0 to enable alternative particle mode. High values won't make the server lag (the client on the other side is a different story).
+* `offset` (**default: 0**) is distance from the player in which the particles will spawn randomly. If it's 0 the particles will appear exactly at the player's location. It may have a different meaning in alternative mode.
+* `offset_x`, `offset_y` and `offset_z` (**default: 0**) is the override for particular axis offset, useful in the alternative mode, for example for setting colors.
+* `speed` (**default: 0**) is the speed of particles. This may have a different meaning in alternative mode.
+* `count` (**default: 1**) controls how many times the server will spawn the particle. This differs from `amount` because multiple particles are spawned server-side, which means very high values (like a few hundreds) spawned every tick can lag the server. Use this if you need the alternative `amount` mode but still want to spawn multiple particles.
+* `manual_offset` (**default: 0**) the same as offset, but used in server-side spawning described above.
+* `manual_offset_x`, `manual_offset_y` and `manual_offset_z` (**default: 0**) is the override for particular axis offset in server-side spawning, this time with no special meaning.
 
 ```
 effect_name:
   type: particle
   [event settings]
   particle: [particle type]
-  amount: [positive integer]
+  amount: [non-negative integer]
   offset: [non-negative decimal]
+  speed: [non-negative decimal]
+  count: [non-negative integer]
+  manual_offset: [non-negative decimal]
 ```
 
 # Event types
