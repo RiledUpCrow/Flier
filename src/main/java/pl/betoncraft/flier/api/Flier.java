@@ -21,6 +21,7 @@ import pl.betoncraft.flier.api.content.Game;
 import pl.betoncraft.flier.api.content.Lobby;
 import pl.betoncraft.flier.api.content.Wings;
 import pl.betoncraft.flier.api.core.ConfigManager;
+import pl.betoncraft.flier.api.core.ItemSet;
 import pl.betoncraft.flier.api.core.LoadingException;
 import pl.betoncraft.flier.api.core.Modification;
 import pl.betoncraft.flier.api.core.UsableItem;
@@ -123,6 +124,14 @@ public interface Flier extends Plugin {
 	 *             when the Modification cannot be created due to an error or Modification is not defined
 	 */
 	public Modification getModification(String id) throws LoadingException;
+
+	/**
+	 * @param id ID of the ItemSet
+	 * @return the ItemSet with specified name, never null
+	 * @throws LoadingException
+	 *             when the ItemSet cannot be created due to an error or ItemSet is not defined
+	 */
+	public ItemSet getItemSet(String id) throws LoadingException;
 
 	/**
 	 * @param id ID of the Effect

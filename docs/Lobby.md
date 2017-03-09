@@ -9,20 +9,17 @@ lobby_name:
     button_name:
       buy_cost: [integer]
       on_buy:
-        item: [item_set_name]
+        item_set: [item set name]
         add_type: [add type]
         amount: [non-negative integer]
-        conflict_action: [conflict_action]
-        saving: false
+        conflict_action: [conflict action]
+        saving: [true/false]
       sell_cost: [integer]
       on_sell:
         [the same as in on_buy]
       unlock_cost: [integer]
       on_unlock:
         [the same as in on_buy]
-  items:
-    item_set_name:
-      [item set settings]
   default_class:
   - item_set_name
   respawn_action: [action]
@@ -57,7 +54,7 @@ _This description is large, so the main settings are separated with lines._
 
 * `buttons` is a list of clickable, item set giving controls (for example a button in `physicalLobby` is a block in the room). Each button support two types of the click, called "buy" and "sell" (you don't have to actually sell anything with "sell" type, it's just a name). Additionally, a button can be locked before using it, so the player has to unlock it with money. You can specify the cost of each action in `buy_cost`, `sell_cost` and `unlock_cost` options. Negative values will give the money to the player, so you can use that for selling items.
 
-    Each of the `on_buy`, `on_sell` and `on_unlock` categories holds so called _applier_, which is a set of rules on how to apply an item set. The `item` option is the name of the item set, as defined below, in the _items_ section. The `add_type` specifies how exactly that item set will be added. Possible values are:
+    Each of the `on_buy`, `on_sell` and `on_unlock` categories holds so called _applier_, which is a set of rules on how to apply an item set. The `item_set` option is the name of the item set, as defined in _sets.yml_ file. The `add_type` specifies how exactly that item set will be added. Possible values are:
 
     * `increase` - simplest possible way, increases the amount of the items. If an item has a maximum value, it won't increase over that value.
     * `decrease` - removes the items. If an item has a minimum value, it won't decrease below that value.
@@ -69,7 +66,7 @@ _This description is large, so the main settings are separated with lines._
 
     Another example, if the player has 1 rocket, the item set has 2 rockets and you `increase` it to amount of 3, the player will receive 6 rockets, to the amount of 7. Because `1 + (2 * 3) = 1 + 6 = 7`.
 
-    Next is the `conflict_action`. It specified what happend if you try to add a different item set in the same category.
+    Next is the `conflict_action`. It specified what happened if you try to add a different item set in the same category.
 
     Imagine you have two different rocket types - fast, light one and a strong, slow missile. You set a limit of 6 for the light rockets and 2 for the heavy ones, and give them the same category, let's call it `rockets`. The player can either buy heavy rockets or light rockets, but not both at the same time - they both go to the same category, and you can have only one item set in the category. Now if the player has bought light rockets already and he clicks on the heavy rockets, these things can happen:
 
@@ -82,9 +79,6 @@ _This description is large, so the main settings are separated with lines._
 
     You don't have to worry about this setting if you're using `nothing` respawn action, the stored stage isn't used in that case.
 
-***
-
-* `items` is the section where you define your item sets. Please refer to the _Item Set_ chapter of this documentation for more information.
 
 ***
 

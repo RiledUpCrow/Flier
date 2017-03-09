@@ -15,8 +15,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.bukkit.configuration.ConfigurationSection;
-
 import pl.betoncraft.flier.api.content.Engine;
 import pl.betoncraft.flier.api.content.Wings;
 import pl.betoncraft.flier.api.core.ItemSet;
@@ -40,16 +38,12 @@ public class DefaultClass implements PlayerClass {
 	private final Map<String, List<SetApplier>> stored = new HashMap<>();
 	private final Map<String, List<SetApplier>> def;
 	
-	public DefaultClass(List<ConfigurationSection> sets, RespawnAction respAct) throws LoadingException {
+	public DefaultClass(List<String> sets, RespawnAction respAct) throws LoadingException {
 		respawnAction = respAct;
 		Map<String, List<SetApplier>> map = new HashMap<>(sets.size());
-		for (ConfigurationSection set : sets) {
-			try {
-				SetApplier applier = new DefaultSetApplier(set);
-				map.computeIfAbsent(applier.getCategory(), k -> new ArrayList<>()).add(applier);
-			} catch (LoadingException e) {
-				throw (LoadingException) new LoadingException(String.format("Error in '%s' button.", set.getName())).initCause(e);
-			}
+		for (String set : sets) {
+			SetApplier applier = new DefaultSetApplier(set);
+			map.computeIfAbsent(applier.getCategory(), k -> new ArrayList<>()).add(applier);
 		}
 		def = Collections.unmodifiableMap(map);
 		reset();

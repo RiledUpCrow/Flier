@@ -66,6 +66,11 @@ public interface ConfigManager {
 	public FileConfiguration getEffects();
 
 	/**
+	 * @return the sets.yml configuration
+	 */
+	public FileConfiguration getItemSets();
+
+	/**
 	 * Saves the lobbies.yml file.
 	 */
 	public void saveLobbies();
@@ -114,5 +119,10 @@ public interface ConfigManager {
 	 * Saves the effects.yml file.
 	 */
 	public void saveEffects();
+
+	/**
+	 * Saves the sets.yml file.
+	 */
+	public void saveItemSets();
 
 }

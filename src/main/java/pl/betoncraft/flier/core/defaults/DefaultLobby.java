@@ -56,7 +56,6 @@ public abstract class DefaultLobby implements Lobby, Listener {
 	protected Location spawn;
 	protected Map<UUID, InGamePlayer> players = new HashMap<>();
 	protected PlayerClass defClass;
-	protected Map<String, ConfigurationSection> items = new HashMap<>();
 	protected Map<String, Button> buttons = new HashMap<>();
 	protected Map<InGamePlayer, List<Button>> unlocked = new HashMap<>();
 
@@ -64,25 +63,8 @@ public abstract class DefaultLobby implements Lobby, Listener {
 		loader = new ValueLoader(section);
 		spawn = loader.loadLocation("spawn");
 		respawnAction = loader.loadEnum("respawn_action", RespawnAction.class);
-		ConfigurationSection itemsSection = section.getConfigurationSection("items");
-		if (itemsSection != null) for (String i : itemsSection.getKeys(false)) {
-			ConfigurationSection itemSection = itemsSection.getConfigurationSection(i);
-			if (itemSection == null) {
-				throw new LoadingException(String.format("'%s' is not an item set.", i));
-			}
-			items.put(i, itemSection);
-		}
 		try {
-			List<String> playerClass = section.getStringList("default_class");
-			List<ConfigurationSection> sets = new ArrayList<>();
-			for (String set : playerClass) {
-				ConfigurationSection sec = items.get(set);
-				if (sec == null) {
-					throw new LoadingException(String.format("Item set '%s' is not defined.", set));
-				}
-				sets.add(sec);
-			}
-			defClass = new DefaultClass(sets, respawnAction);
+			defClass = new DefaultClass(section.getStringList("default_class"), respawnAction);
 		} catch (LoadingException e) {
 			throw (LoadingException) new LoadingException("Error in default class.").initCause(e);
 		}
@@ -128,19 +110,19 @@ public abstract class DefaultLobby implements Lobby, Listener {
 			unlockCost = loader.loadNonNegativeInt("unlock_cost", 0);
 			try {
 				ConfigurationSection buySection = section.getConfigurationSection("on_buy");
-				onBuy = buySection == null ? null : new DefaultSetApplier(buySection, items);
+				onBuy = buySection == null ? null : new DefaultSetApplier(buySection);
 			} catch (LoadingException e) {
 				throw (LoadingException) new LoadingException("Error in 'on_buy' section.").initCause(e);
 			}
 			try {
 				ConfigurationSection sellSection = section.getConfigurationSection("on_sell");
-				onSell = sellSection == null ? null : new DefaultSetApplier(sellSection, items);
+				onSell = sellSection == null ? null : new DefaultSetApplier(sellSection);
 			} catch (LoadingException e) {
 				throw (LoadingException) new LoadingException("Error in 'on_sell' section.").initCause(e);
 			}
 			try {
 				ConfigurationSection unlockSection = section.getConfigurationSection("on_unlock");
-				onUnlock = unlockSection == null ? null : new DefaultSetApplier(unlockSection, items);
+				onUnlock = unlockSection == null ? null : new DefaultSetApplier(unlockSection);
 			} catch (LoadingException e) {
 				throw (LoadingException) new LoadingException("Error in 'on_unlock' section.").initCause(e);
 			}

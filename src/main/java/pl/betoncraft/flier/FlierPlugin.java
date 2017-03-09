@@ -12,7 +12,6 @@ import java.util.Map;
 
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
@@ -44,12 +43,14 @@ import pl.betoncraft.flier.api.content.Game;
 import pl.betoncraft.flier.api.content.Lobby;
 import pl.betoncraft.flier.api.content.Wings;
 import pl.betoncraft.flier.api.core.ConfigManager;
+import pl.betoncraft.flier.api.core.ItemSet;
 import pl.betoncraft.flier.api.core.LoadingException;
 import pl.betoncraft.flier.api.core.Modification;
 import pl.betoncraft.flier.api.core.UsableItem;
 import pl.betoncraft.flier.bonus.EntityBonus;
 import pl.betoncraft.flier.command.FlierCommand;
 import pl.betoncraft.flier.core.DefaultModification;
+import pl.betoncraft.flier.core.DefaultSet;
 import pl.betoncraft.flier.core.DefaultUsableItem;
 import pl.betoncraft.flier.effect.GameSoundEffect;
 import pl.betoncraft.flier.effect.ParticleEffect;
@@ -183,15 +184,7 @@ public class FlierPlugin extends JavaPlugin implements Flier {
 
 	@Override
 	public UsableItem getItem(String id) throws LoadingException {
-		ConfigurationSection section = configManager.getItems().getConfigurationSection(id);
-		if (section == null) {
-			throw new LoadingException(String.format("Item with ID '%s' does not exist.", id));
-		}
-		try {
-			return new DefaultUsableItem(section);
-		} catch (LoadingException e) {
-			throw (LoadingException) new LoadingException(String.format("Error in '%s' item.", id)).initCause(e);
-		}
+		return getObject(id, "item", configManager.getItems(), s -> new DefaultUsableItem(s));
 	}
 
 	@Override
@@ -221,16 +214,12 @@ public class FlierPlugin extends JavaPlugin implements Flier {
 
 	@Override
 	public Modification getModification(String id) throws LoadingException {
-		FileConfiguration mods = configManager.getModifications();
-		ConfigurationSection section = mods.getConfigurationSection(id);
-		if (section == null) {
-			throw new LoadingException(String.format("'%s' modification is not defined.", id));
-		}
-		try {
-			return new DefaultModification(section);
-		} catch (LoadingException e) {
-			throw (LoadingException) new LoadingException(String.format("Error in '%s' modification.", id)).initCause(e);
-		}
+		return getObject(id, "modification", configManager.getModifications(), s -> new DefaultModification(s));
+	}
+	
+	@Override
+	public ItemSet getItemSet(String id) throws LoadingException {
+		return getObject(id, "item set", configManager.getItemSets(), s -> new DefaultSet(s));
 	}
 	
 	@Override
@@ -248,6 +237,18 @@ public class FlierPlugin extends JavaPlugin implements Flier {
 		Factory<T> factory = factories.get(type);
 		if (factory == null) {
 			throw new LoadingException(String.format("%s type '%s' does not exist.", Utils.capitalize(name), type));
+		}
+		try {
+			return factory.get(config);
+		} catch (LoadingException e) {
+			throw (LoadingException) new LoadingException(String.format("Error in '%s' %s.", id, name)).initCause(e);
+		}
+	}
+	
+	private <T> T getObject(String id, String name, ConfigurationSection section, Factory<T> factory) throws LoadingException {
+		ConfigurationSection config = section.getConfigurationSection(id);
+		if (config == null) {
+			throw new LoadingException(String.format("%s with ID '%s' does not exist.", Utils.capitalize(name), id));
 		}
 		try {
 			return factory.get(config);

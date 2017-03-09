@@ -33,6 +33,7 @@ public class DefaultConfigManager implements ConfigManager {
 	                            ACTIONS = "actions.yml",
 	                            ACTIVATORS = "activators.yml",
 	                            MODIFICATIONS = "modifications.yml",
+	                            ITEM_SETS = "sets.yml",
 	                            EFFECTS = "effects.yml";
 
 	private Config lobbies;
@@ -44,6 +45,7 @@ public class DefaultConfigManager implements ConfigManager {
 	private Config actions;
 	private Config activators;
 	private Config modifications;
+	private Config itemSets;
 	private Config effects;
 
 	public DefaultConfigManager() {
@@ -56,6 +58,7 @@ public class DefaultConfigManager implements ConfigManager {
 		actions = new Config(ACTIONS);
 		activators = new Config(ACTIVATORS);
 		modifications = new Config(MODIFICATIONS);
+		itemSets = new Config(ITEM_SETS);
 		effects = new Config(EFFECTS);
 	}
 	
@@ -130,6 +133,11 @@ public class DefaultConfigManager implements ConfigManager {
 	@Override
 	public FileConfiguration getModifications() {
 		return modifications.config;
+	}
+	
+	@Override
+	public FileConfiguration getItemSets() {
+		return itemSets.config;
 	}
 
 	@Override
@@ -213,6 +221,15 @@ public class DefaultConfigManager implements ConfigManager {
 	public void saveModifications() {
 		try {
 			modifications.config.save(modifications.file);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	@Override
+	public void saveItemSets() {
+		try {
+			itemSets.config.save(itemSets.file);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

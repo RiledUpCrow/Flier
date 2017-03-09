@@ -150,7 +150,7 @@ public class DefaultSet implements ItemSet {
 	
 	@Override
 	public boolean isEmpty() {
-		return engine == null && wings == null && items.stream().allMatch(item -> item.getAmount() == 0);
+		return engine == null && wings == null && items.stream().allMatch(item -> item.getAmount() == 0) && mods.isEmpty();
 	}
 
 	@Override

@@ -1,0 +1,42 @@
+fast_class:                  # ID of the item set (used in the `buttons` section)
+  name: Fast                 # name of the player's class
+  engine: fastEngine         # engine added in this item set
+  wings: lightWings          # wings added in this item set
+  items:                     # list of items
+  - item: fastWeapon         # ID of the item (from "items.yml")
+  - item: gun
+  - item: bomb
+balanced_class:
+  name: Balanced
+  engine: balancedEngine
+  wings: balancedWings
+  items:
+  - item: balancedWeapon
+  - item: gun
+  - item: bomb
+strong_class:
+  name: Strong
+  engine: strongEngine
+  wings: heavyWings
+  items:
+  - item: strongWeapon
+  - item: gun
+  - item: bomb
+the_rocket:
+  items:
+  - item: rocket
+    max: 3                   # maximum amount of these items a player can have
+the_launcher:
+  items:
+  - item: launcher
+    max: 5
+the_compass:
+  items:
+  - item: radar
+    max: 1
+  modifications:
+  - bigger_magazine
+the_repair_kit:
+  items:
+  - item: wings
+    max: 2

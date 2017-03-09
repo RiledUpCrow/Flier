@@ -19,107 +19,64 @@
 #    rocket_button:
 #      buy_cost: 15               # cost of buying this item set
 #      on_buy:                    # items to apply when buying
-#        item: the_rocket         # ID of the item set
+#        item_set: the_rocket     # ID of the item set
 #        add_type: increase       # how it's added, see docs
 #        conflict_action: skip    # what happens, when there already is something of that category
 #      sell_cost: -15             # negative, because we're giving the money back
 #      on_sell:                   # items to apply when selling
-#        item: addRocket          # it's the same as above
+#        item_set: addRocket      # it's the same as above
 #        add_type: decrease       # but we're decreasing instead of increasing
 #        conflict_action: skip
 #      block: 100;200;300;world   # location of the block to click, **EDIT THIS BEFORE USING!**
 #    launcher_button:
 #      buy_cost: 10
 #      on_buy:
-#        item: the_launcher
+#        item_set: the_launcher
 #        add_type: increase
 #        conflict_action: skip
 #      sell_cost: -10
 #      on_sell:
-#        item: the_launcher
+#        item_set: the_launcher
 #        add_type: decrease
 #        conflict_action: skip
 #      block: 100;200;300;world   # **EDIT THIS BEFORE USING!**
 #    repair_kit_button:
 #      buy_cost: 20
 #      on_buy:
-#        item: the_repair_kit
+#        item_set: the_repair_kit
 #        add_type: increase
 #        conflict_action: skip
 #      sell_cost: -20
 #      on_sell:
-#        item: the_repair_kit
+#        item_set: the_repair_kit
 #        add_type: decrease
 #        conflict_action: skip
 #      block: 100;200;300;world   # **EDIT THIS BEFORE USING!**
 #    compass_button:
 #      unlock_cost: 5
 #      on_unlock:
-#        item: the_compass
+#        item_set: the_compass
 #        add_type: fill
 #        conflict_action: skip
 #      block: 100;200;300;world   # **EDIT THIS BEFORE USING!**
 #    fast_button:
 #      on_buy:
-#        item: fast_class
+#        item_set: fast_class
 #        add_type: fill
 #        conflict_action: replace
 #      block: 100;200;300;world   # **EDIT THIS BEFORE USING!**
 #    balanced_button:
 #      on_buy:
-#        item: balanced_class
+#        item_set: balanced_class
 #        add_type: fill
 #        conflict_action: replace
 #      block: 100;200;300;world   # **EDIT THIS BEFORE USING!**
 #    strong_button:
 #      on_buy:
-#        item: strong_class
+#        item_set: strong_class
 #        add_type: fill
 #        conflict_action: replace
 #      block: 100;200;300;world   # **EDIT THIS BEFORE USING!**
-#  items:                         # list of item sets
-#    the_rocket:                  # ID of the item set (used in the `buttons` section)
-#      items:                     # list of items received when buying
-#      - item: rocket             # ID of the item (from "items.yml")
-#        max: 3                   # maximum amount of these items a player can have
-#    the_launcher:
-#      items:
-#      - item: launcher
-#        max: 5
-#    the_compass:
-#      items:
-#      - item: radar
-#        max: 1
-#      modifications:
-#      - bigger_magazine
-#    the_repair_kit:
-#      items:
-#      - item: wings
-#        max: 2
-#    fast_class:
-#      name: Fast
-#      engine: fastEngine         # Engine added in this item set
-#      wings: lightWings          # Wings added in this item set
-#      items:
-#      - item: fastWeapon
-#      - item: gun
-#      - item: bomb
-#    balanced_class:
-#      name: Balanced
-#      engine: balancedEngine
-#      wings: balancedWings
-#      items:
-#      - item: balancedWeapon
-#      - item: gun
-#      - item: bomb
-#    strong_class:
-#      name: Strong
-#      engine: strongEngine
-#      wings: heavyWings
-#      items:
-#      - item: strongWeapon
-#      - item: gun
-#      - item: bomb
 #  respawn_action: nothing        # what happens with items after respawn (see docs)
 #  games:                         # list of Games in this Lobby
 #  - default
