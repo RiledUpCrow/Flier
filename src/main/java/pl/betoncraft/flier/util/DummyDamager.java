@@ -28,6 +28,11 @@ public class DummyDamager implements Damager {
 	public double getPhysical() {
 		return 0;
 	}
+	
+	@Override
+	public int getNoDamageTicks() {
+		return 0;
+	}
 
 	@Override
 	public boolean wingsOff() {

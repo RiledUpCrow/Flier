@@ -26,11 +26,11 @@ import pl.betoncraft.flier.core.defaults.DefaultAttack;
 import pl.betoncraft.flier.util.Utils;
 
 /**
- * Burst shooting weapon with unguided projectiles.
+ * Burst shooting weapon with unguided projectile-based bullets.
  *
  * @author Jakub Sapalski
  */
-public class MachineGun extends DefaultAttack {
+public class ProjectileGun extends DefaultAttack {
 	
 	private static final String ENTITY = "entity";
 	private static final String BURST_AMOUNT = "burst_amount";
@@ -43,7 +43,7 @@ public class MachineGun extends DefaultAttack {
 	private final double projectileSpeed;
 	private final int range = 10 * 20;
 	
-	public MachineGun(ConfigurationSection section) throws LoadingException {
+	public ProjectileGun(ConfigurationSection section) throws LoadingException {
 		super(section);
 		entity = loader.loadEnum(ENTITY, EntityType.class);
 		burstAmount = loader.loadPositiveInt(BURST_AMOUNT);
@@ -58,8 +58,8 @@ public class MachineGun extends DefaultAttack {
 		Map<Projectile, Vector> projectiles = new HashMap<>(burstAmount);
 		new BukkitRunnable() {
 			int counter = burstAmount;
-			double projectileSpeed = modMan.modifyNumber(PROJECTILE_SPEED, MachineGun.this.projectileSpeed);
-			EntityType entity = modMan.modifyEnum(ENTITY, MachineGun.this.entity);
+			double projectileSpeed = modMan.modifyNumber(PROJECTILE_SPEED, ProjectileGun.this.projectileSpeed);
+			EntityType entity = modMan.modifyEnum(ENTITY, ProjectileGun.this.entity);
 			@Override
 			public void run() {
 				Vector velocity = player.getLocation().getDirection().clone().multiply(projectileSpeed);
@@ -76,7 +76,7 @@ public class MachineGun extends DefaultAttack {
 					explosive.setIsIncendiary(false);
 					explosive.setYield(0);
 				}
-				Utils.saveDamager(projectile, MachineGun.this, data);
+				Utils.saveDamager(projectile, ProjectileGun.this, data);
 				projectiles.put(projectile, velocity);
 				counter --;
 				if (counter <= 0) {

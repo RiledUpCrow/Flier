@@ -7,7 +7,6 @@
 package pl.betoncraft.flier.game;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
@@ -23,7 +22,6 @@ import pl.betoncraft.flier.api.core.Damager;
 import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.LoadingException;
 import pl.betoncraft.flier.api.core.SidebarLine;
-import pl.betoncraft.flier.api.core.Damager.DamageResult;
 import pl.betoncraft.flier.core.defaults.DefaultGame;
 import pl.betoncraft.flier.event.FlierPlayerSpawnEvent;
 import pl.betoncraft.flier.util.Utils;
@@ -130,7 +128,8 @@ public class TeamDeathMatch extends DefaultGame {
 	public void slowTick() {}
 
 	@Override
-	public void handleKill(InGamePlayer killer, InGamePlayer killed) {
+	public void handleKill(InGamePlayer killer, InGamePlayer killed, boolean fall) {
+		super.handleKill(killer, killed, fall);
 		if (killer == null) {
 			score(getTeam(killed), suicideScore);
 			return;
@@ -144,7 +143,7 @@ public class TeamDeathMatch extends DefaultGame {
 	}
 
 	@Override
-	public void handleHit(List<DamageResult> result, InGamePlayer attacker, InGamePlayer attacked, Damager damager) {}
+	public void handleHit(InGamePlayer attacker, InGamePlayer attacked, Damager damager) {}
 	
 	@Override
 	public void afterRespawn(InGamePlayer player) {

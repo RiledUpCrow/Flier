@@ -25,9 +25,11 @@ public abstract class DefaultAttack extends DefaultAction implements Attack {
 	private static final String WINGS_OFF = "wings_off";
 	private static final String PHYSICAL_DAMAGE = "physical_damage";
 	private static final String DAMAGE = "damage";
+	private static final String NO_DAMAGE_TICKS = "no_damage_ticks";
 
 	protected final double damage;
 	protected final double physicalDamage;
+	protected final int noDamageTicks;
 	protected final boolean wingsOff;
 	protected final boolean midAirPhysicalDamage;
 	protected final boolean suicidal;
@@ -38,6 +40,7 @@ public abstract class DefaultAttack extends DefaultAction implements Attack {
 		super(section);
 		damage = loader.loadDouble(DAMAGE);
 		physicalDamage = loader.loadDouble(PHYSICAL_DAMAGE);
+		noDamageTicks = loader.loadPositiveInt(NO_DAMAGE_TICKS, 20);
 		wingsOff = loader.loadBoolean(WINGS_OFF, false);
 		midAirPhysicalDamage = loader.loadBoolean(MIDAIR_PHYSICAL_DAMAGE, false);
 		suicidal = loader.loadBoolean(SUICIDAL, false);
@@ -53,6 +56,11 @@ public abstract class DefaultAttack extends DefaultAction implements Attack {
 	@Override
 	public double getPhysical() {
 		return modMan.modifyNumber(PHYSICAL_DAMAGE, physicalDamage);
+	}
+	
+	@Override
+	public int getNoDamageTicks() {
+		return noDamageTicks;
 	}
 	
 	@Override

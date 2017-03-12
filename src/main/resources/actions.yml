@@ -6,19 +6,25 @@
 #
 
 balancedShot:
-  type: machineGun          # type of the Action
-  entity: small fireball    # entity used as a projectile
-  burst_amount: 10          # amount of projectiles in a burst
+  type: particleGun         # type of the Action
+  particle: smoke normal    # particle used as a bullet
+  amount: 10                # particle settings
+  offset: 0.1               #
+  speed: 0.01               #
+  burst_amount: 10          # amount of bullets in a burst
   burst_ticks: 1            # ticks between shots
-  projectile_speed: 5.75    # speed of projectiles
+  projectile_speed: 7.5     # speed of bullets
   damage: 1200              # damage to wings
   physical_damage: 7.5      # damage to player's health
   wings_off: true           # whenever wings are taken off on hit
   friendly_fire: true       # whenever it can damage friendly players
   suicidal: false           # whenever it can damage the shooter
 strongShot:
-  type: machineGun
-  entity: fireball
+  type: particleGun
+  particle: flame
+  amount: 10
+  offset: 0.1
+  speed: 0.01
   burst_amount: 10
   burst_ticks: 1
   projectile_speed: 5
@@ -28,18 +34,21 @@ strongShot:
   friendly_fire: true
   suicidal: false
 fastShot:
-  type: machineGun
-  entity: snowball
+  type: particleGun
+  particle: crit magic
+  amount: 10
+  offset: 0.1
+  speed: 0.01
   burst_amount: 10
   burst_ticks: 2
-  projectile_speed: 50
+  projectile_speed: 15
   damage: 700
   physical_damage: 5
   wings_off: false
   friendly_fire: true
   suicidal: false
 gunShot:
-  type: machineGun
+  type: projectileGun
   entity: snowball
   burst_amount: 1
   burst_ticks: 1

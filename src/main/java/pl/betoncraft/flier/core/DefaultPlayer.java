@@ -32,13 +32,18 @@ import pl.betoncraft.flier.api.content.Bonus;
 import pl.betoncraft.flier.api.content.Engine;
 import pl.betoncraft.flier.api.content.Lobby;
 import pl.betoncraft.flier.api.content.Wings;
+import pl.betoncraft.flier.api.core.Damager;
+import pl.betoncraft.flier.api.core.Damager.DamageResult;
 import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.PlayerClass;
 import pl.betoncraft.flier.api.core.SidebarLine;
 import pl.betoncraft.flier.api.core.UsableItem;
+import pl.betoncraft.flier.api.core.Usage;
 import pl.betoncraft.flier.event.FlierCollectBonusEvent;
 import pl.betoncraft.flier.event.FlierEngineUseEvent;
+import pl.betoncraft.flier.event.FlierPlayerHitEvent;
 import pl.betoncraft.flier.util.PlayerBackup;
+import pl.betoncraft.flier.util.Position;
 import pl.betoncraft.flier.util.Utils;
 
 /**
@@ -142,6 +147,42 @@ public class DefaultPlayer implements InGamePlayer {
 		if (isPlaying()) {
 			rightClicked = true;
 		}
+	}
+	
+	@Override
+	public List<DamageResult> damage(InGamePlayer shooter, Damager damager) {
+		// empty list means no damage was dealt
+		List<DamageResult> results = new ArrayList<>(3);
+		// if player can't be damaged yet, return
+		if (player.getNoDamageTicks() > 0) {
+			return results;
+		}
+		// player is not playing, nothing happens
+		// ignore if you can's commit suicide with this weapon
+		if (isPlaying() || !(shooter != null && shooter.equals(this) && !damager.suicidal())) {
+			if (Position.check(getPlayer(), Usage.Where.NO_FALL)) {
+				setAttacker(shooter);
+				results.add(DamageResult.HIT);
+				if (Position.check(getPlayer(), Usage.Where.AIR)) {
+					if (damager.wingsOff()) {
+						results.add(DamageResult.WINGS_OFF);
+					}
+					if (damager.midAirPhysicalDamage()) {
+						results.add(DamageResult.REGULAR_DAMAGE);
+					}
+					results.add(DamageResult.WINGS_DAMAGE);
+				} else if (Position.check(getPlayer(), Usage.Where.GROUND)) {
+					results.add(DamageResult.REGULAR_DAMAGE);
+				}
+			}
+		}
+		// fire an event
+		FlierPlayerHitEvent hitEvent = new FlierPlayerHitEvent(shooter, this, results, damager);
+		Bukkit.getPluginManager().callEvent(hitEvent);
+		if (hitEvent.isCancelled()) {
+			results.clear();
+		}
+		return results;
 	}
 	
 	@Override

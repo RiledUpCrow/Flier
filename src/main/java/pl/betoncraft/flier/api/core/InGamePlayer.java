@@ -13,6 +13,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 import pl.betoncraft.flier.api.content.Lobby;
+import pl.betoncraft.flier.api.core.Damager.DamageResult;
 
 /**
  * Represents a player who is in a Game.
@@ -157,5 +158,18 @@ public interface InGamePlayer {
 	 * Makes the player leave the lobby back to Minecraft.
 	 */
 	public void exitLobby();
+
+	/**
+	 * Deals Damager's damage from the shooter to the player.
+	 * 
+	 * @param shooter
+	 *            the player who shot the Damager; can be null or equal to
+	 *            player
+	 * @param damager
+	 *            the Damager used for the attack; cannot be null
+	 * @return list of damage results, never null; if it's empty the damage was
+	 *         not dealt
+	 */
+	List<DamageResult> damage(InGamePlayer shooter, Damager damager);
 
 }

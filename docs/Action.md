@@ -176,15 +176,15 @@ rocket_action:
 * `lifetime` is the amount of ticks the missile will live after launching. If it does not hit anything for this time, it will disappear.
 * `maneuverability` is the ability to turn when targeting someone. The greater this number is, the better the rocket is at following its target.
 
-## Machine Gun
+## Projectile Gun
 
-**`machineGun`**
+**`projectileGun`**
 
-This action is an attack which shoots a burst of straight-flying projectiles in the direction the player is looking.
+This action is an attack which shoots a burst of straight-flying projectile-based bullets in the direction the player is looking.
 
 ```
 gun_action:
-  type: machineGun
+  type: projectileGun
   [attack specific settings]
   entity: [projectile type]
   burst_amount: [positive integer]
@@ -193,9 +193,39 @@ gun_action:
 ```
 
 * `entity` (**required**) is the [entity](https://hub.spigotmc.org/javadocs/spigot/org/bukkit/entity/EntityType.html) (must be a projectile, can't use a sheep) used by the attack.
-* `burst_amount` (**required**) is the amount of projectiles in a burst.
-* `burst_ticks` (**required**) is the amount of ticks between shooting projectiles.
-* `projectile_speed` (**required**) is the speed of the projectiles.
+* `burst_amount` (**required**) is the amount of bullets in a burst.
+* `burst_ticks` (**required**) is the amount of ticks between shooting bullets.
+* `projectile_speed` (**required**) is the speed of the bullets.
+
+## Particle Gun
+
+**`particleGun`**
+
+This action is an attack which shoots a burst of straight-flying particle-based bullets in the direction the player is looking.
+
+```
+gun_action:
+  type: particleGun
+  [attack specific settings]
+  particle: [particle type]
+  amount: [non-negative integer]
+  offset: [non-negative decimal]
+  speed: [non-negative decimal]
+  density: [positive decimal]
+  burst_amount: [positive integer]
+  burst_ticks: [positive integer]
+  projectile_speed: [positive decimal]
+```
+
+* `particle` (**required**) is the type of [the particle](https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Particle.html).
+* `amount` (**default: 0**) is the amount of particles. Set it to 0 to enable alternative particle mode. High values won't make the server lag (the client on the other side is a different story).
+* `offset` (**default: 0**) is distance from the player in which the particles will spawn randomly. If it's 0 the particles will appear exactly at the player's location. It may have a different meaning in alternative mode.
+* `offset_x`, `offset_y` and `offset_z` (**default: 0**) is the override for particular axis offset, useful in the alternative mode, for example for setting colors.
+* `speed` (**default: 0**) is the speed of particles. This may have a different meaning in alternative mode.
+* `density` (**default: 0.5**) is the amount of particles per block of bullet's path. Setting it to high values will lag the server.
+* `burst_amount` (**required**) is the amount of bullets in a burst.
+* `burst_ticks` (**required**) is the amount of ticks between shooting bullets.
+* `projectile_speed` (**required**) is the speed of the bullets.
 
 ## Bomb
 

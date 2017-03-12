@@ -47,8 +47,6 @@ import pl.betoncraft.flier.api.core.Damager;
 import pl.betoncraft.flier.api.core.Damager.DamageResult;
 import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.LoadingException;
-import pl.betoncraft.flier.api.core.Usage;
-import pl.betoncraft.flier.event.FlierPlayerHitEvent;
 import pl.betoncraft.flier.event.FlierPlayerKillEvent;
 import pl.betoncraft.flier.event.FlierPlayerKillEvent.Type;
 import pl.betoncraft.flier.sidebar.Altitude;
@@ -59,7 +57,6 @@ import pl.betoncraft.flier.sidebar.Money;
 import pl.betoncraft.flier.sidebar.Reload;
 import pl.betoncraft.flier.sidebar.Speed;
 import pl.betoncraft.flier.util.EffectListener;
-import pl.betoncraft.flier.util.Position;
 import pl.betoncraft.flier.util.Utils;
 import pl.betoncraft.flier.util.ValueLoader;
 
@@ -175,33 +172,77 @@ public abstract class DefaultGame implements Listener, Game {
 	 */
 	public abstract void slowTick();
 	
-	/**
-	 * Handles one player killing another one.
-	 * In case of suicide killer is null.
-	 * 
-	 * @param killer the player who killed another
-	 * @param killed the player who was killed
-	 */
-	public abstract void handleKill(InGamePlayer killer, InGamePlayer killed);
+	@Override
+	public void handleKill(InGamePlayer killer, InGamePlayer killed, boolean fall) {
+		if (killer != null && !killer.equals(killed)) {
+			if (fall) {
+				notifyAllPlayers(String.format("%s was shot down by %s!",
+						Utils.formatPlayer(killed), Utils.formatPlayer(killer)));
+			} else {
+				notifyAllPlayers(String.format("%s was killed by %s!",
+						Utils.formatPlayer(killed), Utils.formatPlayer(killer)));
+			}
+			// fire an event
+			FlierPlayerKillEvent deathEvent = new FlierPlayerKillEvent(killer, killed,
+					fall ? Type.SHOT_DOWN : Type.KILLED);
+			Bukkit.getPluginManager().callEvent(deathEvent);
+			Attitude a = getAttitude(killer, killed);
+			if (a == Attitude.FRIENDLY) {
+				pay(killer, friendlyKillMoney);
+				pay(killed, byFriendlyDeathMoney);
+			} else if (a == Attitude.HOSTILE) {
+				pay(killer, enemyKillMoney);
+				pay(killed, byEnemyDeathMoney);
+			}
+		} else {
+			notifyAllPlayers(String.format("%s commited suicide...", Utils.formatPlayer(killed)));
+			// fire an event
+			FlierPlayerKillEvent deathEvent = new FlierPlayerKillEvent(killed, killed,
+					fall ? Type.SHOT_DOWN : Type.KILLED);
+			Bukkit.getPluginManager().callEvent(deathEvent);
+			pay(killed, suicideMoney);
+		}
+		Utils.clearPlayer(killed.getPlayer());
+		killed.setPlaying(false);
+		killed.setAttacker(null);
+		afterRespawn(killed);
+	}
 	
-	/**
-	 * Handles one player hitting another one with a Damager.
-	 * 
-	 * @param result result of the hit; it's unmodifiable now
-	 * @param attacker the attacking player
-	 * @param attacked the attacked player
-	 * @param damager the Damager used in the hit
-	 */
-	public abstract void handleHit(List<DamageResult> result, InGamePlayer attacker, InGamePlayer attacked, Damager damager);
+	@Override
+	public void handleHit(InGamePlayer attacker, InGamePlayer attacked, Damager damager) {
+		List<DamageResult> results = attacked.damage(attacker, damager);
+		// handle a general hit
+		if (results.contains(DamageResult.HIT) && attacker != null) {
+			// pay money for a hit
+			Attitude a = getAttitude(attacker, attacked);
+			if (a == Attitude.FRIENDLY) {
+				pay(attacker, friendlyHitMoney);
+				pay(attacked, byFriendlyHitMoney);
+			} else if (a == Attitude.HOSTILE) {
+				pay(attacker, enemyHitMoney);
+				pay(attacked, byEnemyHitMoney);
+			}
+			// display a message about the hit and play the sound to the shooter if he exists and if he hit someone else
+			if (attacker != null && !attacker.equals(this)) {
+				attacker.getPlayer().sendMessage(ChatColor.YELLOW + "You managed to hit " + Utils.formatPlayer(attacked) + "!");
+			}
+		}
+		// handle physical damage
+		if (results.contains(DamageResult.REGULAR_DAMAGE)) {
+			attacked.getPlayer().damage(damager.getPhysical());
+			attacked.getPlayer().setNoDamageTicks(damager.getNoDamageTicks());
+		}
+		// handle taking wings off
+		if (results.contains(DamageResult.WINGS_OFF)) {
+			attacked.takeWingsOff();
+		}
+		// handle wing damage
+		if (results.contains(DamageResult.WINGS_DAMAGE)) {
+			attacked.getClazz().getWings().removeHealth(damager.getDamage());
+		}
+	}
 	
-	/**
-	 * This method is called for the respawned player. Use it if you want to do
-	 * something special after respawning the player, or just pass him to
-	 * lobby.respawnPlayer().
-	 * 
-	 * @param player
-	 *            the player who has just respawned
-	 */
+	@Override
 	public abstract void afterRespawn(InGamePlayer player);
 
 	@Override
@@ -334,75 +375,7 @@ public abstract class DefaultGame implements Listener, Game {
 			return;
 		}
 		// weapon was used on in-game player, process the attack
-		List<DamageResult> result = damage(player, weapon.getAttacker(), weapon.getDamager());
-		InGamePlayer shooter = weapon.getAttacker();
-		// fire an event
-		FlierPlayerHitEvent hitEvent = new FlierPlayerHitEvent(shooter, player, result, weapon.getDamager());
-		Bukkit.getPluginManager().callEvent(hitEvent);
-		if (hitEvent.isCancelled()) {
-			return;
-		}
-		// handle the hit
-		handleHit(result, weapon.getAttacker(), player, weapon.getDamager());
-		// handle a general hit
-		if (result.contains(DamageResult.HIT) && shooter != null) {
-			// pay money for a hit
-			Attitude a = getAttitude(shooter, player);
-			if (a == Attitude.FRIENDLY) {
-				pay(shooter, friendlyHitMoney);
-				pay(player, byFriendlyHitMoney);
-			} else if (a == Attitude.HOSTILE) {
-				pay(shooter, enemyHitMoney);
-				pay(player, byEnemyHitMoney);
-			}
-			// display a message about the hit and play the sound to the shooter if he exists and if he hit someone else
-			if (shooter != null && !shooter.equals(player)) {
-				shooter.getPlayer().sendMessage(ChatColor.YELLOW + "You managed to hit " + Utils.formatPlayer(player) + "!");
-			}
-		}
-		// handle physical damage
-		if (result.contains(DamageResult.REGULAR_DAMAGE)) {
-			event.setCancelled(false);
-			event.setDamage(weapon.getDamager().getPhysical());
-		}
-		// handle taking wings off
-		if (result.contains(DamageResult.WINGS_OFF)) {
-			player.takeWingsOff();
-		}
-		// handle wing damage
-		if (result.contains(DamageResult.WINGS_DAMAGE)) {
-			player.getClazz().getWings().removeHealth(weapon.getDamager().getDamage());
-		}
-	}
-
-	public List<DamageResult> damage(InGamePlayer attacked, InGamePlayer attacker, Damager damager) {
-		List<DamageResult> list = new ArrayList<>(3);
-		// player is not playing, nothing happens
-		if (!attacked.isPlaying()) {
-			return list;
-		}
-		Player shooter = attacker == null ? null : attacker.getPlayer();
-		// ignore if you can's commit suicide with this weapon
-		if (shooter != null && shooter.equals(attacked) && !damager.suicidal()) {
-			return list;
-		}
-		// flying, handle air attack
-		if (Position.check(attacked.getPlayer(), Usage.Where.NO_FALL)) {
-			attacked.setAttacker(attacker);
-			list.add(DamageResult.HIT);
-			if (Position.check(attacked.getPlayer(), Usage.Where.AIR)) {
-				if (damager.wingsOff()) {
-					list.add(DamageResult.WINGS_OFF);
-				}
-				if (damager.midAirPhysicalDamage()) {
-					list.add(DamageResult.REGULAR_DAMAGE);
-				}
-				list.add(DamageResult.WINGS_DAMAGE);
-			} else if (Position.check(attacked.getPlayer(), Usage.Where.GROUND)) {
-				list.add(DamageResult.REGULAR_DAMAGE);
-			}
-		}
-		return list;
+		handleHit(weapon.getAttacker(), player, weapon.getDamager());
 	}
 	
 	@EventHandler(priority=EventPriority.HIGH)
@@ -416,43 +389,7 @@ public abstract class DefaultGame implements Listener, Game {
 			event.setCancelled(true);
 			InGamePlayer lastHit = killed.getAttacker();
 			InGamePlayer killer = lastHit == null ? null : getPlayers().get(lastHit.getPlayer().getUniqueId());
-			if (killer != null && !killer.equals(killed)) {
-				switch (event.getCause()) {
-				case FALL:
-					notifyAllPlayers(String.format("%s was shot down by %s!",
-							Utils.formatPlayer(killed), Utils.formatPlayer(killer)));
-					break;
-				default:
-					notifyAllPlayers(String.format("%s was killed by %s!",
-							Utils.formatPlayer(killed), Utils.formatPlayer(killer)));
-					break;
-				}
-				// fire an event
-				FlierPlayerKillEvent deathEvent = new FlierPlayerKillEvent(killer, killed,
-						event.getCause() == DamageCause.FALL ? Type.SHOT_DOWN : Type.KILLED);
-				Bukkit.getPluginManager().callEvent(deathEvent);
-				handleKill(killer, killed);
-				Attitude a = getAttitude(killer, killed);
-				if (a == Attitude.FRIENDLY) {
-					pay(killer, friendlyKillMoney);
-					pay(killed, byFriendlyDeathMoney);
-				} else if (a == Attitude.HOSTILE) {
-					pay(killer, enemyKillMoney);
-					pay(killed, byEnemyDeathMoney);
-				}
-			} else {
-				notifyAllPlayers(String.format("%s commited suicide...", Utils.formatPlayer(killed)));
-				// fire an event
-				FlierPlayerKillEvent deathEvent = new FlierPlayerKillEvent(killed, killed,
-						event.getCause() == DamageCause.FALL ? Type.SHOT_DOWN : Type.KILLED);
-				Bukkit.getPluginManager().callEvent(deathEvent);
-				handleKill(null, killed);
-				pay(killed, suicideMoney);
-			}
-			Utils.clearPlayer(killed.getPlayer());
-			killed.setPlaying(false);
-			killed.setAttacker(null);
-			afterRespawn(killed);
+			handleKill(killer, killed, event.getCause() == DamageCause.FALL);
 		}
 	}
 	

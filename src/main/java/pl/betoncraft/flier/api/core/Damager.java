@@ -14,7 +14,8 @@ package pl.betoncraft.flier.api.core;
 public interface Damager {
 
 	/**
-	 * Represents a result of player being hit by Damager. There can be multiple results.
+	 * Represents a result of player being hit by Damager. There can be multiple
+	 * results.
 	 *
 	 * @author Jakub Sapalski
 	 */
@@ -34,12 +35,11 @@ public interface Damager {
 		 * When the player is on ground and was not instantly killed.
 		 */
 		REGULAR_DAMAGE,
-		
+
 		/**
 		 * When a hit is accepted at all.
 		 */
 		HIT,
-		
 
 	}
 
@@ -60,32 +60,38 @@ public interface Damager {
 	public double getPhysical();
 
 	/**
+	 * @return the amount of ticks when the player is immune to damage after the
+	 *         hit
+	 */
+	public int getNoDamageTicks();
+
+	/**
 	 * Some weapons can make the wings fall of into the player's inventory. It's
 	 * possible to get them back on quickly and avoid death from falling.
 	 * 
 	 * @return whenever wings should fall off on hit
 	 */
 	public boolean wingsOff();
-	
+
 	/**
-	 * Some weapons can deal physical damage even if the player is flying.
-	 * The usual wing damage is also applied.
+	 * Some weapons can deal physical damage even if the player is flying. The
+	 * usual wing damage is also applied.
 	 * 
 	 * @return whenever this damager deals physical damage mid-air
 	 */
 	public boolean midAirPhysicalDamage();
-	
+
 	/**
 	 * @return true if this damager should damage players in the same team in
 	 *         case there are teams
 	 */
 	public boolean friendlyFire();
-	
+
 	/**
 	 * @return true if this damager can damage the player who fired it
 	 */
 	public boolean suicidal();
-	
+
 	/**
 	 * @return true if the damager can explode and deal damage that way
 	 */
