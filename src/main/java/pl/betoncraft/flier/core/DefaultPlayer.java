@@ -62,6 +62,7 @@ public class DefaultPlayer implements InGamePlayer {
 	private boolean isPlaying;
 	private boolean leftClicked = false;
 	private boolean rightClicked = false;
+	private int noDamageTicks = 0;
 	private List<SidebarLine> lines = new LinkedList<>();
 	private InGamePlayer lastHit = null;
 	private ChatColor color;
@@ -121,7 +122,7 @@ public class DefaultPlayer implements InGamePlayer {
 			use();
 			leftClicked = false;
 			rightClicked = false;
-			
+			noDamageTicks--;
 		}
 	}
 
@@ -153,14 +154,13 @@ public class DefaultPlayer implements InGamePlayer {
 		// empty list means no damage was dealt
 		List<DamageResult> results = new ArrayList<>(3);
 		// if player can't be damaged yet, return
-		if (player.getNoDamageTicks() > 0) {
+		if (noDamageTicks > 0) {
 			return results;
 		}
 		// player is not playing, nothing happens
 		// ignore if you can's commit suicide with this weapon
 		if (isPlaying() || !(shooter != null && shooter.equals(this) && !damager.suicidal())) {
 			if (Position.check(getPlayer(), Usage.Where.NO_FALL)) {
-				setAttacker(shooter);
 				results.add(DamageResult.HIT);
 				if (Position.check(getPlayer(), Usage.Where.AIR)) {
 					if (damager.wingsOff()) {
@@ -182,6 +182,11 @@ public class DefaultPlayer implements InGamePlayer {
 			results.clear();
 		}
 		return results;
+	}
+	
+	@Override
+	public void setNoDamageTicks(int noDamageTicks) {
+		this.noDamageTicks = noDamageTicks;
 	}
 	
 	@Override

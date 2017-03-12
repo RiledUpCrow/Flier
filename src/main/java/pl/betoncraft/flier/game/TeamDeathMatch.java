@@ -143,7 +143,9 @@ public class TeamDeathMatch extends DefaultGame {
 	}
 
 	@Override
-	public void handleHit(InGamePlayer attacker, InGamePlayer attacked, Damager damager) {}
+	public void handleHit(InGamePlayer attacker, InGamePlayer attacked, Damager damager) {
+		super.handleHit(attacker, attacked, damager);
+	}
 	
 	@Override
 	public void afterRespawn(InGamePlayer player) {

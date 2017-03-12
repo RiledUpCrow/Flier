@@ -162,7 +162,7 @@ public class ParticleGun extends DefaultAttack {
 						// hit closest player
 						if (foundPlayer != null) {
 							earlyEnd(foundPlayer.getPlayer().getLocation());
-							foundPlayer.damage(data, ParticleGun.this);
+							foundPlayer.getLobby().getGame().handleHit(data, foundPlayer, ParticleGun.this);
 						}
 						
 						// spawn particles 

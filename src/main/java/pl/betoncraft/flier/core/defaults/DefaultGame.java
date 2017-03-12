@@ -213,6 +213,8 @@ public abstract class DefaultGame implements Listener, Game {
 		List<DamageResult> results = attacked.damage(attacker, damager);
 		// handle a general hit
 		if (results.contains(DamageResult.HIT) && attacker != null) {
+			attacked.setAttacker(attacker);
+			attacked.setNoDamageTicks(damager.getNoDamageTicks());
 			// pay money for a hit
 			Attitude a = getAttitude(attacker, attacked);
 			if (a == Attitude.FRIENDLY) {
@@ -229,8 +231,8 @@ public abstract class DefaultGame implements Listener, Game {
 		}
 		// handle physical damage
 		if (results.contains(DamageResult.REGULAR_DAMAGE)) {
+			attacked.getPlayer().setNoDamageTicks(0);
 			attacked.getPlayer().damage(damager.getPhysical());
-			attacked.getPlayer().setNoDamageTicks(damager.getNoDamageTicks());
 		}
 		// handle taking wings off
 		if (results.contains(DamageResult.WINGS_OFF)) {

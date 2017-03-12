@@ -177,6 +177,13 @@ public interface InGamePlayer {
 	 * @return list of damage results, never null; if it's empty the damage was
 	 *         not dealt
 	 */
-	List<DamageResult> damage(InGamePlayer shooter, Damager damager);
+	public List<DamageResult> damage(InGamePlayer shooter, Damager damager);
+
+	/**
+	 * Sets the amount of ticks when there can be no damage to the player
+	 * 
+	 * @param noDamageTicks amount of ticks
+	 */
+	public void setNoDamageTicks(int noDamageTicks);
 
 }
