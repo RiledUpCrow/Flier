@@ -33,6 +33,9 @@ balancedWeapon:
       ammo_use: -10
       activators:
       - right
+      - hasAmmo
+      actions:
+      - consumeAmmo
 strongWeapon:
   material: blaze rod
   name: '&4Strong Weapon'
@@ -61,6 +64,9 @@ strongWeapon:
       ammo_use: -15
       activators:
       - right
+      - hasAmmo
+      actions:
+      - consumeAmmo
 fastWeapon:
   material: stick
   name: '&4Fast Weapon'
@@ -88,10 +94,9 @@ fastWeapon:
       ammo_use: -5
       activators:
       - right
-    click:
-      where: air
-      activators:
-      - left
+      - hasAmmo
+      actions:
+      - consumeAmmo
 gun:
   material: torch
   name: '&4Gun'
@@ -119,6 +124,9 @@ gun:
       ammo_use: -10
       activators:
       - right
+      - hasAmmo
+      actions:
+      - consumeAmmo
 bomb:
   material: tnt
   name: '&cSelfDestruct Button'
@@ -193,3 +201,10 @@ wings:
       - wingsDead
       actions:
       - repair
+ammo:
+  material: ender pearl
+  name: '&0Ammunition'
+  lore:
+  - '&bAllows reloading.'
+  - '&aRight click with weapon to use.'
+  slot: 6

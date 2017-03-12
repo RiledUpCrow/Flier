@@ -8,7 +8,6 @@ package pl.betoncraft.flier.core;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -199,6 +198,43 @@ public class DefaultPlayer implements InGamePlayer {
 	public boolean isHolding(UsableItem item) {
 		ItemStack stack = player.getInventory().getItemInMainHand();
 		return item == null && stack == null || (item != null && stack != null && item.getItem().isSimilar(stack));
+	}
+	
+	@Override
+	public void consumeItem(UsableItem match) {
+		UsableItem item = clazz.getItems().stream()
+				.filter(i -> i.isSimilar(match))
+				.findFirst()
+				.orElse(null);
+		if (item == null) {
+			return;
+		}
+		int slot = item.slot();
+		int amount = item.getAmount();
+		ItemStack stack = player.getInventory().getItem(slot);
+		// if the stack was not on the correct slot or there was another item, find the correct one
+		if (stack == null || !stack.isSimilar(item.getItem())) {
+			ItemStack[] inv = player.getInventory().getContents();
+			for (int i = 0; i < inv.length; i++) {
+				if (inv[i] != null && item.getItem().isSimilar(inv[i])) {
+					stack = inv[i];
+					slot = i; // remember the current slot, so we can remove it
+					break;
+				}
+			}
+		}
+		// no such item, can't remove
+		if (stack == null) {
+			return;
+		}
+		amount--;
+		if (amount <= 0) { // remove stack
+			player.getInventory().setItem(slot, null); // here the remembered slot is used
+		} else { // decrease stack
+			stack.setAmount(amount);
+			item.setAmmo(item.getMaxAmmo());
+		}
+		clazz.removeItem(item);
 	}
 
 	@Override
@@ -482,39 +518,12 @@ public class DefaultPlayer implements InGamePlayer {
 		if (!isPlaying()) {
 			return;
 		}
-		// we can't remove class items while iterating over them, so this list will remember them
-		// it.remove() won't work, removing class item is more complicated than that
-		List<UsableItem> itemsToRemove = new ArrayList<>();
-		for (Iterator<UsableItem> it = clazz.getItems().iterator(); it.hasNext();) {
-			UsableItem item = it.next();
-			int amount = item.getAmount();
+		// iterate over copied list to avoid concurrent modifications
+		List<UsableItem> copy = new ArrayList<>(clazz.getItems());
+		for (UsableItem item : copy) {
 			if (item.use(this) && item.getAmmo() == 0 && item.isConsumable()) {
-				int slot = item.slot();
-				ItemStack stack = player.getInventory().getItem(slot);
-				// if the stack was not on the correct slot or there was another item, find the correct one
-				if (stack == null || !stack.isSimilar(item.getItem())) {
-					ItemStack[] inv = player.getInventory().getContents();
-					for (int i = 0; i < inv.length; i++) {
-						if (inv[i] != null && item.getItem().isSimilar(inv[i])) {
-							stack = inv[i];
-							slot = i; // remember the current slot, so we can remove it
-							break;
-						}
-					}
-				}
-				amount--;
-				if (amount <= 0) { // remove stack
-					player.getInventory().setItem(slot, null); // here the remembered slot is used
-				} else { // decrease stack
-					stack.setAmount(amount);
-					item.setAmmo(item.getMaxAmmo());
-				}
-				itemsToRemove.add(item); // remember the item to remove from the class
+				consumeItem(item);
 			}
-		}
-		// remove items from the class
-		for (UsableItem item : itemsToRemove) {
-			clazz.removeItem(item);
 		}
 	}
 

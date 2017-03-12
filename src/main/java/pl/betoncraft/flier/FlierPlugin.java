@@ -19,6 +19,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import pl.betoncraft.flier.action.ConsumeAction;
 import pl.betoncraft.flier.action.EffectAction;
 import pl.betoncraft.flier.action.FuelAction;
 import pl.betoncraft.flier.action.ItemSetAction;
@@ -31,6 +32,7 @@ import pl.betoncraft.flier.action.attack.Bomb;
 import pl.betoncraft.flier.action.attack.HomingMissile;
 import pl.betoncraft.flier.action.attack.ParticleGun;
 import pl.betoncraft.flier.action.attack.ProjectileGun;
+import pl.betoncraft.flier.activator.ItemActivator;
 import pl.betoncraft.flier.activator.LeftClickActivator;
 import pl.betoncraft.flier.activator.RightClickActivator;
 import pl.betoncraft.flier.activator.SlowTickActivator;
@@ -107,10 +109,12 @@ public class FlierPlugin extends JavaPlugin implements Flier {
 		registerAction("fuel", s -> new FuelAction(s));
 		registerAction("targetCompass", s -> new TargetAction(s));
 		registerAction("itemSet", s -> new ItemSetAction(s));
+		registerAction("consume", s -> new ConsumeAction(s));
 		registerActivator("leftClick", s -> new LeftClickActivator(s));
 		registerActivator("rightClick", s -> new RightClickActivator(s));
 		registerActivator("slowTick", s -> new SlowTickActivator(s));
 		registerActivator("wingsHealth", s -> new WingsHealthActivator(s));
+		registerActivator("item", s -> new ItemActivator(s));
 		registerEffect("publicSound", s -> new PublicSoundEffect(s));
 		registerEffect("privateSound", s -> new PrivateSoundEffect(s));
 		registerEffect("gameSound", s -> new GameSoundEffect(s));

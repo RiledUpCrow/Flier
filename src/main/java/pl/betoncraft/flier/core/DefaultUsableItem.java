@@ -158,7 +158,7 @@ public class DefaultUsableItem extends DefaultItem implements UsableItem {
 	
 	@Override
 	public boolean setAmount(int amount) {
-		if (amount < 0 || amount > max) {
+		if (amount < 0 || (max != 0 && amount > max)) {
 			return false;
 		} else {
 			this.amount = amount;

@@ -58,3 +58,17 @@ wing_health:
 * `number_type` (**default: absolute**) is the type of the number. Available values are:
   * `absolute`
   * `percentage`
+
+## Item
+
+**`item`**
+
+This Activator is activated when the player has specified item in the inventory.
+
+```
+has_item:
+  type: item
+  item: [item name]
+```
+
+* `item` the name of the item, as in _items.yml_ file.

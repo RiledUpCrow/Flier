@@ -27,3 +27,4 @@ fix:
   actions:
   - fixAll
   - refuel
+  - refill

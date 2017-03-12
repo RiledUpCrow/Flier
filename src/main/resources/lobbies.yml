@@ -15,6 +15,7 @@
 #  leave: 100;200;300;world       # "leave" block, **EDIT THIS BEFORE USING!**
 #  default_class:                 # list of item sets for default class
 #  - balanced
+#  - ammo
 #  buttons:                       # list of buttons with item sets
 #    rocket_button:
 #      buy_cost: 15               # cost of buying this item set
@@ -64,19 +65,22 @@
 #        item_set: fast_class
 #        add_type: fill
 #        conflict_action: replace
+#        saving: true
 #      block: 100;200;300;world   # **EDIT THIS BEFORE USING!**
 #    balanced_button:
 #      on_buy:
 #        item_set: balanced_class
 #        add_type: fill
 #        conflict_action: replace
+#        saving: true
 #      block: 100;200;300;world   # **EDIT THIS BEFORE USING!**
 #    strong_button:
 #      on_buy:
 #        item_set: strong_class
 #        add_type: fill
 #        conflict_action: replace
+#        saving: true
 #      block: 100;200;300;world   # **EDIT THIS BEFORE USING!**
-#  respawn_action: nothing        # what happens with items after respawn (see docs)
+#  respawn_action: combine        # what happens with items after respawn (see docs)
 #  games:                         # list of Games in this Lobby
 #  - default

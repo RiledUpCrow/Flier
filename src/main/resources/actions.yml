@@ -91,3 +91,11 @@ fixAll:
 refuel:
   type: fuel
   amount: 2000
+refill:
+  type: itemSet
+  item_set: ammo
+  add_type: fill
+  conflict_action: replace
+consumeAmmo:
+  type: consume
+  item: ammo

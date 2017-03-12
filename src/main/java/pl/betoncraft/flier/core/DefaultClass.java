@@ -189,18 +189,34 @@ public class DefaultClass implements PlayerClass {
 
 	@Override
 	public List<UsableItem> getItems() {
-		return Collections.unmodifiableList(compiled.getItems());
+		return compiled.getItems();
 	}
 	
 	@Override
 	public boolean removeItem(UsableItem removeItem) {
+		int newAmount = 0;
+		boolean found = false;
+		// find the item on the compiled list
+		for (Iterator<UsableItem> it = compiled.getItems().iterator(); it.hasNext();) {
+			UsableItem item = it.next();
+			if (item.isSimilar(removeItem)) {
+				newAmount = item.getAmount() - 1;
+				if (newAmount > 0) {
+					item.setAmount(newAmount);
+				} else {
+					item.setAmount(0);
+					it.remove();
+				}
+				found = true;
+				break;
+			}
+		}
 		// removing from the compiled list isn't necessary, it's read-only
-		for (Iterator<ItemSet> itSet = current.values().iterator(); itSet.hasNext();) {
+		if (found) loop: for (Iterator<ItemSet> itSet = current.values().iterator(); itSet.hasNext();) {
 			ItemSet set = itSet.next();
 			for (Iterator<UsableItem> itItem = set.getItems().iterator(); itItem.hasNext();) {
 				UsableItem item = itItem.next();
 				if (item.isSimilar(removeItem)) {
-					int newAmount = item.getAmount() - 1;
 					if (newAmount > 0) {
 						item.setAmount(newAmount);
 					} else {
@@ -211,11 +227,11 @@ public class DefaultClass implements PlayerClass {
 							itSet.remove();
 						}
 					}
-					return true;
+					break loop;
 				}
 			}
 		}
-		return false;
+		return found;
 	}
 	
 	@Override

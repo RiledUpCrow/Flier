@@ -65,6 +65,13 @@ public interface InGamePlayer {
 	public void takeWingsOff();
 
 	/**
+	 * Consumes the UsableItem, removing it both from the class and from the player's inventory.
+	 * 
+	 * @param item
+	 */
+	public void consumeItem(UsableItem item);
+
+	/**
 	 * @return the the lobby this player is in
 	 */
 	public Lobby getLobby();

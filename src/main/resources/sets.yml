@@ -40,3 +40,8 @@ the_repair_kit:
   items:
   - item: wings
     max: 2
+ammo:
+  category: ammo
+  items:
+  - item: ammo
+    amount: 10

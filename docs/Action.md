@@ -151,6 +151,20 @@ apply_set:
   saving: [true/false]
 ```
 
+## Consume
+
+**`consume`**
+
+This action will consume a single item from player's inventory, just like using a consumable item does. It will not update all class items, as opposed to `itemSet` with a single item decreasing.
+
+```
+consume_item:
+  type: consume
+  item: [item name]
+```
+
+* `item` is the name of the item, as in _items.yml_ file.
+
 ## Homing missile
 
 **`homingMissile`**
