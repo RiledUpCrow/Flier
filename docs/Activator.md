@@ -56,8 +56,8 @@ wing_health:
 * `min` (**required**) is the lower bound of acceptable health level.
 * `max` (**default: the same as `min` value**) is the upper bound of acceptable health level.
 * `number_type` (**default: absolute**) is the type of the number. Available values are:
-  * `absolute`
-  * `percentage`
+    * `absolute`
+    * `percentage`
 
 ## Item
 

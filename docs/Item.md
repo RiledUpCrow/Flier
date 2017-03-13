@@ -13,7 +13,7 @@ item_name:
   lore:
   - Some lines of the lore
   - More lines...
-  weight: [decimal]]
+  weight: [decimal]
   slot: [integer]
   consumable: [boolean]
   ammo: [non-negative integer]

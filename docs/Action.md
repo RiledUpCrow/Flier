@@ -112,7 +112,7 @@ target_action:
 
 ## Wings Health
 
-**`wingsHealth`***
+**`wingsHealth`**
 
 This action modifies the health of Wings. It will break the Wings if their health drops to 0 and restore them if their health goes above 0.
 

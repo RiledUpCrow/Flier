@@ -14,7 +14,7 @@
 #  start: 100;200;300;world       # "start" block, **EDIT THIS BEFORE USING!**
 #  leave: 100;200;300;world       # "leave" block, **EDIT THIS BEFORE USING!**
 #  default_class:                 # list of item sets for default class
-#  - balanced
+#  - balanced_class
 #  - ammo
 #  buttons:                       # list of buttons with item sets
 #    rocket_button:
@@ -25,7 +25,7 @@
 #        conflict_action: skip    # what happens, when there already is something of that category
 #      sell_cost: -15             # negative, because we're giving the money back
 #      on_sell:                   # items to apply when selling
-#        item_set: addRocket      # it's the same as above
+#        item_set: the_rocket     # it's the same as above
 #        add_type: decrease       # but we're decreasing instead of increasing
 #        conflict_action: skip
 #      block: 100;200;300;world   # location of the block to click, **EDIT THIS BEFORE USING!**
