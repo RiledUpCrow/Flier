@@ -30,7 +30,9 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityExplodeEvent;
+import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.ExplosionPrimeEvent;
+import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -415,6 +417,23 @@ public abstract class DefaultGame implements Listener, Game {
 			return;
 		}
 		if (!weapon.getDamager().isExploding()) {
+			event.setCancelled(true);
+		}
+	}
+	
+	@EventHandler
+	public void onRegen(EntityRegainHealthEvent event) {
+		if (event.getEntity() instanceof Player) {
+			Player player = (Player) event.getEntity();
+			if (dataMap.containsKey(player.getUniqueId())) {
+				event.setCancelled(true);
+			}
+		}
+	}
+	
+	@EventHandler
+	public void onHunger(FoodLevelChangeEvent event) {
+		if (dataMap.containsKey(event.getEntity().getUniqueId())) {
 			event.setCancelled(true);
 		}
 	}
