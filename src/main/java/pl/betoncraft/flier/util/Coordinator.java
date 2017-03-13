@@ -25,14 +25,14 @@ import pl.betoncraft.flier.api.Flier;
  * @author Jakub Sapalski
  */
 public class Coordinator implements Listener {
-	
+
 	private static Set<UUID> set;
-	
+
 	public Coordinator() {
 		set = new HashSet<>();
 		Bukkit.getPluginManager().registerEvents(this, Flier.getInstance());
 	}
-	
+
 	@EventHandler
 	public void onClick(PlayerInteractEvent event) {
 		if (!event.hasBlock()) {
@@ -41,22 +41,28 @@ public class Coordinator implements Listener {
 		if (!set.contains(event.getPlayer().getUniqueId())) {
 			return;
 		}
+		event.setCancelled(true);
 		String blockType = event.getClickedBlock().getType().toString();
 		Location loc = event.getClickedBlock().getLocation();
-		String location = loc.getBlockX() + ";" + loc.getBlockY() + ";" + loc.getBlockZ() + ";" + loc.getWorld().getName();
+		String location = String.format("%d;%d;%d;%s",
+				loc.getBlockX(), loc.getBlockY(), loc.getBlockZ(), loc.getWorld().getName());
 		Flier.getInstance().getLogger().info(String.format("Coordinates for %s: %s", blockType, location));
-		Bukkit.dispatchCommand(Bukkit.getConsoleSender(), String.format("tellraw %s [\"\",{\"text\":\"%sCoordinates for %s%s%s: %s%s\",\"clickEvent\":{\"action\":\"suggest_command\",\"value\":\"%s\"},\"hoverEvent\":{\"action\":\"show_text\",\"value\":{\"text\":\"\",\"extra\":[{\"text\":\"Click this to get block coordinates.\",\"color\":\"aqua\"}]}}}]",
-				event.getPlayer().getName(), ChatColor.YELLOW, ChatColor.LIGHT_PURPLE, blockType, ChatColor.YELLOW, ChatColor.WHITE, location, location));
+		Bukkit.dispatchCommand(Bukkit.getConsoleSender(), String.format(
+				"tellraw %s [\"\",{\"text\":\"%sCoordinates for %s%s%s: %s%s\",\"clickEvent\":{\"action\":\"suggest"
+				+ "_command\",\"value\":\"%s\"},\"hoverEvent\":{\"action\":\"show_text\",\"value\":{\"text\":\"\","
+				+ "\"extra\":[{\"text\":\"Click this to get block coordinates.\",\"color\":\"aqua\"}]}}}]",
+				event.getPlayer().getName(), ChatColor.YELLOW, ChatColor.LIGHT_PURPLE, blockType, ChatColor.YELLOW,
+				ChatColor.WHITE, location, location));
 	}
-	
+
 	public static boolean isActive(UUID player) {
 		return set.contains(player);
 	}
-	
+
 	public static void addPlayer(UUID player) {
 		set.add(player);
 	}
-	
+
 	public static void removePlayer(UUID player) {
 		set.remove(player);
 	}
