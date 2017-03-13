@@ -48,6 +48,10 @@
 			<id>spigot-api</id>
 			<url>https://hub.spigotmc.org/nexus/content/repositories/snapshots</url>
 		</repository>
+		<repository>
+			<id>betonquest-repo</id>
+			<url>http://betonquest.betoncraft.pl/mvn</url>
+		</repository>
 	</repositories>
 	<dependencies>
 		<dependency>
@@ -55,6 +59,11 @@
 			<artifactId>spigot-api</artifactId>
 			<version>1.10.2-R0.1-SNAPSHOT</version>
 			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>pl.betoncraft</groupId>
+			<artifactId>BetonLangAPI</artifactId>
+			<version>1.0.1</version>
 		</dependency>
 	</dependencies>
 </project>

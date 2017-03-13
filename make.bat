@@ -34,6 +34,7 @@ pandoc^
  docs\Home.md^
  docs\Installation.md^
  docs\Commands.md^
+ docs\Integrations.md^
  docs\Lobby.md^
  docs\Game.md^
  docs\ItemSet.md^

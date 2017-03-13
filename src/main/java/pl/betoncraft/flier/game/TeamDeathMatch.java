@@ -15,6 +15,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.entity.Player;
 
 import pl.betoncraft.flier.api.content.Game;
 import pl.betoncraft.flier.api.content.Lobby;
@@ -24,6 +25,7 @@ import pl.betoncraft.flier.api.core.LoadingException;
 import pl.betoncraft.flier.api.core.SidebarLine;
 import pl.betoncraft.flier.core.defaults.DefaultGame;
 import pl.betoncraft.flier.event.FlierPlayerSpawnEvent;
+import pl.betoncraft.flier.util.LangManager;
 import pl.betoncraft.flier.util.Utils;
 import pl.betoncraft.flier.util.ValueLoader;
 
@@ -217,8 +219,11 @@ public class TeamDeathMatch extends DefaultGame {
 	private void setTeam(InGamePlayer data, SimpleTeam team) {
 		players.put(data.getPlayer().getUniqueId(), team);
 		data.setColor(team.getColor());
+		String teamName = team.getName().startsWith("$") ?
+				LangManager.getMessage(data.getPlayer(), team.getName().substring(1)) :
+				team.getName();
 		String title = String.format("title %s title {\"text\":\"%s%s\"}",
-				data.getPlayer().getName(), team.getColor(), Utils.capitalize(team.getName()));
+				data.getPlayer().getName(), team.getColor(), Utils.capitalize(teamName));
 		Bukkit.dispatchCommand(Bukkit.getConsoleSender(), title);
 		updateColors();
 	}
@@ -261,15 +266,20 @@ public class TeamDeathMatch extends DefaultGame {
 		if (newScore >= pointsToWin) {
 			// display message about winning
 			for (Entry<UUID, SimpleTeam> entry : players.entrySet()) {
-				String name = Bukkit.getPlayer(entry.getKey()).getName();
+				Player player = Bukkit.getPlayer(entry.getKey());
+				String name = player.getName();
 				String word;
 				if (entry.getValue().equals(team)) {
-					word = "You win!";
+					word = LangManager.getMessage(player, "win");
 				} else {
-					word = "You lose!";
+					word = LangManager.getMessage(player, "lose");
 				}
-				String title = String.format("title %s title {\"text\":\"%sTeam %s wins!\"}",
-						name, team.getColor(), Utils.capitalize(team.getName()));
+				String teamName = team.getName().startsWith("$") ?
+						LangManager.getMessage(player, team.getName().substring(1)) :
+						team.getName();
+				String win = LangManager.getMessage(player, "team_win", teamName);
+				String title = String.format("title %s title {\"text\":\"%s\"}",
+						name, win);
 				String subTitle = String.format("title %s subtitle {\"text\":\"%s%s\"}",
 						name, entry.getValue().getColor(), word);
 				Bukkit.dispatchCommand(Bukkit.getConsoleSender(), title);

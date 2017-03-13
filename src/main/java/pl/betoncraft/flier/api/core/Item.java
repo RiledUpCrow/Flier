@@ -6,6 +6,7 @@
  */
 package pl.betoncraft.flier.api.core;
 
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 /**
@@ -21,9 +22,9 @@ public interface Item {
 	public String getID();
 
 	/**
-	 * @return the ItemStack equal to this item
+	 * @return the ItemStack equal to this item, with strings translated for specified player
 	 */
-	public ItemStack getItem();
+	public ItemStack getItem(Player player);
 
 	/**
 	 * @return weight of an item

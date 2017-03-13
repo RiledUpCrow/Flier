@@ -26,7 +26,6 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
 
-import net.md_5.bungee.api.ChatColor;
 import pl.betoncraft.flier.api.Flier;
 import pl.betoncraft.flier.api.content.Game;
 import pl.betoncraft.flier.api.content.Lobby;
@@ -39,6 +38,7 @@ import pl.betoncraft.flier.api.core.SetApplier;
 import pl.betoncraft.flier.core.DefaultClass;
 import pl.betoncraft.flier.core.DefaultPlayer;
 import pl.betoncraft.flier.core.DefaultSetApplier;
+import pl.betoncraft.flier.util.LangManager;
 import pl.betoncraft.flier.util.ValueLoader;
 
 /**
@@ -218,7 +218,7 @@ public abstract class DefaultLobby implements Lobby, Listener {
 			boolean unlocked = button.getUnlockCost() == 0 || ul.contains(button);
 			if (!unlocked) {
 				if (!button.getRequirements().stream().map(name -> buttons.get(name)).allMatch(b -> ul.contains(b))) {
-					if (notify) player.getPlayer().sendMessage(ChatColor.RED + "You need to unlock other buttons first.");
+					if (notify) LangManager.sendMessage(player.getPlayer(), "unlock_other");
 				} else if (button.getUnlockCost() <= player.getMoney()) {
 					SetApplier applier = button.getOnUnlock();
 					Runnable run = () -> {
@@ -230,7 +230,7 @@ public abstract class DefaultLobby implements Lobby, Listener {
 					if (applier == null) {
 						run.run();
 						applied = true;
-						message = ChatColor.GREEN + "Unlocked!";
+						message = "unlocked";
 					} else {
 						AddResult result = applier.isSaving() ? player.getClazz().addStored(applier) :
 							player.getClazz().addCurrent(applier);
@@ -241,15 +241,15 @@ public abstract class DefaultLobby implements Lobby, Listener {
 						case REMOVED:
 							run.run();
 							applied = true;
-							message = ChatColor.GREEN + "Unlocked!";
+							message = "unlocked";
 							break;
 						default:
-							message = ChatColor.RED + "You can't use this right now.";
+							message = "cant_use";
 						}
-						if (notify) player.getPlayer().sendMessage(message);
+						if (notify) LangManager.sendMessage(player.getPlayer(), message);;
 					}
 				} else {
-					if (notify) player.getPlayer().sendMessage(ChatColor.RED + "Not enough money to unlock this.");
+					if (notify) LangManager.sendMessage(player.getPlayer(), "no_money_unlock");
 				}
 			} else {
 				int cost;
@@ -274,42 +274,42 @@ public abstract class DefaultLobby implements Lobby, Listener {
 						case ADDED:
 							run.run();
 							applied = true;
-							message = ChatColor.GREEN + "Items added!";
+							message = "items_added";
 							break;
 						case FILLED:
 							run.run();
 							applied = true;
-							message = ChatColor.GREEN + "Items refilled!";
+							message = "items_refilled";
 							break;
 						case REMOVED:
 							run.run();
 							applied = true;
-							message = ChatColor.GREEN + "Items removed!";
+							message = "items_removed";
 							break;
 						case REPLACED:
 							run.run();
 							applied = true;
-							message = ChatColor.GREEN + "Items replaced!";
+							message = "items_replaced";
 							break;
 						case ALREADY_EMPTIED:
 							// no running, items were not added
-							message = ChatColor.RED + "You can't sell more of these items!";
+							message = "cant_sell";
 							break;
 						case ALREADY_MAXED:
 							// no running, items were not added
-							message = ChatColor.RED + "You have reached a limit!";
+							message = "item_limit";
 							break;
 						case SKIPPED:
 							// no running, items were not added
-							message = ChatColor.RED + "You already have another item in this category!";
+							message = "item_conflict";
 							break;
 						}
-						if (notify) player.getPlayer().sendMessage(message);
+						if (notify) LangManager.sendMessage(player.getPlayer(), message);
 					} else {
-						if (notify) player.getPlayer().sendMessage(ChatColor.RED + "Not enough money to buy this.");
+						if (notify) LangManager.sendMessage(player.getPlayer(), "no_money_buy");
 					}
 				} else {
-					if (notify) player.getPlayer().sendMessage(ChatColor.RED + "You can't do this.");
+					if (notify) LangManager.sendMessage(player.getPlayer(), "cant_do");
 				}
 			}
 		}

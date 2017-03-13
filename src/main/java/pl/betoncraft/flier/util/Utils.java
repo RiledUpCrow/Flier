@@ -61,6 +61,9 @@ public class Utils {
 	 * @return the capitalized string
 	 */
 	public static String capitalize(String string) {
+		if (string.isEmpty()) {
+			return string;
+		}
 		char[] chars = string.toCharArray();
 		chars[0] = (chars[0] + "").toUpperCase().charAt(0);
 		return new String(chars);
@@ -76,8 +79,11 @@ public class Utils {
 	 */
 	public static String formatPlayer(InGamePlayer player) {
 		PlayerClass clazz = player.getClazz();
+		String clazzName = clazz.getName().startsWith("$") ?
+				LangManager.getMessage(player.getPlayer(), clazz.getName().substring(1)) :
+				clazz.getName();
 		String name = player.getPlayer().getName();
-		return player.getColor() + name + ChatColor.WHITE + " (" + ChatColor.AQUA + clazz.getName() + ChatColor.WHITE + ")";
+		return player.getColor() + name + ChatColor.WHITE + " (" + ChatColor.AQUA + clazzName + ChatColor.WHITE + ")";
 	}
 
 	/**

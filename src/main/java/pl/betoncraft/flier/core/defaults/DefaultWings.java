@@ -6,7 +6,6 @@
  */
 package pl.betoncraft.flier.core.defaults;
 
-import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 
 import pl.betoncraft.flier.api.content.Wings;
@@ -31,7 +30,6 @@ public abstract class DefaultWings extends DefaultItem implements Wings {
 
 	public DefaultWings(ConfigurationSection section) throws LoadingException {
 		super(section);
-		super.item.setType(Material.ELYTRA);
 		maxHealth = loader.loadPositiveDouble(MAX_HEALTH);
 		regeneration = loader.loadNonNegativeDouble(REGENERATION);
 		health = maxHealth;

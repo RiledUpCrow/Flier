@@ -65,6 +65,7 @@ import pl.betoncraft.flier.game.TeamDeathMatch;
 import pl.betoncraft.flier.lobby.PhysicalLobby;
 import pl.betoncraft.flier.util.Coordinator;
 import pl.betoncraft.flier.util.DefaultConfigManager;
+import pl.betoncraft.flier.util.LangManager;
 import pl.betoncraft.flier.util.Utils;
 import pl.betoncraft.flier.wings.SimpleWings;
 
@@ -90,6 +91,7 @@ public class FlierPlugin extends JavaPlugin implements Flier {
 		configManager = new DefaultConfigManager();
 		flierCommand = new FlierCommand();
 		getCommand("flier").setExecutor(flierCommand);
+		new LangManager();
 
 		// register new types
 		registerEngine("multiplyingEngine", s -> new MultiplyingEngine(s));
@@ -150,26 +152,27 @@ public class FlierPlugin extends JavaPlugin implements Flier {
 
 	@Override
 	public void reload() {
-		reloadConfig();
-		configManager = new DefaultConfigManager();
-		for (Lobby lobby : lobbies.values()) {
-			lobby.stop();
-		}
-		lobbies.clear();
-		ConfigurationSection lobbySection = configManager.getLobbies();
-		if (lobbySection != null) {
-			for (String section : lobbySection.getKeys(false)) {
-				try {
+		try {
+			reloadConfig();
+			configManager = new DefaultConfigManager();
+			LangManager.reload();
+			for (Lobby lobby : lobbies.values()) {
+				lobby.stop();
+			}
+			lobbies.clear();
+			ConfigurationSection lobbySection = configManager.getLobbies();
+			if (lobbySection != null) {
+				for (String section : lobbySection.getKeys(false)) {
 					lobbies.put(section, getObject(section, "lobby", lobbySection, lobbyTypes));
-				} catch (LoadingException e) {
-					getLogger().severe(String.format("There was an error during loading:", section));
-					getLogger().severe(String.format("    - %s", e.getMessage()));
-					Throwable cause = e.getCause();
-					while (cause != null) {
-						getLogger().severe(String.format("    - %s", cause.getMessage()));
-						cause = cause.getCause();
-					}
 				}
+			}
+		} catch (LoadingException e) {
+			getLogger().severe("There was an error during loading:");
+			getLogger().severe(String.format("    - %s", e.getMessage()));
+			Throwable cause = e.getCause();
+			while (cause != null) {
+				getLogger().severe(String.format("    - %s", cause.getMessage()));
+				cause = cause.getCause();
 			}
 		}
 		getLogger().info(String.format("Loaded %d lobbies.", lobbies.size()));

@@ -1,4 +1,6 @@
 ### Flier configuration
 #
-# This is empty right now - all configuration is done via other files.
+# This only contains language right now - the rest is managed by other files.
 #
+
+language: en

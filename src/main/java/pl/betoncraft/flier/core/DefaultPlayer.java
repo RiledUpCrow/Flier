@@ -202,7 +202,7 @@ public class DefaultPlayer implements InGamePlayer {
 	@Override
 	public boolean isHolding(UsableItem item) {
 		ItemStack stack = player.getInventory().getItemInMainHand();
-		return item == null && stack == null || (item != null && stack != null && item.getItem().isSimilar(stack));
+		return item == null && stack == null || (item != null && stack != null && item.getItem(player).isSimilar(stack));
 	}
 	
 	@Override
@@ -217,11 +217,12 @@ public class DefaultPlayer implements InGamePlayer {
 		int slot = item.slot();
 		int amount = item.getAmount();
 		ItemStack stack = player.getInventory().getItem(slot);
+		ItemStack compare = item.getItem(player);
 		// if the stack was not on the correct slot or there was another item, find the correct one
-		if (stack == null || !stack.isSimilar(item.getItem())) {
+		if (stack == null || !stack.isSimilar(compare)) {
 			ItemStack[] inv = player.getInventory().getContents();
 			for (int i = 0; i < inv.length; i++) {
-				if (inv[i] != null && item.getItem().isSimilar(inv[i])) {
+				if (inv[i] != null && compare.isSimilar(inv[i])) {
 					stack = inv[i];
 					slot = i; // remember the current slot, so we can remove it
 					break;
@@ -284,12 +285,12 @@ public class DefaultPlayer implements InGamePlayer {
 		Wings wings = clazz.getWings();
 		List<UsableItem> items = clazz.getItems();
 		getPlayer().getInventory().clear();
-		getPlayer().getInventory().setItemInOffHand(engine.getItem());
-		getPlayer().getInventory().setChestplate(wings.getItem());
+		getPlayer().getInventory().setItemInOffHand(engine.getItem(player));
+		getPlayer().getInventory().setChestplate(wings.getItem(player));
 		for (UsableItem item : items) {
 			int amount = item.getAmount();
 			int slot = item.slot();
-			ItemStack itemStack = item.getItem();
+			ItemStack itemStack = item.getItem(player);
 			itemStack.setAmount(amount);
 			if (slot >= 0) {
 				player.getInventory().setItem(slot, itemStack);
@@ -445,7 +446,7 @@ public class DefaultPlayer implements InGamePlayer {
 	}
 	
 	private boolean hasWings() {
-		ItemStack wings = clazz.getWings().getItem();
+		ItemStack wings = clazz.getWings().getItem(player);
 		ItemStack chestPlate = player.getInventory().getChestplate();
 		if (chestPlate != null && chestPlate.isSimilar(wings)) {
 			return true;
@@ -504,7 +505,7 @@ public class DefaultPlayer implements InGamePlayer {
 	}
 
 	private void createWings() {
-		player.getInventory().setItem(1, clazz.getWings().getItem());
+		player.getInventory().setItem(1, clazz.getWings().getItem(player));
 	}
 
 	private void enableWings() {

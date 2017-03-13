@@ -15,7 +15,6 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.configuration.ConfigurationSection;
@@ -59,6 +58,7 @@ import pl.betoncraft.flier.sidebar.Money;
 import pl.betoncraft.flier.sidebar.Reload;
 import pl.betoncraft.flier.sidebar.Speed;
 import pl.betoncraft.flier.util.EffectListener;
+import pl.betoncraft.flier.util.LangManager;
 import pl.betoncraft.flier.util.Utils;
 import pl.betoncraft.flier.util.ValueLoader;
 
@@ -178,11 +178,9 @@ public abstract class DefaultGame implements Listener, Game {
 	public void handleKill(InGamePlayer killer, InGamePlayer killed, boolean fall) {
 		if (killer != null && !killer.equals(killed)) {
 			if (fall) {
-				notifyAllPlayers(String.format("%s was shot down by %s!",
-						Utils.formatPlayer(killed), Utils.formatPlayer(killer)));
+				notifyAllPlayers("shot_down", Utils.formatPlayer(killed), Utils.formatPlayer(killer));
 			} else {
-				notifyAllPlayers(String.format("%s was killed by %s!",
-						Utils.formatPlayer(killed), Utils.formatPlayer(killer)));
+				notifyAllPlayers("killed", Utils.formatPlayer(killed), Utils.formatPlayer(killer));
 			}
 			// fire an event
 			FlierPlayerKillEvent deathEvent = new FlierPlayerKillEvent(killer, killed,
@@ -197,7 +195,7 @@ public abstract class DefaultGame implements Listener, Game {
 				pay(killed, byEnemyDeathMoney);
 			}
 		} else {
-			notifyAllPlayers(String.format("%s commited suicide...", Utils.formatPlayer(killed)));
+			notifyAllPlayers("suicide", Utils.formatPlayer(killed));
 			// fire an event
 			FlierPlayerKillEvent deathEvent = new FlierPlayerKillEvent(killed, killed,
 					fall ? Type.SHOT_DOWN : Type.KILLED);
@@ -228,7 +226,7 @@ public abstract class DefaultGame implements Listener, Game {
 			}
 			// display a message about the hit and play the sound to the shooter if he exists and if he hit someone else
 			if (attacker != null && !attacker.equals(this)) {
-				attacker.getPlayer().sendMessage(ChatColor.YELLOW + "You managed to hit " + Utils.formatPlayer(attacked) + "!");
+				LangManager.sendMessage(attacker.getPlayer(), "hit", Utils.formatPlayer(attacked));
 			}
 		}
 		// handle physical damage
@@ -332,7 +330,7 @@ public abstract class DefaultGame implements Listener, Game {
 			event.setCancelled(true);
 			ItemStack item = event.getPlayer().getInventory().getItemInMainHand();
 			Wings wings = data.getClazz().getWings();
-			if (item != null && wings != null && item.isSimilar(wings.getItem())) {
+			if (item != null && wings != null && item.isSimilar(wings.getItem(data.getPlayer()))) {
 				// handle wearing wings
 				event.getPlayer().getInventory().setChestplate(item);
 				event.getPlayer().getInventory().setItemInMainHand(null);
@@ -397,9 +395,9 @@ public abstract class DefaultGame implements Listener, Game {
 		}
 	}
 	
-	private void notifyAllPlayers(String message) {
+	private void notifyAllPlayers(String message, Object... variables) {
 		for (InGamePlayer player : dataMap.values()) {
-			player.getPlayer().sendMessage(message);
+			LangManager.sendMessage(player.getPlayer(), message, variables);
 		}
 	}
 	
