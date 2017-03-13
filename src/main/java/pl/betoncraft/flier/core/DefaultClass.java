@@ -205,7 +205,6 @@ public class DefaultClass implements PlayerClass {
 					item.setAmount(newAmount);
 				} else {
 					item.setAmount(0);
-					it.remove();
 				}
 				found = true;
 				break;
@@ -221,7 +220,6 @@ public class DefaultClass implements PlayerClass {
 						item.setAmount(newAmount);
 					} else {
 						item.setAmount(0);
-						itItem.remove();
 						// empty ItemSets should be removed, no need to keep them
 						if (set.isEmpty()) {
 							itSet.remove();
