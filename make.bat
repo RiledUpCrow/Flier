@@ -55,22 +55,21 @@ if %ERRORLEVEL% NEQ 0 (
 )
 
 echo Zipping source code...
-git archive -o target\SourceCode.zip HEAD docs src pom.xml >nul 2>nul
+git archive -o target\SourceCode.zip HEAD docs src pom.xml README.md LICENSE >nul 2>nul
 if %ERRORLEVEL% NEQ 0 (
   echo Error: could not zip the source code
   goto :eof
 )
 
 echo Bundling files...
-copy LICENSE target >nul 2>nul
-copy README.md target >nul 2>nul
+type changelog.txt > target\ChangeLog.txt
 cd target
-7z a Flier.zip Flier.jar Documentation.pdf SourceCode.zip LICENSE README.md >nul 2>nul
+7z a Flier.zip Flier.jar Documentation.pdf SourceCode.zip ChangeLog.txt >nul 2>nul
 if %ERRORLEVEL% NEQ 0 (
   echo Error: could not bundle all items together
   goto :eof
 )
-del Flier.jar Documentation.pdf SourceCode.zip LICENSE README.md >nul 2>nul
+del Flier.jar Documentation.pdf SourceCode.zip ChangeLog.txt >nul 2>nul
 cd ..
 
 echo Flier package created!

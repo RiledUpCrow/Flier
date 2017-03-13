@@ -1,0 +1,20 @@
+v0.5.0
+
+* Added Modification API
+* Added Effect API
+* Improved error messages
+* Added location picking tool (/flier coordinator)
+* Added requirements to lobby buttons
+* Added "consume" action
+* Added "itemSet" action
+* Added "item" activator
+* Added "particleGun" attack
+* Renamed "machineGun" attack to "projectileGun"
+* Added "bomb" action
+* Replaced "autodestruct" with "suicide"
+* Added Multiverse to optional dependencies
+* Fixed air weapons usable on the ground
+* Improved lobby control commands (/flier lobby)
+* Disabled health regeneration while in-game
+* Allowed using lobby buttons while in-game
+* Compass points to lobby spawn if no players are present
