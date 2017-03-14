@@ -17,8 +17,12 @@ en:
   killed: "%s was killed by %s!"
   shot_down: "%s was shot down by %s!"
   win: "You win!"
-  lose: "You lose!
+  lose: "You lose!"
   team_win: "Team %s wins!"
+  no_such_game: "&cThere is no such game."
+  game_joined: "&aGame joined!"
+  game_created: "&aGame created!"
+  games_full: "&cAll games are currently full."
 pl:
   no_money_unlock: "&cNie masz pieniędzy aby to odblokować."
   no_money_buy: "&cNie masz pieniędzy aby to kupić."
@@ -38,5 +42,9 @@ pl:
   killed: "%s został zabity przez %s!"
   shot_down: "%s został zestrzelony przez %s!"
   win: "Wygrana!"
-  lose: "Przegrana!
+  lose: "Przegrana!"
   team_win: "Drużyna %s wygrywa!"
+  no_such_game: "&cNie ma takiej gry."
+  game_joined: "&aDołączono do gry."
+  game_created: "&aGra utworzona."
+  games_full: "&cWszystkie gry są obecnie pełne."

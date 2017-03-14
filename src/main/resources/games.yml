@@ -11,11 +11,11 @@ default:
   teams:                               # list of teams
     blue:
       name: 'Blue'                     # name of the team
-      location: 100;200;300;world;0;0  # spawn location for the team, **EDIT THIS BEFORE USING!**
+      location: blue_spawn             # spawn location for the team
       color: blue                      # color of the team
     red:
       name: 'Red'
-      location: 100;200;300;world;0;0  # **EDIT THIS BEFORE USING!**
+      location: red_spawn
       color: red
   money:                               # money settings for the Game
     enabled: true                      # whenever the money system is enabled at all
@@ -26,6 +26,8 @@ default:
     suicide: -1                        #
   height_limit: 512                    # maximum height of the map
   height_damage: 0.5                   # damage taken when flying above the height limit
+  viable_arenas:                       # list of arenas this game can use
+  - default
   bonuses:                             # list of Bonuses in this Game
   - money
   - fix
@@ -57,7 +59,7 @@ default:
         item_set: the_rocket           # it's the same as above
         add_type: decrease             # but we're decreasing instead of increasing
         conflict_action: skip
-      block: 100;200;300;world         # location of the block to click, **EDIT THIS BEFORE USING!**
+      block: rocket_button             # location of the block to click
     launcher_button:
       buy_cost: 10
       on_buy:
@@ -69,7 +71,7 @@ default:
         item_set: the_launcher
         add_type: decrease
         conflict_action: skip
-      block: 100;200;300;world         # **EDIT THIS BEFORE USING!**
+      block: launcher_button
     repair_kit_button:
       buy_cost: 20
       on_buy:
@@ -81,35 +83,35 @@ default:
         item_set: the_repair_kit
         add_type: decrease
         conflict_action: skip
-      block: 100;200;300;world         # **EDIT THIS BEFORE USING!**
+      block: repair_kit_button
     compass_button:
       unlock_cost: 5
       on_unlock:
         item_set: the_compass
         add_type: fill
         conflict_action: skip
-      block: 100;200;300;world         # **EDIT THIS BEFORE USING!**
+      block: compass_button
     fast_button:
       on_buy:
         item_set: fast_class
         add_type: fill
         conflict_action: replace
         saving: true
-      block: 100;200;300;world         # **EDIT THIS BEFORE USING!**
+      block: fast_button
     balanced_button:
       on_buy:
         item_set: balanced_class
         add_type: fill
         conflict_action: replace
         saving: true
-      block: 100;200;300;world         # **EDIT THIS BEFORE USING!**
+      block: balanced_button
     strong_button:
       on_buy:
         item_set: strong_class
         add_type: fill
         conflict_action: replace
         saving: true
-      block: 100;200;300;world         # **EDIT THIS BEFORE USING!**
+      block: strong_button
   respawn_action: combine              # what happens with items after respawn (see docs)
-  center: 100;200;300;world            # center of the map, **EDIT THIS BEFORE USING!**
+  center: center                       # center of the map
   radius: 1000                         # the radius defining map borders

@@ -34,7 +34,8 @@ public class DefaultConfigManager implements ConfigManager {
 	                            ACTIVATORS = "activators.yml",
 	                            MODIFICATIONS = "modifications.yml",
 	                            ITEM_SETS = "sets.yml",
-	                            EFFECTS = "effects.yml";
+	                            EFFECTS = "effects.yml",
+	                            ARENAS = "arenas.yml";
 
 	private Config lobbies;
 	private Config games;
@@ -47,6 +48,7 @@ public class DefaultConfigManager implements ConfigManager {
 	private Config modifications;
 	private Config itemSets;
 	private Config effects;
+	private Config arenas;
 
 	public DefaultConfigManager() {
 		lobbies = new Config(LOBBIES);
@@ -60,6 +62,7 @@ public class DefaultConfigManager implements ConfigManager {
 		modifications = new Config(MODIFICATIONS);
 		itemSets = new Config(ITEM_SETS);
 		effects = new Config(EFFECTS);
+		arenas = new Config(ARENAS);
 	}
 	
 	private class Config {
@@ -143,6 +146,11 @@ public class DefaultConfigManager implements ConfigManager {
 	@Override
 	public FileConfiguration getEffects() {
 		return effects.config;
+	}
+
+	@Override
+	public FileConfiguration getArenas() {
+		return arenas.config;
 	}
 	
 	@Override
@@ -239,6 +247,15 @@ public class DefaultConfigManager implements ConfigManager {
 	public void saveEffects() {
 		try {
 			effects.config.save(effects.file);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Override
+	public void saveArenas() {
+		try {
+			arenas.config.save(arenas.file);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

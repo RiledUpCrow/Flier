@@ -11,7 +11,10 @@
 #  join:                          # list of "join" blocks
 #  - 100;200;300;world            # **EDIT THIS BEFORE USING!**
 #  spawn: 100;200;300;world;0;0   # spawn location of the Lobby, **EDIT THIS BEFORE USING!**
-#  start: 100;200;300;world       # "start" block, **EDIT THIS BEFORE USING!**
+#  start:                         # list of start blocks
+#    default: 100;200;300;world   # "start" block for default game, **EDIT THIS BEFORE USING!**
 #  leave: 100;200;300;world       # "leave" block, **EDIT THIS BEFORE USING!**
-#  games:                         # list of Games in this Lobby
+#  games:                         # list of games in this Lobby
+#  - default
+#  arenas:                        # list of arenas this lobby can use to launch games
 #  - default

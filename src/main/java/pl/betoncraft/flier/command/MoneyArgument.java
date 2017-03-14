@@ -10,6 +10,8 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Set;
+import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -18,6 +20,7 @@ import org.bukkit.permissions.Permission;
 
 import net.md_5.bungee.api.ChatColor;
 import pl.betoncraft.flier.api.Flier;
+import pl.betoncraft.flier.api.content.Game;
 import pl.betoncraft.flier.api.content.Lobby;
 import pl.betoncraft.flier.api.core.CommandArgument;
 import pl.betoncraft.flier.api.core.InGamePlayer;
@@ -41,15 +44,24 @@ public class MoneyArgument implements CommandArgument {
 				sender.sendMessage(ChatColor.RED + playerName + " is offline.");
 				return;
 			}
-			for (Lobby lobby : Flier.getInstance().getLobbies().values()) {
-				InGamePlayer data = lobby.getGame().getPlayers().get(player.getUniqueId());
-				if (data == null) {
-					sender.sendMessage(ChatColor.RED + playerName + " is not in any game.");
-					return;
+			UUID uuid = player.getUniqueId();
+			InGamePlayer data = null;
+			loop: for (Lobby lobby : Flier.getInstance().getLobbies().values()) {
+				for (Set<Game> games : lobby.getGames().values()) {
+					for (Game game : games) {
+						data = game.getPlayers().get(uuid);
+						if (data != null) {
+							break loop;
+						}
+					}
 				}
-				data.setMoney(money);
-				sender.sendMessage(ChatColor.GREEN + playerName + " has now $" + money + ".");
 			}
+			if (data == null) {
+				sender.sendMessage(ChatColor.RED + playerName + " is not in any game.");
+				return;
+			}
+			data.setMoney(money);
+			sender.sendMessage(ChatColor.GREEN + playerName + " has now $" + money + ".");
 		} catch (NoSuchElementException e) {
 			CommandArgument.displayHelp(sender, currentCommand, this);
 		} catch (NumberFormatException e) {

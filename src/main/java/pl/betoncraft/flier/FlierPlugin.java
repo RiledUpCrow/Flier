@@ -46,6 +46,7 @@ import pl.betoncraft.flier.api.content.Engine;
 import pl.betoncraft.flier.api.content.Game;
 import pl.betoncraft.flier.api.content.Lobby;
 import pl.betoncraft.flier.api.content.Wings;
+import pl.betoncraft.flier.api.core.Arena;
 import pl.betoncraft.flier.api.core.ConfigManager;
 import pl.betoncraft.flier.api.core.ItemSet;
 import pl.betoncraft.flier.api.core.LoadingException;
@@ -53,6 +54,7 @@ import pl.betoncraft.flier.api.core.Modification;
 import pl.betoncraft.flier.api.core.UsableItem;
 import pl.betoncraft.flier.bonus.EntityBonus;
 import pl.betoncraft.flier.command.FlierCommand;
+import pl.betoncraft.flier.core.DefaultArena;
 import pl.betoncraft.flier.core.DefaultModification;
 import pl.betoncraft.flier.core.DefaultSet;
 import pl.betoncraft.flier.core.DefaultUsableItem;
@@ -236,6 +238,11 @@ public class FlierPlugin extends JavaPlugin implements Flier {
 	@Override
 	public Effect getEffect(String id) throws LoadingException {
 		return getObject(id, "effect", configManager.getEffects(), effectTypes);
+	}
+
+	@Override
+	public Arena getArena(String id) throws LoadingException {
+		return getObject(id, "arena", configManager.getArenas(), s -> new DefaultArena(s));
 	}
 
 	private <T> T getObject(String id, String name, ConfigurationSection section, Map<String, Factory<T>> factories)

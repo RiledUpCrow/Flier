@@ -15,8 +15,10 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
+import pl.betoncraft.flier.api.core.Arena;
 import pl.betoncraft.flier.api.core.Damager;
 import pl.betoncraft.flier.api.core.InGamePlayer;
+import pl.betoncraft.flier.api.core.LoadingException;
 import pl.betoncraft.flier.api.core.SetApplier;
 
 /**
@@ -30,6 +32,21 @@ public interface Game {
 	 * The Button in a Lobby, which has costs and can be locked.
 	 */
 	public interface Button {
+		
+		/**
+		 * @return the name of Location of this Button
+		 */
+		public String getLocationName();
+		
+		/**
+		 * @return the Location of this Button
+		 */
+		public Location getLocation();
+		
+		/**
+		 * @param location the Location of this Bonus
+		 */
+		public void setLocation(Location location);
 
 		/**
 		 * @return the set of Button names required for unlocking this Button
@@ -216,5 +233,30 @@ public interface Game {
 	 * @return the location of the Game's center
 	 */
 	public Location getCenter();
+	
+	/**
+	 * @return the Arena currently used by this Game
+	 */
+	public Arena getArena();
+
+	/**
+	 * @param arena Arena to set for this Game or null to remove the Arena
+	 */
+	public void setArena(Arena arena) throws LoadingException;
+
+	/**
+	 * @return the list of names of Arenas which can be used for this Game
+	 */
+	public List<String> getViableArenas();
+	
+	/**
+	 * @return the maximum amount of players this Game can have or 0 if there is no limit
+	 */
+	public int getMaxPlayers();
+	
+	/**
+	 * @return whenever the Game is currently running
+	 */
+	public boolean isRunning();
 
 }

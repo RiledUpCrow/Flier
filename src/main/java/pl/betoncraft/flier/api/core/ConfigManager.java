@@ -71,6 +71,11 @@ public interface ConfigManager {
 	public FileConfiguration getItemSets();
 
 	/**
+	 * @return the arenas.yml configuration
+	 */
+	public FileConfiguration getArenas();
+
+	/**
 	 * Saves the lobbies.yml file.
 	 */
 	public void saveLobbies();
@@ -124,5 +129,10 @@ public interface ConfigManager {
 	 * Saves the sets.yml file.
 	 */
 	public void saveItemSets();
+	
+	/**
+	 * Saves the arenas.yml file.
+	 */
+	public void saveArenas();
 
 }

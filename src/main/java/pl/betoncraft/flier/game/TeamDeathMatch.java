@@ -17,7 +17,7 @@ import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
-import pl.betoncraft.flier.api.content.Game;
+import pl.betoncraft.flier.api.core.Arena;
 import pl.betoncraft.flier.api.core.Damager;
 import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.LoadingException;
@@ -69,12 +69,13 @@ public class TeamDeathMatch extends DefaultGame {
 		
 		private int score = 0;
 		private String name;
+		private String spawnName;
 		private Location spawn;
 		private ChatColor color;
 		
 		public SimpleTeam(ConfigurationSection section) throws LoadingException {
 			ValueLoader loader = new ValueLoader(section);
-			spawn = loader.loadLocation("location");
+			spawnName = loader.loadString("location");
 			color = loader.loadEnum("color", ChatColor.class);
 			name = ChatColor.translateAlternateColorCodes('&', loader.loadString("name"));
 		}
@@ -82,9 +83,17 @@ public class TeamDeathMatch extends DefaultGame {
 		public int getScore() {
 			return score;
 		}
+		
+		public String getSpawnName() {
+			return spawnName;
+		}
 
 		public Location getSpawn() {
 			return spawn;
+		}
+		
+		public void setSpawn(Location spawn) {
+			this.spawn = spawn;
 		}
 
 		public ChatColor getColor() {
@@ -204,6 +213,14 @@ public class TeamDeathMatch extends DefaultGame {
 		return map;
 	}
 	
+	@Override
+	public void setArena(Arena arena) throws LoadingException {
+		super.setArena(arena);
+		for (SimpleTeam team : teams.values()) {
+			team.setSpawn(arena.getLocation(team.getSpawnName()));
+		}
+	}
+	
 	private  SimpleTeam getTeam(InGamePlayer data) {
 		return players.get(data.getPlayer().getUniqueId());
 	}
@@ -277,17 +294,8 @@ public class TeamDeathMatch extends DefaultGame {
 				Bukkit.dispatchCommand(Bukkit.getConsoleSender(), title);
 				Bukkit.dispatchCommand(Bukkit.getConsoleSender(), subTitle);
 			}
-			// start next game
-			Game[] games = new Game[lobby.getGames().size()];
-			games = lobby.getGames().values().toArray(games);
-			Game game = null;
-			for (int i = 0; i < games.length; i++) {
-				if (games[i].equals(this)) {
-					game = games[(i+1) % games.length];
-					break;
-				}
-			}
-			lobby.setGame(game);
+			// end game
+			stop();
 		}
 	}
 

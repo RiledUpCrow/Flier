@@ -9,6 +9,8 @@ package pl.betoncraft.flier.command;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -19,6 +21,7 @@ import com.google.common.collect.Sets;
 
 import net.md_5.bungee.api.ChatColor;
 import pl.betoncraft.flier.api.Flier;
+import pl.betoncraft.flier.api.content.Game;
 import pl.betoncraft.flier.api.content.Game.Button;
 import pl.betoncraft.flier.api.content.Lobby;
 import pl.betoncraft.flier.api.core.CommandArgument;
@@ -78,22 +81,27 @@ public class ChooseItemArgument implements CommandArgument {
 				player = (Player) sender;
 			}
 		}
-		boolean found = false;
-		for (Lobby lobby : flier.getLobbies().values()) {
-			InGamePlayer data = lobby.getGame().getPlayers().get(player.getUniqueId());
-			if (data != null) {
-				found = true;
-				Button button = lobby.getGame().getButtons().get(item);
-				if (button != null) {
-					lobby.getGame().applyButton(data, button, buy, player.equals(sender));
-				} else {
-					CommandArgument.displayObjects(sender, "button", item, lobby.getGame().getButtons().keySet());
-					return;
+		UUID uuid = player.getUniqueId();
+		InGamePlayer data = null;
+		loop: for (Lobby lobby : flier.getLobbies().values()) {
+			for (Set<Game> games : lobby.getGames().values()) {
+				for (Game game : games) {
+					data = game.getPlayers().get(uuid);
+					if (data != null) {
+						break loop;
+					}
 				}
-				break;
 			}
 		}
-		if (!found) {
+		if (data != null) {
+			Button button = data.getGame().getButtons().get(item);
+			if (button != null) {
+				data.getGame().applyButton(data, button, buy, player.equals(sender));
+			} else {
+				CommandArgument.displayObjects(sender, "button", item, data.getGame().getButtons().keySet());
+				return;
+			}
+		} else {
 			if (player.equals(sender)) {
 				sender.sendMessage(String.format("%sYou are not in a lobby.", ChatColor.RED));
 			} else {

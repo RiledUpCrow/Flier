@@ -20,6 +20,7 @@ import pl.betoncraft.flier.api.content.Engine;
 import pl.betoncraft.flier.api.content.Game;
 import pl.betoncraft.flier.api.content.Lobby;
 import pl.betoncraft.flier.api.content.Wings;
+import pl.betoncraft.flier.api.core.Arena;
 import pl.betoncraft.flier.api.core.ConfigManager;
 import pl.betoncraft.flier.api.core.ItemSet;
 import pl.betoncraft.flier.api.core.LoadingException;
@@ -140,6 +141,14 @@ public interface Flier extends Plugin {
 	 *             when the Effect cannot be created due to an error, type is not defined or Effect is not defined
 	 */
 	public Effect getEffect(String id) throws LoadingException;
+
+	/**
+	 * @param id ID of the Arena
+	 * @return the Arena with specified name, never null
+	 * @throws LoadingException
+	 *             when the Arena cannot be created due to an error or Arena is not defined
+	 */
+	public Arena getArena(String id) throws LoadingException;
 
 	/**
 	 * Registers a new Engine type with specified name. The factory will be used

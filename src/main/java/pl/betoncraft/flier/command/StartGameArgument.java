@@ -9,6 +9,7 @@ package pl.betoncraft.flier.command;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -34,6 +35,13 @@ public class StartGameArgument implements CommandArgument {
 	public void parse(CommandSender sender, String currentCommand, Iterator<String> it) {
 		Flier flier = Flier.getInstance();
 		Player player = null;
+		String game;
+		try {
+			game = it.next();
+		} catch (NoSuchElementException e) {
+			CommandArgument.displayHelp(sender, currentCommand, this);
+			return;
+		}
 		if (it.hasNext()) {
 			if (!sender.hasPermission(force)) {
 				CommandArgument.noPermission(sender);
@@ -57,7 +65,7 @@ public class StartGameArgument implements CommandArgument {
 		for (Lobby lobby : flier.getLobbies().values()) {
 			if (lobby.getPlayers().contains(player.getUniqueId())) {
 				found = true;
-				lobby.getGame().addPlayer(player);
+				lobby.joinGame(player, game);
 				break;
 			}
 		}
@@ -96,12 +104,12 @@ public class StartGameArgument implements CommandArgument {
 	@Override
 	public String getHelp(CommandSender sender) {
 		if (CommandArgument.checkUser(sender, User.CONSOLE)) {
-			return "<player>";
+			return "<game> <player>";
 		} else {
 			if (sender.hasPermission(force)) {
-				return "[player]";
+				return "<game> [player]";
 			} else {
-				return "";
+				return "<game>";
 			}
 		}
 	}

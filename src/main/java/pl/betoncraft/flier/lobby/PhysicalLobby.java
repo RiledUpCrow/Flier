@@ -7,9 +7,12 @@
 package pl.betoncraft.flier.lobby;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
+import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
@@ -21,6 +24,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import pl.betoncraft.flier.api.core.LoadingException;
 import pl.betoncraft.flier.core.defaults.DefaultLobby;
 import pl.betoncraft.flier.util.Utils;
+import pl.betoncraft.flier.util.ValueLoader;
 
 /**
  * Physical lobby with fixed classes selected by clicking on blocks.
@@ -30,7 +34,7 @@ import pl.betoncraft.flier.util.Utils;
 public class PhysicalLobby extends DefaultLobby {
 
 	private List<Block> join = new ArrayList<>();
-	private Block start;
+	private Map<String, Location> start = new HashMap<>();
 	private Block leave;
 
 	public PhysicalLobby(ConfigurationSection section) throws LoadingException {
@@ -44,7 +48,16 @@ public class PhysicalLobby extends DefaultLobby {
 				throw (LoadingException) new LoadingException(String.format("Error in %s join location", index)).initCause(e);
 			}
 		}
-		start = loader.loadLocation("start").getBlock();
+		ConfigurationSection startSection = section.getConfigurationSection("start");
+		if (startSection != null) {
+			ValueLoader startLoader = new ValueLoader(startSection);
+			for (String key : startSection.getKeys(false)) {
+				if (!gameSets.containsKey(key)) {
+					throw new LoadingException(String.format("Start location points to non-existing game '%s'.", key));
+				}
+				start.put(key, startLoader.loadLocation(key));
+			}
+		}
 		leave = loader.loadLocation("leave").getBlock();
 	}
 
@@ -73,10 +86,10 @@ public class PhysicalLobby extends DefaultLobby {
 				return;
 			}
 			// joining the game
-			if (block.equals(start)) {
-				currentGame.addPlayer(player);
-				return;
-			}
+			start.entrySet().stream()
+					.filter(e -> e.getValue().equals(block.getLocation()))
+					.findFirst()
+					.ifPresent(e -> joinGame(player, e.getKey()));
 		} else {
 			// joining
 			if (join.contains(block)) {

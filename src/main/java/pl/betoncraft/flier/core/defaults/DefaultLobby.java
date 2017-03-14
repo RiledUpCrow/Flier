@@ -9,6 +9,7 @@ package pl.betoncraft.flier.core.defaults;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -23,12 +24,13 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.scoreboard.Scoreboard;
 
 import pl.betoncraft.flier.api.Flier;
 import pl.betoncraft.flier.api.content.Game;
 import pl.betoncraft.flier.api.content.Lobby;
+import pl.betoncraft.flier.api.core.Arena;
 import pl.betoncraft.flier.api.core.LoadingException;
+import pl.betoncraft.flier.util.LangManager;
 import pl.betoncraft.flier.util.PlayerBackup;
 import pl.betoncraft.flier.util.ValueLoader;
 
@@ -41,26 +43,34 @@ public abstract class DefaultLobby implements Lobby, Listener {
 	
 	protected ValueLoader loader;
 
-	protected Map<String, Game> games = new HashMap<>();
-	protected Game currentGame;
+	protected Map<String, Set<Game>> gameSets = new HashMap<>();
+	protected Map<String, Arena> arenas = new HashMap<>();
 	protected Location spawn;
 	protected Set<UUID> players = new HashSet<>();
 	protected Map<UUID, PlayerBackup> backups = new HashMap<>();
-	protected Map<UUID, Scoreboard> oldScoreboards = new HashMap<>();
 
 	public DefaultLobby(ConfigurationSection section) throws LoadingException {
 		loader = new ValueLoader(section);
 		spawn = loader.loadLocation("spawn");
 		List<String> gameNames = section.getStringList("games");
-		for (String gameName : gameNames) {
-			Game game = Flier.getInstance().getGame(gameName);
-			game.setLobby(this);
-			games.put(gameName, game);
+		Flier flier = Flier.getInstance();
+		for (String arenaName : section.getStringList("arenas")) {
+			arenas.put(arenaName, flier.getArena(arenaName));
 		}
-		if (games.isEmpty()) {
+		for (String gameName : gameNames) {
+			Game game = flier.getGame(gameName);
+			for (String arenaName : game.getViableArenas()) {
+				Arena arena = arenas.get(arenaName);
+				if (arena == null) {
+					throw new LoadingException(String.format("Game '%s' refers to non-existing arena '%s'.", gameName, arenaName));
+				}
+				game.setArena(arena);
+			}
+			gameSets.put(gameName, new HashSet<>());
+		}
+		if (gameSets.isEmpty()) {
 			throw new LoadingException("Game list is empty.");
 		}
-		currentGame = games.get(gameNames.get(0));
 		Bukkit.getPluginManager().registerEvents(this, Flier.getInstance());
 	}
 
@@ -74,7 +84,6 @@ public abstract class DefaultLobby implements Lobby, Listener {
 		PlayerBackup backup = new PlayerBackup(player);
 		backup.save();
 		backups.put(uuid, backup);
-		oldScoreboards.put(uuid, player.getScoreboard());
 		player.teleport(spawn);
 	}
 
@@ -82,10 +91,63 @@ public abstract class DefaultLobby implements Lobby, Listener {
 	public void removePlayer(Player player) {
 		UUID uuid = player.getUniqueId();
 		if (players.remove(uuid)) {
-			currentGame.removePlayer(player);
-			player.setScoreboard(oldScoreboards.remove(uuid));
-			player.getInventory().clear();
+			loop: for (Set<Game> set : gameSets.values()) {
+				for (Iterator<Game> it = set.iterator(); it.hasNext();) {
+					Game game = it.next();
+					if (game.getPlayers().containsKey(uuid)) {
+						game.removePlayer(player);
+						if (!game.isRunning()) {
+							game.getArena().setUsed(false);
+							it.remove();
+						}
+						break loop;
+					}
+				}
+			}
 			backups.remove(uuid).load();
+		}
+	}
+	
+	@Override
+	public JoinResult joinGame(Player player, String gameName) {
+		Set<Game> games = gameSets.get(gameName);
+		if (games == null) {
+			LangManager.sendMessage(player, "no_such_game");
+			return JoinResult.NO_SUCH_GAME;
+		}
+		Game game = null;
+		for (Game g : games) {
+			if (g.getPlayers().size() < g.getMaxPlayers()) {
+				game = g;
+				break;
+			}
+		}
+		if (game != null) {
+			game.addPlayer(player);
+			LangManager.sendMessage(player, "game_joined");
+			return JoinResult.GAME_JOINED;
+		} else {
+			try {
+				game = Flier.getInstance().getGame(gameName);
+				List<String> viable = game.getViableArenas();
+				for (String arenaName : viable) {
+					Arena arena = arenas.get(arenaName);
+					if (!arena.isUsed()) {
+						arena.setUsed(true);
+						games.add(game);
+						game.setLobby(this);
+						game.setArena(arena);
+						game.addPlayer(player);
+						LangManager.sendMessage(player, "game_created");
+						return JoinResult.GAME_CREATED;
+					}
+				}
+				LangManager.sendMessage(player, "games_full");
+				return JoinResult.GAMES_FULL;
+			} catch (LoadingException e) {
+				// won't throw, it's checked
+				return null;
+			}
 		}
 	}
 
@@ -93,22 +155,15 @@ public abstract class DefaultLobby implements Lobby, Listener {
 	public Set<UUID> getPlayers() {
 		return players;
 	}
-
+	
 	@Override
-	public void setGame(Game game) {
-		currentGame.stop();
-		currentGame = game;
-		// no need to start the game, it's running if there were players
-	}
-
-	@Override
-	public Game getGame() {
-		return currentGame;
+	public Map<String, Set<Game>> getGames() {
+		return Collections.unmodifiableMap(gameSets);
 	}
 	
 	@Override
-	public Map<String, Game> getGames() {
-		return Collections.unmodifiableMap(games);
+	public Map<String, Arena> getArenas() {
+		return Collections.unmodifiableMap(arenas);
 	}
 	
 	@Override

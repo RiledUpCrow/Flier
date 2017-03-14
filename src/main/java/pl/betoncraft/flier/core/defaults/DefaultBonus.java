@@ -37,9 +37,10 @@ public abstract class DefaultBonus implements Bonus {
 	protected final boolean consumable;
 	protected final int cooldown;
 	protected final int respawn;
-	protected final Location location;
+	protected final String locationName;
 	protected final List<Action> actions = new ArrayList<>();
 
+	protected Location location;
 	protected boolean available = false;
 	protected Map<UUID, Long> cooldowns = new HashMap<>();
 	protected BukkitRunnable starter;
@@ -51,7 +52,7 @@ public abstract class DefaultBonus implements Bonus {
 		consumable = loader.loadBoolean("consumable");
 		cooldown = loader.loadNonNegativeInt("cooldown");
 		respawn = loader.loadNonNegativeInt("respawn");
-		location = loader.loadLocation("location");
+		locationName = loader.loadString("location");
 		Flier flier = Flier.getInstance();
 		for (String id : section.getStringList("actions")) {
 			actions.add(flier.getAction(id));
@@ -62,10 +63,20 @@ public abstract class DefaultBonus implements Bonus {
 	public String getID() {
 		return id;
 	}
+	
+	@Override
+	public String getLocationName() {
+		return locationName;
+	}
 
 	@Override
 	public Location getLocation() {
 		return location;
+	}
+	
+	@Override
+	public void setLocation(Location location) {
+		this.location = location;
 	}
 
 	@Override

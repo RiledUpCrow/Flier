@@ -8,7 +8,7 @@
 
 money:
   type: entity                  # type of the Bonus
-  location: 100;200;300;world   # location of the Entity, **EDIT THIS BEFORE USING!**
+  location: money_bonus         # location of the Entity
   entity: sheep                 # type of the Entity
   distance: 2                   # radius where it can be collected
   consumable: true              # whenever the Entity disappears when collected
@@ -18,7 +18,7 @@ money:
   - giveMoney                   # this Action gives money, see actions.yml file
 fix:
   type: entity
-  location: 100;200;300;world   # **EDIT THIS BEFORE USING!**
+  location: fix_bonus
   entity: chicken
   distance: 2.5
   consumable: true

@@ -23,11 +23,21 @@ public interface Bonus {
 	 * @return the ID of this Bonus
 	 */
 	public String getID();
+	
+	/**
+	 * @return the name of this Bonus' Location
+	 */
+	public String getLocationName();
 
 	/**
-	 * @return the location of a Bonus
+	 * @return the Location of a Bonus
 	 */
 	public Location getLocation();
+	
+	/**
+	 * @param location the Location of a Bonus
+	 */
+	public void setLocation(Location location);
 
 	/**
 	 * @return the minimum distance to activate this Bonus

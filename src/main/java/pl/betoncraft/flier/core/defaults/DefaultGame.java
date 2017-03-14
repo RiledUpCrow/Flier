@@ -20,7 +20,6 @@ import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Sound;
-import org.bukkit.block.Block;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -50,6 +49,7 @@ import pl.betoncraft.flier.api.content.Bonus;
 import pl.betoncraft.flier.api.content.Game;
 import pl.betoncraft.flier.api.content.Lobby;
 import pl.betoncraft.flier.api.content.Wings;
+import pl.betoncraft.flier.api.core.Arena;
 import pl.betoncraft.flier.api.core.Damager;
 import pl.betoncraft.flier.api.core.Damager.DamageResult;
 import pl.betoncraft.flier.api.core.InGamePlayer;
@@ -83,62 +83,69 @@ import pl.betoncraft.flier.util.ValueLoader;
  */
 public abstract class DefaultGame implements Listener, Game {
 
+	protected final String id;
 	protected final ValueLoader loader;
-
 	protected GameHeartBeat heartBeat;
-	protected Map<UUID, InGamePlayer> dataMap = new HashMap<>();
-	protected List<Bonus> bonuses = new ArrayList<>();
-	protected EffectListener listener;
-	protected Map<String, Button> buttons = new HashMap<>();
-	protected Map<InGamePlayer, List<Button>> unlocked = new HashMap<>();
-	protected Map<Block, Button> blocks = new HashMap<>();
+	
+	protected final Map<UUID, InGamePlayer> dataMap = new HashMap<>();
+	protected final EffectListener listener;
+	protected final List<String> availableArenas;
+	protected final String centerName;
+	protected final List<Bonus> bonuses = new ArrayList<>();
+	protected final Map<String, Button> buttons = new HashMap<>();
+	protected final Map<InGamePlayer, List<Button>> unlocked = new HashMap<>();
+	protected final RespawnAction respawnAction;
+	protected final int maxPlayers;
+	protected final PlayerClass defClass;
+	protected final int heightLimit;
+	protected final double heightDamage;
+	protected final int radius;
+	protected final boolean useMoney;
+	protected final int enemyKillMoney;
+	protected final int enemyHitMoney;
+	protected final int friendlyKillMoney;
+	protected final int friendlyHitMoney;
+	protected final int byEnemyDeathMoney;
+	protected final int byEnemyHitMoney;
+	protected final int byFriendlyDeathMoney;
+	protected final int byFriendlyHitMoney;
+	protected final int suicideMoney;
+
 	protected Lobby lobby;
-	protected RespawnAction respawnAction;
-	protected PlayerClass defClass;
-	
-	private List<UUID> blocked = new LinkedList<>();
-	
-	protected int heightLimit;
-	protected double heightDamage;
+	protected Arena arena;
+	protected boolean running = false;
 	protected Location center;
-	protected int radius;
-	protected boolean useMoney;
-	protected int enemyKillMoney;
-	protected int enemyHitMoney;
-	protected int friendlyKillMoney;
-	protected int friendlyHitMoney;
-	protected int byEnemyDeathMoney;
-	protected int byEnemyHitMoney;
-	protected int byFriendlyDeathMoney;
-	protected int byFriendlyHitMoney;
-	protected int suicideMoney;
-	
-	private int minX, minZ, maxX, maxZ;
+	protected int minX, minZ, maxX, maxZ;
+
+	private final List<UUID> blocked = new LinkedList<>();
 	
 	public DefaultGame(ConfigurationSection section) throws LoadingException {
+		id = section.getName();
 		loader = new ValueLoader(section);
 		Flier flier = Flier.getInstance();
+		listener = new EffectListener(section.getStringList("effects"), this);
+		maxPlayers = loader.loadNonNegativeInt("max_players", 0);
+		respawnAction = loader.loadEnum("respawn_action", RespawnAction.class);
+		centerName = loader.loadString("center");
+		availableArenas = section.getStringList("viable_arenas");
+		if (availableArenas.isEmpty()) {
+			throw new LoadingException("No viable arenas are specified.");
+		}
 		for (String bonusName : section.getStringList("bonuses")) {
 			bonuses.add(flier.getBonus(bonusName));
 		}
-		listener = new EffectListener(section.getStringList("effects"), this);
 		ConfigurationSection buttonsSection = section.getConfigurationSection("buttons");
-		if (buttonsSection != null) for (String i : buttonsSection.getKeys(false)) {
-			ConfigurationSection buttonSection = buttonsSection.getConfigurationSection(i);
+		if (buttonsSection != null) for (String button : buttonsSection.getKeys(false)) {
+			ConfigurationSection buttonSection = buttonsSection.getConfigurationSection(button);
 			if (buttonSection == null) {
-				throw new LoadingException(String.format("'%s' is not a button.", i));
+				throw new LoadingException(String.format("'%s' is not a button.", button));
 			}
 			try {
-				ValueLoader loader = new ValueLoader(buttonSection);
-				Block block = loader.loadLocation("block").getBlock();
-				Button b = new DefaultButton(buttonSection);
-				buttons.put(i, b);
-				blocks.put(block, b);
+				buttons.put(button, new DefaultButton(buttonSection));
 			} catch (LoadingException e) {
-				throw (LoadingException) new LoadingException(String.format("Error in '%s' button.", i)).initCause(e);
+				throw (LoadingException) new LoadingException(String.format("Error in '%s' button.", button)).initCause(e);
 			}
 		}
-		respawnAction = loader.loadEnum("respawn_action", RespawnAction.class);
 		try {
 			defClass = new DefaultClass(section.getStringList("default_class"), respawnAction);
 		} catch (LoadingException e) {
@@ -146,12 +153,7 @@ public abstract class DefaultGame implements Listener, Game {
 		}
 		heightLimit = loader.loadInt("height_limit", 512);
 		heightDamage = loader.loadNonNegativeDouble("height_damage", 0.5);
-		center = loader.loadLocation("center");
 		radius = loader.loadPositiveInt("radius");
-		minX = center.getBlockX() - radius;
-		maxX = center.getBlockX() + radius;
-		minZ = center.getBlockZ() - radius;
-		maxZ = center.getBlockZ() + radius;
 		useMoney = loader.loadBoolean("money.enabled", false);
 		enemyKillMoney = loader.loadInt("money.enemy_kill", 0);
 		enemyHitMoney = loader.loadInt("money.enemy_hit", 0);
@@ -164,7 +166,7 @@ public abstract class DefaultGame implements Listener, Game {
 		suicideMoney = loader.loadInt("money.suicide", 0);
 	}
 	
-	public class GameHeartBeat extends BukkitRunnable {
+	protected class GameHeartBeat extends BukkitRunnable {
 		
 		private int i = 0;
 		private DefaultGame game;
@@ -210,6 +212,8 @@ public abstract class DefaultGame implements Listener, Game {
 	
 	public class DefaultButton implements Button {
 		
+		protected final String locationName;
+		protected Location location;
 		protected final Set<String> requirements;
 		protected final int buyCost;
 		protected final int sellCost;
@@ -220,6 +224,7 @@ public abstract class DefaultGame implements Listener, Game {
 
 		public DefaultButton(ConfigurationSection section) throws LoadingException {
 			ValueLoader loader = new ValueLoader(section);
+			locationName = loader.loadString("block");
 			requirements = new HashSet<>(section.getStringList("required"));
 			buyCost = loader.loadInt("buy_cost", 0);
 			sellCost = loader.loadInt("sell_cost", 0);
@@ -242,6 +247,21 @@ public abstract class DefaultGame implements Listener, Game {
 			} catch (LoadingException e) {
 				throw (LoadingException) new LoadingException("Error in 'on_unlock' section.").initCause(e);
 			}
+		}
+		
+		@Override
+		public String getLocationName() {
+			return locationName;
+		}
+		
+		@Override
+		public Location getLocation() {
+			return location;
+		}
+		
+		@Override
+		public void setLocation(Location location) {
+			this.location = new Location(location.getWorld(), location.getBlockX(), location.getBlockY(), location.getBlockZ());
 		}
 		
 		@Override
@@ -335,6 +355,7 @@ public abstract class DefaultGame implements Listener, Game {
 
 	@Override
 	public void start() {
+		running = true;
 		heartBeat = new GameHeartBeat(this);
 		Bukkit.getPluginManager().registerEvents(this, Flier.getInstance());
 		for (Bonus bonus : bonuses) {
@@ -344,6 +365,7 @@ public abstract class DefaultGame implements Listener, Game {
 
 	@Override
 	public void stop() {
+		running = false;
 		HandlerList.unregisterAll(this);
 		heartBeat.cancel();
 		Collection<InGamePlayer> copy = new ArrayList<>(dataMap.values());
@@ -353,6 +375,11 @@ public abstract class DefaultGame implements Listener, Game {
 		for (Bonus bonus : bonuses) {
 			bonus.stop();
 		}
+	}
+	
+	@Override
+	public boolean isRunning() {
+		return running;
 	}
 	
 	@Override
@@ -577,6 +604,37 @@ public abstract class DefaultGame implements Listener, Game {
 		return center;
 	}
 	
+	@Override
+	public List<String> getViableArenas() {
+		return availableArenas;
+	}
+	
+	@Override
+	public Arena getArena() {
+		return arena;
+	}
+	
+	@Override
+	public void setArena(Arena arena) throws LoadingException {
+		this.arena = arena;
+		center = arena.getLocation(centerName);
+		minX = center.getBlockX() - radius;
+		maxX = center.getBlockX() + radius;
+		minZ = center.getBlockZ() - radius;
+		maxZ = center.getBlockZ() + radius;
+		for (Bonus bonus : bonuses) {
+			bonus.setLocation(arena.getLocation(bonus.getLocationName()));
+		}
+		for (Button button : buttons.values()) {
+			button.setLocation(arena.getLocation(button.getLocationName()));
+		}
+	}
+	
+	@Override
+	public int getMaxPlayers() {
+		return maxPlayers;
+	}
+	
 	@EventHandler(priority=EventPriority.HIGH)
 	public void onClick(PlayerInteractEvent event) {
 		InGamePlayer data = getPlayers().get(event.getPlayer().getUniqueId());
@@ -597,7 +655,10 @@ public abstract class DefaultGame implements Listener, Game {
 					}.runTaskLater(Flier.getInstance(), 5);
 				}
 				// apply the button
-				Button button = blocks.get(event.getClickedBlock());
+				Button button = buttons.values().stream()
+						.filter(b -> b.getLocation().equals(event.getClickedBlock().getLocation()))
+						.findFirst()
+						.orElse(null);
 				if (button != null) {
 					applyButton(data, button, event.getAction() == Action.LEFT_CLICK_BLOCK, true);
 					return;

@@ -13,12 +13,18 @@ import java.util.UUID;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
+import pl.betoncraft.flier.api.core.Arena;
+
 /**
  * Represents a lobby.
  *
  * @author Jakub Sapalski
  */
 public interface Lobby {
+	
+	public enum JoinResult {
+		GAME_CREATED, GAME_JOINED, GAMES_FULL, NO_SUCH_GAME
+	}
 
 	/**
 	 * Adds player to the lobby. Creates an InGamePlayer instance and adds the
@@ -39,6 +45,20 @@ public interface Lobby {
 	public void removePlayer(Player player);
 
 	/**
+	 * Tries to move this player to the Game with specified name. If it fails
+	 * for some reason (Games are full and no available Arenas to create new
+	 * Game), it will display a message and return false. This method will
+	 * create a new Game if it needs to.
+	 * 
+	 * @param player
+	 *            Player to add to the Game
+	 * @param gameName
+	 *            name of the Game
+	 * @return the result of the join
+	 */
+	public JoinResult joinGame(Player player, String gameName);
+
+	/**
 	 * @return a set with UUIDs of players in this Lobby
 	 */
 	public Set<UUID> getPlayers();
@@ -49,21 +69,14 @@ public interface Lobby {
 	public void stop();
 
 	/**
-	 * Sets the game for this lobby.
-	 * 
-	 * @param game
-	 */
-	void setGame(Game game);
-
-	/**
-	 * @return the current game
-	 */
-	public Game getGame();
-
-	/**
 	 * @return the map of games and their names
 	 */
-	public Map<String, Game> getGames();
+	public Map<String, Set<Game>> getGames();
+
+	/**
+	 * @return the map of Arenas and their names
+	 */
+	public Map<String, Arena> getArenas();
 
 	/**
 	 * @return the spawn location of the lobby

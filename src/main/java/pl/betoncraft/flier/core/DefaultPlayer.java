@@ -54,6 +54,7 @@ public class DefaultPlayer implements InGamePlayer {
 	private Player player;
 	private Game game;
 	private PlayerClass clazz;
+	private Scoreboard oldSb;
 	private Scoreboard sb;
 
 	private boolean isPlaying;
@@ -70,6 +71,7 @@ public class DefaultPlayer implements InGamePlayer {
 		this.player = player;
 		this.game = game;
 		this.clazz = clazz;
+		oldSb = player.getScoreboard();
 		sb = Bukkit.getScoreboardManager().getNewScoreboard();
 		Objective stats = sb.registerNewObjective("stats", "dummy");
 		stats.setDisplaySlot(DisplaySlot.SIDEBAR);
@@ -357,6 +359,7 @@ public class DefaultPlayer implements InGamePlayer {
 	@Override
 	public void exitGame() {
 		Utils.clearPlayer(player);
+		player.setScoreboard(oldSb);
 	}
 	
 	private boolean isAccelerating() {
