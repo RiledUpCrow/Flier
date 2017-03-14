@@ -9,11 +9,8 @@ package pl.betoncraft.flier.core.defaults;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -32,13 +29,9 @@ import pl.betoncraft.flier.api.content.Lobby;
 import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.LoadingException;
 import pl.betoncraft.flier.api.core.PlayerClass;
-import pl.betoncraft.flier.api.core.PlayerClass.AddResult;
 import pl.betoncraft.flier.api.core.PlayerClass.RespawnAction;
-import pl.betoncraft.flier.api.core.SetApplier;
 import pl.betoncraft.flier.core.DefaultClass;
 import pl.betoncraft.flier.core.DefaultPlayer;
-import pl.betoncraft.flier.core.DefaultSetApplier;
-import pl.betoncraft.flier.util.LangManager;
 import pl.betoncraft.flier.util.ValueLoader;
 
 /**
@@ -56,8 +49,6 @@ public abstract class DefaultLobby implements Lobby, Listener {
 	protected Location spawn;
 	protected Map<UUID, InGamePlayer> players = new HashMap<>();
 	protected PlayerClass defClass;
-	protected Map<String, Button> buttons = new HashMap<>();
-	protected Map<InGamePlayer, List<Button>> unlocked = new HashMap<>();
 
 	public DefaultLobby(ConfigurationSection section) throws LoadingException {
 		loader = new ValueLoader(section);
@@ -67,18 +58,6 @@ public abstract class DefaultLobby implements Lobby, Listener {
 			defClass = new DefaultClass(section.getStringList("default_class"), respawnAction);
 		} catch (LoadingException e) {
 			throw (LoadingException) new LoadingException("Error in default class.").initCause(e);
-		}
-		ConfigurationSection buttonsSection = section.getConfigurationSection("buttons");
-		if (buttonsSection != null) for (String i : buttonsSection.getKeys(false)) {
-			ConfigurationSection buttonSection = buttonsSection.getConfigurationSection(i);
-			if (buttonSection == null) {
-				throw new LoadingException(String.format("'%s' is not a button.", i));
-			}
-			try {
-				buttons.put(i, new DefaultButton(buttonSection));
-			} catch (LoadingException e) {
-				throw (LoadingException) new LoadingException(String.format("Error in '%s' button.", i)).initCause(e);
-			}
 		}
 		List<String> gameNames = section.getStringList("games");
 		for (String gameName : gameNames) {
@@ -90,79 +69,6 @@ public abstract class DefaultLobby implements Lobby, Listener {
 		}
 		currentGame = games.get(gameNames.get(0));
 		Bukkit.getPluginManager().registerEvents(this, Flier.getInstance());
-	}
-	
-	public class DefaultButton implements Button {
-		
-		protected final Set<String> requirements;
-		protected final int buyCost;
-		protected final int sellCost;
-		protected final int unlockCost;
-		protected final SetApplier onBuy;
-		protected final SetApplier onSell;
-		protected final SetApplier onUnlock;
-
-		public DefaultButton(ConfigurationSection section) throws LoadingException {
-			ValueLoader loader = new ValueLoader(section);
-			requirements = new HashSet<>(section.getStringList("required"));
-			buyCost = loader.loadInt("buy_cost", 0);
-			sellCost = loader.loadInt("sell_cost", 0);
-			unlockCost = loader.loadNonNegativeInt("unlock_cost", 0);
-			try {
-				ConfigurationSection buySection = section.getConfigurationSection("on_buy");
-				onBuy = buySection == null ? null : new DefaultSetApplier(buySection);
-			} catch (LoadingException e) {
-				throw (LoadingException) new LoadingException("Error in 'on_buy' section.").initCause(e);
-			}
-			try {
-				ConfigurationSection sellSection = section.getConfigurationSection("on_sell");
-				onSell = sellSection == null ? null : new DefaultSetApplier(sellSection);
-			} catch (LoadingException e) {
-				throw (LoadingException) new LoadingException("Error in 'on_sell' section.").initCause(e);
-			}
-			try {
-				ConfigurationSection unlockSection = section.getConfigurationSection("on_unlock");
-				onUnlock = unlockSection == null ? null : new DefaultSetApplier(unlockSection);
-			} catch (LoadingException e) {
-				throw (LoadingException) new LoadingException("Error in 'on_unlock' section.").initCause(e);
-			}
-		}
-		
-		@Override
-		public Set<String> getRequirements() {
-			return requirements;
-		}
-
-		@Override
-		public int getBuyCost() {
-			return buyCost;
-		}
-
-		@Override
-		public int getSellCost() {
-			return sellCost;
-		}
-
-		@Override
-		public int getUnlockCost() {
-			return unlockCost;
-		}
-
-		@Override
-		public SetApplier getOnBuy() {
-			return onBuy;
-		}
-
-		@Override
-		public SetApplier getOnSell() {
-			return onSell;
-		}
-
-		@Override
-		public SetApplier getOnUnlock() {
-			return onUnlock;
-		}
-		
 	}
 
 	@Override
@@ -203,117 +109,6 @@ public abstract class DefaultLobby implements Lobby, Listener {
 			currentGame.addPlayer(player);
 		}
 		// no need to start the game, it's running if there were players
-	}
-	
-	@Override
-	public Map<String, Button> getButtons() {
-		return buttons;
-	}
-
-	@Override
-	public boolean applyButton(InGamePlayer player, Button button, boolean buy, boolean notify) {
-		boolean applied = false;
-		if (button != null) {
-			List<Button> ul = unlocked.computeIfAbsent(player, k -> new LinkedList<>());
-			boolean unlocked = button.getUnlockCost() == 0 || ul.contains(button);
-			if (!unlocked) {
-				if (!button.getRequirements().stream().map(name -> buttons.get(name)).allMatch(b -> ul.contains(b))) {
-					if (notify) LangManager.sendMessage(player.getPlayer(), "unlock_other");
-				} else if (button.getUnlockCost() <= player.getMoney()) {
-					SetApplier applier = button.getOnUnlock();
-					Runnable run = () -> {
-						ul.add(button);
-						player.setMoney(player.getMoney() - button.getUnlockCost());
-						player.updateClass();
-					};
-					String message;
-					if (applier == null) {
-						run.run();
-						applied = true;
-						message = "unlocked";
-					} else {
-						AddResult result = applier.isSaving() ? player.getClazz().addStored(applier) :
-							player.getClazz().addCurrent(applier);
-						switch (result) {
-						case ADDED:
-						case FILLED:
-						case REPLACED:
-						case REMOVED:
-							run.run();
-							applied = true;
-							message = "unlocked";
-							break;
-						default:
-							message = "cant_use";
-						}
-						if (notify) LangManager.sendMessage(player.getPlayer(), message);;
-					}
-				} else {
-					if (notify) LangManager.sendMessage(player.getPlayer(), "no_money_unlock");
-				}
-			} else {
-				int cost;
-				SetApplier applier;
-				if (buy) {
-					cost = button.getBuyCost();
-					applier = button.getOnBuy();
-				} else {
-					cost = button.getSellCost();
-					applier = button.getOnSell();
-				}
-				if (applier != null) {
-					if (cost <= player.getMoney()) {
-						AddResult result = applier.isSaving() ? player.getClazz().addStored(applier) :
-							player.getClazz().addCurrent(applier);
-						Runnable run = () -> {
-							player.setMoney(player.getMoney() - cost);
-							player.updateClass();
-						};
-						String message = null;
-						switch (result) {
-						case ADDED:
-							run.run();
-							applied = true;
-							message = "items_added";
-							break;
-						case FILLED:
-							run.run();
-							applied = true;
-							message = "items_refilled";
-							break;
-						case REMOVED:
-							run.run();
-							applied = true;
-							message = "items_removed";
-							break;
-						case REPLACED:
-							run.run();
-							applied = true;
-							message = "items_replaced";
-							break;
-						case ALREADY_EMPTIED:
-							// no running, items were not added
-							message = "cant_sell";
-							break;
-						case ALREADY_MAXED:
-							// no running, items were not added
-							message = "item_limit";
-							break;
-						case SKIPPED:
-							// no running, items were not added
-							message = "item_conflict";
-							break;
-						}
-						if (notify) LangManager.sendMessage(player.getPlayer(), message);
-					} else {
-						if (notify) LangManager.sendMessage(player.getPlayer(), "no_money_buy");
-					}
-				} else {
-					if (notify) LangManager.sendMessage(player.getPlayer(), "cant_do");
-				}
-			}
-		}
-		return applied;
 	}
 
 	@Override

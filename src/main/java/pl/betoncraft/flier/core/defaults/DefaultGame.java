@@ -10,19 +10,24 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Sound;
+import org.bukkit.block.Block;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -48,6 +53,9 @@ import pl.betoncraft.flier.api.core.Damager;
 import pl.betoncraft.flier.api.core.Damager.DamageResult;
 import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.LoadingException;
+import pl.betoncraft.flier.api.core.PlayerClass.AddResult;
+import pl.betoncraft.flier.api.core.SetApplier;
+import pl.betoncraft.flier.core.DefaultSetApplier;
 import pl.betoncraft.flier.event.FlierPlayerKillEvent;
 import pl.betoncraft.flier.event.FlierPlayerKillEvent.Type;
 import pl.betoncraft.flier.sidebar.Altitude;
@@ -75,6 +83,10 @@ public abstract class DefaultGame implements Listener, Game {
 	protected Map<UUID, InGamePlayer> dataMap = new HashMap<>();
 	protected List<Bonus> bonuses = new ArrayList<>();
 	protected EffectListener listener;
+	protected Map<String, Button> buttons = new HashMap<>();
+	protected Map<InGamePlayer, List<Button>> unlocked = new HashMap<>();
+	private Map<Block, Button> blocks = new HashMap<>();
+	private List<UUID> blocked = new LinkedList<>();
 	
 	protected int heightLimit;
 	protected double heightDamage;
@@ -100,6 +112,22 @@ public abstract class DefaultGame implements Listener, Game {
 			bonuses.add(flier.getBonus(bonusName));
 		}
 		listener = new EffectListener(section.getStringList("effects"), this);
+		ConfigurationSection buttonsSection = section.getConfigurationSection("buttons");
+		if (buttonsSection != null) for (String i : buttonsSection.getKeys(false)) {
+			ConfigurationSection buttonSection = buttonsSection.getConfigurationSection(i);
+			if (buttonSection == null) {
+				throw new LoadingException(String.format("'%s' is not a button.", i));
+			}
+			try {
+				ValueLoader loader = new ValueLoader(buttonSection);
+				Block block = loader.loadLocation("block").getBlock();
+				Button b = new DefaultButton(buttonSection);
+				buttons.put(i, b);
+				blocks.put(block, b);
+			} catch (LoadingException e) {
+				throw (LoadingException) new LoadingException(String.format("Error in '%s' button.", i)).initCause(e);
+			}
+		}
 		heightLimit = loader.loadInt("height_limit", 512);
 		heightDamage = loader.loadNonNegativeDouble("height_damage", 0.5);
 		center = loader.loadLocation("center");
@@ -162,7 +190,80 @@ public abstract class DefaultGame implements Listener, Game {
 				i = 0;
 			}
 		}
-	}	
+	}
+	
+	public class DefaultButton implements Button {
+		
+		protected final Set<String> requirements;
+		protected final int buyCost;
+		protected final int sellCost;
+		protected final int unlockCost;
+		protected final SetApplier onBuy;
+		protected final SetApplier onSell;
+		protected final SetApplier onUnlock;
+
+		public DefaultButton(ConfigurationSection section) throws LoadingException {
+			ValueLoader loader = new ValueLoader(section);
+			requirements = new HashSet<>(section.getStringList("required"));
+			buyCost = loader.loadInt("buy_cost", 0);
+			sellCost = loader.loadInt("sell_cost", 0);
+			unlockCost = loader.loadNonNegativeInt("unlock_cost", 0);
+			try {
+				ConfigurationSection buySection = section.getConfigurationSection("on_buy");
+				onBuy = buySection == null ? null : new DefaultSetApplier(buySection);
+			} catch (LoadingException e) {
+				throw (LoadingException) new LoadingException("Error in 'on_buy' section.").initCause(e);
+			}
+			try {
+				ConfigurationSection sellSection = section.getConfigurationSection("on_sell");
+				onSell = sellSection == null ? null : new DefaultSetApplier(sellSection);
+			} catch (LoadingException e) {
+				throw (LoadingException) new LoadingException("Error in 'on_sell' section.").initCause(e);
+			}
+			try {
+				ConfigurationSection unlockSection = section.getConfigurationSection("on_unlock");
+				onUnlock = unlockSection == null ? null : new DefaultSetApplier(unlockSection);
+			} catch (LoadingException e) {
+				throw (LoadingException) new LoadingException("Error in 'on_unlock' section.").initCause(e);
+			}
+		}
+		
+		@Override
+		public Set<String> getRequirements() {
+			return requirements;
+		}
+
+		@Override
+		public int getBuyCost() {
+			return buyCost;
+		}
+
+		@Override
+		public int getSellCost() {
+			return sellCost;
+		}
+
+		@Override
+		public int getUnlockCost() {
+			return unlockCost;
+		}
+
+		@Override
+		public SetApplier getOnBuy() {
+			return onBuy;
+		}
+
+		@Override
+		public SetApplier getOnSell() {
+			return onSell;
+		}
+
+		@Override
+		public SetApplier getOnUnlock() {
+			return onUnlock;
+		}
+		
+	}
 
 	/**
 	 * The game should do game-specific stuff in a fast tick here.
@@ -246,6 +347,117 @@ public abstract class DefaultGame implements Listener, Game {
 	
 	@Override
 	public abstract void afterRespawn(InGamePlayer player);
+	
+	@Override
+	public Map<String, Button> getButtons() {
+		return buttons;
+	}
+
+	@Override
+	public boolean applyButton(InGamePlayer player, Button button, boolean buy, boolean notify) {
+		boolean applied = false;
+		if (button != null) {
+			List<Button> ul = unlocked.computeIfAbsent(player, k -> new LinkedList<>());
+			boolean unlocked = button.getUnlockCost() == 0 || ul.contains(button);
+			if (!unlocked) {
+				if (!button.getRequirements().stream().map(name -> buttons.get(name)).allMatch(b -> ul.contains(b))) {
+					if (notify) LangManager.sendMessage(player.getPlayer(), "unlock_other");
+				} else if (button.getUnlockCost() <= player.getMoney()) {
+					SetApplier applier = button.getOnUnlock();
+					Runnable run = () -> {
+						ul.add(button);
+						player.setMoney(player.getMoney() - button.getUnlockCost());
+						player.updateClass();
+					};
+					String message;
+					if (applier == null) {
+						run.run();
+						applied = true;
+						message = "unlocked";
+					} else {
+						AddResult result = applier.isSaving() ? player.getClazz().addStored(applier) :
+							player.getClazz().addCurrent(applier);
+						switch (result) {
+						case ADDED:
+						case FILLED:
+						case REPLACED:
+						case REMOVED:
+							run.run();
+							applied = true;
+							message = "unlocked";
+							break;
+						default:
+							message = "cant_use";
+						}
+						if (notify) LangManager.sendMessage(player.getPlayer(), message);;
+					}
+				} else {
+					if (notify) LangManager.sendMessage(player.getPlayer(), "no_money_unlock");
+				}
+			} else {
+				int cost;
+				SetApplier applier;
+				if (buy) {
+					cost = button.getBuyCost();
+					applier = button.getOnBuy();
+				} else {
+					cost = button.getSellCost();
+					applier = button.getOnSell();
+				}
+				if (applier != null) {
+					if (cost <= player.getMoney()) {
+						AddResult result = applier.isSaving() ? player.getClazz().addStored(applier) :
+							player.getClazz().addCurrent(applier);
+						Runnable run = () -> {
+							player.setMoney(player.getMoney() - cost);
+							player.updateClass();
+						};
+						String message = null;
+						switch (result) {
+						case ADDED:
+							run.run();
+							applied = true;
+							message = "items_added";
+							break;
+						case FILLED:
+							run.run();
+							applied = true;
+							message = "items_refilled";
+							break;
+						case REMOVED:
+							run.run();
+							applied = true;
+							message = "items_removed";
+							break;
+						case REPLACED:
+							run.run();
+							applied = true;
+							message = "items_replaced";
+							break;
+						case ALREADY_EMPTIED:
+							// no running, items were not added
+							message = "cant_sell";
+							break;
+						case ALREADY_MAXED:
+							// no running, items were not added
+							message = "item_limit";
+							break;
+						case SKIPPED:
+							// no running, items were not added
+							message = "item_conflict";
+							break;
+						}
+						if (notify) LangManager.sendMessage(player.getPlayer(), message);
+					} else {
+						if (notify) LangManager.sendMessage(player.getPlayer(), "no_money_buy");
+					}
+				} else {
+					if (notify) LangManager.sendMessage(player.getPlayer(), "cant_do");
+				}
+			}
+		}
+		return applied;
+	}
 
 	@Override
 	public void addPlayer(InGamePlayer data) {
@@ -328,6 +540,28 @@ public abstract class DefaultGame implements Listener, Game {
 		InGamePlayer data = getPlayers().get(event.getPlayer().getUniqueId());
 		if (data != null) {
 			event.setCancelled(true);
+			// handle button clicking
+			if (event.hasBlock()) {
+				// this prevents double clicks on next tick
+				if (blocked.contains(event.getPlayer().getUniqueId())) {
+					return;
+				} else {
+					blocked.add(event.getPlayer().getUniqueId());
+					new BukkitRunnable() {
+						@Override
+						public void run() {
+							blocked.remove(event.getPlayer().getUniqueId());
+						}
+					}.runTaskLater(Flier.getInstance(), 5);
+				}
+				// apply the button
+				Button button = blocks.get(event.getClickedBlock());
+				if (button != null) {
+					applyButton(data, button, event.getAction() == Action.LEFT_CLICK_BLOCK, true);
+					return;
+				}
+			}
+			// not a button
 			ItemStack item = event.getPlayer().getInventory().getItemInMainHand();
 			Wings wings = data.getClazz().getWings();
 			if (item != null && wings != null && item.isSimilar(wings.getItem(data.getPlayer()))) {
@@ -337,7 +571,7 @@ public abstract class DefaultGame implements Listener, Game {
 				event.getPlayer().getWorld().playSound(
 						event.getPlayer().getLocation(), Sound.ITEM_ARMOR_EQUIP_GENERIC, 1, 1);
 			} else {
-				// handle a click
+				// handle a regular click
 				switch (event.getAction()) {
 				case LEFT_CLICK_AIR:
 				case LEFT_CLICK_BLOCK:

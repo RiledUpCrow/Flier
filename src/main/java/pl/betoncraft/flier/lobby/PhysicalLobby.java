@@ -7,10 +7,8 @@
 package pl.betoncraft.flier.lobby;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 import org.bukkit.block.Block;
@@ -27,7 +25,6 @@ import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.LoadingException;
 import pl.betoncraft.flier.core.defaults.DefaultLobby;
 import pl.betoncraft.flier.util.Utils;
-import pl.betoncraft.flier.util.ValueLoader;
 
 /**
  * Physical lobby with fixed classes selected by clicking on blocks.
@@ -39,7 +36,6 @@ public class PhysicalLobby extends DefaultLobby {
 	private List<Block> join = new ArrayList<>();
 	private Block start;
 	private Block leave;
-	private Map<Block, Button> blocks = new HashMap<>();
 
 	private List<UUID> blocked = new LinkedList<>();
 
@@ -56,17 +52,6 @@ public class PhysicalLobby extends DefaultLobby {
 		}
 		start = loader.loadLocation("start").getBlock();
 		leave = loader.loadLocation("leave").getBlock();
-		ConfigurationSection buttonsSection = section.getConfigurationSection("buttons");
-		if (buttonsSection != null) for (String i : buttonsSection.getKeys(false)) {
-			ConfigurationSection blockSection = buttonsSection.getConfigurationSection(i);
-			try {
-				ValueLoader loader = new ValueLoader(blockSection);
-				Block block = loader.loadLocation("block").getBlock();
-				blocks.put(block, buttons.get(i));
-			} catch (LoadingException e) {
-				throw (LoadingException) new LoadingException(String.format("Error in '%s' button.", i)).initCause(e);
-			}
-		}
 	}
 
 	@EventHandler(priority = EventPriority.LOW)
@@ -106,12 +91,6 @@ public class PhysicalLobby extends DefaultLobby {
 			}
 			if (block.equals(start)) {
 				currentGame.startPlayer(data);
-			} else {
-				Button button = blocks.get(block);
-				if (button == null) {
-					return;
-				}
-				applyButton(data, button, event.getAction() == Action.LEFT_CLICK_BLOCK, true);
 			}
 		}
 		event.setCancelled(true);

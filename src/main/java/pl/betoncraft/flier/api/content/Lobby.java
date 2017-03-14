@@ -7,13 +7,11 @@
 package pl.betoncraft.flier.api.content;
 
 import java.util.Map;
-import java.util.Set;
 
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 import pl.betoncraft.flier.api.core.InGamePlayer;
-import pl.betoncraft.flier.api.core.SetApplier;
 
 /**
  * Represents a lobby.
@@ -21,47 +19,6 @@ import pl.betoncraft.flier.api.core.SetApplier;
  * @author Jakub Sapalski
  */
 public interface Lobby {
-	
-	/**
-	 * The Button in a Lobby, which has costs and can be locked.
-	 */
-	public interface Button {
-		
-		/**
-		 * @return the set of Button names required for unlocking this Button
-		 */
-		public Set<String> getRequirements();
-
-		/**
-		 * @return the cost to buy an ItemSet
-		 */
-		public int getBuyCost();
-
-		/**
-		 * @return the cost to sell an ItemSet
-		 */
-		public int getSellCost();
-
-		/**
-		 * @return the cost to unlock this Button
-		 */
-		public int getUnlockCost();
-
-		/**
-		 * @return the SetApplier for buying
-		 */
-		public SetApplier getOnBuy();
-
-		/**
-		 * @return the SetApplier for selling
-		 */
-		public SetApplier getOnSell();
-
-		/**
-		 * @return the SetApplier for unlocking
-		 */
-		public SetApplier getOnUnlock();
-	}
 
 	/**
 	 * Adds player to the lobby. Creates an InGamePlayer instance and adds the
@@ -96,21 +53,6 @@ public interface Lobby {
 	 * Called when the game ends.
 	 */
 	public void stop();
-
-	/**
-	 * @return the map containing all Buttons in this Game and their names.
-	 */
-	public Map<String, Button> getButtons();
-
-	/**
-	 * Applies the specified Button to the player.
-	 * 
-	 * @param player the player
-	 * @param button the button to apply
-	 * @param buy whenever the player wants to buy (true) or sell (false)
-	 * @param message whenever to display a message
-	 */
-	public boolean applyButton(InGamePlayer player, Button button, boolean buy, boolean message);
 
 	/**
 	 * Sets the game for this lobby.

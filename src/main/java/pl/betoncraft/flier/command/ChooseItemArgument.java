@@ -19,8 +19,8 @@ import com.google.common.collect.Sets;
 
 import net.md_5.bungee.api.ChatColor;
 import pl.betoncraft.flier.api.Flier;
+import pl.betoncraft.flier.api.content.Game.Button;
 import pl.betoncraft.flier.api.content.Lobby;
-import pl.betoncraft.flier.api.content.Lobby.Button;
 import pl.betoncraft.flier.api.core.CommandArgument;
 import pl.betoncraft.flier.api.core.InGamePlayer;
 
@@ -83,11 +83,11 @@ public class ChooseItemArgument implements CommandArgument {
 			InGamePlayer data = lobby.getGame().getPlayers().get(player.getUniqueId());
 			if (data != null) {
 				found = true;
-				Button button = lobby.getButtons().get(item);
+				Button button = lobby.getGame().getButtons().get(item);
 				if (button != null) {
-					lobby.applyButton(data, button, buy, player.equals(sender));
+					lobby.getGame().applyButton(data, button, buy, player.equals(sender));
 				} else {
-					CommandArgument.displayObjects(sender, "button", item, lobby.getButtons().keySet());
+					CommandArgument.displayObjects(sender, "button", item, lobby.getGame().getButtons().keySet());
 					return;
 				}
 				break;
