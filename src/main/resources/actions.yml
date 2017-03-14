@@ -12,7 +12,8 @@ balancedShot:
   offset: 0.1               #
   speed: 0.01               #
   burst_amount: 10          # amount of bullets in a burst
-  burst_ticks: 1            # ticks between shots
+  burst_ticks: 20           # length of the burst
+  spread: 0.005             # precision of bullets (0 means perfect)
   projectile_speed: 7.5     # speed of bullets
   damage: 1200              # damage to wings
   physical_damage: 7.5      # damage to player's health
@@ -27,6 +28,7 @@ strongShot:
   speed: 0.01
   burst_amount: 10
   burst_ticks: 1
+  spread: 0.05
   projectile_speed: 5
   damage: 2800
   physical_damage: 20
@@ -39,8 +41,8 @@ fastShot:
   amount: 10
   offset: 0.1
   speed: 0.01
-  burst_amount: 10
-  burst_ticks: 2
+  burst_amount: 5
+  burst_ticks: 5
   projectile_speed: 15
   damage: 700
   physical_damage: 5

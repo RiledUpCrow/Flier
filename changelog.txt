@@ -3,6 +3,7 @@ v0.5.0
 * Added Modification API
 * Added Effect API
 * Improved error messages
+* Added translations
 * Added location picking tool (/flier coordinator)
 * Added requirements to lobby buttons
 * Added "consume" action
@@ -18,3 +19,4 @@ v0.5.0
 * Disabled health regeneration while in-game
 * Allowed using lobby buttons while in-game
 * Compass points to lobby spawn if no players are present
+* Added bullet spread to particleGun

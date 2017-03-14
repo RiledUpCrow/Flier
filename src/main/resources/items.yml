@@ -21,7 +21,7 @@ balancedWeapon:
       - left
     shoot:                                          # one of the usages
       where: air                                    # where it can be used
-      cooldown: 30                                  # cooldown after this usage
+      cooldown: 40                                  # cooldown after this usage
       ammo_use: 1                                   # amount of ammunition taken
       activators:                                   # list of Activators
       - left                                        # this usage is activated after left click
@@ -52,7 +52,7 @@ strongWeapon:
       - left
     shoot:
       where: air
-      cooldown: 40
+      cooldown: 60
       ammo_use: 1
       activators:
       - left

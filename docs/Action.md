@@ -228,6 +228,7 @@ gun_action:
   density: [positive decimal]
   burst_amount: [positive integer]
   burst_ticks: [positive integer]
+  spread: [non-negative integer]
   projectile_speed: [positive decimal]
 ```
 
@@ -238,7 +239,8 @@ gun_action:
 * `speed` (**default: 0**) is the speed of particles. This may have a different meaning in alternative mode.
 * `density` (**default: 0.5**) is the amount of particles per block of bullet's path. Setting it to high values will lag the server.
 * `burst_amount` (**required**) is the amount of bullets in a burst.
-* `burst_ticks` (**required**) is the amount of ticks between shooting bullets.
+* `burst_ticks` (**required**) is the total time of the burst.
+* `spread` (**default: 0**) is the precision of the bullets, where 0 means perfect.
 * `projectile_speed` (**required**) is the speed of the bullets.
 
 ## Bomb
