@@ -7,7 +7,6 @@
 package pl.betoncraft.flier.lobby;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
@@ -18,10 +17,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.scheduler.BukkitRunnable;
 
-import pl.betoncraft.flier.api.Flier;
-import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.LoadingException;
 import pl.betoncraft.flier.core.defaults.DefaultLobby;
 import pl.betoncraft.flier.util.Utils;
@@ -36,8 +32,6 @@ public class PhysicalLobby extends DefaultLobby {
 	private List<Block> join = new ArrayList<>();
 	private Block start;
 	private Block leave;
-
-	private List<UUID> blocked = new LinkedList<>();
 
 	public PhysicalLobby(ConfigurationSection section) throws LoadingException {
 		super(section);
@@ -62,38 +56,35 @@ public class PhysicalLobby extends DefaultLobby {
 		if (event.getAction() != Action.LEFT_CLICK_BLOCK && event.getAction() != Action.RIGHT_CLICK_BLOCK) {
 			return;
 		}
+		if (!event.hasBlock()) {
+			return;
+		}
+
 		Player player = event.getPlayer();
+		UUID uuid = player.getUniqueId();
 		Block block = event.getClickedBlock();
-		if (block == null) {
-			return;
-		}
-		// this prevents double clicks on next tick
-		if (blocked.contains(player.getUniqueId())) {
-			return;
-		} else {
-			blocked.add(player.getUniqueId());
-			new BukkitRunnable() {
-				@Override
-				public void run() {
-					blocked.remove(player.getUniqueId());
-				}
-			}.runTaskLater(Flier.getInstance(), 5);
-		}
-		// handle the click
-		if (join.contains(block)) {
-			addPlayer(player);
-		} else if (block.equals(leave)) {
-			removePlayer(player);
-		} else {
-			InGamePlayer data = players.get(player.getUniqueId());
-			if (data == null) {
+		boolean inside = players.contains(uuid);
+
+		if (inside) {
+			event.setCancelled(true);
+			// quitting
+			if (block.equals(leave)) {
+				removePlayer(player);
 				return;
 			}
+			// joining the game
 			if (block.equals(start)) {
-				currentGame.startPlayer(data);
+				currentGame.addPlayer(player);
+				return;
+			}
+		} else {
+			// joining
+			if (join.contains(block)) {
+				event.setCancelled(true);
+				addPlayer(player);
+				return;
 			}
 		}
-		event.setCancelled(true);
 	}
 
 }

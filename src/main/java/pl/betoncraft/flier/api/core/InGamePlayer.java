@@ -12,7 +12,7 @@ import java.util.Map;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
-import pl.betoncraft.flier.api.content.Lobby;
+import pl.betoncraft.flier.api.content.Game;
 import pl.betoncraft.flier.api.core.Damager.DamageResult;
 
 /**
@@ -72,9 +72,9 @@ public interface InGamePlayer {
 	public void consumeItem(UsableItem item);
 
 	/**
-	 * @return the the lobby this player is in
+	 * @return the the Game this player is in
 	 */
-	public Lobby getLobby();
+	public Game getGame();
 
 	/**
 	 * @return the Player object of this player
@@ -160,11 +160,6 @@ public interface InGamePlayer {
 	 * Makes the player leave the game back to the lobby.
 	 */
 	public void exitGame();
-
-	/**
-	 * Makes the player leave the lobby back to Minecraft.
-	 */
-	public void exitLobby();
 
 	/**
 	 * Deals Damager's damage from the shooter to the player.

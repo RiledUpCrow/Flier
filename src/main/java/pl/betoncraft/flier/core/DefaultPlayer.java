@@ -29,7 +29,7 @@ import com.google.common.collect.Lists;
 
 import pl.betoncraft.flier.api.content.Bonus;
 import pl.betoncraft.flier.api.content.Engine;
-import pl.betoncraft.flier.api.content.Lobby;
+import pl.betoncraft.flier.api.content.Game;
 import pl.betoncraft.flier.api.content.Wings;
 import pl.betoncraft.flier.api.core.Damager;
 import pl.betoncraft.flier.api.core.Damager.DamageResult;
@@ -41,7 +41,6 @@ import pl.betoncraft.flier.api.core.Usage;
 import pl.betoncraft.flier.event.FlierCollectBonusEvent;
 import pl.betoncraft.flier.event.FlierEngineUseEvent;
 import pl.betoncraft.flier.event.FlierPlayerHitEvent;
-import pl.betoncraft.flier.util.PlayerBackup;
 import pl.betoncraft.flier.util.Position;
 import pl.betoncraft.flier.util.Utils;
 
@@ -53,11 +52,9 @@ import pl.betoncraft.flier.util.Utils;
 public class DefaultPlayer implements InGamePlayer {
 	
 	private Player player;
-	private Lobby lobby;
+	private Game game;
 	private PlayerClass clazz;
-	private PlayerBackup backup;
 	private Scoreboard sb;
-	private Scoreboard oldSb;
 
 	private boolean isPlaying;
 	private boolean leftClicked = false;
@@ -69,14 +66,11 @@ public class DefaultPlayer implements InGamePlayer {
 	private long glowTimer;
 	private int money;
 	
-	public DefaultPlayer(Player player, Lobby lobby, PlayerClass clazz) {
+	public DefaultPlayer(Player player, Game game, PlayerClass clazz) {
 		this.player = player;
-		this.lobby = lobby;
+		this.game = game;
 		this.clazz = clazz;
-		backup = new PlayerBackup(player);
-		backup.save();
 		sb = Bukkit.getScoreboardManager().getNewScoreboard();
-		oldSb = player.getScoreboard();
 		Objective stats = sb.registerNewObjective("stats", "dummy");
 		stats.setDisplaySlot(DisplaySlot.SIDEBAR);
 		stats.setDisplayName("Stats");
@@ -244,8 +238,8 @@ public class DefaultPlayer implements InGamePlayer {
 	}
 
 	@Override
-	public Lobby getLobby() {
-		return lobby;
+	public Game getGame() {
+		return game;
 	}
 	
 	@Override
@@ -362,25 +356,7 @@ public class DefaultPlayer implements InGamePlayer {
 	
 	@Override
 	public void exitGame() {
-		lobby.getGame().removePlayer(this);
-		isPlaying = false;
-		lines.clear();
-		lastHit = null;
-		color = null;
-		glowTimer = 0;
-		money = 0;
-		clazz.reset();
 		Utils.clearPlayer(player);
-		updateClass();
-		getPlayer().teleport(lobby.getSpawn());
-	}
-	
-	@Override
-	public void exitLobby() {
-		exitGame();
-		player.setScoreboard(oldSb);
-		player.getInventory().clear();
-		backup.load();
 	}
 	
 	private boolean isAccelerating() {
@@ -488,7 +464,7 @@ public class DefaultPlayer implements InGamePlayer {
 	}
 
 	private void checkBonuses() {
-		List<Bonus> bonuses = lobby.getGame().getBonuses();
+		List<Bonus> bonuses = game.getBonuses();
 		for (Bonus bonus : bonuses) {
 			if (!bonus.isAvailable()) {
 				continue;

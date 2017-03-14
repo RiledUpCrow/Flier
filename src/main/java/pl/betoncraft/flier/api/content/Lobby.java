@@ -7,11 +7,11 @@
 package pl.betoncraft.flier.api.content;
 
 import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
-
-import pl.betoncraft.flier.api.core.InGamePlayer;
 
 /**
  * Represents a lobby.
@@ -39,15 +39,9 @@ public interface Lobby {
 	public void removePlayer(Player player);
 
 	/**
-	 * Teleports the player to the lobby spawn and prepares him for further
-	 * playing, according to RespawnAction. It does not actually respawns the
-	 * player, because this is the Game's responsibility. The game can then pass
-	 * the player to the Lobby when it decides to using this method.
-	 * 
-	 * @param player
-	 *            player to respawn in the lobby
+	 * @return a set with UUIDs of players in this Lobby
 	 */
-	public void respawnPlayer(InGamePlayer player);
+	public Set<UUID> getPlayers();
 
 	/**
 	 * Called when the game ends.

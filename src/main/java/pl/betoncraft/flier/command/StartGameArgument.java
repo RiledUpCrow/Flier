@@ -19,7 +19,6 @@ import net.md_5.bungee.api.ChatColor;
 import pl.betoncraft.flier.api.Flier;
 import pl.betoncraft.flier.api.content.Lobby;
 import pl.betoncraft.flier.api.core.CommandArgument;
-import pl.betoncraft.flier.api.core.InGamePlayer;
 
 /**
  * Moves the player into the game.
@@ -56,10 +55,9 @@ public class StartGameArgument implements CommandArgument {
 		}
 		boolean found = false;
 		for (Lobby lobby : flier.getLobbies().values()) {
-			InGamePlayer data = lobby.getGame().getPlayers().get(player.getUniqueId());
-			if (data != null) {
+			if (lobby.getPlayers().contains(player.getUniqueId())) {
 				found = true;
-				lobby.getGame().startPlayer(data);
+				lobby.getGame().addPlayer(player);
 				break;
 			}
 		}

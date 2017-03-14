@@ -18,13 +18,11 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
 import pl.betoncraft.flier.api.content.Game;
-import pl.betoncraft.flier.api.content.Lobby;
 import pl.betoncraft.flier.api.core.Damager;
 import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.LoadingException;
 import pl.betoncraft.flier.api.core.SidebarLine;
 import pl.betoncraft.flier.core.defaults.DefaultGame;
-import pl.betoncraft.flier.event.FlierPlayerSpawnEvent;
 import pl.betoncraft.flier.util.LangManager;
 import pl.betoncraft.flier.util.Utils;
 import pl.betoncraft.flier.util.ValueLoader;
@@ -128,6 +126,33 @@ public class TeamDeathMatch extends DefaultGame {
 	
 	@Override
 	public void slowTick() {}
+	
+	@Override
+	public InGamePlayer addPlayer(Player player) {
+		InGamePlayer data = super.addPlayer(player);
+		if (data != null) {
+			data.getLines().addAll(lines.values());
+			SimpleTeam team = chooseTeam();
+			setTeam(data, team);
+			handleRespawn(data);
+		}
+		return data;
+	}
+	
+	@Override
+	public void removePlayer(Player player) {
+		super.removePlayer(player);
+		players.remove(player.getUniqueId());
+		updateColors();
+	}
+	
+	@Override
+	public void stop() {
+		super.stop();
+		for (SimpleTeam team : teams.values()) {
+			team.setScore(0);
+		}
+	}
 
 	@Override
 	public void handleKill(InGamePlayer killer, InGamePlayer killed, boolean fall) {
@@ -150,42 +175,9 @@ public class TeamDeathMatch extends DefaultGame {
 	}
 	
 	@Override
-	public void afterRespawn(InGamePlayer player) {
-		player.getLobby().respawnPlayer(player);
-	}
-	
-	@Override
-	public void addPlayer(InGamePlayer data) {
-		super.addPlayer(data);
-		data.getLines().addAll(lines.values());
-	}
-	
-	@Override
-	public void startPlayer(InGamePlayer data) {
-		super.startPlayer(data);
-		SimpleTeam team = getTeam(data);
-		if (team == null) {
-			team = chooseTeam();
-			setTeam(data, team);
-		}
-		data.getPlayer().teleport(team.getSpawn());
-		FlierPlayerSpawnEvent event = new FlierPlayerSpawnEvent(data);
-		Bukkit.getPluginManager().callEvent(event);
-	}
-	
-	@Override
-	public void removePlayer(InGamePlayer data) {
-		super.removePlayer(data);
-		players.remove(data.getPlayer().getUniqueId());
-		updateColors();
-	}
-	
-	@Override
-	public void stop() {
-		super.stop();
-		for (SimpleTeam team : teams.values()) {
-			team.setScore(0);
-		}
+	public void handleRespawn(InGamePlayer player) {
+		super.handleRespawn(player);
+		player.getPlayer().teleport(players.get(player.getPlayer().getUniqueId()).getSpawn());
 	}
 	
 	@Override
@@ -286,7 +278,6 @@ public class TeamDeathMatch extends DefaultGame {
 				Bukkit.dispatchCommand(Bukkit.getConsoleSender(), subTitle);
 			}
 			// start next game
-			Lobby lobby = dataMap.values().iterator().next().getLobby();
 			Game[] games = new Game[lobby.getGames().size()];
 			games = lobby.getGames().values().toArray(games);
 			Game game = null;

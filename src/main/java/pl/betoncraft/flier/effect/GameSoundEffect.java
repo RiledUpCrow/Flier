@@ -24,7 +24,7 @@ public class GameSoundEffect extends SoundEffect {
 
 	@Override
 	public void fire(InGamePlayer player) {
-		player.getLobby().getGame().getPlayers().values().forEach(
+		player.getGame().getPlayers().values().forEach(
 				p -> p.getPlayer().getWorld().playSound(p.getPlayer().getLocation(), sound, volume, pitch));
 	}
 

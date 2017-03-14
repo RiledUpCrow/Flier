@@ -59,7 +59,7 @@ public class MatchingTwoPlayersEvent extends MatchingPlayerEvent {
 		this.otherPrefix = otherPrefix;
 		this.playerPrefix = playerPrefix;
 		parsePlayer(other, otherPrefix);
-		setString("attitude", player.getLobby().getGame().getAttitude(player, other).toString());
+		setString("attitude", player.getGame().getAttitude(player, other).toString());
 	}
 
 	/**

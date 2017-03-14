@@ -40,7 +40,7 @@ public class Altitude implements SidebarLine {
 				color = ChatColor.GRAY.toString();
 			} else if (aboveGround < health) {
 				color = ChatColor.GREEN.toString();
-			} else if (loc.getBlockY() < player.getLobby().getGame().getHeightLimit()) {
+			} else if (loc.getBlockY() < player.getGame().getHeightLimit()) {
 				color = ChatColor.YELLOW.toString();
 			} else {
 				color = ChatColor.RED.toString();

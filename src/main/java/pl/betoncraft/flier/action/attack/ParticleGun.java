@@ -196,7 +196,7 @@ public class ParticleGun extends DefaultAttack {
 			// we're looking only for the closest player
 			InGamePlayer foundPlayer = null;
 			double smallestDistance = squared;
-			for (InGamePlayer player : shooter.getLobby().getGame().getPlayers().values()) {
+			for (InGamePlayer player : shooter.getGame().getPlayers().values()) {
 				// don't hit the shooter
 				if (player.equals(shooter)) {
 					continue;
@@ -218,7 +218,7 @@ public class ParticleGun extends DefaultAttack {
 			// hit closest player
 			if (foundPlayer != null) {
 				earlyEnd(foundPlayer.getPlayer().getLocation());
-				foundPlayer.getLobby().getGame().handleHit(shooter, foundPlayer, ParticleGun.this);
+				foundPlayer.getGame().handleHit(shooter, foundPlayer, ParticleGun.this);
 			}
 			
 			// spawn particles 

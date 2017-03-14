@@ -37,7 +37,7 @@ public class MatchingPlayerEvent extends MatchingEvent {
 	 *            the player involved in this event
 	 */
 	public MatchingPlayerEvent(InGamePlayer player) {
-		super(player.getLobby().getGame());
+		super(player.getGame());
 		this.player = player;
 		parsePlayer(player, "");
 	}

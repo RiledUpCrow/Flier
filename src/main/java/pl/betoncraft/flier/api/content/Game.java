@@ -12,6 +12,8 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.entity.Player;
 
 import pl.betoncraft.flier.api.core.Damager;
 import pl.betoncraft.flier.api.core.InGamePlayer;
@@ -23,12 +25,12 @@ import pl.betoncraft.flier.api.core.SetApplier;
  * @author Jakub Sapalski
  */
 public interface Game {
-	
+
 	/**
 	 * The Button in a Lobby, which has costs and can be locked.
 	 */
 	public interface Button {
-		
+
 		/**
 		 * @return the set of Button names required for unlocking this Button
 		 */
@@ -73,10 +75,14 @@ public interface Game {
 	/**
 	 * Applies the specified Button to the player.
 	 * 
-	 * @param player the player
-	 * @param button the button to apply
-	 * @param buy whenever the player wants to buy (true) or sell (false)
-	 * @param message whenever to display a message
+	 * @param player
+	 *            the player
+	 * @param button
+	 *            the button to apply
+	 * @param buy
+	 *            whenever the player wants to buy (true) or sell (false)
+	 * @param message
+	 *            whenever to display a message
 	 */
 	public boolean applyButton(InGamePlayer player, Button button, boolean buy, boolean message);
 
@@ -86,7 +92,7 @@ public interface Game {
 	 * @param player
 	 *            player to add
 	 */
-	public void addPlayer(InGamePlayer player);
+	public InGamePlayer addPlayer(Player player);
 
 	/**
 	 * Removes the player from the game.
@@ -94,15 +100,7 @@ public interface Game {
 	 * @param player
 	 *            player to remove
 	 */
-	public void removePlayer(InGamePlayer player);
-
-	/**
-	 * Moves the player from the lobby to the game.
-	 * 
-	 * @param data
-	 *            player to start
-	 */
-	void startPlayer(InGamePlayer data);
+	public void removePlayer(Player player);
 
 	/**
 	 * Returns the map containing players by their UUID.
@@ -121,6 +119,20 @@ public interface Game {
 	 * clean up all its data so it can be freshly started again.
 	 */
 	public void stop();
+
+	/**
+	 * @return the Lobby this Game is in
+	 */
+	public Lobby getLobby();
+
+	/**
+	 * This method must be used on newly created Game to let it know what
+	 * created it.
+	 * 
+	 * @param lobby
+	 *            the Lobby this Game is in
+	 */
+	public void setLobby(Lobby lobby);
 
 	/**
 	 * Returns the Attitude of one player towards another. The game should tell
@@ -198,6 +210,11 @@ public interface Game {
 	 * @param player
 	 *            the player who has just respawned
 	 */
-	public void afterRespawn(InGamePlayer player);
+	public void handleRespawn(InGamePlayer player);
+
+	/**
+	 * @return the location of the Game's center
+	 */
+	public Location getCenter();
 
 }

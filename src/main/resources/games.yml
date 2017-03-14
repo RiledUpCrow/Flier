@@ -42,5 +42,74 @@ default:
   - chicken_sound
   - sheep_sound
   - engine_smoke
+  default_class:                       # list of item sets for default class
+  - balanced_class
+  - ammo
+  buttons:                             # list of buttons with item sets
+    rocket_button:
+      buy_cost: 15                     # cost of buying this item set
+      on_buy:                          # items to apply when buying
+        item_set: the_rocket           # ID of the item set
+        add_type: increase             # how it's added, see docs
+        conflict_action: skip          # what happens, when there already is something of that category
+      sell_cost: -15                   # negative, because we're giving the money back
+      on_sell:                         # items to apply when selling
+        item_set: the_rocket           # it's the same as above
+        add_type: decrease             # but we're decreasing instead of increasing
+        conflict_action: skip
+      block: 100;200;300;world         # location of the block to click, **EDIT THIS BEFORE USING!**
+    launcher_button:
+      buy_cost: 10
+      on_buy:
+        item_set: the_launcher
+        add_type: increase
+        conflict_action: skip
+      sell_cost: -10
+      on_sell:
+        item_set: the_launcher
+        add_type: decrease
+        conflict_action: skip
+      block: 100;200;300;world         # **EDIT THIS BEFORE USING!**
+    repair_kit_button:
+      buy_cost: 20
+      on_buy:
+        item_set: the_repair_kit
+        add_type: increase
+        conflict_action: skip
+      sell_cost: -20
+      on_sell:
+        item_set: the_repair_kit
+        add_type: decrease
+        conflict_action: skip
+      block: 100;200;300;world         # **EDIT THIS BEFORE USING!**
+    compass_button:
+      unlock_cost: 5
+      on_unlock:
+        item_set: the_compass
+        add_type: fill
+        conflict_action: skip
+      block: 100;200;300;world         # **EDIT THIS BEFORE USING!**
+    fast_button:
+      on_buy:
+        item_set: fast_class
+        add_type: fill
+        conflict_action: replace
+        saving: true
+      block: 100;200;300;world         # **EDIT THIS BEFORE USING!**
+    balanced_button:
+      on_buy:
+        item_set: balanced_class
+        add_type: fill
+        conflict_action: replace
+        saving: true
+      block: 100;200;300;world         # **EDIT THIS BEFORE USING!**
+    strong_button:
+      on_buy:
+        item_set: strong_class
+        add_type: fill
+        conflict_action: replace
+        saving: true
+      block: 100;200;300;world         # **EDIT THIS BEFORE USING!**
+  respawn_action: combine              # what happens with items after respawn (see docs)
   center: 100;200;300;world            # center of the map, **EDIT THIS BEFORE USING!**
   radius: 1000                         # the radius defining map borders

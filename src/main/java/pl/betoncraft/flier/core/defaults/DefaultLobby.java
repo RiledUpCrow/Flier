@@ -6,11 +6,12 @@
  */
 package pl.betoncraft.flier.core.defaults;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -22,16 +23,13 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.scoreboard.Scoreboard;
 
 import pl.betoncraft.flier.api.Flier;
 import pl.betoncraft.flier.api.content.Game;
 import pl.betoncraft.flier.api.content.Lobby;
-import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.LoadingException;
-import pl.betoncraft.flier.api.core.PlayerClass;
-import pl.betoncraft.flier.api.core.PlayerClass.RespawnAction;
-import pl.betoncraft.flier.core.DefaultClass;
-import pl.betoncraft.flier.core.DefaultPlayer;
+import pl.betoncraft.flier.util.PlayerBackup;
 import pl.betoncraft.flier.util.ValueLoader;
 
 /**
@@ -43,25 +41,20 @@ public abstract class DefaultLobby implements Lobby, Listener {
 	
 	protected ValueLoader loader;
 
-	protected RespawnAction respawnAction;
 	protected Map<String, Game> games = new HashMap<>();
 	protected Game currentGame;
 	protected Location spawn;
-	protected Map<UUID, InGamePlayer> players = new HashMap<>();
-	protected PlayerClass defClass;
+	protected Set<UUID> players = new HashSet<>();
+	protected Map<UUID, PlayerBackup> backups = new HashMap<>();
+	protected Map<UUID, Scoreboard> oldScoreboards = new HashMap<>();
 
 	public DefaultLobby(ConfigurationSection section) throws LoadingException {
 		loader = new ValueLoader(section);
 		spawn = loader.loadLocation("spawn");
-		respawnAction = loader.loadEnum("respawn_action", RespawnAction.class);
-		try {
-			defClass = new DefaultClass(section.getStringList("default_class"), respawnAction);
-		} catch (LoadingException e) {
-			throw (LoadingException) new LoadingException("Error in default class.").initCause(e);
-		}
 		List<String> gameNames = section.getStringList("games");
 		for (String gameName : gameNames) {
 			Game game = Flier.getInstance().getGame(gameName);
+			game.setLobby(this);
 			games.put(gameName, game);
 		}
 		if (games.isEmpty()) {
@@ -74,40 +67,37 @@ public abstract class DefaultLobby implements Lobby, Listener {
 	@Override
 	public void addPlayer(Player player) {
 		UUID uuid = player.getUniqueId();
-		if (players.containsKey(uuid)) {
+		if (players.contains(uuid)) {
 			return;
 		}
-		InGamePlayer data = new DefaultPlayer(player, this, (DefaultClass) defClass.replicate());
-		players.put(uuid, data);
+		players.add(uuid);
+		PlayerBackup backup = new PlayerBackup(player);
+		backup.save();
+		backups.put(uuid, backup);
+		oldScoreboards.put(uuid, player.getScoreboard());
 		player.teleport(spawn);
-		currentGame.addPlayer(data);
 	}
 
 	@Override
 	public void removePlayer(Player player) {
 		UUID uuid = player.getUniqueId();
-		InGamePlayer data = players.remove(uuid);
-		if (data != null) {
-			data.exitLobby();
+		if (players.remove(uuid)) {
+			currentGame.removePlayer(player);
+			player.setScoreboard(oldScoreboards.remove(uuid));
+			player.getInventory().clear();
+			backups.remove(uuid).load();
 		}
 	}
-	
+
 	@Override
-	public void respawnPlayer(InGamePlayer player) {
-		PlayerClass clazz = player.getClazz();
-		clazz.onRespawn();
-		player.updateClass();
-		player.getPlayer().teleport(spawn);
+	public Set<UUID> getPlayers() {
+		return players;
 	}
 
 	@Override
 	public void setGame(Game game) {
-		List<InGamePlayer> players = new ArrayList<>(currentGame.getPlayers().values());
 		currentGame.stop();
 		currentGame = game;
-		for (InGamePlayer player : players) {
-			currentGame.addPlayer(player);
-		}
 		// no need to start the game, it's running if there were players
 	}
 
@@ -128,7 +118,7 @@ public abstract class DefaultLobby implements Lobby, Listener {
 	
 	@Override
 	public void stop() {
-		for (Player player : players.values().stream().map(data -> data.getPlayer()).collect(Collectors.toList())) {
+		for (Player player : players.stream().map(uuid -> Bukkit.getPlayer(uuid)).collect(Collectors.toList())) {
 			removePlayer(player);
 		}
 		// no need to stop the game, it's not running without players
@@ -137,10 +127,7 @@ public abstract class DefaultLobby implements Lobby, Listener {
 	
 	@EventHandler
 	public void onLeave(PlayerQuitEvent event) {
-		InGamePlayer player = players.remove(event.getPlayer().getUniqueId());
-		if (player != null) {
-			player.exitLobby();
-		}
+		removePlayer(event.getPlayer());
 	}
 
 }

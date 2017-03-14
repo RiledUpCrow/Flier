@@ -35,8 +35,8 @@ public class TargetAction extends DefaultAction {
 			InGamePlayer nearest = null;
 			double distance = 0;
 			Attitude target = modMan.modifyEnum(TARGET, this.target);
-			for (InGamePlayer d : data.getLobby().getGame().getPlayers().values()) {
-				if (data.getLobby().getGame().getAttitude(d, data) == target) {
+			for (InGamePlayer d : data.getGame().getPlayers().values()) {
+				if (data.getGame().getAttitude(d, data) == target) {
 					double dist = data.getPlayer().getLocation().distanceSquared(d.getPlayer().getLocation());
 					if (distance == 0 || dist < distance) {
 						distance = dist;
@@ -47,7 +47,7 @@ public class TargetAction extends DefaultAction {
 			if (nearest != null) {
 				data.getPlayer().setCompassTarget(nearest.getPlayer().getLocation());
 			} else {
-				data.getPlayer().setCompassTarget(data.getLobby().getSpawn());
+				data.getPlayer().setCompassTarget(data.getGame().getCenter());
 			}
 		}
 		return true;

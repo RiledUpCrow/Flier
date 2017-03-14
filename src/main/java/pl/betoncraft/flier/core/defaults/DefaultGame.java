@@ -48,16 +48,22 @@ import org.bukkit.scheduler.BukkitRunnable;
 import pl.betoncraft.flier.api.Flier;
 import pl.betoncraft.flier.api.content.Bonus;
 import pl.betoncraft.flier.api.content.Game;
+import pl.betoncraft.flier.api.content.Lobby;
 import pl.betoncraft.flier.api.content.Wings;
 import pl.betoncraft.flier.api.core.Damager;
 import pl.betoncraft.flier.api.core.Damager.DamageResult;
 import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.LoadingException;
+import pl.betoncraft.flier.api.core.PlayerClass;
 import pl.betoncraft.flier.api.core.PlayerClass.AddResult;
+import pl.betoncraft.flier.api.core.PlayerClass.RespawnAction;
 import pl.betoncraft.flier.api.core.SetApplier;
+import pl.betoncraft.flier.core.DefaultClass;
+import pl.betoncraft.flier.core.DefaultPlayer;
 import pl.betoncraft.flier.core.DefaultSetApplier;
 import pl.betoncraft.flier.event.FlierPlayerKillEvent;
 import pl.betoncraft.flier.event.FlierPlayerKillEvent.Type;
+import pl.betoncraft.flier.event.FlierPlayerSpawnEvent;
 import pl.betoncraft.flier.sidebar.Altitude;
 import pl.betoncraft.flier.sidebar.Ammo;
 import pl.betoncraft.flier.sidebar.Fuel;
@@ -85,7 +91,11 @@ public abstract class DefaultGame implements Listener, Game {
 	protected EffectListener listener;
 	protected Map<String, Button> buttons = new HashMap<>();
 	protected Map<InGamePlayer, List<Button>> unlocked = new HashMap<>();
-	private Map<Block, Button> blocks = new HashMap<>();
+	protected Map<Block, Button> blocks = new HashMap<>();
+	protected Lobby lobby;
+	protected RespawnAction respawnAction;
+	protected PlayerClass defClass;
+	
 	private List<UUID> blocked = new LinkedList<>();
 	
 	protected int heightLimit;
@@ -127,6 +137,12 @@ public abstract class DefaultGame implements Listener, Game {
 			} catch (LoadingException e) {
 				throw (LoadingException) new LoadingException(String.format("Error in '%s' button.", i)).initCause(e);
 			}
+		}
+		respawnAction = loader.loadEnum("respawn_action", RespawnAction.class);
+		try {
+			defClass = new DefaultClass(section.getStringList("default_class"), respawnAction);
+		} catch (LoadingException e) {
+			throw (LoadingException) new LoadingException("Error in default class.").initCause(e);
 		}
 		heightLimit = loader.loadInt("height_limit", 512);
 		heightDamage = loader.loadNonNegativeDouble("height_damage", 0.5);
@@ -274,6 +290,70 @@ public abstract class DefaultGame implements Listener, Game {
 	 * The game should do game-specific stuff in a slow tick here.
 	 */
 	public abstract void slowTick();
+
+	@Override
+	public InGamePlayer addPlayer(Player player) {
+		UUID uuid = player.getUniqueId();
+		if (dataMap.containsKey(uuid)) {
+			return null;
+		}
+		if (dataMap.isEmpty()) {
+			start();
+		}
+		InGamePlayer data =  new DefaultPlayer(player, this, defClass.replicate());
+		dataMap.put(uuid, data);
+		data.getLines().add(new Fuel(data));
+		data.getLines().add(new Health(data));
+		data.getLines().add(new Speed(data));
+		data.getLines().add(new Altitude(data));
+		data.getLines().add(new Ammo(data));
+		data.getLines().add(new Reload(data));
+		if (useMoney) {
+			data.getLines().add(new Money(data));
+		}
+		return data;
+	}
+	
+	@Override
+	public void removePlayer(Player player) {
+		InGamePlayer data = dataMap.remove(player.getUniqueId());
+		if (data == null) {
+			return;
+		}
+		unlocked.remove(data);
+		data.exitGame();
+		data.getPlayer().teleport(lobby.getSpawn());
+		if (dataMap.isEmpty()) {
+			stop();
+		}
+	}
+	
+	@Override
+	public Map<UUID, InGamePlayer> getPlayers() {
+		return Collections.unmodifiableMap(dataMap);
+	}
+
+	@Override
+	public void start() {
+		heartBeat = new GameHeartBeat(this);
+		Bukkit.getPluginManager().registerEvents(this, Flier.getInstance());
+		for (Bonus bonus : bonuses) {
+			bonus.start();
+		}
+	}
+
+	@Override
+	public void stop() {
+		HandlerList.unregisterAll(this);
+		heartBeat.cancel();
+		Collection<InGamePlayer> copy = new ArrayList<>(dataMap.values());
+		for (InGamePlayer data : copy) {
+			removePlayer(data.getPlayer());
+		}
+		for (Bonus bonus : bonuses) {
+			bonus.stop();
+		}
+	}
 	
 	@Override
 	public void handleKill(InGamePlayer killer, InGamePlayer killed, boolean fall) {
@@ -306,7 +386,7 @@ public abstract class DefaultGame implements Listener, Game {
 		Utils.clearPlayer(killed.getPlayer());
 		killed.setPlaying(false);
 		killed.setAttacker(null);
-		afterRespawn(killed);
+		handleRespawn(killed);
 	}
 	
 	@Override
@@ -346,7 +426,20 @@ public abstract class DefaultGame implements Listener, Game {
 	}
 	
 	@Override
-	public abstract void afterRespawn(InGamePlayer player);
+	public void handleRespawn(InGamePlayer player) {
+		PlayerClass clazz = player.getClazz();
+		clazz.onRespawn();
+		player.updateClass();
+		player.getPlayer().getInventory().setHeldItemSlot(0);
+		new BukkitRunnable() {
+			@Override
+			public void run() {
+				player.setPlaying(true);
+			}
+		}.runTaskLater(Flier.getInstance(), 20);
+		FlierPlayerSpawnEvent event = new FlierPlayerSpawnEvent(player);
+		Bukkit.getPluginManager().callEvent(event);
+	}
 	
 	@Override
 	public Map<String, Button> getButtons() {
@@ -458,71 +551,15 @@ public abstract class DefaultGame implements Listener, Game {
 		}
 		return applied;
 	}
-
+	
 	@Override
-	public void addPlayer(InGamePlayer data) {
-		UUID uuid = data.getPlayer().getUniqueId();
-		if (dataMap.isEmpty()) {
-			start();
-		} else if (dataMap.containsKey(uuid)) {
-			return;
-		}
-		dataMap.put(uuid, data);
-		data.getLines().add(new Fuel(data));
-		data.getLines().add(new Health(data));
-		data.getLines().add(new Speed(data));
-		data.getLines().add(new Altitude(data));
-		data.getLines().add(new Ammo(data));
-		data.getLines().add(new Reload(data));
-		if (useMoney) {
-			data.getLines().add(new Money(data));
-		}
+	public Lobby getLobby() {
+		return lobby;
 	}
 	
 	@Override
-	public void startPlayer(InGamePlayer data) {
-		data.getPlayer().getInventory().setHeldItemSlot(0);
-		new BukkitRunnable() {
-			@Override
-			public void run() {
-				data.setPlaying(true);
-			}
-		}.runTaskLater(Flier.getInstance(), 20);
-	}
-	
-	@Override
-	public void removePlayer(InGamePlayer data) {
-		dataMap.remove(data.getPlayer().getUniqueId());
-		if (dataMap.isEmpty()) {
-			stop();
-		}
-	}
-	
-	@Override
-	public Map<UUID, InGamePlayer> getPlayers() {
-		return Collections.unmodifiableMap(dataMap);
-	}
-
-	@Override
-	public void start() {
-		heartBeat = new GameHeartBeat(this);
-		Bukkit.getPluginManager().registerEvents(this, Flier.getInstance());
-		for (Bonus bonus : bonuses) {
-			bonus.start();
-		}
-	}
-
-	@Override
-	public void stop() {
-		HandlerList.unregisterAll(this);
-		heartBeat.cancel();
-		Collection<InGamePlayer> copy = new ArrayList<>(dataMap.values());
-		for (InGamePlayer data : copy) {
-			data.exitGame();
-		}
-		for (Bonus bonus : bonuses) {
-			bonus.stop();
-		}
+	public void setLobby(Lobby lobby) {
+		this.lobby = lobby;
 	}
 	
 	@Override
@@ -533,6 +570,11 @@ public abstract class DefaultGame implements Listener, Game {
 	@Override
 	public int getHeightLimit() {
 		return heightLimit;
+	}
+	
+	@Override
+	public Location getCenter() {
+		return center;
 	}
 	
 	@EventHandler(priority=EventPriority.HIGH)
