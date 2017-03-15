@@ -24,6 +24,7 @@ import pl.betoncraft.flier.action.EffectAction;
 import pl.betoncraft.flier.action.FuelAction;
 import pl.betoncraft.flier.action.ItemSetAction;
 import pl.betoncraft.flier.action.LaunchAction;
+import pl.betoncraft.flier.action.LeaveGameAction;
 import pl.betoncraft.flier.action.MoneyAction;
 import pl.betoncraft.flier.action.SuicideAction;
 import pl.betoncraft.flier.action.TargetAction;
@@ -101,6 +102,7 @@ public class FlierPlugin extends JavaPlugin implements Flier {
 		registerLobby("physicalLobby", s -> new PhysicalLobby(s));
 		registerGame("teamDeathMatch", s -> new TeamDeathMatch(s));
 		registerBonus("entity", s -> new EntityBonus(s));
+		registerAction("leave", s -> new LeaveGameAction(s));
 		registerAction("projectileGun", s -> new ProjectileGun(s));
 		registerAction("particleGun", s -> new ParticleGun(s));
 		registerAction("homingMissile", s -> new HomingMissile(s));
