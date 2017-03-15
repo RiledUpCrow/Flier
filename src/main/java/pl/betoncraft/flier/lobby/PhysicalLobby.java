@@ -8,6 +8,7 @@ package pl.betoncraft.flier.lobby;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -20,7 +21,9 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.scheduler.BukkitRunnable;
 
+import pl.betoncraft.flier.api.Flier;
 import pl.betoncraft.flier.api.core.LoadingException;
 import pl.betoncraft.flier.core.defaults.DefaultLobby;
 import pl.betoncraft.flier.util.Utils;
@@ -36,6 +39,8 @@ public class PhysicalLobby extends DefaultLobby {
 	private List<Block> join = new ArrayList<>();
 	private Map<String, Location> start = new HashMap<>();
 	private Block leave;
+
+	private final List<UUID> blocked = new LinkedList<>();
 
 	public PhysicalLobby(ConfigurationSection section) throws LoadingException {
 		super(section);
@@ -80,24 +85,47 @@ public class PhysicalLobby extends DefaultLobby {
 
 		if (inside) {
 			event.setCancelled(true);
+			// this prevents double clicks on next tick
+			if (blocked.contains(event.getPlayer().getUniqueId())) {
+				return;
+			}
 			// quitting
 			if (block.equals(leave)) {
 				removePlayer(player);
+				block(player.getUniqueId());
 				return;
 			}
 			// joining the game
 			start.entrySet().stream()
 					.filter(e -> e.getValue().equals(block.getLocation()))
 					.findFirst()
-					.ifPresent(e -> joinGame(player, e.getKey()));
+					.ifPresent(e -> {
+						joinGame(player, e.getKey());
+						block(player.getUniqueId());
+					});
 		} else {
 			// joining
 			if (join.contains(block)) {
 				event.setCancelled(true);
+				// this prevents double clicks on next tick
+				if (blocked.contains(event.getPlayer().getUniqueId())) {
+					return;
+				}
 				addPlayer(player);
+				block(player.getUniqueId());
 				return;
 			}
 		}
+	}
+	
+	private void block(UUID uuid) {
+		blocked.add(uuid);
+		new BukkitRunnable() {
+			@Override
+			public void run() {
+				blocked.remove(uuid);
+			}
+		}.runTaskLater(Flier.getInstance(), 5);
 	}
 
 }
