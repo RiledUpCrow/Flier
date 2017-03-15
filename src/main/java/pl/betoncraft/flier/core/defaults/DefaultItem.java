@@ -12,10 +12,10 @@ import java.util.stream.Collectors;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.Item;
 import pl.betoncraft.flier.api.core.LoadingException;
 import pl.betoncraft.flier.util.LangManager;
@@ -58,7 +58,7 @@ public abstract class DefaultItem implements Item {
 	}
 
 	@Override
-	public ItemStack getItem(Player player) {
+	public ItemStack getItem(InGamePlayer player) {
 		String name = rawName.startsWith("$") ?
 				LangManager.getMessage(player, rawName.substring(1)) :
 				ChatColor.translateAlternateColorCodes('&', rawName);

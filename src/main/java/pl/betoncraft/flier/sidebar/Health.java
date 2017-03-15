@@ -12,6 +12,7 @@ import pl.betoncraft.flier.api.content.Wings;
 import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.PlayerClass;
 import pl.betoncraft.flier.api.core.SidebarLine;
+import pl.betoncraft.flier.util.LangManager;
 
 /**
  * A sidebar line showing wings health.
@@ -23,9 +24,11 @@ public class Health implements SidebarLine {
 	private InGamePlayer player;
 	private double lastValue = 0;
 	private String lastString;
+	private String translated;
 	
 	public Health(InGamePlayer player) {
 		this.player = player;
+		translated = LangManager.getMessage(player, "health");
 	}
 
 	@Override
@@ -44,10 +47,16 @@ public class Health implements SidebarLine {
 			} else {
 				color = ChatColor.YELLOW.toString();
 			}
-			lastString = String.format("H: %s%.1f%%", color, h);
+			lastString = format(translated, color, String.format("%.1f", h));
 			lastValue = h;
 		}
 		return lastString;
+	}
+	
+	private String format(String string, Object color, Object health) {
+		return string
+				.replace("{color}", color.toString())
+				.replace("{health}", health.toString());
 	}
 
 }

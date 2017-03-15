@@ -41,6 +41,7 @@ import pl.betoncraft.flier.api.core.Usage;
 import pl.betoncraft.flier.event.FlierCollectBonusEvent;
 import pl.betoncraft.flier.event.FlierEngineUseEvent;
 import pl.betoncraft.flier.event.FlierPlayerHitEvent;
+import pl.betoncraft.flier.util.LangManager;
 import pl.betoncraft.flier.util.Position;
 import pl.betoncraft.flier.util.Utils;
 
@@ -54,6 +55,7 @@ public class DefaultPlayer implements InGamePlayer {
 	private Player player;
 	private Game game;
 	private PlayerClass clazz;
+	private String lang;
 	private Scoreboard oldSb;
 	private Scoreboard sb;
 
@@ -71,6 +73,7 @@ public class DefaultPlayer implements InGamePlayer {
 		this.player = player;
 		this.game = game;
 		this.clazz = clazz;
+		lang = LangManager.getLanguage(player);
 		oldSb = player.getScoreboard();
 		sb = Bukkit.getScoreboardManager().getNewScoreboard();
 		Objective stats = sb.registerNewObjective("stats", "dummy");
@@ -198,7 +201,7 @@ public class DefaultPlayer implements InGamePlayer {
 	@Override
 	public boolean isHolding(UsableItem item) {
 		ItemStack stack = player.getInventory().getItemInMainHand();
-		return item == null && stack == null || (item != null && stack != null && item.getItem(player).isSimilar(stack));
+		return item == null && stack == null || (item != null && stack != null && item.getItem(this).isSimilar(stack));
 	}
 	
 	@Override
@@ -213,7 +216,7 @@ public class DefaultPlayer implements InGamePlayer {
 		int slot = item.slot();
 		int amount = item.getAmount();
 		ItemStack stack = player.getInventory().getItem(slot);
-		ItemStack compare = item.getItem(player);
+		ItemStack compare = item.getItem(this);
 		// if the stack was not on the correct slot or there was another item, find the correct one
 		if (stack == null || !stack.isSimilar(compare)) {
 			ItemStack[] inv = player.getInventory().getContents();
@@ -261,6 +264,11 @@ public class DefaultPlayer implements InGamePlayer {
 	}
 
 	@Override
+	public String getLanguage() {
+		return lang;
+	}
+
+	@Override
 	public boolean isPlaying() {
 		return isPlaying;
 	}
@@ -281,12 +289,12 @@ public class DefaultPlayer implements InGamePlayer {
 		Wings wings = clazz.getWings();
 		List<UsableItem> items = clazz.getItems();
 		getPlayer().getInventory().clear();
-		getPlayer().getInventory().setItemInOffHand(engine.getItem(player));
-		getPlayer().getInventory().setChestplate(wings.getItem(player));
+		getPlayer().getInventory().setItemInOffHand(engine.getItem(this));
+		getPlayer().getInventory().setChestplate(wings.getItem(this));
 		for (UsableItem item : items) {
 			int amount = item.getAmount();
 			int slot = item.slot();
-			ItemStack itemStack = item.getItem(player);
+			ItemStack itemStack = item.getItem(this);
 			itemStack.setAmount(amount);
 			if (slot >= 0) {
 				player.getInventory().setItem(slot, itemStack);
@@ -425,7 +433,7 @@ public class DefaultPlayer implements InGamePlayer {
 	}
 	
 	private boolean hasWings() {
-		ItemStack wings = clazz.getWings().getItem(player);
+		ItemStack wings = clazz.getWings().getItem(this);
 		ItemStack chestPlate = player.getInventory().getChestplate();
 		if (chestPlate != null && chestPlate.isSimilar(wings)) {
 			return true;
@@ -484,7 +492,7 @@ public class DefaultPlayer implements InGamePlayer {
 	}
 
 	private void createWings() {
-		player.getInventory().setItem(1, clazz.getWings().getItem(player));
+		player.getInventory().setItem(1, clazz.getWings().getItem(this));
 	}
 
 	private void enableWings() {

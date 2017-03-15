@@ -9,6 +9,7 @@ package pl.betoncraft.flier.sidebar;
 import net.md_5.bungee.api.ChatColor;
 import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.SidebarLine;
+import pl.betoncraft.flier.util.LangManager;
 
 /**
  * A sidebar line showing amount of money.
@@ -20,9 +21,11 @@ public class Money implements SidebarLine {
 	private InGamePlayer player;
 	private double lastValue = 0;
 	private String lastString;
+	private String translated;
 	
 	public Money(InGamePlayer player) {
 		this.player = player;
+		translated = LangManager.getMessage(player, "money");
 	}
 
 	@Override
@@ -32,10 +35,16 @@ public class Money implements SidebarLine {
 			m = 0;
 		}
 		if (lastString == null || m != lastValue) {
-			lastString = String.format("M: %s%d$", ChatColor.LIGHT_PURPLE, m);
+			lastString = format(translated, ChatColor.LIGHT_PURPLE, m);
 			lastValue = m;
 		}
 		return lastString;
+	}
+	
+	private String format(String string, Object color, Object money) {
+		return string
+				.replace("{color}", color.toString())
+				.replace("{money}", money.toString());
 	}
 
 }

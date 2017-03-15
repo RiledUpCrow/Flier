@@ -11,6 +11,7 @@ import org.bukkit.Location;
 
 import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.SidebarLine;
+import pl.betoncraft.flier.util.LangManager;
 import pl.betoncraft.flier.util.Utils;
 
 /**
@@ -23,9 +24,11 @@ public class Altitude implements SidebarLine {
 	private InGamePlayer player;
 	private double lastValue = 0;
 	private String lastString;
+	private String translated;
 	
 	public Altitude(InGamePlayer player) {
 		this.player = player;
+		this.translated = LangManager.getMessage(player, "altitude");
 	}
 
 	@Override
@@ -45,10 +48,16 @@ public class Altitude implements SidebarLine {
 			} else {
 				color = ChatColor.RED.toString();
 			}
-			lastString = String.format("A: %s%.1fm", color, a);
+			lastString = format(translated, color, String.format("%.1f", a));
 			lastValue = a;
 		}
 		return lastString;
+	}
+	
+	private String format(String string, Object color, Object altitude) {
+		return string
+				.replace("{color}", color.toString())
+				.replace("{altitude}", altitude.toString());
 	}
 
 }

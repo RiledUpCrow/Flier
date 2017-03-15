@@ -21,6 +21,7 @@ import org.bukkit.entity.Player;
 import pl.betoncraft.betonlangapi.BetonLangAPI;
 import pl.betoncraft.betonlangapi.TranslatedPlugin;
 import pl.betoncraft.flier.api.Flier;
+import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.LoadingException;
 
 /**
@@ -77,26 +78,71 @@ public class LangManager {
 			instance.messages = YamlConfiguration.loadConfiguration(file).getConfigurationSection(instance.lang);
 		}
 	}
+	
+	/**
+	 * Gets the language used by the CommandSender.
+	 * 
+	 * @param player
+	 *            CommandSender
+	 * @return the language used
+	 */
+	public static String getLanguage(CommandSender player) {
+		if (instance.api) {
+			return player instanceof Player ? BetonLangAPI.getLanguage((Player) player) : instance.lang;
+		} else {
+			return instance.lang;
+		}
+	}
 
+	/**
+	 * Returns the message in the language this player uses in the Game.
+	 * 
+	 * @param player
+	 *            player for whom the message needs to be translated
+	 * @param message
+	 *            message name
+	 * @param variables
+	 *            array of variables
+	 * @return the message string
+	 */
+	public static String getMessage(InGamePlayer player, String message, Object... variables) {
+		return getMessage(player.getLanguage(), message, variables);
+	}
+	
 	/**
 	 * Returns the message in this player's language.
 	 * 
 	 * @param player
-	 *            player for which the message needs to be translated
+	 *            CommandSender for whom the message needs to be translated
 	 * @param message
 	 *            message name
+	 * @param variables
+	 *            array of variables
 	 * @return the message string
 	 */
 	public static String getMessage(CommandSender player, String message, Object... variables) {
+		return getMessage(getLanguage(player), message, variables);
+	}
+	
+	/**
+	 * Returns the message in specified language.
+	 * 
+	 * @param lang
+	 *            language to which the message needs to be translated
+	 * @param message
+	 *            message name
+	 * @param variables
+	 *            array of variables
+	 * @return the message string
+	 */
+	public static String getMessage(String lang, String message, Object... variables) {
 		String string;
 		if (instance.api) {
-			string = BetonLangAPI.getMessage(player, instance.flier, message);
+			string = BetonLangAPI.getMessage(lang, instance.flier, message);
 		} else {
 			string = instance.messages.getString(message);
 		}
 		if (string == null) {
-			Player p = player instanceof Player ? (Player) player : null;
-			String lang = instance.api ? BetonLangAPI.getLanguage(p) : instance.lang;
 			instance.flier.getLogger()
 					.warning(String.format("Message '%s' in language '%s' is not defined.", message, lang));
 			return "";
@@ -104,13 +150,10 @@ public class LangManager {
 		try {
 			return String.format(string, variables).replace('&', '§');
 		} catch (IllegalFormatException e) {
-			Player p = player instanceof Player ? (Player) player : null;
-			String lang = instance.api ? BetonLangAPI.getLanguage(p) : instance.lang;
 			instance.flier.getLogger().warning(String.format("Error in '%s' message ('%s' language) formatting: %s",
 					message, lang, e.getMessage()));
 			return "";
 		}
-		
 	}
 
 	/**
@@ -118,16 +161,34 @@ public class LangManager {
 	 * variables.
 	 * 
 	 * @param player
-	 *            the player to which the message will be sent
+	 *            the player to whom the message will be sent
 	 * @param message
 	 *            message name
 	 * @param variables
-	 *            list of variables to insert in the message
+	 *            array of variables
+	 */
+	public static void sendMessage(InGamePlayer player, String message, Object... variables) {
+		send(player.getPlayer(), getMessage(player, message, variables));
+	}
+	
+	/**
+	 * Sends specified message to specified CommandSender, optionally inserting
+	 * variables.
+	 * 
+	 * @param player
+	 *            the CommandSender to whom the message will be sent
+	 * @param message
+	 *            message name
+	 * @param variables
+	 *            array of variables
 	 */
 	public static void sendMessage(CommandSender player, String message, Object... variables) {
-		String string = getMessage(player, message, variables);
-		if (!string.isEmpty()) {
-			player.sendMessage(string);
+		send(player, getMessage(player, message, variables));
+	}
+	
+	private static void send(CommandSender player, String translated) {
+		if (translated != null && !translated.isEmpty()) {
+			player.sendMessage(translated);
 		}
 	}
 

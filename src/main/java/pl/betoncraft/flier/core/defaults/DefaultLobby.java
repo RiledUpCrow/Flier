@@ -29,6 +29,7 @@ import pl.betoncraft.flier.api.Flier;
 import pl.betoncraft.flier.api.content.Game;
 import pl.betoncraft.flier.api.content.Lobby;
 import pl.betoncraft.flier.api.core.Arena;
+import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.LoadingException;
 import pl.betoncraft.flier.util.LangManager;
 import pl.betoncraft.flier.util.PlayerBackup;
@@ -123,8 +124,8 @@ public abstract class DefaultLobby implements Lobby, Listener {
 			}
 		}
 		if (game != null) {
-			game.addPlayer(player);
-			LangManager.sendMessage(player, "game_joined");
+			InGamePlayer data = game.addPlayer(player);
+			LangManager.sendMessage(data, "game_joined");
 			return JoinResult.GAME_JOINED;
 		} else {
 			try {
@@ -137,8 +138,8 @@ public abstract class DefaultLobby implements Lobby, Listener {
 						games.add(game);
 						game.setLobby(this);
 						game.setArena(arena);
-						game.addPlayer(player);
-						LangManager.sendMessage(player, "game_created");
+						InGamePlayer data = game.addPlayer(player);
+						LangManager.sendMessage(data, "game_created");
 						return JoinResult.GAME_CREATED;
 					}
 				}

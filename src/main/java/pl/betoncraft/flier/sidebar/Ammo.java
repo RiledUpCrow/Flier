@@ -11,6 +11,7 @@ import org.bukkit.ChatColor;
 import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.SidebarLine;
 import pl.betoncraft.flier.api.core.UsableItem;
+import pl.betoncraft.flier.util.LangManager;
 
 /**
  * A sidebar line showing ammunition of currently held UsableItem.
@@ -23,10 +24,12 @@ public class Ammo implements SidebarLine {
 	private boolean inactive = false;
 	private int lastAmmo = 0;
 	private int lastMaxAmmo = 0;
-	private String lastString = String.format("M: %s0/0", ChatColor.BLACK);
+	private String lastString;
+	private String translated;
 	
 	public Ammo(InGamePlayer player) {
 		this.player = player;
+		this.translated = LangManager.getMessage(player, "ammo");
 	}
 
 	@Override
@@ -42,7 +45,7 @@ public class Ammo implements SidebarLine {
 		if (item == null || item.getMaxAmmo() == 0) {
 			if (!inactive) {
 				inactive = true;
-				lastString = String.format("M: %s-/-", ChatColor.GRAY);
+				lastString = format(translated, ChatColor.GRAY, "-", "-");
 			}
 		} else {
 			int ammo = item.getAmmo();
@@ -61,10 +64,17 @@ public class Ammo implements SidebarLine {
 					color = ChatColor.RED.toString();
 				}
 				inactive = false;
-				lastString = String.format("M: %s%d/%d", color, ammo, maxAmmo);
+				lastString = format(translated, color, ammo, maxAmmo);
 			}
 		}
 		return lastString;
+	}
+	
+	private String format(String string, Object color, Object current, Object max) {
+		return string
+				.replace("{color}", color.toString())
+				.replace("{current}", current.toString())
+				.replace("{max}", max.toString());
 	}
 
 }

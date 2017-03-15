@@ -9,6 +9,7 @@ package pl.betoncraft.flier.game;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
@@ -35,7 +36,6 @@ import pl.betoncraft.flier.util.ValueLoader;
 public class TeamDeathMatch extends DefaultGame {
 	
 	protected final Map<String, SimpleTeam> teams = new HashMap<>();
-	protected final Map<String, TeamLine> lines = new HashMap<>();
 	protected final Map<UUID, SimpleTeam> players = new HashMap<>();
 	
 	protected final int suicideScore;
@@ -55,7 +55,6 @@ public class TeamDeathMatch extends DefaultGame {
 			try {
 				SimpleTeam team = new SimpleTeam(teams.getConfigurationSection(t));
 				this.teams.put(t, team);
-				this.lines.put(t, new TeamLine(team));
 			} catch (LoadingException e) {
 				throw (LoadingException) new LoadingException(String.format("Error in '%s' team.", t)).initCause(e);
 			}
@@ -114,16 +113,22 @@ public class TeamDeathMatch extends DefaultGame {
 		private SimpleTeam team;
 		private int lastValue = 0;
 		private String lastString;
+		private String translated;
 		
-		public TeamLine(SimpleTeam team) {
+		public TeamLine(InGamePlayer player, SimpleTeam team) {
 			this.team = team;
+			translated = team.getName();
+			if (translated.startsWith("$")) {
+				translated = LangManager.getMessage(player, translated.substring(1));
+			}
+			translated = team.getColor() + translated + ChatColor.WHITE + ": ";
 		}
 
 		@Override
 		public String getText() {
 			int a = team.getScore();
 			if (lastString == null || a != lastValue) {
-				lastString = team.getColor() + team.getName() + ChatColor.WHITE + ": " + a;
+				lastString = translated + a;
 				lastValue = a;
 			}
 			return lastString;
@@ -140,9 +145,12 @@ public class TeamDeathMatch extends DefaultGame {
 	public InGamePlayer addPlayer(Player player) {
 		InGamePlayer data = super.addPlayer(player);
 		if (data != null) {
-			data.getLines().addAll(lines.values());
 			SimpleTeam team = chooseTeam();
 			setTeam(data, team);
+			data.getLines().addAll(teams.values().stream()
+					.map(t -> new TeamLine(data, t))
+					.collect(Collectors.toList())
+			);
 			handleRespawn(data);
 		}
 		return data;
@@ -229,7 +237,7 @@ public class TeamDeathMatch extends DefaultGame {
 		players.put(data.getPlayer().getUniqueId(), team);
 		data.setColor(team.getColor());
 		String teamName = team.getName().startsWith("$") ?
-				LangManager.getMessage(data.getPlayer(), team.getName().substring(1)) :
+				LangManager.getMessage(data, team.getName().substring(1)) :
 				team.getName();
 		String title = String.format("title %s title {\"text\":\"%s%s\"}",
 				data.getPlayer().getName(), team.getColor(), Utils.capitalize(teamName));
@@ -275,18 +283,18 @@ public class TeamDeathMatch extends DefaultGame {
 		if (newScore >= pointsToWin) {
 			// display message about winning
 			for (Entry<UUID, SimpleTeam> entry : players.entrySet()) {
-				Player player = Bukkit.getPlayer(entry.getKey());
-				String name = player.getName();
+				InGamePlayer data = dataMap.get(entry.getKey());
+				String name = data.getPlayer().getName();
 				String word;
 				if (entry.getValue().equals(team)) {
-					word = LangManager.getMessage(player, "win");
+					word = LangManager.getMessage(data, "win");
 				} else {
-					word = LangManager.getMessage(player, "lose");
+					word = LangManager.getMessage(data, "lose");
 				}
 				String teamName = team.getName().startsWith("$") ?
-						LangManager.getMessage(player, team.getName().substring(1)) :
+						LangManager.getMessage(data, team.getName().substring(1)) :
 						team.getName();
-				String win = LangManager.getMessage(player, "team_win", teamName);
+				String win = LangManager.getMessage(data, "team_win", teamName);
 				String title = String.format("title %s title {\"text\":\"%s\"}",
 						name, win);
 				String subTitle = String.format("title %s subtitle {\"text\":\"%s%s\"}",

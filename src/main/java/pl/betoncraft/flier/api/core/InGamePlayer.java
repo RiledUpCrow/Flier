@@ -85,6 +85,11 @@ public interface InGamePlayer {
 	 * @return total weight of all items carried by the player
 	 */
 	public double getWeight();
+	
+	/**
+	 * @return the language chosen by this player
+	 */
+	public String getLanguage();
 
 	/**
 	 * @return whenever the player is currently playing

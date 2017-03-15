@@ -434,7 +434,7 @@ public abstract class DefaultGame implements Listener, Game {
 			}
 			// display a message about the hit and play the sound to the shooter if he exists and if he hit someone else
 			if (attacker != null && !attacker.equals(this)) {
-				LangManager.sendMessage(attacker.getPlayer(), "hit", Utils.formatPlayer(attacked));
+				LangManager.sendMessage(attacker, "hit", Utils.formatPlayer(attacked));
 			}
 		}
 		// handle physical damage
@@ -481,7 +481,7 @@ public abstract class DefaultGame implements Listener, Game {
 			boolean unlocked = button.getUnlockCost() == 0 || ul.contains(button);
 			if (!unlocked) {
 				if (!button.getRequirements().stream().map(name -> buttons.get(name)).allMatch(b -> ul.contains(b))) {
-					if (notify) LangManager.sendMessage(player.getPlayer(), "unlock_other");
+					if (notify) LangManager.sendMessage(player, "unlock_other");
 				} else if (button.getUnlockCost() <= player.getMoney()) {
 					SetApplier applier = button.getOnUnlock();
 					Runnable run = () -> {
@@ -509,10 +509,10 @@ public abstract class DefaultGame implements Listener, Game {
 						default:
 							message = "cant_use";
 						}
-						if (notify) LangManager.sendMessage(player.getPlayer(), message);;
+						if (notify) LangManager.sendMessage(player, message);;
 					}
 				} else {
-					if (notify) LangManager.sendMessage(player.getPlayer(), "no_money_unlock");
+					if (notify) LangManager.sendMessage(player, "no_money_unlock");
 				}
 			} else {
 				int cost;
@@ -567,12 +567,12 @@ public abstract class DefaultGame implements Listener, Game {
 							message = "item_conflict";
 							break;
 						}
-						if (notify) LangManager.sendMessage(player.getPlayer(), message);
+						if (notify) LangManager.sendMessage(player, message);
 					} else {
-						if (notify) LangManager.sendMessage(player.getPlayer(), "no_money_buy");
+						if (notify) LangManager.sendMessage(player, "no_money_buy");
 					}
 				} else {
-					if (notify) LangManager.sendMessage(player.getPlayer(), "cant_do");
+					if (notify) LangManager.sendMessage(player, "cant_do");
 				}
 			}
 		}
@@ -667,7 +667,7 @@ public abstract class DefaultGame implements Listener, Game {
 			// not a button
 			ItemStack item = event.getPlayer().getInventory().getItemInMainHand();
 			Wings wings = data.getClazz().getWings();
-			if (item != null && wings != null && item.isSimilar(wings.getItem(data.getPlayer()))) {
+			if (item != null && wings != null && item.isSimilar(wings.getItem(data))) {
 				// handle wearing wings
 				event.getPlayer().getInventory().setChestplate(item);
 				event.getPlayer().getInventory().setItemInMainHand(null);
@@ -734,7 +734,7 @@ public abstract class DefaultGame implements Listener, Game {
 	
 	private void notifyAllPlayers(String message, Object... variables) {
 		for (InGamePlayer player : dataMap.values()) {
-			LangManager.sendMessage(player.getPlayer(), message, variables);
+			LangManager.sendMessage(player, message, variables);
 		}
 	}
 	

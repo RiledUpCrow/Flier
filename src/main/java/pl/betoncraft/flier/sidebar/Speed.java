@@ -11,6 +11,7 @@ import org.bukkit.util.Vector;
 
 import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.SidebarLine;
+import pl.betoncraft.flier.util.LangManager;
 
 /**
  * A sidebar line showing player's speed.
@@ -22,9 +23,11 @@ public class Speed implements SidebarLine {
 	private InGamePlayer player;
 	private double lastValue = 0;
 	private String lastString;
+	private String translated;
 	
 	public Speed(InGamePlayer player) {
 		this.player = player;
+		translated = LangManager.getMessage(player, "speed");
 	}
 
 	@Override
@@ -46,10 +49,16 @@ public class Speed implements SidebarLine {
 			} else {
 				color = ChatColor.YELLOW.toString();
 			}
-			lastString = String.format("S: %s%.1f~", color, s);
+			lastString = format(translated, color, String.format("%.1f", s));
 			lastValue = s;
 		}
 		return lastString;
+	}
+	
+	private String format(String string, Object color, Object speed) {
+		return string
+				.replace("{color}", color.toString())
+				.replace("{speed}", speed.toString());
 	}
 
 }

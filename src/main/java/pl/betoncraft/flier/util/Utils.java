@@ -80,7 +80,7 @@ public class Utils {
 	public static String formatPlayer(InGamePlayer player) {
 		PlayerClass clazz = player.getClazz();
 		String clazzName = clazz.getName().startsWith("$") ?
-				LangManager.getMessage(player.getPlayer(), clazz.getName().substring(1)) :
+				LangManager.getMessage(player, clazz.getName().substring(1)) :
 				clazz.getName();
 		String name = player.getPlayer().getName();
 		return player.getColor() + name + ChatColor.WHITE + " (" + ChatColor.AQUA + clazzName + ChatColor.WHITE + ")";

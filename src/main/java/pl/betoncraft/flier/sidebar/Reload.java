@@ -11,6 +11,7 @@ import org.bukkit.ChatColor;
 import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.SidebarLine;
 import pl.betoncraft.flier.api.core.UsableItem;
+import pl.betoncraft.flier.util.LangManager;
 
 /**
  * A sidebar line showing cooldown progress for currently held item.
@@ -20,11 +21,11 @@ import pl.betoncraft.flier.api.core.UsableItem;
 public class Reload implements SidebarLine {
 	
 	private InGamePlayer player;
-	private String inactive = String.format("R: %s---", ChatColor.GRAY);
-	private String ready = String.format("R: %s***", ChatColor.GREEN);
+	private String translated;
 	
 	public Reload(InGamePlayer player) {
 		this.player = player;
+		translated = LangManager.getMessage(player, "reload");
 	}
 
 	@Override
@@ -38,13 +39,19 @@ public class Reload implements SidebarLine {
 			}
 		}
 		if (item == null || !item.getUsages().stream().filter(usage -> usage.canUse(player)).findAny().isPresent()) {
-			return inactive;
+			return format(translated, ChatColor.GRAY, "---");
 		}
 		int ticks = item.getCooldown();
 		if (ticks == 0) {
-			return ready;
+			return format(translated, ChatColor.GREEN, "***");
 		}
-		return String.format("R: %s%.1fs", ChatColor.YELLOW, ticks / 20.0);
+		return format(translated, ChatColor.YELLOW, String.format("%.1fs", ticks / 20.0));
+	}
+	
+	private String format(String string, Object color, Object status) {
+		return string
+				.replace("{color}", color.toString())
+				.replace("{status}", status.toString());
 	}
 
 }
