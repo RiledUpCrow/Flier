@@ -117,7 +117,7 @@ public abstract class DefaultLobby implements Lobby, Listener {
 		}
 		Game game = null;
 		for (Game g : games) {
-			if (g.getPlayers().size() < g.getMaxPlayers()) {
+			if (g.getMaxPlayers() == 0 || g.getPlayers().size() < g.getMaxPlayers()) {
 				game = g;
 				break;
 			}

@@ -140,6 +140,7 @@ public class ParticleGun extends DefaultAttack {
 		private Vector currentVel;
 		private double currentSpeed;
 		private double squared;
+		private boolean early = false;
 		
 		public ParticleTracker(Location start, InGamePlayer shooter, double projectileSpeed, double proximity, double spread) {
 			// get starting parameters
@@ -148,14 +149,21 @@ public class ParticleGun extends DefaultAttack {
 			this.proximity = proximity;
 			world = start.getWorld();
 			dir = start.getDirection();
-			tracer = new BlockIterator(world, start.toVector(), dir, 0, 0);
 			
 			// calculate random spread
 			if (spread > 0) {
-				Vector perpendicular = new Vector(random.nextDouble(), random.nextDouble(), random.nextDouble())
-						.normalize().multiply(spread);
+				double x = random.nextDouble();
+				double y = random.nextDouble();
+				double z = random.nextDouble();
+				if (random.nextBoolean()) x = -x;
+				if (random.nextBoolean()) y = -y;
+				if (random.nextBoolean()) z = -z;
+				Vector perpendicular = new Vector(x, y, z).normalize().multiply(spread);
 				dir.add(perpendicular).normalize();
 			}
+			
+			// create block tracer
+			tracer = new BlockIterator(world, start.toVector(), dir, 0, 0);
 			
 			// calculate velocity and speed
 			vel = dir.clone().multiply(projectileSpeed);
@@ -231,6 +239,10 @@ public class ParticleGun extends DefaultAttack {
 				world.spawnParticle(particle, start, amount, offsetX, offsetY, offsetZ, extra);
 			}
 			
+			if (early) {
+				world.spawnParticle(particle, start, 100, 0, 0, 0, 0.25);
+			}
+			
 			// decrease range and quit if it's out
 			range -= currentSpeed;
 			if (range <= 0) {
@@ -254,6 +266,7 @@ public class ParticleGun extends DefaultAttack {
 			currentVel = end.clone().subtract(start).toVector();
 			currentSpeed = currentVel.length();
 			squared = currentSpeed * currentSpeed;
+			early = true;
 			cancel();
 		}
 	}
