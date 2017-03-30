@@ -6,8 +6,10 @@
  */
 package pl.betoncraft.flier.action;
 
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 
+import pl.betoncraft.flier.api.Flier;
 import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.core.defaults.DefaultAction;
 
@@ -24,7 +26,8 @@ public class LeaveGameAction extends DefaultAction {
 
 	@Override
 	public boolean act(InGamePlayer player) {
-		player.getGame().removePlayer(player.getPlayer());
+		Bukkit.getScheduler().scheduleSyncDelayedTask(Flier.getInstance(),
+				() -> player.getGame().removePlayer(player.getPlayer()));
 		return true;
 	}
 
