@@ -20,11 +20,11 @@ engine_name:
 * `regeneration` (**required**) is the amount of fuel regenerated every tick while _not_ accelerating. Set it to 0 if you want to restore fuel some other way than via regeneration.
 * `glow_time` (**required**) is the time the player glows after using their engine. If you don't want to glow, set it to 0.
 
-# Engine types
+## Engine types
 
 Each engine type has a different acceleration model.
 
-## Multiplying engine
+### Multiplying engine
 
 **`multiplyingEngine`**
 

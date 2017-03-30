@@ -48,11 +48,11 @@ These settings apply to every game. Some of them have default values, so if you 
   * `by_friendly_hit` (**default: 0**) amount of money the player receives for being hit by an ally. It can be negative.
   * `suicide` (**default: 0**) amount of money the player receives for killing himself. It can be negative.
 
-# Game types
+## Game types
 
 Each game type adds additional settings to configure game-specific rules, for example spawn points and teams.
 
-## Team DeathMatch
+### Team DeathMatch
 
 **`teamDeathMatch`**
 
@@ -73,8 +73,6 @@ game_name:
     another_team_id:
       [...]
 ```
-
-### Team DeathMatch settings
 
 * `suicide_score` (**default: 0**) points given to a team if one of its members commits a suicide.
 * `friendly_kill_score` (**default: 0**) points given to a team if one of its members kills an ally.

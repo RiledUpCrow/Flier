@@ -26,9 +26,9 @@ some_bonus:
 * `cooldown` (**required**) is the amount of ticks before the player can collect the bonus again.
 * `respawn` (**required**) is the amount of ticks before the bonus is respawned after being collected.
 
-# Bonus types
+## Bonus types
 
-## Entity
+### Entity
 
 **`entity`**
 

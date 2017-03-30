@@ -88,9 +88,9 @@ _This description is large, so the main settings are separated with lines._
 
 * `games` is the list of games available in this lobby. The first game in this list will be started when a player joins the lobby. You can change active game with _flier setgame {lobby} {game}_ command.
 
-# Lobby types
+## Lobby types
 
-## Physical lobby
+### Physical lobby
 
 **`physicalLobby`**
 

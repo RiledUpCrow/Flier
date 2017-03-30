@@ -43,9 +43,9 @@ All are self-explanatory except for range. It has a special syntax (`>(10)`), wh
 * `event_type` (**required**) is the type of the event which will fire this effect
 * `matchers` is a list of matchers which the event must match in order to fire the effect
 
-# Effect types
+## Effect types
 
-## Sound effect
+### Sound effect
 
 All sound effects play a sound, but to a different targets. These settings are available in all of them:
 
@@ -62,7 +62,7 @@ effect_name
   pitch: [positive decimal]
 ```
 
-### Types:
+#### Types:
 
 **`privateSound`** (player effect)
 
@@ -76,7 +76,7 @@ This effect will play a sound at this player's location to everyone else who can
 
 This effect will play a sound to every player in the Game at their locations.
 
-## Particle effect
+### Particle effect
 
 **`particle`**
 
@@ -103,7 +103,7 @@ effect_name:
   manual_offset: [non-negative decimal]
 ```
 
-# Event types
+## Event types
 
 Every player event has available these matchers:
 
@@ -123,7 +123,7 @@ If the event involves another player (like `hit` event - the shooter is main pla
 
 Non-player events don't have any additional matchers.
 
-## Use event
+### Use event
 
 **`use`** (player event)
 
@@ -134,7 +134,7 @@ This event fires whenever some player uses an item with a usage.
 * `amount` _(number)_ the amount of these items the player has
 * `usage` _(text)_ the ID of the usage used in this event
 
-## Hit event
+### Hit event
 
 **`hit`** (two players event, second player has `target_` prefix)
 
@@ -147,7 +147,7 @@ This event fires when one player hits another one with a weapon. Effects will be
 * `damage_to_wings` _(number)_ the amount of damage the weapon deals to the wings (not necessarily dealt)
 * `damage_to_health` _(number)_ the amount of damage the weapon deals to the player (not necessarily dealt)
 
-## Get hit event
+### Get hit event
 
 **`get hit`** (two players event, second player has `shooter_` prefix)
 
@@ -155,7 +155,7 @@ This event fires when one player gets hit by another one with a weapon. Effects 
 
 All other matchers like `wings_off` and `damage_to_health` are exactly the same as in `hit` event described above.
 
-## Kill event
+### Kill event
 
 **`kill`** (two players event, second player has `killed_` prefix)
 
@@ -165,7 +165,7 @@ This event fires when the main player kills the other one. Effects will be fired
 * `shot_down` _(true/false)_ whenever the player died because of falling from the sky
 * `killed` _(true/false)_ whenever the player was killed on the ground (not by falling)
 
-## Killed event
+### Killed event
 
 **`killed`** (two players event, second player has `killer_` prefix)
 
@@ -173,19 +173,19 @@ This event fires when the main player is killed by the other one. Effects will b
 
 All other matches like  `suicide` and `shot_down` are exactly the same as in `kill` event described above.
 
-## Engine use event
+### Engine use event
 
 **`engine`** (player event)
 
 This event fires every tick while the player is using the engine. It has no special matchers.
 
-## Spawn event
+### Spawn event
 
 **`spawn`** (player event)
 
 This event fires when the player spawns in the game. It has no special matchers.
 
-## Bonus collect event
+### Bonus collect event
 
 **`bonus`** (player event)
 

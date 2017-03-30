@@ -16,11 +16,11 @@ wings_name:
 * `max_health` (**required**) is the health of wings.
 * `regeneration` (**required**) is the amount of health regenerated every tick.
 
-# Wing types
+## Wing types
 
 Each wing type has a different flight model.
 
-## Simple wings
+### Simple wings
 
 **`simpleWings`**
 

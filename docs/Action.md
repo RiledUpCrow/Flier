@@ -32,9 +32,9 @@ some_attack_action
 * `friendly_fire` (**default: true**) whenever you can hit friendly players with this weapon.
 * `exploding` (**default: false**) in case the projectiles of this weapon are explosive (like ghast fireballs), it controls whenever they will explode.
 
-# Action types
+## Action types
 
-## Effect
+### Effect
 
 **`effect`**
 
@@ -51,7 +51,7 @@ effect_action:
 * `actions` is a list of Action that will be applied on every tick.
 * `duration` (**required**) is amount of ticks for which these Actions will be run.
 
-## Fuel
+### Fuel
 
 **`fuel`**
 
@@ -65,7 +65,7 @@ fuel_action:
 
 * `amount` (**required**) the amount of fuel to add (negative values will remove fuel).
 
-## Launch
+### Launch
 
 **`launch`**
 
@@ -79,7 +79,7 @@ launch_action:
 
 * `speed` (**required**) is the speed with which you will be launched.
 
-## Money
+### Money
 
 **`money`**
 
@@ -93,7 +93,7 @@ money_action:
 
 * `money` (**required**) is the amount of money to add. Negative values will remove money.
 
-## Target compass
+### Target compass
 
 **`targetCompass`**
 
@@ -110,7 +110,7 @@ target_action:
   * `friendly`
   * `neutral`
 
-## Wings Health
+### Wings Health
 
 **`wingsHealth`**
 
@@ -124,7 +124,7 @@ wings_health_action:
 
 * `amount` (**required**) is the amount of health added to the Wings. Negative values remove health.
 
-## Suicide
+### Suicide
 
 **`suicide`**
 
@@ -135,7 +135,7 @@ self_destruction:
   type: suicide
 ```
 
-## Item set
+### Item set
 
 **`itemSet`**
 
@@ -151,7 +151,7 @@ apply_set:
   saving: [true/false]
 ```
 
-## Consume
+### Consume
 
 **`consume`**
 
@@ -165,7 +165,7 @@ consume_item:
 
 * `item` is the name of the item, as in _items.yml_ file.
 
-## Homing missile
+### Homing missile
 
 **`homingMissile`**
 
@@ -190,7 +190,7 @@ rocket_action:
 * `lifetime` is the amount of ticks the missile will live after launching. If it does not hit anything for this time, it will disappear.
 * `maneuverability` is the ability to turn when targeting someone. The greater this number is, the better the rocket is at following its target.
 
-## Projectile Gun
+### Projectile Gun
 
 **`projectileGun`**
 
@@ -211,7 +211,7 @@ gun_action:
 * `burst_ticks` (**required**) is the amount of ticks between shooting bullets.
 * `projectile_speed` (**required**) is the speed of the bullets.
 
-## Particle Gun
+### Particle Gun
 
 **`particleGun`**
 
@@ -243,7 +243,7 @@ gun_action:
 * `spread` (**default: 0**) is the precision of the bullets, where 0 means perfect.
 * `projectile_speed` (**required**) is the speed of the bullets.
 
-## Bomb
+### Bomb
 
 This action is an attack which creates an exploding TNT. The `exploding` option should be set to `true` or it won't work.
 

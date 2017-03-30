@@ -4,9 +4,9 @@ Activators simply check conditions. They are used in Usages, in Items. When all 
 
 Technically speaking, Activators in Usages are checked every tick (20 times per second). If there are no Activators in some Usage, it will run 20 times a second, all the time. Be careful with this. There are special `leftClick` and `rightClick` Activators which activate only after the player clicked with the appropriate mouse button. There's also a `slowTick` Activator, which is active only once in four ticks. Use this to run the Usage 5 times per second. Note that clicking and `slowTick` activators are not compatible - you have only 25% chances that the click will happen on a slow tick.
 
-# Activator types
+## Activator types
 
-## Left Click
+### Left Click
 
 **`leftClick`**
 
@@ -17,7 +17,7 @@ left:
   type: leftClick
 ```
 
-## Right click
+### Right click
 
 **`rightClick`**
 
@@ -28,7 +28,7 @@ right:
   type: rightClick
 ```
 
-## Slow Tick
+### Slow Tick
 
 **`slowTick`**
 
@@ -39,7 +39,7 @@ slow:
   type: slowTick
 ```
 
-## Wings health
+### Wings health
 
 **`wingsHealth`**
 
@@ -59,7 +59,7 @@ wing_health:
     * `absolute`
     * `percentage`
 
-## Item
+### Item
 
 **`item`**
 
