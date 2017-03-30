@@ -13,9 +13,12 @@ import java.util.Map;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -76,6 +79,7 @@ public class FlierPlugin extends JavaPlugin implements Flier {
 	
 	private ConfigManager configManager;
 	private FlierCommand flierCommand;
+	private Listener autoJoin;
 
 	private Map<String, Factory<Engine>> engineTypes = new HashMap<>();
 	private Map<String, Factory<Wings>> wingTypes = new HashMap<>();
@@ -90,7 +94,6 @@ public class FlierPlugin extends JavaPlugin implements Flier {
 
 	@Override
 	public void onEnable() {
-		saveDefaultConfig();
 		configManager = new DefaultConfigManager();
 		flierCommand = new FlierCommand();
 		getCommand("flier").setExecutor(flierCommand);
@@ -157,17 +160,49 @@ public class FlierPlugin extends JavaPlugin implements Flier {
 	@Override
 	public void reload() {
 		try {
+			// reload configuration files
 			reloadConfig();
 			configManager = new DefaultConfigManager();
 			LangManager.reload();
+			// stop current lobbies and games
 			for (Lobby lobby : lobbies.values()) {
 				lobby.stop();
 			}
 			lobbies.clear();
+			// load new lobbies and games
 			ConfigurationSection lobbySection = configManager.getLobbies();
 			if (lobbySection != null) {
 				for (String section : lobbySection.getKeys(false)) {
 					lobbies.put(section, getObject(section, "lobby", lobbySection, lobbyTypes));
+				}
+			}
+			// unregister the old automatic lobby joining
+			if (autoJoin != null) {
+				HandlerList.unregisterAll(autoJoin);
+			}
+			// register new automatic lobby joining in case it's enabled
+			if (getConfig().getBoolean("autojoin.enabled", false)) {
+				String name = getConfig().getString("autojoin.lobby", null);
+				if (name != null) {
+					Lobby lobby = lobbies.get(name);
+					if (lobby != null) {
+						autoJoin = new Listener() {
+							@EventHandler
+							public void onJoin(PlayerJoinEvent event) {
+								lobby.addPlayer(event.getPlayer());
+							}
+						};
+						// add all online players in case of a reload
+						for (Player player : Bukkit.getOnlinePlayers()) {
+							lobby.addPlayer(player);
+						}
+						// add all players joining in the future
+						Bukkit.getPluginManager().registerEvents(autoJoin, this);
+					} else {
+						getLogger().warning(String.format("Automatic joining specifies non-existing '%s' lobby.", name));
+					}
+				} else {
+					getLogger().warning("Automatic joining is enabled but the lobby is not specified.");
 				}
 			}
 		} catch (LoadingException e) {

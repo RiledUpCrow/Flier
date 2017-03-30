@@ -51,6 +51,7 @@ public class DefaultConfigManager implements ConfigManager {
 	private Config arenas;
 
 	public DefaultConfigManager() {
+		Flier.getInstance().saveDefaultConfig();
 		lobbies = new Config(LOBBIES);
 		games = new Config(GAMES);
 		bonuses = new Config(BONUSES);

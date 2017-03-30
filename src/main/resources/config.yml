@@ -4,3 +4,6 @@
 #
 
 language: en
+autojoin:
+  enabled: false
+  lobby: default
