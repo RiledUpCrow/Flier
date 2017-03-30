@@ -437,11 +437,6 @@ public abstract class DefaultGame implements Listener, Game {
 				LangManager.sendMessage(attacker, "hit", Utils.formatPlayer(attacked));
 			}
 		}
-		// handle physical damage
-		if (results.contains(DamageResult.REGULAR_DAMAGE)) {
-			attacked.getPlayer().setNoDamageTicks(0);
-			attacked.getPlayer().damage(damager.getPhysical());
-		}
 		// handle taking wings off
 		if (results.contains(DamageResult.WINGS_OFF)) {
 			attacked.takeWingsOff();
@@ -449,6 +444,12 @@ public abstract class DefaultGame implements Listener, Game {
 		// handle wing damage
 		if (results.contains(DamageResult.WINGS_DAMAGE)) {
 			attacked.getClazz().getWings().removeHealth(damager.getDamage());
+		}
+		// handle physical damage
+		// it's the last one to avoid modifying stuff after respawn
+		if (results.contains(DamageResult.REGULAR_DAMAGE)) {
+			attacked.getPlayer().setNoDamageTicks(0);
+			attacked.getPlayer().damage(damager.getPhysical());
 		}
 	}
 	
