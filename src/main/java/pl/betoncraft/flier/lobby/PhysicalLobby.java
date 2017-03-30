@@ -71,20 +71,19 @@ public class PhysicalLobby extends DefaultLobby {
 		if (event.isCancelled()) {
 			return;
 		}
-		if (event.getAction() != Action.LEFT_CLICK_BLOCK && event.getAction() != Action.RIGHT_CLICK_BLOCK) {
-			return;
-		}
-		if (!event.hasBlock()) {
-			return;
-		}
-
 		Player player = event.getPlayer();
 		UUID uuid = player.getUniqueId();
-		Block block = event.getClickedBlock();
 		boolean inside = players.contains(uuid);
 
 		if (inside) {
 			event.setCancelled(true);
+			if (event.getAction() != Action.LEFT_CLICK_BLOCK && event.getAction() != Action.RIGHT_CLICK_BLOCK) {
+				return;
+			}
+			if (!event.hasBlock()) {
+				return;
+			}
+			Block block = event.getClickedBlock();
 			// this prevents double clicks on next tick
 			if (blocked.contains(event.getPlayer().getUniqueId())) {
 				return;
@@ -105,7 +104,7 @@ public class PhysicalLobby extends DefaultLobby {
 					});
 		} else {
 			// joining
-			if (join.contains(block)) {
+			if (event.hasBlock() && join.contains(event.getClickedBlock())) {
 				event.setCancelled(true);
 				// this prevents double clicks on next tick
 				if (blocked.contains(event.getPlayer().getUniqueId())) {

@@ -23,6 +23,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 import pl.betoncraft.flier.api.Flier;
@@ -184,6 +185,19 @@ public abstract class DefaultLobby implements Lobby, Listener {
 	@EventHandler
 	public void onLeave(PlayerQuitEvent event) {
 		removePlayer(event.getPlayer());
+	}
+	
+	@EventHandler
+	public void onDamage(EntityDamageEvent event) {
+		UUID uuid = event.getEntity().getUniqueId();
+		if (players.contains(uuid) &&
+				!gameSets.values().stream().anyMatch(
+						set -> set.stream().anyMatch(
+								game -> game.getPlayers().containsKey(uuid)
+						)
+				)) {
+			event.setCancelled(true);
+		}
 	}
 
 }
