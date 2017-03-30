@@ -116,6 +116,7 @@ public class DefaultPlayer implements InGamePlayer {
 				regenerateFuel();
 			}
 			checkBonuses();
+			displayReloadingTime();
 			
 			// manage UsableItems
 			use();
@@ -489,6 +490,33 @@ public class DefaultPlayer implements InGamePlayer {
 				}
 			}
 		}
+	}
+	
+	private void displayReloadingTime() {
+		int slot = player.getInventory().getHeldItemSlot();
+		UsableItem item = null;
+		for (UsableItem i : clazz.getItems()) {
+			if (i.slot() == slot) {
+				item = i;
+				break;
+			}
+		}
+		if (item == null || !item.getUsages().stream().filter(usage -> usage.canUse(this)).findAny().isPresent()) {
+			player.setExp(0);
+			return;
+		}
+		int ticks = item.getCooldown();
+		int max = item.getWholeCooldown();
+		float amount;
+		if (ticks == 0) {
+			amount = (float) 0.9999; 
+		} else if (max == 0) {
+			amount = 0;
+		} else {
+			amount = (float) (max - ticks) / (float) max;
+		}
+		player.setExp(amount);
+		
 	}
 
 	private void createWings() {

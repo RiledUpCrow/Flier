@@ -185,6 +185,7 @@ public abstract class DefaultGame implements Listener, Game {
 			for (InGamePlayer data : getPlayers().values()) {
 				data.fastTick();
 				Location loc = data.getPlayer().getLocation();
+				// height damage
 				if (loc.getBlockX() < minX || loc.getBlockX() > maxX ||
 						loc.getBlockZ() < minZ || loc.getBlockZ() > maxZ) {
 					data.getPlayer().damage(data.getPlayer().getHealth() + 1);
