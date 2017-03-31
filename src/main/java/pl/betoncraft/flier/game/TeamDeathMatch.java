@@ -182,25 +182,18 @@ public class TeamDeathMatch extends DefaultGame {
 	}
 	
 	@Override
-	public InGamePlayer addPlayer(Player player) {
-		InGamePlayer data = super.addPlayer(player);
-		if (data != null) {
-			SimpleTeam team = chooseTeam();
-			setTeam(data, team);
-			data.getLines().addAll(teams.values().stream()
-					.map(t -> new TeamLine(data, t))
-					.collect(Collectors.toList())
-			);
-			handleRespawn(data);
-		}
-		return data;
-	}
-	
-	@Override
 	public void removePlayer(Player player) {
 		super.removePlayer(player);
 		players.remove(player.getUniqueId());
 		updateColors();
+	}
+	
+	@Override
+	public void start() {
+		super.start();
+		for (InGamePlayer player : dataMap.values()) {
+			handleRespawn(player);
+		}
 	}
 	
 	@Override
@@ -234,7 +227,16 @@ public class TeamDeathMatch extends DefaultGame {
 	@Override
 	public void handleRespawn(InGamePlayer player) {
 		super.handleRespawn(player);
-		player.getPlayer().teleport(players.get(player.getPlayer().getUniqueId()).getSpawn());
+		SimpleTeam team = players.get(player.getPlayer().getUniqueId());
+		if (team == null) {
+			team = chooseTeam();
+			setTeam(player, team);
+			player.getLines().addAll(teams.values().stream()
+					.map(t -> new TeamLine(player, t))
+					.collect(Collectors.toList())
+			);
+		}
+		player.getPlayer().teleport(team.getSpawn());
 	}
 	
 	@Override

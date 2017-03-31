@@ -11,7 +11,7 @@ default:
   teams:                               # list of teams
     blue:
       name: 'Blue'                     # name of the team
-      location: blue_spawn             # spawn location for the team
+      location: blue_spawn             # spawn location for the team (defined in arenas,yml)
       color: blue                      # color of the team
     red:
       name: 'Red'
@@ -26,6 +26,7 @@ default:
     suicide: -1                        #
   height_limit: 512                    # maximum height of the map
   height_damage: 0.5                   # damage taken when flying above the height limit
+  waiting_room: room                   # location of the waiting room
   viable_arenas:                       # list of arenas this game can use
   - default
   bonuses:                             # list of Bonuses in this Game

@@ -65,7 +65,7 @@ public class DefaultPlayer implements InGamePlayer {
 	private int noDamageTicks = 0;
 	private List<SidebarLine> lines = new LinkedList<>();
 	private InGamePlayer lastHit = null;
-	private ChatColor color;
+	private ChatColor color = ChatColor.WHITE;
 	private long glowTimer;
 	private int money;
 	

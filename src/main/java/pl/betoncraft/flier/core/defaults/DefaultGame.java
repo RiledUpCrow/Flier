@@ -87,6 +87,7 @@ public abstract class DefaultGame implements Listener, Game {
 	protected final String id;
 	protected final ValueLoader loader;
 	protected GameHeartBeat heartBeat;
+	protected WaitingRoom waitingRoom;
 	
 	protected final Map<UUID, InGamePlayer> dataMap = new HashMap<>();
 	protected final EffectListener listener;
@@ -132,6 +133,7 @@ public abstract class DefaultGame implements Listener, Game {
 		timeLeft = maxTime;
 		respawnAction = loader.loadEnum("respawn_action", RespawnAction.class);
 		centerName = loader.loadString("center");
+		waitingRoom = new WaitingRoom(this);
 		availableArenas = section.getStringList("viable_arenas");
 		if (availableArenas.isEmpty()) {
 			throw new LoadingException("No viable arenas are specified.");
@@ -310,6 +312,128 @@ public abstract class DefaultGame implements Listener, Game {
 		}
 		
 	}
+	
+	/**
+	 * Represents the waiting room which can hold players currently not in-game
+	 * and spawn them into the game.
+	 */
+	protected class WaitingRoom {
+		
+		protected final Game game;
+		protected final int minPlayers;
+		protected final int respawnDelay;
+		protected final int startDelay;
+		protected final boolean locking;
+		protected final String locationName;
+
+		protected List<InGamePlayer> waitingPlayers = new ArrayList<>();
+		protected int currentWaitingTime;
+		protected Location location;
+		protected BukkitRunnable ticker;
+		
+		public WaitingRoom(Game game) throws LoadingException {
+			this.game = game;
+			minPlayers = loader.loadPositiveInt("min_players", 1);
+			respawnDelay = loader.loadNonNegativeInt("respawn_delay", 0);
+			startDelay = loader.loadNonNegativeInt("start_delay", 0);
+			locking = loader.loadBoolean("locking", false);
+			locationName = loader.loadString("waiting_room");
+			ticker = new BukkitRunnable() {
+				public void run() {
+					tick();
+				};
+			};
+			ticker.runTaskTimer(Flier.getInstance(), 0, 1);
+			currentWaitingTime = -1; // lower than 0 means the waiting room is idle
+		}
+		
+		/**
+		 * @return whenever the waiting room is locked for new players
+		 */
+		public boolean isLocked() {
+			return locking && game.isRunning();
+		}
+		
+		/**
+		 * Adds this player to the waiting room.
+		 * 
+		 * @param player
+		 */
+		public void addPlayer(InGamePlayer player) {
+			waitingPlayers.add(player);
+			if (!running) {
+				// the game hasn't started yet
+				if (waitingPlayers.size() >= minPlayers) {
+					// minimum player amount has been reached
+					if (startDelay == 0) {
+						// no start delay, start immediately
+						startPlayers();
+						return; // players teleported, no need to put them in the waiting room
+					} else {
+						// start delay should be applied
+						if (currentWaitingTime > 0) {
+							// start delay already in place
+						} else {
+							// create start delay
+							currentWaitingTime = startDelay;
+						}
+					} 
+				} else {
+					// not enough players yet
+				}
+			} else {
+				// the game has already started
+				if (respawnDelay == 0) {
+					// no respawn delay, start immediately
+					startPlayers();
+					return; // players teleported, no need to put them in the waiting room
+				} else {
+					if (currentWaitingTime > 0) {
+						// respawn delay already in place
+					} else {
+						// create respawn delay
+						currentWaitingTime = respawnDelay;
+					}
+				}
+			}
+			// after the player has been added to the list and waiting time was set
+			// we need to teleport them to the waiting room
+			player.getPlayer().teleport(location);
+		}
+		
+		public void removePlayer(InGamePlayer player) {
+			// it's assumed the teleporting of the player was already done
+			waitingPlayers.remove(player);
+		}
+		
+		/**
+		 * Starts the game for all waiting players.
+		 */
+		public void startPlayers() {
+			if (!running) {
+				// start the game in case it's not running
+				start();
+			} else {
+				// run the regular respawn routine
+				for (InGamePlayer player : waitingPlayers) {
+					handleRespawn(player);
+				}
+			}
+			waitingPlayers.clear();
+		}
+		
+		/**
+		 * Called every tick so waiting room can decrease the counters.
+		 */
+		public void tick() {
+			// start the game if the waiting time is exactly 0
+			// lower means the game was already started and the waiting room is idle
+			if (--currentWaitingTime == 0) {
+				startPlayers();
+			}
+		}
+		
+	}
 
 	/**
 	 * The game should do game-specific stuff in a fast tick here.
@@ -328,15 +452,18 @@ public abstract class DefaultGame implements Listener, Game {
 
 	@Override
 	public InGamePlayer addPlayer(Player player) {
+		// can't join if the waiting room is locked
+		if (waitingRoom.isLocked()) {
+			return null;
+		}
+		// can't join if already joined
 		UUID uuid = player.getUniqueId();
 		if (dataMap.containsKey(uuid)) {
 			return null;
 		}
-		if (dataMap.isEmpty()) {
-			start();
-		}
 		InGamePlayer data =  new DefaultPlayer(player, this, defClass.replicate());
 		dataMap.put(uuid, data);
+		// creating default stuff
 		data.getLines().add(new Fuel(data));
 		data.getLines().add(new Health(data));
 		data.getLines().add(new Speed(data));
@@ -349,6 +476,8 @@ public abstract class DefaultGame implements Listener, Game {
 		if (maxTime != 0) {
 			data.getLines().add(new Time(data));
 		}
+		// move into waiting room
+		waitingRoom.addPlayer(data);
 		return data;
 	}
 	
@@ -359,6 +488,7 @@ public abstract class DefaultGame implements Listener, Game {
 			return;
 		}
 		unlocked.remove(data);
+		waitingRoom.removePlayer(data);
 		data.exitGame();
 		data.getPlayer().teleport(lobby.getSpawn());
 		if (dataMap.isEmpty()) {
@@ -387,6 +517,7 @@ public abstract class DefaultGame implements Listener, Game {
 		timeLeft = maxTime;
 		HandlerList.unregisterAll(this);
 		heartBeat.cancel();
+		waitingRoom.ticker.cancel();
 		Collection<InGamePlayer> copy = new ArrayList<>(dataMap.values());
 		for (InGamePlayer data : copy) {
 			removePlayer(data.getPlayer());
@@ -432,7 +563,7 @@ public abstract class DefaultGame implements Listener, Game {
 		Utils.clearPlayer(killed.getPlayer());
 		killed.setPlaying(false);
 		killed.setAttacker(null);
-		handleRespawn(killed);
+		waitingRoom.addPlayer(killed);
 	}
 	
 	@Override
@@ -637,6 +768,7 @@ public abstract class DefaultGame implements Listener, Game {
 	@Override
 	public void setArena(Arena arena) throws LoadingException {
 		this.arena = arena;
+		waitingRoom.location = arena.getLocation(waitingRoom.locationName);
 		center = arena.getLocation(centerName);
 		minX = center.getBlockX() - radius;
 		maxX = center.getBlockX() + radius;
@@ -757,16 +889,6 @@ public abstract class DefaultGame implements Listener, Game {
 		}
 	}
 	
-	private void notifyAllPlayers(String message, Object... variables) {
-		for (InGamePlayer player : dataMap.values()) {
-			LangManager.sendMessage(player, message, variables);
-		}
-	}
-	
-	private void pay(InGamePlayer player, int amount) {
-		player.setMoney(player.getMoney() + amount);
-	}
-	
 	@EventHandler
 	public void onExplode(ExplosionPrimeEvent event) {
 		if (event.isCancelled()) {
@@ -845,6 +967,16 @@ public abstract class DefaultGame implements Listener, Game {
 		if (getPlayers().containsKey(event.getPlayer().getUniqueId())) {
 			event.setCancelled(true);
 		}
+	}
+	
+	private void notifyAllPlayers(String message, Object... variables) {
+		for (InGamePlayer player : dataMap.values()) {
+			LangManager.sendMessage(player, message, variables);
+		}
+	}
+	
+	private void pay(InGamePlayer player, int amount) {
+		player.setMoney(player.getMoney() + amount);
 	}
 
 }

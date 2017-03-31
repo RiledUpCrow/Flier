@@ -4,6 +4,7 @@ default:
   blue_spawn: 100;200;300;world
   red_spawn: 100;200;300;world
   center: 100;200;300;world
+  room: 100;200;300;world
   rocket_button: 100;200;300;world
   launcher_button: 100;200;300;world
   repair_kit_button: 100;200;300;world
