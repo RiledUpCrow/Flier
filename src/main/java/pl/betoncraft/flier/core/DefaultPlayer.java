@@ -449,7 +449,11 @@ public class DefaultPlayer implements InGamePlayer {
 	private void updateStats() {
 		int i = 0;
 		for (SidebarLine line : Lists.reverse(lines)) {
-			setStatistic(i++, line.getText());
+			String text = line.getText();
+			if (text.length() > 16) {
+				text = text.substring(0, 16);
+			}
+			setStatistic(i++, text);
 		}
 		while (i < ChatColor.values().length) {
 			setStatistic(i++, null);

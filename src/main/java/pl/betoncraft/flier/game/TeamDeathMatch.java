@@ -121,14 +121,16 @@ public class TeamDeathMatch extends DefaultGame {
 			if (translated.startsWith("$")) {
 				translated = LangManager.getMessage(player, translated.substring(1));
 			}
-			translated = team.getColor() + translated + ChatColor.WHITE + ": ";
 		}
 
 		@Override
 		public String getText() {
 			int a = team.getScore();
 			if (lastString == null || a != lastValue) {
-				lastString = translated + a;
+				String format = team.getColor() + "%s" + ChatColor.WHITE + ": " + a;
+				int left = 16 - format.length();
+				String temp = translated.length() > left ? translated.substring(0, left) : translated;
+				lastString = String.format(format, temp);
 				lastValue = a;
 			}
 			return lastString;
