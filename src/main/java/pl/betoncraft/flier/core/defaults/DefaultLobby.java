@@ -52,6 +52,8 @@ public abstract class DefaultLobby implements Lobby, Listener {
 	protected Set<UUID> players = new HashSet<>();
 	protected Map<UUID, PlayerBackup> backups = new HashMap<>();
 	protected int maxGames;
+	
+	protected String autoJoinGame;
 
 	public DefaultLobby(ConfigurationSection section) throws LoadingException {
 		loader = new ValueLoader(section);
@@ -76,6 +78,13 @@ public abstract class DefaultLobby implements Lobby, Listener {
 		if (gameSets.isEmpty()) {
 			throw new LoadingException("Game list is empty.");
 		}
+		if (section.contains("autojoin", true)) {
+			autoJoinGame = loader.loadString("autojoin");
+			if (!gameSets.containsKey(autoJoinGame)) {
+				throw new LoadingException(
+						String.format("Automatic joining impossible because game '%s' is not on the list.", autoJoinGame));
+			}
+		}
 		Bukkit.getPluginManager().registerEvents(this, Flier.getInstance());
 	}
 
@@ -89,6 +98,12 @@ public abstract class DefaultLobby implements Lobby, Listener {
 		PlayerBackup backup = new PlayerBackup(player);
 		backup.save();
 		backups.put(uuid, backup);
+		if (autoJoinGame != null) {
+			JoinResult result = joinGame(player, autoJoinGame);
+			if (result == JoinResult.GAME_CREATED || result == JoinResult.GAME_JOINED) {
+				return;
+			}
+		}
 		player.teleport(spawn);
 	}
 

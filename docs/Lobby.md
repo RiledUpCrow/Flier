@@ -23,6 +23,7 @@ lobby_name:
   default_class:
   - item_set_name
   respawn_action: [action]
+  autojoin: [game name]
   games:
   - game_name
   - other_game
@@ -87,6 +88,8 @@ _This description is large, so the main settings are separated with lines._
 * `default_class` is the list of item sets which will be applied to the player when he joins the lobby. All these sets are applied as `fill`, `replace`, saving and single (amount is 1). The sets specified here must be defined in the _items_ section (the one described above).
 
 ***
+
+* `autojoin` (**optional**) when the name of a game is specified here, players will join this game automatically upon entering the lobby.
 
 * `max_games` (**default: 0**) if you want to have many arenas but your server can't run that many games you can limit amount of running games with this setting. It will refuse to create new games above the limit even if there are some free arenas.
 
