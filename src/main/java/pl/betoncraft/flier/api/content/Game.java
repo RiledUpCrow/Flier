@@ -259,4 +259,9 @@ public interface Game {
 	 */
 	public boolean isRunning();
 
+	/**
+	 * @return the amount of ticks before this game ends.
+	 */
+	public int getTimeLeft();
+
 }

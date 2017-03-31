@@ -7,10 +7,11 @@
 package pl.betoncraft.flier.game;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.stream.Collectors;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -142,6 +143,43 @@ public class TeamDeathMatch extends DefaultGame {
 	
 	@Override
 	public void slowTick() {}
+	
+	@Override
+	public void endGame() {
+		// get the winning team
+		int maxPoints = players.values().stream()
+				.max((teamA, teamB) -> teamA.getScore() - teamB.getScore())
+				.map(team -> team.getScore())
+				.orElse(0);
+		List<SimpleTeam> winners = players.values().stream()
+				.filter(team -> team.getScore() == maxPoints)
+				.collect(Collectors.toList());
+		// display message about winning
+		for (Entry<UUID, SimpleTeam> entry : players.entrySet()) {
+			InGamePlayer data = dataMap.get(entry.getKey());
+			String name = data.getPlayer().getName();
+			String word;
+			if (winners.contains(entry.getValue())) {
+				word = LangManager.getMessage(data, "win");
+			} else {
+				word = LangManager.getMessage(data, "lose");
+			}
+			String teamNames = String.join(", ", winners.stream().map(team -> {
+				return team.getName().startsWith("$") ?
+						LangManager.getMessage(data, team.getName().substring(1)) :
+						team.getName();
+			}).collect(Collectors.toList()));
+			String win = LangManager.getMessage(data, "team_win", teamNames);
+			String title = String.format("title %s title {\"text\":\"%s\"}",
+					name, win);
+			String subTitle = String.format("title %s subtitle {\"text\":\"%s%s\"}",
+					name, entry.getValue().getColor(), word);
+			Bukkit.dispatchCommand(Bukkit.getConsoleSender(), title);
+			Bukkit.dispatchCommand(Bukkit.getConsoleSender(), subTitle);
+		}
+		// end game
+		stop();
+	}
 	
 	@Override
 	public InGamePlayer addPlayer(Player player) {
@@ -283,29 +321,7 @@ public class TeamDeathMatch extends DefaultGame {
 		int newScore = team.getScore() + amount;
 		team.setScore(newScore);
 		if (newScore >= pointsToWin) {
-			// display message about winning
-			for (Entry<UUID, SimpleTeam> entry : players.entrySet()) {
-				InGamePlayer data = dataMap.get(entry.getKey());
-				String name = data.getPlayer().getName();
-				String word;
-				if (entry.getValue().equals(team)) {
-					word = LangManager.getMessage(data, "win");
-				} else {
-					word = LangManager.getMessage(data, "lose");
-				}
-				String teamName = team.getName().startsWith("$") ?
-						LangManager.getMessage(data, team.getName().substring(1)) :
-						team.getName();
-				String win = LangManager.getMessage(data, "team_win", teamName);
-				String title = String.format("title %s title {\"text\":\"%s\"}",
-						name, win);
-				String subTitle = String.format("title %s subtitle {\"text\":\"%s%s\"}",
-						name, entry.getValue().getColor(), word);
-				Bukkit.dispatchCommand(Bukkit.getConsoleSender(), title);
-				Bukkit.dispatchCommand(Bukkit.getConsoleSender(), subTitle);
-			}
-			// end game
-			stop();
+			endGame();
 		}
 	}
 

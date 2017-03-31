@@ -71,6 +71,7 @@ import pl.betoncraft.flier.sidebar.Health;
 import pl.betoncraft.flier.sidebar.Money;
 import pl.betoncraft.flier.sidebar.Reload;
 import pl.betoncraft.flier.sidebar.Speed;
+import pl.betoncraft.flier.sidebar.Time;
 import pl.betoncraft.flier.util.EffectListener;
 import pl.betoncraft.flier.util.LangManager;
 import pl.betoncraft.flier.util.Utils;
@@ -96,6 +97,7 @@ public abstract class DefaultGame implements Listener, Game {
 	protected final Map<InGamePlayer, List<Button>> unlocked = new HashMap<>();
 	protected final RespawnAction respawnAction;
 	protected final int maxPlayers;
+	protected final int maxTime;
 	protected final PlayerClass defClass;
 	protected final int heightLimit;
 	protected final double heightDamage;
@@ -114,6 +116,7 @@ public abstract class DefaultGame implements Listener, Game {
 	protected Lobby lobby;
 	protected Arena arena;
 	protected boolean running = false;
+	protected int timeLeft;
 	protected Location center;
 	protected int minX, minZ, maxX, maxZ;
 
@@ -125,6 +128,8 @@ public abstract class DefaultGame implements Listener, Game {
 		Flier flier = Flier.getInstance();
 		listener = new EffectListener(section.getStringList("effects"), this);
 		maxPlayers = loader.loadNonNegativeInt("max_players", 0);
+		maxTime = loader.loadNonNegativeInt("max_time", 0) * 20;
+		timeLeft = maxTime;
 		respawnAction = loader.loadEnum("respawn_action", RespawnAction.class);
 		centerName = loader.loadString("center");
 		availableArenas = section.getStringList("viable_arenas");
@@ -178,6 +183,10 @@ public abstract class DefaultGame implements Listener, Game {
 
 		@Override
 		public void run() {
+			if (maxTime != 0 && --timeLeft <= 0) {
+				endGame();
+				return;
+			}
 			for (Bonus bonus : bonuses) {
 				bonus.update();
 			}
@@ -311,6 +320,11 @@ public abstract class DefaultGame implements Listener, Game {
 	 * The game should do game-specific stuff in a slow tick here.
 	 */
 	public abstract void slowTick();
+	
+	/**
+	 * Ends the game by selecting the winner.
+	 */
+	public abstract void endGame();
 
 	@Override
 	public InGamePlayer addPlayer(Player player) {
@@ -331,6 +345,9 @@ public abstract class DefaultGame implements Listener, Game {
 		data.getLines().add(new Reload(data));
 		if (useMoney) {
 			data.getLines().add(new Money(data));
+		}
+		if (maxTime != 0) {
+			data.getLines().add(new Time(data));
 		}
 		return data;
 	}
@@ -367,6 +384,7 @@ public abstract class DefaultGame implements Listener, Game {
 	@Override
 	public void stop() {
 		running = false;
+		timeLeft = maxTime;
 		HandlerList.unregisterAll(this);
 		heartBeat.cancel();
 		Collection<InGamePlayer> copy = new ArrayList<>(dataMap.values());
@@ -635,6 +653,11 @@ public abstract class DefaultGame implements Listener, Game {
 	@Override
 	public int getMaxPlayers() {
 		return maxPlayers;
+	}
+	
+	@Override
+	public int getTimeLeft() {
+		return timeLeft;
 	}
 	
 	@EventHandler(priority=EventPriority.HIGH)

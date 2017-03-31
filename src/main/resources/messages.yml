@@ -30,6 +30,7 @@ en:
   money: "C: {color}${money}"
   speed: "S: {color}{speed}~"
   reload: "R: {color}{status}"
+  time: "T: {color}{min}:{s}"
 pl:
   no_money_unlock: "&cNie masz pieniędzy aby to odblokować."
   no_money_buy: "&cNie masz pieniędzy aby to kupić."
@@ -59,6 +60,7 @@ pl:
   ammo: "A: {color}{current}/{max}"
   fuel: "P: {color}{fuel}%%"
   health: "Z: {color}{health}%%"
-  money: "K: {color}${money}"
+  money: "K: {color}{money}zł"
   speed: "S: {color}{speed}~"
   reload: "R: {color}{status}"
+  time: "C: {color}{min}:{s}"
