@@ -13,6 +13,9 @@ game_name:
   - other_effect
   height_limit: 0
   height_damage: 1
+  max_players: 0
+  viable_arenas:
+  - [arena name]
   money:
     enabled: false
     enemy_kill: 0
@@ -36,6 +39,8 @@ These settings apply to every game. Some of them have default values, so if you 
 * `effects` list of effects available in this game. You don't have to specify this if you don't want any effects.
 * `height_limit` (**default: 0**) a height at which players will receive suffocation damage (kind of simulating low air pressure). If it's 0 or lower, it doesn't apply.
 * `height_damage` (**default: 1**) the amount of suffocation damage per second. It can use fractions.
+* `max_players` (**default: 0**) the maximum amount of players in this game. If it's reached the lobby will try to create another game.
+* `viable_arenas` list of arenas on which this game can be played. New games will be created in the first free arena from this list.
 * `money` settings responsible for money in the game. If you don't want to use this system you can simply omit this section.
   * `enabled` (**default: false**) whenever the money system is enabled. If it's _true_, money will be displayed on the sidebar.
   * `enemy_kill` (**default: 0**) amount of money the player receives for killing an enemy.

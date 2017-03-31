@@ -26,6 +26,8 @@ lobby_name:
   games:
   - game_name
   - other_game
+  arenas:
+  - default
 ```
 
 ## Lobby settings
@@ -86,7 +88,11 @@ _This description is large, so the main settings are separated with lines._
 
 ***
 
+* `max_games` (**default: 0**) if you want to have many arenas but your server can't run that many games you can limit amount of running games with this setting. It will refuse to create new games above the limit even if there are some free arenas.
+
 * `games` is the list of games available in this lobby. The first game in this list will be started when a player joins the lobby. You can change active game with _flier setgame {lobby} {game}_ command.
+
+* `arenas` is the list of arenas on which this lobby can assign games. When a player tries to join a game but there is no more room in existing games, the lobby will create a new game of chosen type in the first free arena on which this game can be played (see `viable_arenas` in game settings).
 
 ## Lobby types
 

@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -50,10 +51,12 @@ public abstract class DefaultLobby implements Lobby, Listener {
 	protected Location spawn;
 	protected Set<UUID> players = new HashSet<>();
 	protected Map<UUID, PlayerBackup> backups = new HashMap<>();
+	protected int maxGames;
 
 	public DefaultLobby(ConfigurationSection section) throws LoadingException {
 		loader = new ValueLoader(section);
 		spawn = loader.loadLocation("spawn");
+		maxGames = loader.loadNonNegativeInt("max_games", 0);
 		List<String> gameNames = section.getStringList("games");
 		Flier flier = Flier.getInstance();
 		for (String arenaName : section.getStringList("arenas")) {
@@ -130,18 +133,21 @@ public abstract class DefaultLobby implements Lobby, Listener {
 			return JoinResult.GAME_JOINED;
 		} else {
 			try {
-				game = Flier.getInstance().getGame(gameName);
-				List<String> viable = game.getViableArenas();
-				for (String arenaName : viable) {
-					Arena arena = arenas.get(arenaName);
-					if (!arena.isUsed()) {
-						arena.setUsed(true);
-						games.add(game);
-						game.setLobby(this);
-						game.setArena(arena);
-						InGamePlayer data = game.addPlayer(player);
-						LangManager.sendMessage(data, "game_created");
-						return JoinResult.GAME_CREATED;
+				int amount = gameSets.values().stream().flatMapToInt(set -> IntStream.of(set.size())).sum();
+				if (amount < maxGames || maxGames == 0) {
+					game = Flier.getInstance().getGame(gameName);
+					List<String> viable = game.getViableArenas();
+					for (String arenaName : viable) {
+						Arena arena = arenas.get(arenaName);
+						if (!arena.isUsed()) {
+							arena.setUsed(true);
+							games.add(game);
+							game.setLobby(this);
+							game.setArena(arena);
+							InGamePlayer data = game.addPlayer(player);
+							LangManager.sendMessage(data, "game_created");
+							return JoinResult.GAME_CREATED;
+						}
 					}
 				}
 				LangManager.sendMessage(player, "games_full");
