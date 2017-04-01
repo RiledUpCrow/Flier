@@ -104,7 +104,10 @@ public interface Game {
 	public boolean applyButton(InGamePlayer player, Button button, boolean buy, boolean message);
 
 	/**
-	 * Adds the player to the game.
+	 * Adds the player to the game. It will throw IllegalStateException if the
+	 * player is already in the game or the game is locked. If you want to add
+	 * the player easily, use {@link Lobby#joinGame(Player, String) joinGame}
+	 * method instead.
 	 * 
 	 * @param player
 	 *            player to add
@@ -258,6 +261,11 @@ public interface Game {
 	 * @return whenever the Game is currently running
 	 */
 	public boolean isRunning();
+
+	/**
+	 * @return whenever the Game is currently locked for new players
+	 */
+	public boolean isLocked();
 
 	/**
 	 * @return the amount of ticks before this game ends.

@@ -314,6 +314,13 @@ public abstract class DefaultGame implements Listener, Game {
 	}
 	
 	/**
+	 * Reason for making the player wait in the waiting room.
+	 */
+	protected enum WaitReason {
+		NO_WAIT, MORE_PLAYERS, START_DELAY, RESPAWN_DELAY
+	}
+	
+	/**
 	 * Represents the waiting room which can hold players currently not in-game
 	 * and spawn them into the game.
 	 */
@@ -359,7 +366,8 @@ public abstract class DefaultGame implements Listener, Game {
 		 * 
 		 * @param player
 		 */
-		public void addPlayer(InGamePlayer player) {
+		public WaitReason addPlayer(InGamePlayer player) {
+			WaitReason reason;
 			waitingPlayers.add(player);
 			if (!running) {
 				// the game hasn't started yet
@@ -368,7 +376,7 @@ public abstract class DefaultGame implements Listener, Game {
 					if (startDelay == 0) {
 						// no start delay, start immediately
 						startPlayers();
-						return; // players teleported, no need to put them in the waiting room
+						return WaitReason.NO_WAIT; // players teleported, no need to put them in the waiting room
 					} else {
 						// start delay should be applied
 						if (currentWaitingTime > 0) {
@@ -377,16 +385,18 @@ public abstract class DefaultGame implements Listener, Game {
 							// create start delay
 							currentWaitingTime = startDelay;
 						}
+						reason = WaitReason.START_DELAY;
 					} 
 				} else {
 					// not enough players yet
+					reason = WaitReason.MORE_PLAYERS;
 				}
 			} else {
 				// the game has already started
 				if (respawnDelay == 0) {
 					// no respawn delay, start immediately
 					startPlayers();
-					return; // players teleported, no need to put them in the waiting room
+					return WaitReason.NO_WAIT; // players teleported, no need to put them in the waiting room
 				} else {
 					if (currentWaitingTime > 0) {
 						// respawn delay already in place
@@ -394,11 +404,13 @@ public abstract class DefaultGame implements Listener, Game {
 						// create respawn delay
 						currentWaitingTime = respawnDelay;
 					}
+					reason = WaitReason.RESPAWN_DELAY;
 				}
 			}
 			// after the player has been added to the list and waiting time was set
 			// we need to teleport them to the waiting room
 			player.getPlayer().teleport(location);
+			return reason;
 		}
 		
 		public void removePlayer(InGamePlayer player) {
@@ -454,12 +466,12 @@ public abstract class DefaultGame implements Listener, Game {
 	public InGamePlayer addPlayer(Player player) {
 		// can't join if the waiting room is locked
 		if (waitingRoom.isLocked()) {
-			return null;
+			throw new IllegalStateException("The game is locked.");
 		}
 		// can't join if already joined
 		UUID uuid = player.getUniqueId();
 		if (dataMap.containsKey(uuid)) {
-			return null;
+			throw new IllegalStateException("Player is already in game.");
 		}
 		InGamePlayer data =  new DefaultPlayer(player, this, defClass.replicate());
 		dataMap.put(uuid, data);
@@ -477,8 +489,26 @@ public abstract class DefaultGame implements Listener, Game {
 			data.getLines().add(new Time(data));
 		}
 		// move into waiting room
-		waitingRoom.addPlayer(data);
+		WaitReason reason = waitingRoom.addPlayer(data);
+		waitMessage(player, reason);
 		return data;
+	}
+	
+	public void waitMessage(Player player, WaitReason reason) {
+		switch (reason) {
+		case MORE_PLAYERS:
+			LangManager.sendMessage(player, "more_players", waitingRoom.minPlayers - dataMap.size());
+			break;
+		case NO_WAIT:
+			LangManager.sendMessage(player, "no_waiting");
+			break;
+		case RESPAWN_DELAY:
+			LangManager.sendMessage(player, "respawn_delay", (double) waitingRoom.currentWaitingTime / 20.0);
+			break;
+		case START_DELAY:
+			LangManager.sendMessage(player, "start_delay", (double) waitingRoom.currentWaitingTime / 20.0);
+			break;
+		}
 	}
 	
 	@Override
@@ -513,23 +543,30 @@ public abstract class DefaultGame implements Listener, Game {
 
 	@Override
 	public void stop() {
-		running = false;
+		if (running) {
+			running = false;
+			HandlerList.unregisterAll(this);
+			heartBeat.cancel();
+			for (Bonus bonus : bonuses) {
+				bonus.stop();
+			}
+		}
 		timeLeft = maxTime;
-		HandlerList.unregisterAll(this);
-		heartBeat.cancel();
 		waitingRoom.ticker.cancel();
 		Collection<InGamePlayer> copy = new ArrayList<>(dataMap.values());
 		for (InGamePlayer data : copy) {
 			removePlayer(data.getPlayer());
-		}
-		for (Bonus bonus : bonuses) {
-			bonus.stop();
 		}
 	}
 	
 	@Override
 	public boolean isRunning() {
 		return running;
+	}
+	
+	@Override
+	public boolean isLocked() {
+		return waitingRoom.isLocked();
 	}
 	
 	@Override
@@ -563,7 +600,8 @@ public abstract class DefaultGame implements Listener, Game {
 		Utils.clearPlayer(killed.getPlayer());
 		killed.setPlaying(false);
 		killed.setAttacker(null);
-		waitingRoom.addPlayer(killed);
+		WaitReason reason = waitingRoom.addPlayer(killed);
+		waitMessage(killed.getPlayer(), reason);
 	}
 	
 	@Override

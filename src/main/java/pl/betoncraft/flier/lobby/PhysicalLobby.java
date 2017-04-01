@@ -73,9 +73,8 @@ public class PhysicalLobby extends DefaultLobby {
 		}
 		Player player = event.getPlayer();
 		UUID uuid = player.getUniqueId();
-		boolean inside = players.contains(uuid);
 
-		if (inside) {
+		if (players.contains(uuid)) {
 			event.setCancelled(true);
 			if (event.getAction() != Action.LEFT_CLICK_BLOCK && event.getAction() != Action.RIGHT_CLICK_BLOCK) {
 				return;

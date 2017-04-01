@@ -31,7 +31,6 @@ import pl.betoncraft.flier.api.Flier;
 import pl.betoncraft.flier.api.content.Game;
 import pl.betoncraft.flier.api.content.Lobby;
 import pl.betoncraft.flier.api.core.Arena;
-import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.LoadingException;
 import pl.betoncraft.flier.util.LangManager;
 import pl.betoncraft.flier.util.PlayerBackup;
@@ -130,21 +129,26 @@ public abstract class DefaultLobby implements Lobby, Listener {
 	
 	@Override
 	public JoinResult joinGame(Player player, String gameName) {
+		if (gameSets.values().stream().anyMatch(
+				set -> set.stream().anyMatch(
+						game -> game.getPlayers().containsKey(player.getUniqueId())
+				)
+		)) {
+			return JoinResult.ALREADY_IN_GAME;
+		}
 		Set<Game> games = gameSets.get(gameName);
 		if (games == null) {
-			LangManager.sendMessage(player, "no_such_game");
 			return JoinResult.NO_SUCH_GAME;
 		}
 		Game game = null;
 		for (Game g : games) {
-			if (g.getMaxPlayers() == 0 || g.getPlayers().size() < g.getMaxPlayers()) {
+			if (!g.isLocked() && (g.getMaxPlayers() == 0 || g.getPlayers().size() < g.getMaxPlayers())) {
 				game = g;
 				break;
 			}
 		}
 		if (game != null) {
-			InGamePlayer data = game.addPlayer(player);
-			LangManager.sendMessage(data, "game_joined");
+			game.addPlayer(player);
 			return JoinResult.GAME_JOINED;
 		} else {
 			try {
@@ -159,18 +163,36 @@ public abstract class DefaultLobby implements Lobby, Listener {
 							games.add(game);
 							game.setLobby(this);
 							game.setArena(arena);
-							InGamePlayer data = game.addPlayer(player);
-							LangManager.sendMessage(data, "game_created");
+							game.addPlayer(player);
 							return JoinResult.GAME_CREATED;
 						}
 					}
 				}
-				LangManager.sendMessage(player, "games_full");
 				return JoinResult.GAMES_FULL;
 			} catch (LoadingException e) {
 				// won't throw, it's checked
 				return null;
 			}
+		}
+	}
+	
+	public static void joinMessage(Player player, JoinResult result) {
+		switch (result) {
+		case ALREADY_IN_GAME:
+			LangManager.sendMessage(player, "already_in_game");
+			break;
+		case GAME_CREATED:
+			LangManager.sendMessage(player, "game_created");
+			break;
+		case GAME_JOINED:
+			LangManager.sendMessage(player, "game_joined");
+			break;
+		case GAMES_FULL:
+			LangManager.sendMessage(player, "games_full");
+			break;
+		case NO_SUCH_GAME:
+			LangManager.sendMessage(player, "no_such_game");
+			break;
 		}
 	}
 

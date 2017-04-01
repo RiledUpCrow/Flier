@@ -23,7 +23,7 @@ import pl.betoncraft.flier.api.core.Arena;
 public interface Lobby {
 	
 	public enum JoinResult {
-		GAME_CREATED, GAME_JOINED, GAMES_FULL, NO_SUCH_GAME
+		GAME_CREATED, GAME_JOINED, GAMES_FULL, NO_SUCH_GAME, ALREADY_IN_GAME
 	}
 
 	/**
