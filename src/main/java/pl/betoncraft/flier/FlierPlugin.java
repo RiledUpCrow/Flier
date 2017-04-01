@@ -128,9 +128,6 @@ public class FlierPlugin extends JavaPlugin implements Flier {
 		registerEffect("privateSound", s -> new PrivateSoundEffect(s));
 		registerEffect("gameSound", s -> new GameSoundEffect(s));
 		registerEffect("particle", s -> new ParticleEffect(s));
-
-		// load stuff
-		reload();
 		
 		// add projectile cleanup listener
 		Bukkit.getPluginManager().registerEvents(new Listener() {
@@ -148,6 +145,9 @@ public class FlierPlugin extends JavaPlugin implements Flier {
 		new Coordinator(); // temporary solution
 		
 		// TODO add after-crash player restore
+		
+		// schedule loading after all plugins are enabled
+		Bukkit.getScheduler().runTask(this, () -> reload());
 	}
 
 	@Override
