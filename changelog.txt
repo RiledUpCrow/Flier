@@ -1,22 +1,47 @@
-v0.5.0
+Flier 0.5.0
 
+ == API ==
 * Added Modification API
 * Added Effect API
+
+ == Plugin ==
 * Improved error messages
 * Added translations
 * Added location picking tool (/flier coordinator)
-* Added requirements to lobby buttons
+* Added Multiverse to optional dependencies
+* Improved lobby control commands (/flier lobby)
+* Lobby and game loading now happens after all plugins are enabled
+* Fixed problems with too long sidebar lines
+
+ == Gameplay ==
+* Added reloading time on the experience bar
+* Fixed air weapons usable on the ground
+* Disabled health regeneration while in-game
+* Compass points to lobby spawn if no players are present
+* Added requirements to item buttons
+
+ == Lobby ==
+* Moved item buttons from lobby to game
+* Added optional maximum game per lobby limit
+* Added arenas to allow concurrent games
+* Added automatic lobby joining
+* Added automatic game starting
+
+ == Game ==
+* Added minimum amount of players required for the game to start
+* Added maximum amount of players in game
+* Added optional game start delay
+* Added optional respawn delay
+* Players will wait in the waiting room during these delays
+* The game can be locked after starting
+* Added optional maximum game time
+
+ == Content ==
 * Added "consume" action
 * Added "itemSet" action
 * Added "item" activator
 * Added "particleGun" attack
 * Renamed "machineGun" attack to "projectileGun"
 * Added "bomb" action
+* Added "leave" action
 * Replaced "autodestruct" with "suicide"
-* Added Multiverse to optional dependencies
-* Fixed air weapons usable on the ground
-* Improved lobby control commands (/flier lobby)
-* Disabled health regeneration while in-game
-* Allowed using lobby buttons while in-game
-* Compass points to lobby spawn if no players are present
-* Added bullet spread to particleGun
