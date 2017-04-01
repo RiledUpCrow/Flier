@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.IllegalFormatException;
 
 import org.bukkit.Bukkit;
@@ -69,6 +70,25 @@ public class LangManager {
 				out.close();
 			} catch (IOException e) {
 				e.printStackTrace();
+			}
+		} else {
+			// update new strings
+			YamlConfiguration def = YamlConfiguration.loadConfiguration(
+					new InputStreamReader(Flier.getInstance().getResource("messages.yml")));
+			YamlConfiguration cur = YamlConfiguration.loadConfiguration(file);
+			boolean changed = false;
+			for (String key : def.getKeys(true)) {
+				if (!cur.contains(key)) {
+					changed = true;
+					cur.set(key, def.get(key));
+				}
+			}
+			if (changed) {
+				try {
+					cur.save(file);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 			}
 		}
 		if (instance.api) {
