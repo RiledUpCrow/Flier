@@ -7,6 +7,7 @@
 package pl.betoncraft.flier.core.defaults;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -16,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -326,6 +328,10 @@ public abstract class DefaultGame implements Listener, Game {
 	 */
 	protected class WaitingRoom {
 		
+		protected final List<Integer> displayTimes = Arrays.asList(
+				1, 2, 3, 4, 5, 10, 15, 30, 60, 90, 120, 180, 240, 300, 600).stream()
+				.map(i -> i * 20).collect(Collectors.toList());
+		
 		protected final Game game;
 		protected final int minPlayers;
 		protected final int respawnDelay;
@@ -334,6 +340,7 @@ public abstract class DefaultGame implements Listener, Game {
 		protected final String locationName;
 
 		protected List<InGamePlayer> waitingPlayers = new ArrayList<>();
+		protected WaitReason reason = WaitReason.NO_WAIT;
 		protected int currentWaitingTime;
 		protected Location location;
 		protected BukkitRunnable ticker;
@@ -364,10 +371,10 @@ public abstract class DefaultGame implements Listener, Game {
 		/**
 		 * Adds this player to the waiting room.
 		 * 
-		 * @param player
+		 * @param player the player to add
+		 * @return the type of waiting the player experiences
 		 */
 		public WaitReason addPlayer(InGamePlayer player) {
-			WaitReason reason;
 			waitingPlayers.add(player);
 			if (!running) {
 				// the game hasn't started yet
@@ -375,13 +382,10 @@ public abstract class DefaultGame implements Listener, Game {
 					// minimum player amount has been reached
 					if (startDelay == 0) {
 						// no start delay, start immediately
-						startPlayers();
-						return WaitReason.NO_WAIT; // players teleported, no need to put them in the waiting room
+						reason = WaitReason.NO_WAIT;
 					} else {
 						// start delay should be applied
-						if (currentWaitingTime > 0) {
-							// start delay already in place
-						} else {
+						if (currentWaitingTime <= 0) {
 							// create start delay
 							currentWaitingTime = startDelay;
 						}
@@ -395,12 +399,9 @@ public abstract class DefaultGame implements Listener, Game {
 				// the game has already started
 				if (respawnDelay == 0) {
 					// no respawn delay, start immediately
-					startPlayers();
-					return WaitReason.NO_WAIT; // players teleported, no need to put them in the waiting room
+					reason = WaitReason.NO_WAIT; // players teleported, no need to put them in the waiting room
 				} else {
-					if (currentWaitingTime > 0) {
-						// respawn delay already in place
-					} else {
+					if (currentWaitingTime <= 0) {
 						// create respawn delay
 						currentWaitingTime = respawnDelay;
 					}
@@ -408,11 +409,21 @@ public abstract class DefaultGame implements Listener, Game {
 				}
 			}
 			// after the player has been added to the list and waiting time was set
-			// we need to teleport them to the waiting room
-			player.getPlayer().teleport(location);
+			// we need to teleport them to the waiting room or immediately to the game
+			if (reason == WaitReason.NO_WAIT) {
+				startPlayers();
+			} else {
+				player.getPlayer().teleport(location);
+			}
 			return reason;
 		}
 		
+		/**
+		 * Removes the player from the waiting room. It does not teleport him in
+		 * any way.
+		 * 
+		 * @param player the player to remove
+		 */
 		public void removePlayer(InGamePlayer player) {
 			// it's assumed the teleporting of the player was already done
 			waitingPlayers.remove(player);
@@ -440,9 +451,19 @@ public abstract class DefaultGame implements Listener, Game {
 		public void tick() {
 			// start the game if the waiting time is exactly 0
 			// lower means the game was already started and the waiting room is idle
-			if (--currentWaitingTime == 0) {
+			if (currentWaitingTime == 0) {
 				startPlayers();
+			} else {
+				// display countdown on specific seconds
+				if (displayTimes.contains(currentWaitingTime)) {
+					if (reason == WaitReason.RESPAWN_DELAY || reason == WaitReason.START_DELAY) {
+						waitingPlayers.forEach(
+								data -> LangManager.sendMessage(data, "countdown",
+										(double) currentWaitingTime / 20.0));
+					}
+				}
 			}
+			currentWaitingTime--;
 		}
 		
 	}
@@ -450,7 +471,7 @@ public abstract class DefaultGame implements Listener, Game {
 	/**
 	 * The game should do game-specific stuff in a fast tick here.
 	 */
-	public abstract void fastTick();;
+	public abstract void fastTick();
 
 	/**
 	 * The game should do game-specific stuff in a slow tick here.
@@ -490,14 +511,23 @@ public abstract class DefaultGame implements Listener, Game {
 		}
 		// move into waiting room
 		WaitReason reason = waitingRoom.addPlayer(data);
-		waitMessage(player, reason);
+		// run on next tick, so the message is shown after lobby join message
+		Bukkit.getScheduler().runTask(Flier.getInstance(), () -> waitMessage(player, reason));
 		return data;
 	}
 	
+	/**
+	 * Displays a message about the cause of the waiting.
+	 * 
+	 * @param player
+	 * @param reason
+	 */
 	public void waitMessage(Player player, WaitReason reason) {
 		switch (reason) {
 		case MORE_PLAYERS:
-			LangManager.sendMessage(player, "more_players", waitingRoom.minPlayers - dataMap.size());
+			for (InGamePlayer data : waitingRoom.waitingPlayers) {
+				LangManager.sendMessage(data, "more_players", waitingRoom.minPlayers - dataMap.size());
+			}
 			break;
 		case NO_WAIT:
 			LangManager.sendMessage(player, "no_waiting");

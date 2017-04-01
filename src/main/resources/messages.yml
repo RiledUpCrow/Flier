@@ -20,6 +20,7 @@ en:
   no_waiting: "&2Respawned!"
   respawn_delay: "&2Respawning in %.0f seconds."
   start_delay: "&2Game starting in %.0f seconds."
+  countdown: "&2== Start in %.0f seconds =="
   win: "You win!"
   lose: "You lose!"
   team_win: "Team %s wins!"
@@ -56,7 +57,8 @@ pl:
   more_players: "&2Gra rozpocznie się kiedy dołączy jeszcze %d graczy."
   no_waiting: "&2Respawn!"
   respawn_delay: "&2Respawn za %.0f sekund."
-  start_delay: "&2Gra rozpocznie się za %.0f sekund."e
+  start_delay: "&2Gra rozpocznie się za %.0f sekund."
+  countdown: "&2== Start za %.0f sekund =="
   win: "Wygrana!"
   lose: "Przegrana!"
   team_win: "Drużyna %s wygrywa!"

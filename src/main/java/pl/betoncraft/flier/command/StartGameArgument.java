@@ -19,7 +19,9 @@ import org.bukkit.permissions.Permission;
 import net.md_5.bungee.api.ChatColor;
 import pl.betoncraft.flier.api.Flier;
 import pl.betoncraft.flier.api.content.Lobby;
+import pl.betoncraft.flier.api.content.Lobby.JoinResult;
 import pl.betoncraft.flier.api.core.CommandArgument;
+import pl.betoncraft.flier.core.defaults.DefaultLobby;
 
 /**
  * Moves the player into the game.
@@ -65,7 +67,8 @@ public class StartGameArgument implements CommandArgument {
 		for (Lobby lobby : flier.getLobbies().values()) {
 			if (lobby.getPlayers().contains(player.getUniqueId())) {
 				found = true;
-				lobby.joinGame(player, game);
+				JoinResult res = lobby.joinGame(player, game);
+				DefaultLobby.joinMessage(player, res);
 				break;
 			}
 		}

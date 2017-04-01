@@ -99,6 +99,7 @@ public abstract class DefaultLobby implements Lobby, Listener {
 		backups.put(uuid, backup);
 		if (autoJoinGame != null) {
 			JoinResult result = joinGame(player, autoJoinGame);
+			joinMessage(player, result);
 			if (result == JoinResult.GAME_CREATED || result == JoinResult.GAME_JOINED) {
 				return;
 			}

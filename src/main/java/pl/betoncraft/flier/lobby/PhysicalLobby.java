@@ -98,7 +98,8 @@ public class PhysicalLobby extends DefaultLobby {
 					.filter(e -> e.getValue().equals(block.getLocation()))
 					.findFirst()
 					.ifPresent(e -> {
-						joinGame(player, e.getKey());
+						JoinResult res = joinGame(player, e.getKey());
+						DefaultLobby.joinMessage(player, res);
 						block(player.getUniqueId());
 					});
 		} else {
