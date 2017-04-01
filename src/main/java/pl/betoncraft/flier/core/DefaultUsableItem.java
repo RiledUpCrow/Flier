@@ -37,22 +37,24 @@ public class DefaultUsableItem extends DefaultItem implements UsableItem {
 	protected final boolean consumable;
 	protected final int maxAmmo;
 	protected final List<Usage> usages = new ArrayList<>();
+	protected final int defAmount;
+	protected final int maxAmount;
+	protected final int minAmount;
 
+	protected int amount;
 	protected int time = 0;
 	protected int whole = 0;
 	protected int ammo;
-
-	protected boolean set = false;
-	protected int def;
-	protected int max;
-	protected int min;
-	protected int amount;
 
 	public DefaultUsableItem(ConfigurationSection section) throws LoadingException {
 		super(section);
 		consumable = loader.loadBoolean(CONSUMABLE, false);
 		maxAmmo = loader.loadNonNegativeInt(AMMO, 0);
 		ammo = maxAmmo;
+		defAmount = loader.loadPositiveInt("amount", 1);
+		maxAmount = loader.loadNonNegativeInt("max_amount", 0);
+		minAmount = loader.loadNonNegativeInt("min_amount", 0);
+		amount = defAmount;
 		ConfigurationSection usagesSection = section.getConfigurationSection("usages");
 		if (usagesSection != null) for (String id : usagesSection.getKeys(false)) {
 			ConfigurationSection usageSection = usagesSection.getConfigurationSection(id);
@@ -105,6 +107,37 @@ public class DefaultUsableItem extends DefaultItem implements UsableItem {
 			this.ammo = maxAmmo;
 		}
 	}
+	
+	@Override
+	public int getAmount() {
+		return amount;
+	}
+	
+	@Override
+	public boolean setAmount(int amount) {
+		int max = getMaxAmount();
+		if (amount < 0 || (max != 0 && amount > max)) {
+			return false;
+		} else {
+			this.amount = amount;
+			return true;
+		}
+	}
+	
+	@Override
+	public int getMaxAmount() {
+		return (int) modMan.modifyNumber("max_amount", maxAmount);
+	}
+	
+	@Override
+	public int getMinAmount() {
+		return (int) modMan.modifyNumber("min_amount", minAmount);
+	}
+	
+	@Override
+	public int getDefAmount() {
+		return (int) modMan.modifyNumber("amount", defAmount);
+	}
 
 	@Override
 	public List<Usage> getUsages() {
@@ -152,49 +185,6 @@ public class DefaultUsableItem extends DefaultItem implements UsableItem {
 	}
 	
 	@Override
-	public int getAmount() {
-		return amount;
-	}
-	
-	@Override
-	public boolean setAmount(int amount) {
-		if (amount < 0 || (max != 0 && amount > max)) {
-			return false;
-		} else {
-			this.amount = amount;
-			return true;
-		}
-	}
-	
-	@Override
-	public int getMax() {
-		return max;
-	}
-	
-	@Override
-	public int getMin() {
-		return min;
-	}
-	
-	@Override
-	public void setDefaultAmounts(int def, int max, int min) throws UnsupportedOperationException {
-		if (!set) {
-			set = true;
-			this.def = def;
-			this.max = max;
-			this.min = min;
-			this.amount = def;
-		} else {
-			throw new UnsupportedOperationException("Cannot set default values twice!");
-		}
-	}
-
-	@Override
-	public int getDefaultAmount() {
-		return def;
-	}
-	
-	@Override
 	public boolean isSimilar(Item item) {
 		if (item instanceof DefaultUsableItem && super.isSimilar(item)) {
 			DefaultUsableItem usable = (DefaultUsableItem) item;
@@ -215,7 +205,13 @@ public class DefaultUsableItem extends DefaultItem implements UsableItem {
 	@Override
 	public void addModification(Modification mod) {
 		if (mod.getTarget() == ModificationTarget.USABLE_ITEM) {
+			// amounts are a special case, so they need to be handled exclusively
+			int oldAmount = getDefAmount();
 			modMan.addModification(mod);
+			int newAmount = getDefAmount();
+			int difference = newAmount - oldAmount;
+			// when default amount increases, the current one should increase too
+			setAmount(amount + difference);
 		} else if (mod.getTarget() == ModificationTarget.ACTION) {
 			usages.forEach(usage -> usage.getActions().stream()
 					.filter(action -> mod.getNames().contains(action.getID()))

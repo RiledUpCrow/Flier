@@ -70,7 +70,7 @@ public interface UsableItem extends Item {
 	public void setAmmo(int ammo);
 
 	/**
-	 * @return the amount of this UsableItem
+	 * @return the amount of this Item
 	 */
 	public int getAmount();
 
@@ -83,32 +83,20 @@ public interface UsableItem extends Item {
 	public boolean setAmount(int amount);
 
 	/**
-	 * @return the maximum amount of these UsableItems
+	 * @return the maximum amount of these Items
 	 */
-	public int getMax();
+	public int getMaxAmount();
 
 	/**
-	 * @return the minimum amount of these UsableItems (in case you want to sell
+	 * @return the minimum amount of these Items (in case you want to sell
 	 *         too much)
 	 */
-	public int getMin();
+	public int getMinAmount();
 
 	/**
-	 * @param def
-	 *            default amount of this item
-	 * @param max
-	 *            maximum amount of this item
-	 * @param min
-	 *            minimum amount of this item
-	 * @throws UnsupportedOperationException
-	 *             when this method is called the second time
+	 * @return the default amount of these Items
 	 */
-	public void setDefaultAmounts(int def, int max, int min) throws UnsupportedOperationException;
-
-	/**
-	 * @return the default amount of these UsableItems
-	 */
-	public int getDefaultAmount();
+	public int getDefAmount();
 
 	/**
 	 * Refills the UsableItem, making it as new.

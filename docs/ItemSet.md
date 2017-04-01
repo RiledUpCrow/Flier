@@ -9,26 +9,19 @@ Each specified item can have `max` value which limits the maximum amount of this
 ```
 items:
   item_set_name:
-    name: The name
-    engine: some_engine
-    wings: some_wings
+    name: Class name
+    engine: [engine name]
+    wings: [wings name]
     items:
-    - item: some_item
-      max: [non-negative integer]
-      min: [non-negative integer]
-    - [other items...]
+    - [item name]
     modifications:
-    - some_modification
-    - other_modification
+    - [modification name]
 ```
 
 ## Item set settings
 
-* `name` is the name of the class; the player will have this name if he chooses this item set
-* `engine` is the name of the Engine, as defined in _engines.yml_.
-* `wings` is the name of the Wings, as defined in _wings.yml_.
-* `items` is the list of items in this Item Set
-  * `item` is the name of the Item, as defined in _items.yml_.
-  * `max` (**default: 0**) is the maximum amount of this items that the player can have. `0` means unlimited.
-  * `min` (**default: 0**) is the amount of this items that the player won't be able to sell if selling is possible.
-* `modifications` is the list of Modifications, as defined in _modifications.yml_.
+* `name` (**optional**) is the name of the class; the player's class will have this name if he chooses this item set. This setting is generally optional, but must be specified in at least one item set - the player cannot have only the sets without a name.
+* `engine` (**optional**) is the name of the Engine, as defined in _engines.yml_.
+* `wings` (**optional**) is the name of the Wings, as defined in _wings.yml_.
+* `items` (**optional**) is the list of items in this set, as defined in _items.yml_.
+* `modifications` (**optional**) is the list of Modifications, as defined in _modifications.yml_.

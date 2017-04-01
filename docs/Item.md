@@ -12,9 +12,11 @@ item_name:
   name: Some name
   lore:
   - Some lines of the lore
-  - More lines...
   weight: [decimal]
   slot: [integer]
+  amount: [positive integer]
+  max_amount: [non-negative integer]
+  min_amount: [non-negative integer]
   consumable: [boolean]
   ammo: [non-negative integer]
   usages:
@@ -23,9 +25,9 @@ item_name:
       ammo_use: [integer]
       where: [where option]
       activators:
-      - some_activator
+      - [activator name]
       actions:
-      - some_action
+      - [action name]
 ```
 
 ## Item settings
@@ -36,6 +38,9 @@ item_name:
 * `weight` (**default: 0**) is the weight of an item. The more your items weight, the more you're pulled to the ground when flying.
 * `slot` (**default: -1**) is the slot in which the item will be placed. Leave it out or set to negative number if you want this item to be placed automatically (not on the hotbar).
 * `consumable` (**default: false**) specifies whenever the item will be consumed after use (or after the ammo runs out).
+* `amount` (**default: 1**) is the amount of these items given to the player.
+* `max_amount` (**default: 0**) is the maximum amount of these items that the player can have. `0` means unlimited.
+* `min_amount` (**default: 0**) is the amount of these items that the player won't be able to sell if selling is possible.
 * `ammo` (**default: 0**) is the maximum amount of ammunition in this item.
 * `usages` is a list of Usages.
   * `cooldown` (**default: 0**) is a cooldown time (in ticks) after activating this Usage, while no other Usages cannot be activated.

@@ -8,7 +8,6 @@ package pl.betoncraft.flier.core;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import org.bukkit.configuration.ConfigurationSection;
 
@@ -56,47 +55,9 @@ public class DefaultSet implements ItemSet {
 		} else {
 			wings = flier.getWing(wingsName);
 		}
-		int index = 0;
-		try {
-			List<Map<?, ?>> maps = section.getMapList("items");
-			for (Map<?, ?> map : maps) {
-				index++;
-				UsableItem item;
-				int amount = 1, max = 0, min = 0;
-				Object itemObject = map.get("item");
-				if (itemObject == null || !(itemObject instanceof String)) {
-					throw new LoadingException("Item name is missing.");
-				}
-				item = flier.getItem((String) itemObject);
-				Object amountObject = map.get("amount");
-				if (amountObject != null) {
-					if (!(amountObject instanceof Integer)) {
-						throw new LoadingException("Item amount must be an integer.");
-					} else {
-						amount = (Integer) amountObject;
-					}
-				}
-				Object maxObject = map.get("max");
-				if (maxObject != null) {
-					if (!(maxObject instanceof Integer)) {
-						throw new LoadingException("Maximum item amount must be an integer.");
-					} else {
-						max = (Integer) maxObject;
-					}
-				}
-				Object minObject = map.get("min");
-				if (minObject != null) {
-					if (!(minObject instanceof Integer)) {
-						throw new LoadingException("Minimum item amount must be an integer.");
-					} else {
-						min = (Integer) minObject;
-					}
-				}
-				item.setDefaultAmounts(amount, max, min);
-				items.add(item);
-			}
-		} catch (LoadingException e) {
-			throw (LoadingException) new LoadingException(String.format("Error in %s item.", index)).initCause(e);
+		List<String> itemNames = section.getStringList("items");
+		for (String itemName : itemNames) {
+			items.add(flier.getItem(itemName));
 		}
 		for (String modName : section.getStringList("modifications")) {
 			mods.add(flier.getModification(modName));
@@ -156,13 +117,13 @@ public class DefaultSet implements ItemSet {
 	@Override
 	public boolean increase(int amount) {
 		for (UsableItem item : items) {
-			int newAmount = item.getAmount() + (item.getDefaultAmount() * amount);
-			if (newAmount < 0 || newAmount < item.getMin() || newAmount > item.getMax()) {
+			int newAmount = item.getAmount() + (item.getDefAmount() * amount);
+			if (newAmount < 0 || newAmount < item.getMinAmount() || newAmount > item.getMaxAmount()) {
 				return false;
 			}
 		}
 		for (UsableItem item : items) {
-			item.setAmount(item.getAmount() + (item.getDefaultAmount() * amount));
+			item.setAmount(item.getAmount() + (item.getDefAmount() * amount));
 		}
 		return true;
 	}
@@ -170,11 +131,11 @@ public class DefaultSet implements ItemSet {
 	@Override
 	public void fill(int amount) {
 		for (UsableItem item : items) {
-			int fullAmount = item.getDefaultAmount() * amount;
+			int fullAmount = item.getDefAmount() * amount;
 			if (item.getAmount() < fullAmount) {
 				// if filling is over the limit, set it to the limit
-				if (!item.setAmount(item.getDefaultAmount() * amount)) {
-					item.setAmount(item.getMax());
+				if (!item.setAmount(item.getDefAmount() * amount)) {
+					item.setAmount(item.getMaxAmount());
 				}
 			}
 		}
@@ -185,7 +146,7 @@ public class DefaultSet implements ItemSet {
 		int amount = -1;
 		for (UsableItem item : items) {
 			int a = item.getAmount();
-			int d = item.getDefaultAmount();
+			int d = item.getDefAmount();
 			int r = (a - (a % d)) / d;
 			if (amount == -1) {
 				amount = r;

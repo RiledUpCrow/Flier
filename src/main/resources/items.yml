@@ -148,6 +148,7 @@ rocket:
   - '&bTracks players. Disables wings. High damage.'
   - '&aLeft click to launch.'
   slot: 3
+  max_amount: 3
   consumable: true
   usages:
     shoot:
@@ -177,6 +178,7 @@ launcher:
   - '&bLaunches you in the direction you''re looking.'
   - '&aLeft click to use.'
   slot: 4
+  max_amount: 5
   consumable: true
   usages:
     shoot:
@@ -192,6 +194,7 @@ wings:
   - '&bRestores destroyed wings.'
   - '&aLeft click to use.'
   slot: 5
+  max_amount: 2
   consumable: true
   usages:
     use:
@@ -208,3 +211,4 @@ ammo:
   - '&bAllows reloading.'
   - '&aRight click with weapon to use.'
   slot: 6
+  amount: 10

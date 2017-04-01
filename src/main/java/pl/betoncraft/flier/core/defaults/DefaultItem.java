@@ -39,7 +39,7 @@ public abstract class DefaultItem implements Item {
 	protected final String rawName;
 	protected final List<String> rawLore;
 	protected final double weight;
-	protected final int slot;	
+	protected final int slot;
 
 	public DefaultItem(ConfigurationSection section) throws LoadingException {
 		id = section.getName();

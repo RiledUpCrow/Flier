@@ -4,49 +4,44 @@ fast_class:                  # ID of the item set (used in the `buttons` section
   engine: fastEngine         # engine added in this item set
   wings: lightWings          # wings added in this item set
   items:                     # list of items
-  - item: fastWeapon         # ID of the item (from "items.yml")
-  - item: gun
-  - item: bomb
+  - fastWeapon               # ID of the item (from "items.yml")
+  - gun
+  - bomb
 balanced_class:
   name: Balanced
-  category: main             # the category here is the same as Fast
+  category: main             # the category here is the same as in Fast
   engine: balancedEngine
   wings: balancedWings
   items:
-  - item: balancedWeapon
-  - item: gun
-  - item: bomb
+  - balancedWeapon
+  - gun
+  - bomb
 strong_class:
   name: Strong
   category: main
   engine: strongEngine
   wings: heavyWings
   items:
-  - item: strongWeapon
-  - item: gun
-  - item: bomb
+  - strongWeapon
+  - gun
+  - bomb
 the_rocket:
   category: rocket           # this category is different because rockets are not main class items
   items:
-  - item: rocket
-    max: 3                   # maximum amount of these items a player can have
+  - rocket
 the_launcher:
   category: launcher
   items:
-  - item: launcher
-    max: 5
+  - launcher
 the_compass:
   category: compass
   items:
-  - item: radar
-    max: 1
+  - radar
 the_repair_kit:
   category: repair
   items:
-  - item: wings
-    max: 2
+  - wings
 ammo:
   category: ammo
   items:
-  - item: ammo
-    amount: 10
+  - ammo
