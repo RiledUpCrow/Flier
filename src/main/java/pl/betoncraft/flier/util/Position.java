@@ -21,8 +21,10 @@ public class Position {
 	private static final int AIR = 2;
 
 	public static boolean check(Player player, Usage.Where position) {
-		boolean ground = ((Entity) player.getPlayer()).isOnGround();
-		boolean air = !ground && player.getPlayer().isGliding() && Utils.getAltitude(player.getPlayer().getLocation(), AIR) == AIR;
+		boolean ground = ((Entity) player.getPlayer()).isOnGround() ||
+				Utils.getAltitude(player.getPlayer().getLocation(), AIR) < AIR;
+		boolean air = !ground && player.getPlayer().isGliding() &&
+				Utils.getAltitude(player.getPlayer().getLocation(), AIR) == AIR;
 		boolean fall = !ground && !air;
 		switch (position) {
 		case GROUND:	 return ground;
