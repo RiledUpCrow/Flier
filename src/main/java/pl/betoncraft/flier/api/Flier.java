@@ -22,6 +22,7 @@ import pl.betoncraft.flier.api.content.Lobby;
 import pl.betoncraft.flier.api.content.Wings;
 import pl.betoncraft.flier.api.core.Arena;
 import pl.betoncraft.flier.api.core.ConfigManager;
+import pl.betoncraft.flier.api.core.FancyStuffWrapper;
 import pl.betoncraft.flier.api.core.ItemSet;
 import pl.betoncraft.flier.api.core.LoadingException;
 import pl.betoncraft.flier.api.core.Modification;
@@ -56,6 +57,11 @@ public interface Flier extends Plugin {
 	 * @return the instance of ConfigManager
 	 */
 	public ConfigManager getConfigManager();
+	
+	/**
+	 * @return the currently used instance of FancyStuffWrapper
+	 */
+	public FancyStuffWrapper getFancyStuff();
 
 	/**
 	 * @return an immutable view of the lobbies map

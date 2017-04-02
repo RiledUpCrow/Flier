@@ -13,12 +13,12 @@ import java.util.Map.Entry;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
+import pl.betoncraft.flier.api.Flier;
 import pl.betoncraft.flier.api.core.Arena;
 import pl.betoncraft.flier.api.core.Damager;
 import pl.betoncraft.flier.api.core.InGamePlayer;
@@ -157,7 +157,6 @@ public class TeamDeathMatch extends DefaultGame {
 		// display message about winning
 		for (Entry<UUID, SimpleTeam> entry : players.entrySet()) {
 			InGamePlayer data = dataMap.get(entry.getKey());
-			String name = data.getPlayer().getName();
 			String word;
 			if (winners.contains(entry.getValue())) {
 				word = LangManager.getMessage(data, "win");
@@ -170,12 +169,8 @@ public class TeamDeathMatch extends DefaultGame {
 						team.getName();
 			}).collect(Collectors.toList()));
 			String win = LangManager.getMessage(data, "team_win", teamNames);
-			String title = String.format("title %s title {\"text\":\"%s\"}",
-					name, win);
-			String subTitle = String.format("title %s subtitle {\"text\":\"%s%s\"}",
-					name, entry.getValue().getColor(), word);
-			Bukkit.dispatchCommand(Bukkit.getConsoleSender(), title);
-			Bukkit.dispatchCommand(Bukkit.getConsoleSender(), subTitle);
+			Flier.getInstance().getFancyStuff().sendTitle(
+					data.getPlayer(), win, entry.getValue().getColor() + word, 0, 0, 0);
 		}
 		// end game
 		stop();
@@ -281,9 +276,8 @@ public class TeamDeathMatch extends DefaultGame {
 		String teamName = team.getName().startsWith("$") ?
 				LangManager.getMessage(data, team.getName().substring(1)) :
 				team.getName();
-		String title = String.format("title %s title {\"text\":\"%s%s\"}",
-				data.getPlayer().getName(), team.getColor(), Utils.capitalize(teamName));
-		Bukkit.dispatchCommand(Bukkit.getConsoleSender(), title);
+		Flier.getInstance().getFancyStuff().sendTitle(
+				data.getPlayer(), team.getColor() + Utils.capitalize(teamName), null, 0, 0, 0);
 		updateColors();
 	}
 

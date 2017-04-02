@@ -52,6 +52,7 @@ import pl.betoncraft.flier.api.content.Lobby;
 import pl.betoncraft.flier.api.content.Wings;
 import pl.betoncraft.flier.api.core.Arena;
 import pl.betoncraft.flier.api.core.ConfigManager;
+import pl.betoncraft.flier.api.core.FancyStuffWrapper;
 import pl.betoncraft.flier.api.core.ItemSet;
 import pl.betoncraft.flier.api.core.LoadingException;
 import pl.betoncraft.flier.api.core.Modification;
@@ -71,6 +72,7 @@ import pl.betoncraft.flier.game.TeamDeathMatch;
 import pl.betoncraft.flier.lobby.PhysicalLobby;
 import pl.betoncraft.flier.util.Coordinator;
 import pl.betoncraft.flier.util.DefaultConfigManager;
+import pl.betoncraft.flier.util.DefaultFancyStuffWrapper;
 import pl.betoncraft.flier.util.LangManager;
 import pl.betoncraft.flier.util.Utils;
 import pl.betoncraft.flier.wings.SimpleWings;
@@ -78,6 +80,7 @@ import pl.betoncraft.flier.wings.SimpleWings;
 public class FlierPlugin extends JavaPlugin implements Flier {
 	
 	private ConfigManager configManager;
+	private FancyStuffWrapper fancyStuff;
 	private FlierCommand flierCommand;
 	private Listener autoJoin;
 
@@ -95,6 +98,7 @@ public class FlierPlugin extends JavaPlugin implements Flier {
 	@Override
 	public void onEnable() {
 		configManager = new DefaultConfigManager();
+		fancyStuff = new DefaultFancyStuffWrapper();
 		flierCommand = new FlierCommand();
 		getCommand("flier").setExecutor(flierCommand);
 		new LangManager();
@@ -220,6 +224,11 @@ public class FlierPlugin extends JavaPlugin implements Flier {
 	@Override
 	public ConfigManager getConfigManager() {
 		return configManager;
+	}
+	
+	@Override
+	public FancyStuffWrapper getFancyStuff() {
+		return fancyStuff;
 	}
 
 	@Override
