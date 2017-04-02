@@ -14,6 +14,7 @@ import java.util.UUID;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.permissions.Permission;
 
 import pl.betoncraft.flier.api.core.Arena;
 import pl.betoncraft.flier.api.core.Damager;
@@ -52,6 +53,11 @@ public interface Game {
 		 * @return the set of Button names required for unlocking this Button
 		 */
 		public Set<String> getRequirements();
+		
+		/**
+		 * @return the set of permissions required to use this Button
+		 */
+		public Set<Permission> getPermissions();
 
 		/**
 		 * @return the cost to buy an ItemSet

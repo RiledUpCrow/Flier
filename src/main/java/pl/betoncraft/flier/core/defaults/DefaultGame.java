@@ -44,6 +44,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.permissions.Permission;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import pl.betoncraft.flier.api.Flier;
@@ -229,6 +230,7 @@ public abstract class DefaultGame implements Listener, Game {
 		protected final String locationName;
 		protected Location location;
 		protected final Set<String> requirements;
+		protected final Set<Permission> permissions;
 		protected final int buyCost;
 		protected final int sellCost;
 		protected final int unlockCost;
@@ -240,6 +242,11 @@ public abstract class DefaultGame implements Listener, Game {
 			ValueLoader loader = new ValueLoader(section);
 			locationName = loader.loadString("block");
 			requirements = new HashSet<>(section.getStringList("required"));
+			permissions = new HashSet<>(
+					section.getStringList("permissions").stream()
+							.map(str -> new Permission(str))
+							.collect(Collectors.toList())
+			);
 			buyCost = loader.loadInt("buy_cost", 0);
 			sellCost = loader.loadInt("sell_cost", 0);
 			unlockCost = loader.loadNonNegativeInt("unlock_cost", 0);
@@ -281,6 +288,11 @@ public abstract class DefaultGame implements Listener, Game {
 		@Override
 		public Set<String> getRequirements() {
 			return requirements;
+		}
+		
+		@Override
+		public Set<Permission> getPermissions() {
+			return permissions;
 		}
 
 		@Override
@@ -696,6 +708,11 @@ public abstract class DefaultGame implements Listener, Game {
 	public boolean applyButton(InGamePlayer player, Button button, boolean buy, boolean notify) {
 		boolean applied = false;
 		if (button != null) {
+			// check permissions
+			if (!button.getPermissions().stream().allMatch(perm -> player.getPlayer().hasPermission(perm))) {
+				LangManager.sendMessage(player, "no_permission");
+				return applied;
+			}
 			List<Button> ul = unlocked.computeIfAbsent(player, k -> new LinkedList<>());
 			boolean unlocked = button.getUnlockCost() == 0 || ul.contains(button);
 			if (!unlocked) {
@@ -728,8 +745,8 @@ public abstract class DefaultGame implements Listener, Game {
 						default:
 							message = "cant_use";
 						}
-						if (notify) LangManager.sendMessage(player, message);;
 					}
+					if (notify) LangManager.sendMessage(player, message);
 				} else {
 					if (notify) LangManager.sendMessage(player, "no_money_unlock");
 				}

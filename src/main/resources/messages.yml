@@ -1,4 +1,5 @@
 en:
+  no_permission: "&cYou don't have permission to do this."
   no_money_unlock: "&cNot enough money to unlock this."
   no_money_buy: "&cNot enough money to buy this."
   cant_use: "&cYou can't use this right now."
@@ -37,6 +38,7 @@ en:
   reload: "R: {color}{status}"
   time: "T: {color}{min}:{s}"
 pl:
+  no_permission: "&cNie masz uprawnień aby tego użyć."
   no_money_unlock: "&cNie masz pieniędzy aby to odblokować."
   no_money_buy: "&cNie masz pieniędzy aby to kupić."
   cant_use: "&cNie możesz teraz tego użyć."
