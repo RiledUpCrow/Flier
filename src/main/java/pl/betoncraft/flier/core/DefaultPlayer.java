@@ -27,11 +27,13 @@ import org.bukkit.util.Vector;
 
 import com.google.common.collect.Lists;
 
+import pl.betoncraft.flier.api.Flier;
 import pl.betoncraft.flier.api.content.Bonus;
 import pl.betoncraft.flier.api.content.Engine;
 import pl.betoncraft.flier.api.content.Game;
 import pl.betoncraft.flier.api.content.Wings;
 import pl.betoncraft.flier.api.core.Damager;
+import pl.betoncraft.flier.api.core.FancyStuffWrapper;
 import pl.betoncraft.flier.api.core.Damager.DamageResult;
 import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.PlayerClass;
@@ -58,6 +60,7 @@ public class DefaultPlayer implements InGamePlayer {
 	private String lang;
 	private Scoreboard oldSb;
 	private Scoreboard sb;
+	private FancyStuffWrapper fancyStuff;
 
 	private boolean isPlaying;
 	private boolean leftClicked = false;
@@ -76,6 +79,7 @@ public class DefaultPlayer implements InGamePlayer {
 		lang = LangManager.getLanguage(player);
 		oldSb = player.getScoreboard();
 		sb = Bukkit.getScoreboardManager().getNewScoreboard();
+		fancyStuff = Flier.getInstance().getFancyStuff();
 		Objective stats = sb.registerNewObjective("stats", "dummy");
 		stats.setDisplaySlot(DisplaySlot.SIDEBAR);
 		stats.setDisplayName("Stats");
@@ -130,11 +134,52 @@ public class DefaultPlayer implements InGamePlayer {
 	public void slowTick() {
 		stopGlowing();
 		updateStats();
+		updateActionBar();
 		if (!sb.equals(player.getScoreboard())) {
 			player.setScoreboard(sb);
 		}
 	}
 	
+	private void updateActionBar() {
+		if (fancyStuff.hasActionBarHandler()) {
+			int slot = player.getInventory().getHeldItemSlot();
+			UsableItem item = null;
+			for (UsableItem i : clazz.getItems()) {
+				if (i.slot() == slot) {
+					item = i;
+					break;
+				}
+			}
+			if (item != null && item.getMaxAmmo() != 0) {
+				int ammo = item.getAmmo();
+				int maxAmmo = item.getMaxAmmo();
+				String color;
+				if (ammo == 0) {
+					color = ChatColor.BLACK.toString();
+				} else if (ammo > maxAmmo / 4.0 * 3.0) {
+					color = ChatColor.GREEN.toString();
+				} else if (ammo > maxAmmo / 4.0) {
+					color = ChatColor.YELLOW.toString();
+				} else {
+					color = ChatColor.RED.toString();
+				}
+				String ammoChar = LangManager.getMessage(this, "ammo_char");
+				String full = "";
+				for (int i = 0; i < ammo; i++) {
+					full += ammoChar;
+				}
+				String empty = "";
+				for (int i = 0; i < maxAmmo - ammo; i++) {
+					empty += ammoChar;
+				}
+				fancyStuff.sendActionBar(player,
+						LangManager.getMessage(this, "actionbar_ammo", color, full, ChatColor.BLACK, empty));
+			} else {
+				fancyStuff.sendActionBar(player, "");
+			}
+		}
+	}
+
 	@Override
 	public void leftClick() {
 		if (isPlaying()) {

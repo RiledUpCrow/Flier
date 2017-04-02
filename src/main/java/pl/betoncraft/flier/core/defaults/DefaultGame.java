@@ -54,6 +54,7 @@ import pl.betoncraft.flier.api.content.Lobby;
 import pl.betoncraft.flier.api.content.Wings;
 import pl.betoncraft.flier.api.core.Arena;
 import pl.betoncraft.flier.api.core.Damager;
+import pl.betoncraft.flier.api.core.FancyStuffWrapper;
 import pl.betoncraft.flier.api.core.Damager.DamageResult;
 import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.LoadingException;
@@ -72,7 +73,6 @@ import pl.betoncraft.flier.sidebar.Ammo;
 import pl.betoncraft.flier.sidebar.Fuel;
 import pl.betoncraft.flier.sidebar.Health;
 import pl.betoncraft.flier.sidebar.Money;
-import pl.betoncraft.flier.sidebar.Reload;
 import pl.betoncraft.flier.sidebar.Speed;
 import pl.betoncraft.flier.sidebar.Time;
 import pl.betoncraft.flier.util.EffectListener;
@@ -93,6 +93,7 @@ public abstract class DefaultGame implements Listener, Game {
 	protected WaitingRoom waitingRoom;
 	
 	protected final Map<UUID, InGamePlayer> dataMap = new HashMap<>();
+	protected final FancyStuffWrapper fancyStuff;
 	protected final EffectListener listener;
 	protected final List<String> availableArenas;
 	protected final String centerName;
@@ -130,6 +131,7 @@ public abstract class DefaultGame implements Listener, Game {
 		id = section.getName();
 		loader = new ValueLoader(section);
 		Flier flier = Flier.getInstance();
+		fancyStuff = flier.getFancyStuff();
 		listener = new EffectListener(section.getStringList("effects"), this);
 		maxPlayers = loader.loadNonNegativeInt("max_players", 0);
 		maxTime = loader.loadNonNegativeInt("max_time", 0) * 20;
@@ -513,8 +515,10 @@ public abstract class DefaultGame implements Listener, Game {
 		data.getLines().add(new Health(data));
 		data.getLines().add(new Speed(data));
 		data.getLines().add(new Altitude(data));
-		data.getLines().add(new Ammo(data));
-		data.getLines().add(new Reload(data));
+		// ammunition will be displayed on action bar if possible
+		if (!fancyStuff.hasActionBarHandler()) {
+			data.getLines().add(new Ammo(data));
+		}
 		if (useMoney) {
 			data.getLines().add(new Money(data));
 		}

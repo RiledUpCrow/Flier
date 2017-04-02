@@ -44,10 +44,8 @@ public interface FancyStuffWrapper {
 	 *            receiver of the message
 	 * @param message
 	 *            message to display
-	 * @param duration
-	 *            duration of the displayed message (in ticks)
 	 */
-	void sendActionBar(Player player, String message, int duration);
+	void sendActionBar(Player player, String message);
 
 	/**
 	 * Sets the tab list header and footer.
@@ -60,5 +58,20 @@ public interface FancyStuffWrapper {
 	 *            footer string
 	 */
 	void setTabList(Player player, String header, String footer);
+
+	/**
+	 * @return whenever a title handling plugin is hooked
+	 */
+	boolean hasTitleHandler();
+
+	/**
+	 * @return whenever an action bar handling plugin is hooked
+	 */
+	boolean hasActionBarHandler();
+
+	/**
+	 * @return whenever a tab list handling plugin is hooked
+	 */
+	boolean hasTabListHandler();
 
 }

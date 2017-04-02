@@ -37,6 +37,8 @@ en:
   speed: "S: {color}{speed}~"
   reload: "R: {color}{status}"
   time: "T: {color}{min}:{s}"
+  actionbar_ammo: "&f[%s%s%s%s&f]"
+  ammo_char: "■"
 pl:
   no_permission: "&cNie masz uprawnień aby tego użyć."
   no_money_unlock: "&cNie masz pieniędzy aby to odblokować."
@@ -76,3 +78,5 @@ pl:
   speed: "S: {color}{speed}~"
   reload: "R: {color}{status}"
   time: "C: {color}{min}:{s}"
+  actionbar_ammo: "&f[%s%s%s%s&f]"
+  ammo_char: "■"

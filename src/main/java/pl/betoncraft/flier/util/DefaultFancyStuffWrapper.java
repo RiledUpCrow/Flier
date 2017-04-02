@@ -66,10 +66,10 @@ public class DefaultFancyStuffWrapper implements FancyStuffWrapper {
 	}
 	
 	@Override
-	public void sendActionBar(Player player, String message, int duration) {
+	public void sendActionBar(Player player, String message) {
 		switch (actionBarPlugin) {
 		case BountifulAPI:
-			BountifulAPI.sendActionBar(player, message, duration);
+			BountifulAPI.sendActionBar(player, message);
 			break;
 		case None:
 			// can't update action bar in Spigot
@@ -87,6 +87,21 @@ public class DefaultFancyStuffWrapper implements FancyStuffWrapper {
 			// can't update tab list in Spigot
 			break;
 		}
+	}
+	
+	@Override
+	public boolean hasTitleHandler() {
+		return titlePlugin != Plugin.None;
+	}
+	
+	@Override
+	public boolean hasActionBarHandler() {
+		return actionBarPlugin != Plugin.None;
+	}
+	
+	@Override
+	public boolean hasTabListHandler() {
+		return tabListPlugin != Plugin.None;
 	}
 	
 }
