@@ -11,6 +11,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 import java.util.IllegalFormatException;
 
 import org.bukkit.Bukkit;
@@ -74,7 +75,7 @@ public class LangManager {
 		} else {
 			// update new strings
 			YamlConfiguration def = YamlConfiguration.loadConfiguration(
-					new InputStreamReader(Flier.getInstance().getResource("messages.yml")));
+					new InputStreamReader(Flier.getInstance().getResource("messages.yml"), Charset.forName("UTF-8")));
 			YamlConfiguration cur = YamlConfiguration.loadConfiguration(file);
 			boolean changed = false;
 			for (String key : def.getKeys(true)) {
