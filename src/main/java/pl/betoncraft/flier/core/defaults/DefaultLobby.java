@@ -111,19 +111,7 @@ public abstract class DefaultLobby implements Lobby, Listener {
 	public void removePlayer(Player player) {
 		UUID uuid = player.getUniqueId();
 		if (players.remove(uuid)) {
-			loop: for (Set<Game> set : gameSets.values()) {
-				for (Iterator<Game> it = set.iterator(); it.hasNext();) {
-					Game game = it.next();
-					if (game.getPlayers().containsKey(uuid)) {
-						game.removePlayer(player);
-						if (!game.isRunning()) {
-							game.getArena().setUsed(false);
-							it.remove();
-						}
-						break loop;
-					}
-				}
-			}
+			leaveGame(player);
 			backups.remove(uuid).load();
 		}
 	}
@@ -173,6 +161,24 @@ public abstract class DefaultLobby implements Lobby, Listener {
 			} catch (LoadingException e) {
 				// won't throw, it's checked
 				return null;
+			}
+		}
+	}
+	
+	@Override
+	public void leaveGame(Player player) {
+		loop: for (Set<Game> set : gameSets.values()) {
+			for (Iterator<Game> it = set.iterator(); it.hasNext();) {
+				Game game = it.next();
+				if (game.getPlayers().containsKey(player.getUniqueId())) {
+					game.removePlayer(player);
+					if (game.getPlayers().isEmpty()) {
+						game.stop();
+						game.getArena().setUsed(false);
+						it.remove();
+					}
+					break loop;
+				}
 			}
 		}
 	}

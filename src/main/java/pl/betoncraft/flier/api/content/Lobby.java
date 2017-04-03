@@ -59,6 +59,15 @@ public interface Lobby {
 	public JoinResult joinGame(Player player, String gameName);
 
 	/**
+	 * Makes the player leave the game he's currently in. Removes the game if
+	 * it's empty.
+	 * 
+	 * @param player
+	 *            Player to remove from his current Game
+	 */
+	public void leaveGame(Player player);
+
+	/**
 	 * @return a set with UUIDs of players in this Lobby
 	 */
 	public Set<UUID> getPlayers();

@@ -8,7 +8,6 @@ package pl.betoncraft.flier.lobby;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -21,11 +20,10 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.scheduler.BukkitRunnable;
 
-import pl.betoncraft.flier.api.Flier;
 import pl.betoncraft.flier.api.core.LoadingException;
 import pl.betoncraft.flier.core.defaults.DefaultLobby;
+import pl.betoncraft.flier.util.DoubleClickBlocker;
 import pl.betoncraft.flier.util.Utils;
 import pl.betoncraft.flier.util.ValueLoader;
 
@@ -39,8 +37,6 @@ public class PhysicalLobby extends DefaultLobby {
 	private List<Block> join = new ArrayList<>();
 	private Map<String, Location> start = new HashMap<>();
 	private Block leave;
-
-	private final List<UUID> blocked = new LinkedList<>();
 
 	public PhysicalLobby(ConfigurationSection section) throws LoadingException {
 		super(section);
@@ -84,13 +80,13 @@ public class PhysicalLobby extends DefaultLobby {
 			}
 			Block block = event.getClickedBlock();
 			// this prevents double clicks on next tick
-			if (blocked.contains(event.getPlayer().getUniqueId())) {
+			if (DoubleClickBlocker.isBlocked(player)) {
 				return;
 			}
 			// quitting
 			if (block.equals(leave)) {
 				removePlayer(player);
-				block(player.getUniqueId());
+				DoubleClickBlocker.block(player);
 				return;
 			}
 			// joining the game
@@ -100,31 +96,21 @@ public class PhysicalLobby extends DefaultLobby {
 					.ifPresent(e -> {
 						JoinResult res = joinGame(player, e.getKey());
 						DefaultLobby.joinMessage(player, res);
-						block(player.getUniqueId());
+						DoubleClickBlocker.block(player);
 					});
 		} else {
 			// joining
 			if (event.hasBlock() && join.contains(event.getClickedBlock())) {
 				event.setCancelled(true);
 				// this prevents double clicks on next tick
-				if (blocked.contains(event.getPlayer().getUniqueId())) {
+				if (DoubleClickBlocker.isBlocked(player)) {
 					return;
 				}
 				addPlayer(player);
-				block(player.getUniqueId());
+				DoubleClickBlocker.block(player);
 				return;
 			}
 		}
-	}
-	
-	private void block(UUID uuid) {
-		blocked.add(uuid);
-		new BukkitRunnable() {
-			@Override
-			public void run() {
-				blocked.remove(uuid);
-			}
-		}.runTaskLater(Flier.getInstance(), 5);
 	}
 
 }

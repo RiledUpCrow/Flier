@@ -22,6 +22,7 @@ import java.util.stream.Collectors;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Sound;
+import org.bukkit.block.Block;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -75,6 +76,7 @@ import pl.betoncraft.flier.sidebar.Health;
 import pl.betoncraft.flier.sidebar.Money;
 import pl.betoncraft.flier.sidebar.Speed;
 import pl.betoncraft.flier.sidebar.Time;
+import pl.betoncraft.flier.util.DoubleClickBlocker;
 import pl.betoncraft.flier.util.EffectListener;
 import pl.betoncraft.flier.util.LangManager;
 import pl.betoncraft.flier.util.Utils;
@@ -100,6 +102,7 @@ public abstract class DefaultGame implements Listener, Game {
 	protected final List<Bonus> bonuses = new ArrayList<>();
 	protected final Map<String, Button> buttons = new HashMap<>();
 	protected final Map<InGamePlayer, List<Button>> unlocked = new HashMap<>();
+	protected final List<String> leaveNames;
 	protected final RespawnAction respawnAction;
 	protected final int maxPlayers;
 	protected final int maxTime;
@@ -122,10 +125,9 @@ public abstract class DefaultGame implements Listener, Game {
 	protected Arena arena;
 	protected boolean running = false;
 	protected int timeLeft;
+	protected List<Block> leaveBlocks;
 	protected Location center;
 	protected int minX, minZ, maxX, maxZ;
-
-	private final List<UUID> blocked = new LinkedList<>();
 	
 	public DefaultGame(ConfigurationSection section) throws LoadingException {
 		id = section.getName();
@@ -139,6 +141,7 @@ public abstract class DefaultGame implements Listener, Game {
 		respawnAction = loader.loadEnum("respawn_action", RespawnAction.class);
 		centerName = loader.loadString("center");
 		waitingRoom = new WaitingRoom(this);
+		leaveNames = section.getStringList("leave_blocks");
 		availableArenas = section.getStringList("viable_arenas");
 		if (availableArenas.isEmpty()) {
 			throw new LoadingException("No viable arenas are specified.");
@@ -568,9 +571,6 @@ public abstract class DefaultGame implements Listener, Game {
 		waitingRoom.removePlayer(data);
 		data.exitGame();
 		data.getPlayer().teleport(lobby.getSpawn());
-		if (dataMap.isEmpty()) {
-			stop();
-		}
 	}
 	
 	@Override
@@ -863,6 +863,10 @@ public abstract class DefaultGame implements Listener, Game {
 		maxX = center.getBlockX() + radius;
 		minZ = center.getBlockZ() - radius;
 		maxZ = center.getBlockZ() + radius;
+		leaveBlocks = new ArrayList<>(leaveNames.size());
+		for (String name : leaveNames) {
+			leaveBlocks.add(arena.getLocation(name).getBlock());
+		}
 		for (Bonus bonus : bonuses) {
 			bonus.setLocation(arena.getLocation(bonus.getLocationName()));
 		}
@@ -889,16 +893,10 @@ public abstract class DefaultGame implements Listener, Game {
 			// handle button clicking
 			if (event.hasBlock()) {
 				// this prevents double clicks on next tick
-				if (blocked.contains(event.getPlayer().getUniqueId())) {
+				if (DoubleClickBlocker.isBlocked(event.getPlayer())) {
 					return;
 				} else {
-					blocked.add(event.getPlayer().getUniqueId());
-					new BukkitRunnable() {
-						@Override
-						public void run() {
-							blocked.remove(event.getPlayer().getUniqueId());
-						}
-					}.runTaskLater(Flier.getInstance(), 5);
+					DoubleClickBlocker.block(event.getPlayer());
 				}
 				// apply the button
 				Button button = buttons.values().stream()
@@ -908,6 +906,10 @@ public abstract class DefaultGame implements Listener, Game {
 				if (button != null) {
 					applyButton(data, button, event.getAction() == Action.LEFT_CLICK_BLOCK, true);
 					return;
+				}
+				// handle leaving block
+				if (leaveBlocks.contains(event.getClickedBlock())) {
+					lobby.leaveGame(event.getPlayer());
 				}
 			}
 			// not a button

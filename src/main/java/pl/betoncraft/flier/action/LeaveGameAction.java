@@ -27,7 +27,7 @@ public class LeaveGameAction extends DefaultAction {
 	@Override
 	public boolean act(InGamePlayer player) {
 		Bukkit.getScheduler().scheduleSyncDelayedTask(Flier.getInstance(),
-				() -> player.getGame().removePlayer(player.getPlayer()));
+				() -> player.getGame().getLobby().leaveGame(player.getPlayer()));
 		return true;
 	}
 
