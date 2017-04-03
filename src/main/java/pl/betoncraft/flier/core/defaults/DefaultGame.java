@@ -176,6 +176,7 @@ public abstract class DefaultGame implements Listener, Game {
 		byFriendlyDeathMoney = loader.loadInt("money.by_friendly_death", 0);
 		byFriendlyHitMoney = loader.loadInt("money.by_friendly_hit", 0);
 		suicideMoney = loader.loadInt("money.suicide", 0);
+		Bukkit.getPluginManager().registerEvents(this, Flier.getInstance());
 	}
 	
 	protected class GameHeartBeat extends BukkitRunnable {
@@ -581,7 +582,6 @@ public abstract class DefaultGame implements Listener, Game {
 	public void start() {
 		running = true;
 		heartBeat = new GameHeartBeat(this);
-		Bukkit.getPluginManager().registerEvents(this, Flier.getInstance());
 		for (Bonus bonus : bonuses) {
 			bonus.start();
 		}
@@ -589,9 +589,9 @@ public abstract class DefaultGame implements Listener, Game {
 
 	@Override
 	public void stop() {
+		HandlerList.unregisterAll(this);
 		if (running) {
 			running = false;
-			HandlerList.unregisterAll(this);
 			heartBeat.cancel();
 			for (Bonus bonus : bonuses) {
 				bonus.stop();
