@@ -32,6 +32,7 @@ import pl.betoncraft.flier.api.content.Game;
 import pl.betoncraft.flier.api.content.Lobby;
 import pl.betoncraft.flier.api.core.Arena;
 import pl.betoncraft.flier.api.core.LoadingException;
+import pl.betoncraft.flier.event.FlierPlayerJoinLobbyEvent;
 import pl.betoncraft.flier.util.LangManager;
 import pl.betoncraft.flier.util.PlayerBackup;
 import pl.betoncraft.flier.util.ValueLoader;
@@ -44,6 +45,7 @@ import pl.betoncraft.flier.util.ValueLoader;
 public abstract class DefaultLobby implements Lobby, Listener {
 	
 	protected ValueLoader loader;
+	protected String id;
 
 	protected Map<String, Set<Game>> gameSets = new HashMap<>();
 	protected Map<String, Arena> arenas = new HashMap<>();
@@ -55,6 +57,7 @@ public abstract class DefaultLobby implements Lobby, Listener {
 	protected String autoJoinGame;
 
 	public DefaultLobby(ConfigurationSection section) throws LoadingException {
+		id = section.getName();
 		loader = new ValueLoader(section);
 		spawn = loader.loadLocation("spawn");
 		maxGames = loader.loadNonNegativeInt("max_games", 0);
@@ -86,13 +89,26 @@ public abstract class DefaultLobby implements Lobby, Listener {
 		}
 		Bukkit.getPluginManager().registerEvents(this, Flier.getInstance());
 	}
+	
+	@Override
+	public String getID() {
+		return id;
+	}
 
 	@Override
 	public void addPlayer(Player player) {
+		// can't join if already inside
 		UUID uuid = player.getUniqueId();
 		if (players.contains(uuid)) {
 			return;
 		}
+		// call the event and stop joining if it was cancelled
+		FlierPlayerJoinLobbyEvent event = new FlierPlayerJoinLobbyEvent(player, this);
+		Bukkit.getPluginManager().callEvent(event);
+		if (event.isCancelled()) {
+			return;
+		}
+		// join the lobby
 		players.add(uuid);
 		PlayerBackup backup = new PlayerBackup(player);
 		backup.save();

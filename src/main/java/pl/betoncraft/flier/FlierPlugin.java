@@ -69,6 +69,7 @@ import pl.betoncraft.flier.effect.PrivateSoundEffect;
 import pl.betoncraft.flier.effect.PublicSoundEffect;
 import pl.betoncraft.flier.engine.MultiplyingEngine;
 import pl.betoncraft.flier.game.TeamDeathMatch;
+import pl.betoncraft.flier.integration.Integrations;
 import pl.betoncraft.flier.lobby.PhysicalLobby;
 import pl.betoncraft.flier.util.Coordinator;
 import pl.betoncraft.flier.util.DefaultConfigManager;
@@ -148,10 +149,14 @@ public class FlierPlugin extends JavaPlugin implements Flier {
 		
 		new Coordinator(); // temporary solution
 		
+		new Integrations();
+		
 		// TODO add after-crash player restore
 		
 		// schedule loading after all plugins are enabled
 		Bukkit.getScheduler().runTask(this, () -> reload());
+		
+		getLogger().info("Flier enabled!");
 	}
 
 	@Override

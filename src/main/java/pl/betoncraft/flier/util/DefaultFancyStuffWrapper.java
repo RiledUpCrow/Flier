@@ -31,13 +31,20 @@ public class DefaultFancyStuffWrapper implements FancyStuffWrapper {
 
 	public DefaultFancyStuffWrapper() {
 		if (Bukkit.getPluginManager().isPluginEnabled("BountifulAPI")) {
-			titlePlugin = Plugin.BountifulAPI;
-			actionBarPlugin = Plugin.BountifulAPI;
-			tabListPlugin = Plugin.BountifulAPI;
+			if (titlePlugin == Plugin.None) titlePlugin = Plugin.BountifulAPI;
+			if (actionBarPlugin == Plugin.None) actionBarPlugin = Plugin.BountifulAPI;
+			if (tabListPlugin == Plugin.None) tabListPlugin = Plugin.BountifulAPI;
 		}
-		Flier.getInstance().getLogger().info(String.format("Using %s for displaying titles.", titlePlugin));
-		Flier.getInstance().getLogger().info(String.format("Using %s for managing action bar.", actionBarPlugin));
-		Flier.getInstance().getLogger().info(String.format("Using %s for setting tab list headers.", tabListPlugin));
+		// log integrations
+		if (titlePlugin != Plugin.None) {
+			Flier.getInstance().getLogger().info(String.format("Using %s for displaying titles.", titlePlugin));
+		}
+		if (actionBarPlugin != Plugin.None) {
+			Flier.getInstance().getLogger().info(String.format("Using %s for managing action bar.", actionBarPlugin));
+		}
+		if (tabListPlugin != Plugin.None) {
+			Flier.getInstance().getLogger().info(String.format("Using %s for setting tab list headers.", tabListPlugin));
+		}
 	}
 	
 	@Override

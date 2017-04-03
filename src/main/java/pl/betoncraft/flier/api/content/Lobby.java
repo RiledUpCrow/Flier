@@ -27,6 +27,11 @@ public interface Lobby {
 	}
 
 	/**
+	 * @return the ID of this lobby
+	 */
+	public String getID();
+
+	/**
 	 * Adds player to the lobby. Creates an InGamePlayer instance and adds the
 	 * player to the current Game.
 	 * 

@@ -63,12 +63,17 @@
 		<dependency>
 			<groupId>pl.betoncraft</groupId>
 			<artifactId>BetonLangAPI</artifactId>
-			<version>1.1.0</version>
+			<version>1.1.1</version>
 		</dependency>
 		<dependency>
 			<groupId>com.connorlinfoot</groupId>
 			<artifactId>BountifulAPI</artifactId>
 			<version>1.6.1</version>
+		</dependency>
+		<dependency>
+			<groupId>pl.betoncraft.betonquest</groupId>
+			<artifactId>BetonQuest</artifactId>
+			<version>1.9</version>
 		</dependency>
 	</dependencies>
 </project>
