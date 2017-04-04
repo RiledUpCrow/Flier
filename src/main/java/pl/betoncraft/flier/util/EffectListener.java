@@ -103,9 +103,9 @@ public class EffectListener implements Listener {
 	public void onHit(FlierPlayerHitEvent event) {
 		boolean org = event.isSwitched();
 		event.setSwitched(false);
-		fireEffects(EventType.HIT, event);
-		event.setSwitched(true);
 		fireEffects(EventType.GET_HIT, event);
+		event.setSwitched(true);
+		fireEffects(EventType.HIT, event);
 		event.setSwitched(org);
 	}
 	
@@ -113,9 +113,9 @@ public class EffectListener implements Listener {
 	public void onKill(FlierPlayerKillEvent event) {
 		boolean org = event.isSwitched();
 		event.setSwitched(false);
-		fireEffects(EventType.KILL, event);
-		event.setSwitched(true);
 		fireEffects(EventType.KILLED, event);
+		event.setSwitched(true);
+		fireEffects(EventType.KILL, event);
 		event.setSwitched(org);
 	}
 	

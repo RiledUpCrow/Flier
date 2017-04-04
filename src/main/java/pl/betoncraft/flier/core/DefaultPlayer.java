@@ -221,7 +221,7 @@ public class DefaultPlayer implements InGamePlayer {
 			}
 		}
 		// fire an event
-		FlierPlayerHitEvent hitEvent = new FlierPlayerHitEvent(shooter, this, results, damager);
+		FlierPlayerHitEvent hitEvent = new FlierPlayerHitEvent(this, shooter, results, damager);
 		Bukkit.getPluginManager().callEvent(hitEvent);
 		if (hitEvent.isCancelled()) {
 			results.clear();

@@ -11,6 +11,10 @@ import org.bukkit.Bukkit;
 import pl.betoncraft.betonquest.BetonQuest;
 import pl.betoncraft.flier.api.Flier;
 import pl.betoncraft.flier.integration.betonquest.EngineCondition;
+import pl.betoncraft.flier.integration.betonquest.FlierDeathObjective;
+import pl.betoncraft.flier.integration.betonquest.FlierGetHitObjective;
+import pl.betoncraft.flier.integration.betonquest.FlierHitObjective;
+import pl.betoncraft.flier.integration.betonquest.FlierKillObjective;
 import pl.betoncraft.flier.integration.betonquest.FlierRespawnObjective;
 import pl.betoncraft.flier.integration.betonquest.GameCondition;
 import pl.betoncraft.flier.integration.betonquest.JoinGameObjective;
@@ -35,6 +39,10 @@ public class Integrations {
 			bq.registerObjectives("joingame", JoinGameObjective.class);
 			bq.registerObjectives("flierrespawn", FlierRespawnObjective.class);
 			bq.registerObjectives("flieruse", UsableItemObjective.class);
+			bq.registerObjectives("flierkill", FlierKillObjective.class);
+			bq.registerObjectives("flierhit", FlierHitObjective.class);
+			bq.registerObjectives("flierdeath", FlierDeathObjective.class);
+			bq.registerObjectives("fliergethit", FlierGetHitObjective.class);
 			Flier.getInstance().getLogger().info("Hooked into BetonQuest!");
 		}
 	}

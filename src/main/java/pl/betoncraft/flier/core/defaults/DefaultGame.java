@@ -629,7 +629,7 @@ public abstract class DefaultGame implements Listener, Game {
 				notifyAllPlayers("killed", Utils.formatPlayer(killed), Utils.formatPlayer(killer));
 			}
 			// fire an event
-			FlierPlayerKillEvent deathEvent = new FlierPlayerKillEvent(killer, killed,
+			FlierPlayerKillEvent deathEvent = new FlierPlayerKillEvent(killed, killer,
 					fall ? Type.SHOT_DOWN : Type.KILLED);
 			Bukkit.getPluginManager().callEvent(deathEvent);
 			Attitude a = getAttitude(killer, killed);
