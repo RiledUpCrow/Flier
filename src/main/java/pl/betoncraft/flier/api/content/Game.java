@@ -91,6 +91,11 @@ public interface Game {
 	}
 
 	/**
+	 * @return the ID of this Game
+	 */
+	public String getID();
+
+	/**
 	 * @return the map containing all Buttons in this Game and their names.
 	 */
 	public Map<String, Button> getButtons();

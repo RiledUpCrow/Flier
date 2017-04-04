@@ -500,6 +500,11 @@ public abstract class DefaultGame implements Listener, Game {
 	 * Ends the game by selecting the winner.
 	 */
 	public abstract void endGame();
+	
+	@Override
+	public String getID() {
+		return id;
+	}
 
 	@Override
 	public InGamePlayer addPlayer(Player player) {

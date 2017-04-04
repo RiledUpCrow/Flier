@@ -32,6 +32,7 @@ import pl.betoncraft.flier.api.content.Game;
 import pl.betoncraft.flier.api.content.Lobby;
 import pl.betoncraft.flier.api.core.Arena;
 import pl.betoncraft.flier.api.core.LoadingException;
+import pl.betoncraft.flier.event.FlierPlayerJoinGameEvent;
 import pl.betoncraft.flier.event.FlierPlayerJoinLobbyEvent;
 import pl.betoncraft.flier.util.LangManager;
 import pl.betoncraft.flier.util.PlayerBackup;
@@ -153,8 +154,12 @@ public abstract class DefaultLobby implements Lobby, Listener {
 			}
 		}
 		if (game != null) {
-			game.addPlayer(player);
-			return JoinResult.GAME_JOINED;
+			if (!event(player, game)) {
+				game.addPlayer(player);
+				return JoinResult.GAME_JOINED;
+			} else {
+				return JoinResult.BLOCKED;
+			}
 		} else {
 			try {
 				int amount = gameSets.values().stream().flatMapToInt(set -> IntStream.of(set.size())).sum();
@@ -164,12 +169,16 @@ public abstract class DefaultLobby implements Lobby, Listener {
 					for (String arenaName : viable) {
 						Arena arena = arenas.get(arenaName);
 						if (!arena.isUsed()) {
-							arena.setUsed(true);
-							games.add(game);
-							game.setLobby(this);
-							game.setArena(arena);
-							game.addPlayer(player);
-							return JoinResult.GAME_CREATED;
+							if (!event(player, game)) {
+								arena.setUsed(true);
+								games.add(game);
+								game.setLobby(this);
+								game.setArena(arena);
+								game.addPlayer(player);
+								return JoinResult.GAME_CREATED;
+							} else {
+								return JoinResult.BLOCKED;
+							}
 						}
 					}
 				}
@@ -179,6 +188,12 @@ public abstract class DefaultLobby implements Lobby, Listener {
 				return null;
 			}
 		}
+	}
+	
+	private boolean event(Player player, Game game) {
+		FlierPlayerJoinGameEvent event = new FlierPlayerJoinGameEvent(player, game);
+		Bukkit.getPluginManager().callEvent(event);
+		return event.isCancelled();
 	}
 	
 	@Override
@@ -215,6 +230,9 @@ public abstract class DefaultLobby implements Lobby, Listener {
 			break;
 		case NO_SUCH_GAME:
 			LangManager.sendMessage(player, "no_such_game");
+			break;
+		case BLOCKED:
+			// no message
 			break;
 		}
 	}
