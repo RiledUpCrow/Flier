@@ -10,8 +10,10 @@ import org.bukkit.Bukkit;
 
 import pl.betoncraft.betonquest.BetonQuest;
 import pl.betoncraft.flier.api.Flier;
+import pl.betoncraft.flier.integration.betonquest.GameCondition;
 import pl.betoncraft.flier.integration.betonquest.JoinGameObjective;
 import pl.betoncraft.flier.integration.betonquest.JoinLobbyObjective;
+import pl.betoncraft.flier.integration.betonquest.LobbyCondition;
 
 /**
  * Loads all possible integrations.
@@ -23,6 +25,8 @@ public class Integrations {
 	public Integrations() {
 		if (Bukkit.getPluginManager().isPluginEnabled("BetonQuest")) {
 			BetonQuest bq = BetonQuest.getInstance();
+			bq.registerConditions("ingame", GameCondition.class);
+			bq.registerConditions("inlobby", LobbyCondition.class);
 			bq.registerObjectives("joinlobby", JoinLobbyObjective.class);
 			bq.registerObjectives("joingame", JoinGameObjective.class);
 			Flier.getInstance().getLogger().info("Hooked into BetonQuest!");
