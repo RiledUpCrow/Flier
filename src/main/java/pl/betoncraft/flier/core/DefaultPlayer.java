@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scoreboard.DisplaySlot;
@@ -242,6 +243,21 @@ public class DefaultPlayer implements InGamePlayer {
 	@Override
 	public boolean didRightClick() {
 		return rightClicked;
+	}
+	
+	@Override
+	public UsableItem getHeldItem() {
+		if (player.getInventory().getItemInMainHand() == null ||
+				player.getInventory().getItemInMainHand().getType() == Material.AIR) {
+			return null;
+		}
+		int heldSlot = player.getInventory().getHeldItemSlot();
+		for (UsableItem item : clazz.getItems()) {
+			if (item.slot() == heldSlot && isHolding(item)) {
+				return item;
+			}
+		}
+		return null;
 	}
 	
 	@Override

@@ -55,6 +55,11 @@ public interface InGamePlayer {
 	public boolean didRightClick();
 
 	/**
+	 * @return the UsableItem which is currently held by the player
+	 */
+	public UsableItem getHeldItem();
+
+	/**
 	 * @return whenever the player is holding this item or not
 	 */
 	public boolean isHolding(UsableItem item);

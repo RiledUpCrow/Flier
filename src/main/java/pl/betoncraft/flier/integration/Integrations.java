@@ -10,6 +10,7 @@ import org.bukkit.Bukkit;
 
 import pl.betoncraft.betonquest.BetonQuest;
 import pl.betoncraft.flier.api.Flier;
+import pl.betoncraft.flier.integration.betonquest.ActivatorCondition;
 import pl.betoncraft.flier.integration.betonquest.EngineCondition;
 import pl.betoncraft.flier.integration.betonquest.FlierDeathObjective;
 import pl.betoncraft.flier.integration.betonquest.FlierGetHitObjective;
@@ -35,6 +36,7 @@ public class Integrations {
 			bq.registerConditions("ingame", GameCondition.class);
 			bq.registerConditions("inlobby", LobbyCondition.class);
 			bq.registerConditions("flierengine", EngineCondition.class);
+			bq.registerConditions("activator", ActivatorCondition.class);
 			bq.registerObjectives("joinlobby", JoinLobbyObjective.class);
 			bq.registerObjectives("joingame", JoinGameObjective.class);
 			bq.registerObjectives("flierrespawn", FlierRespawnObjective.class);
