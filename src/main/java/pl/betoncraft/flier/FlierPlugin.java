@@ -37,6 +37,7 @@ import pl.betoncraft.flier.action.attack.Bomb;
 import pl.betoncraft.flier.action.attack.HomingMissile;
 import pl.betoncraft.flier.action.attack.ParticleGun;
 import pl.betoncraft.flier.action.attack.ProjectileGun;
+import pl.betoncraft.flier.activator.AmmoActivator;
 import pl.betoncraft.flier.activator.ItemActivator;
 import pl.betoncraft.flier.activator.LeftClickActivator;
 import pl.betoncraft.flier.activator.RightClickActivator;
@@ -132,6 +133,7 @@ public class FlierPlugin extends JavaPlugin implements Flier {
 		registerActivator("slowTick", s -> new SlowTickActivator(s));
 		registerActivator("wingsHealth", s -> new WingsHealthActivator(s));
 		registerActivator("item", s -> new ItemActivator(s));
+		registerActivator("ammo", s -> new AmmoActivator(s));
 		registerEffect("publicSound", s -> new PublicSoundEffect(s));
 		registerEffect("privateSound", s -> new PrivateSoundEffect(s));
 		registerEffect("gameSound", s -> new GameSoundEffect(s));
