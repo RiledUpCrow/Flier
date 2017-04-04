@@ -191,7 +191,7 @@ public class EffectListener implements Listener {
 				}
 				break;
 			case NUMBER_SECTION:
-				Double number2 = event.getNumber(name); // somebody should fix this bug with duplicated variables  in switch...
+				Double number2 = event.getNumber(name); // somebody should fix this bug with duplicated variables in switch...
 														// there's a damn break, it can work!
 				if (number2 == null || !(number2 > matcher.minNumber() && number2 < matcher.maxNumber())) {
 					return false;

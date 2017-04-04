@@ -38,7 +38,7 @@ public class FlierPlayerHitEvent extends MatchingTwoPlayersEvent implements Canc
 		super(target, shooter, "shooter_", "target_");
 		this.result = results;
 		this.damager = damager;
-		setBool("self_hit", player.equals(target));
+		setBool("self_hit", shooter.equals(target));
 		for (DamageResult result : all) {
 			setBool(result.toString().toLowerCase(), results.contains(result));
 		}
