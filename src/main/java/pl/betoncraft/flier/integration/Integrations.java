@@ -10,6 +10,7 @@ import org.bukkit.Bukkit;
 
 import pl.betoncraft.betonquest.BetonQuest;
 import pl.betoncraft.flier.api.Flier;
+import pl.betoncraft.flier.integration.betonquest.FlierRespawnObjective;
 import pl.betoncraft.flier.integration.betonquest.GameCondition;
 import pl.betoncraft.flier.integration.betonquest.JoinGameObjective;
 import pl.betoncraft.flier.integration.betonquest.JoinLobbyObjective;
@@ -29,6 +30,7 @@ public class Integrations {
 			bq.registerConditions("inlobby", LobbyCondition.class);
 			bq.registerObjectives("joinlobby", JoinLobbyObjective.class);
 			bq.registerObjectives("joingame", JoinGameObjective.class);
+			bq.registerObjectives("flierrespawn", FlierRespawnObjective.class);
 			Flier.getInstance().getLogger().info("Hooked into BetonQuest!");
 		}
 	}
