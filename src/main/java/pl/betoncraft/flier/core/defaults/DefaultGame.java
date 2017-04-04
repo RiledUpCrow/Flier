@@ -909,7 +909,11 @@ public abstract class DefaultGame implements Listener, Game {
 						.findFirst()
 						.orElse(null);
 				if (button != null) {
-					applyButton(data, button, event.getAction() == Action.LEFT_CLICK_BLOCK, true);
+					FlierClickButtonEvent e = new FlierClickButtonEvent(data, button);
+					Bukkit.getPluginManager().callEvent(e);
+					if (!e.isCancelled()) {
+						applyButton(data, button, event.getAction() == Action.LEFT_CLICK_BLOCK, true);
+					}
 					return;
 				}
 				// handle leaving block
