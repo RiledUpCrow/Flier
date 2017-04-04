@@ -66,6 +66,7 @@ import pl.betoncraft.flier.api.core.SetApplier;
 import pl.betoncraft.flier.core.DefaultClass;
 import pl.betoncraft.flier.core.DefaultPlayer;
 import pl.betoncraft.flier.core.DefaultSetApplier;
+import pl.betoncraft.flier.event.FlierClickButtonEvent;
 import pl.betoncraft.flier.event.FlierPlayerKillEvent;
 import pl.betoncraft.flier.event.FlierPlayerKillEvent.Type;
 import pl.betoncraft.flier.event.FlierPlayerSpawnEvent;
@@ -233,6 +234,7 @@ public abstract class DefaultGame implements Listener, Game {
 	
 	public class DefaultButton implements Button {
 		
+		protected final String id;
 		protected final String locationName;
 		protected Location location;
 		protected final Set<String> requirements;
@@ -245,6 +247,7 @@ public abstract class DefaultGame implements Listener, Game {
 		protected final SetApplier onUnlock;
 
 		public DefaultButton(ConfigurationSection section) throws LoadingException {
+			id = section.getName();
 			ValueLoader loader = new ValueLoader(section);
 			locationName = loader.loadString("block");
 			requirements = new HashSet<>(section.getStringList("required"));
@@ -274,6 +277,11 @@ public abstract class DefaultGame implements Listener, Game {
 			} catch (LoadingException e) {
 				throw (LoadingException) new LoadingException("Error in 'on_unlock' section.").initCause(e);
 			}
+		}
+		
+		@Override
+		public String getID() {
+			return id;
 		}
 		
 		@Override

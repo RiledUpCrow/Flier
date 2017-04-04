@@ -33,6 +33,11 @@ public interface Game {
 	 * The Button in a Lobby, which has costs and can be locked.
 	 */
 	public interface Button {
+
+		/**
+		 * @return the ID of the Button
+		 */
+		public String getID();
 		
 		/**
 		 * @return the name of Location of this Button
