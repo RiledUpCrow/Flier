@@ -251,6 +251,11 @@ public class DefaultPlayer implements InGamePlayer {
 	}
 	
 	@Override
+	public boolean isAccelerating() {
+		return player.isGliding() && player.isSneaking();
+	}
+	
+	@Override
 	public void consumeItem(UsableItem match) {
 		UsableItem item = clazz.getItems().stream()
 				.filter(i -> i.isSimilar(match))
@@ -414,10 +419,6 @@ public class DefaultPlayer implements InGamePlayer {
 	public void exitGame() {
 		Utils.clearPlayer(player);
 		player.setScoreboard(oldSb);
-	}
-	
-	private boolean isAccelerating() {
-		return player.isGliding() && player.isSneaking();
 	}
 	
 	private void startGlowing(int ticks) {

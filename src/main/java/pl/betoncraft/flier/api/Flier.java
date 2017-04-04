@@ -7,6 +7,7 @@
 package pl.betoncraft.flier.api;
 
 import java.util.Map;
+import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
@@ -23,6 +24,7 @@ import pl.betoncraft.flier.api.content.Wings;
 import pl.betoncraft.flier.api.core.Arena;
 import pl.betoncraft.flier.api.core.ConfigManager;
 import pl.betoncraft.flier.api.core.FancyStuffWrapper;
+import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.ItemSet;
 import pl.betoncraft.flier.api.core.LoadingException;
 import pl.betoncraft.flier.api.core.Modification;
@@ -62,6 +64,11 @@ public interface Flier extends Plugin {
 	 * @return the currently used instance of FancyStuffWrapper
 	 */
 	public FancyStuffWrapper getFancyStuff();
+
+	/**
+	 * @return a mutable map of players in games
+	 */
+	public Map<UUID, InGamePlayer> getPlayers();
 
 	/**
 	 * @return an immutable view of the lobbies map

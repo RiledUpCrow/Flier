@@ -17,26 +17,24 @@ import pl.betoncraft.flier.api.Flier;
 import pl.betoncraft.flier.api.core.InGamePlayer;
 
 /**
- * Checks if the player is in specified Game
+ * BetonQuest condition which checks if the player is using his engine.
  *
  * @author Jakub Sapalski
  */
-public class GameCondition extends Condition {
+public class EngineCondition extends Condition {
 	
-	private String game;
 	private Flier flier;
 
-	public GameCondition(Instruction instruction) throws InstructionParseException {
+	public EngineCondition(Instruction instruction) throws InstructionParseException {
 		super(instruction);
-		game = instruction.next();
 		flier = Flier.getInstance();
 	}
 
 	@Override
 	public boolean check(String playerID) throws QuestRuntimeException {
-		UUID uuid = PlayerConverter.getPlayer(playerID).getUniqueId();	
+		UUID uuid = PlayerConverter.getPlayer(playerID).getUniqueId();
 		InGamePlayer player = flier.getPlayers().get(uuid);
-		return player != null && player.getGame().getID().equals(game);
+		return player != null && player.isAccelerating();
 	}
 
 }

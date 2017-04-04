@@ -155,7 +155,7 @@ public abstract class DefaultLobby implements Lobby, Listener {
 		}
 		if (game != null) {
 			if (!event(player, game)) {
-				game.addPlayer(player);
+				Flier.getInstance().getPlayers().put(player.getUniqueId(), game.addPlayer(player));
 				return JoinResult.GAME_JOINED;
 			} else {
 				return JoinResult.BLOCKED;
@@ -174,7 +174,7 @@ public abstract class DefaultLobby implements Lobby, Listener {
 								games.add(game);
 								game.setLobby(this);
 								game.setArena(arena);
-								game.addPlayer(player);
+								Flier.getInstance().getPlayers().put(player.getUniqueId(), game.addPlayer(player));
 								return JoinResult.GAME_CREATED;
 							} else {
 								return JoinResult.BLOCKED;
@@ -203,6 +203,7 @@ public abstract class DefaultLobby implements Lobby, Listener {
 				Game game = it.next();
 				if (game.getPlayers().containsKey(player.getUniqueId())) {
 					game.removePlayer(player);
+					Flier.getInstance().getPlayers().remove(player.getUniqueId());
 					if (game.getPlayers().isEmpty()) {
 						game.stop();
 						game.getArena().setUsed(false);

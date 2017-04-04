@@ -9,6 +9,7 @@ package pl.betoncraft.flier;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
@@ -53,6 +54,7 @@ import pl.betoncraft.flier.api.content.Wings;
 import pl.betoncraft.flier.api.core.Arena;
 import pl.betoncraft.flier.api.core.ConfigManager;
 import pl.betoncraft.flier.api.core.FancyStuffWrapper;
+import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.ItemSet;
 import pl.betoncraft.flier.api.core.LoadingException;
 import pl.betoncraft.flier.api.core.Modification;
@@ -95,6 +97,7 @@ public class FlierPlugin extends JavaPlugin implements Flier {
 	private Map<String, Factory<Effect>> effectTypes = new HashMap<>();
 	
 	private Map<String, Lobby> lobbies = new HashMap<>();
+	private Map<UUID, InGamePlayer> players = new HashMap<>();
 
 	@Override
 	public void onEnable() {
@@ -234,6 +237,11 @@ public class FlierPlugin extends JavaPlugin implements Flier {
 	@Override
 	public FancyStuffWrapper getFancyStuff() {
 		return fancyStuff;
+	}
+	
+	@Override
+	public Map<UUID, InGamePlayer> getPlayers() {
+		return players;
 	}
 
 	@Override

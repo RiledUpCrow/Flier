@@ -60,6 +60,11 @@ public interface InGamePlayer {
 	public boolean isHolding(UsableItem item);
 
 	/**
+	 * @return whenever the player is currently using his engine
+	 */
+	public boolean isAccelerating();
+
+	/**
 	 * Takes wings off the player.
 	 */
 	public void takeWingsOff();
