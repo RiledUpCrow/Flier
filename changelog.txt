@@ -22,6 +22,7 @@ Flier 0.5.0
 
  == Lobby ==
 * Moved item buttons from lobby to game
+* Added optional permissions for buttons
 * Added optional maximum game per lobby limit
 * Added arenas to allow concurrent games
 * Added automatic lobby joining
@@ -44,4 +45,11 @@ Flier 0.5.0
 * Renamed "machineGun" attack to "projectileGun"
 * Added "bomb" action
 * Added "leave" action
+* Added "ammo" activator
 * Replaced "autodestruct" with "suicide"
+
+== Integrations ==
+* BountifulAPI will remove title command messages from console
+* BountifulAPI will display ammunition on action bar
+* BetonQuest will receive some new conditions and objectives
+* BetonLangAPI will enable per-player translations of games and items
