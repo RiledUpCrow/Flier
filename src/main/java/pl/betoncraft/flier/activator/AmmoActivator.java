@@ -56,7 +56,7 @@ public class AmmoActivator extends DefaultActivator {
 
 	@Override
 	public boolean isActive(InGamePlayer player, UsableItem item) {
-		if (item == null) {
+		if (item == null || item.getMaxAmmo() == 0) {
 			return false;
 		}
 		int a = percentage ? (int) ((double) item.getAmmo() / (double) item.getMaxAmmo() * 100.0) : item.getAmmo();
