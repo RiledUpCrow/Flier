@@ -47,6 +47,10 @@ public abstract class DefaultWings extends DefaultItem implements Wings {
 
 	@Override
 	public double getHealth() {
+		double max = getMaxHealth();
+		if (max != 0 && health > max) {
+			health = max;
+		}
 		return health;
 	}
 

@@ -93,6 +93,10 @@ public class DefaultUsableItem extends DefaultItem implements UsableItem {
 
 	@Override
 	public int getAmmo() {
+		int max = getMaxAmmo();
+		if (max != 0 && ammo > max) {
+			ammo = max;
+		}
 		return ammo;
 	}
 
@@ -110,6 +114,10 @@ public class DefaultUsableItem extends DefaultItem implements UsableItem {
 	
 	@Override
 	public int getAmount() {
+		int max = getMaxAmount();
+		if (max != 0 && amount > max) {
+			amount = max;
+		}
 		return amount;
 	}
 	
@@ -205,13 +213,7 @@ public class DefaultUsableItem extends DefaultItem implements UsableItem {
 	@Override
 	public void addModification(Modification mod) {
 		if (mod.getTarget() == ModificationTarget.USABLE_ITEM) {
-			// amounts are a special case, so they need to be handled exclusively
-			int oldAmount = getDefAmount();
 			modMan.addModification(mod);
-			int newAmount = getDefAmount();
-			int difference = newAmount - oldAmount;
-			// when default amount increases, the current one should increase too
-			setAmount(amount + difference);
 		} else if (mod.getTarget() == ModificationTarget.ACTION) {
 			usages.forEach(usage -> usage.getActions().stream()
 					.filter(action -> mod.getNames().contains(action.getID()))

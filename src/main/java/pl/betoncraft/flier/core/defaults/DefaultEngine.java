@@ -62,6 +62,10 @@ public abstract class DefaultEngine extends DefaultItem implements Engine {
 
 	@Override
 	public double getFuel() {
+		double max = getMaxFuel();
+		if (max != 0 && fuel > max) {
+			fuel = max;
+		}
 		return fuel;
 	}
 	
