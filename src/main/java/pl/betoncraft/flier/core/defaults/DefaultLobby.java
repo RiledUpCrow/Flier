@@ -205,14 +205,19 @@ public abstract class DefaultLobby implements Lobby, Listener {
 					game.removePlayer(player);
 					Flier.getInstance().getPlayers().remove(player.getUniqueId());
 					if (game.getPlayers().isEmpty()) {
-						game.stop();
-						game.getArena().setUsed(false);
-						it.remove();
+						endGame(game);
 					}
 					break loop;
 				}
 			}
 		}
+	}
+	
+	@Override
+	public void endGame(Game game) {
+		game.stop();
+		game.getArena().setUsed(false);
+		gameSets.get(game.getID()).remove(game);
 	}
 	
 	public static void joinMessage(Player player, JoinResult result) {

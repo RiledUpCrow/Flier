@@ -173,7 +173,7 @@ public class TeamDeathMatch extends DefaultGame {
 					data.getPlayer(), win, entry.getValue().getColor() + word, 0, 0, 0);
 		}
 		// end game
-		stop();
+		lobby.endGame(this);
 	}
 	
 	@Override

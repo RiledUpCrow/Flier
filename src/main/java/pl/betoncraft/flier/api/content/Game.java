@@ -123,7 +123,7 @@ public interface Game {
 	 * Adds the player to the game. It will throw IllegalStateException if the
 	 * player is already in the game or the game is locked. If you want to add
 	 * the player easily, use {@link Lobby#joinGame(Player, String) joinGame}
-	 * method instead.
+	 * method instead. This method is only called by the Lobby.
 	 * 
 	 * @param player
 	 *            player to add
@@ -131,7 +131,7 @@ public interface Game {
 	public InGamePlayer addPlayer(Player player);
 
 	/**
-	 * Removes the player from the game.
+	 * Removes the player from the game. This method is only called by the Lobby.
 	 * 
 	 * @param player
 	 *            player to remove
@@ -146,13 +146,13 @@ public interface Game {
 	public Map<UUID, InGamePlayer> getPlayers();
 
 	/**
-	 * This method will be called when the game needs to be started.
+	 * This method will be called by the Lobby when the game needs to be started.
 	 */
 	public void start();
 
 	/**
-	 * This method will be called once the game is forced to end. It should
-	 * clean up all its data so it can be freshly started again.
+	 * This method will be called by the Lobby once the game is forced to end.
+	 * It should clean up all its data so it can be freshly started again.
 	 */
 	public void stop();
 

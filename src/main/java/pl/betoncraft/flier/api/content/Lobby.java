@@ -73,6 +73,15 @@ public interface Lobby {
 	public void leaveGame(Player player);
 
 	/**
+	 * Ends the game. It will stop this Game, remove remove it from the Lobby
+	 * and release its arena.
+	 * 
+	 * @param game
+	 *            Game to end
+	 */
+	void endGame(Game game);
+
+	/**
 	 * @return a set with UUIDs of players in this Lobby
 	 */
 	public Set<UUID> getPlayers();
