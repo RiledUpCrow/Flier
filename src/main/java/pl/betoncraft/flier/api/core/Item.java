@@ -58,5 +58,10 @@ public interface Item {
 	 * @param mod
 	 */
 	public void removeModification(Modification mod);
+	
+	/**
+	 * Removes all modifications from this item.
+	 */
+	public void clearModifications();
 
 }

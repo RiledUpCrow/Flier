@@ -102,5 +102,10 @@ public abstract class DefaultWings extends DefaultItem implements Wings {
 	public void removeModification(Modification mod) {
 		modMan.removeModification(mod);
 	}
+	
+	@Override
+	public void clearModifications() {
+		modMan.clear();
+	}
 
 }

@@ -35,6 +35,11 @@ public class ModificationManager {
 		private double bonus = 0;
 	}
 	
+	public void clear() {
+		mods.clear();
+		compiled.clear();
+	}
+	
 	public void addModification(Modification mod) {
 		if (mods.add(mod)) {
 			compile();

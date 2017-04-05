@@ -71,15 +71,23 @@ public class DefaultClass implements PlayerClass {
 				}
 				// don't override existing stuff with nulls!
 				engine = set.getEngine() == null ? engine : set.getEngine();
+				if (engine != null) {
+					engine.clearModifications();
+				}
 				wings = set.getWings() == null ? wings : set.getWings();
+				if (wings != null) {
+					wings.clearModifications();
+				}
 				List<UsableItem> items = set.getItems();
 				loop: for (UsableItem newItem : items) {
 					for (UsableItem existingItem : this.items) {
 						if (existingItem.isSimilar(newItem)) {
 							existingItem.setAmount(existingItem.getAmount() + newItem.getAmount());
+							existingItem.clearModifications();
 							continue loop;
 						}
 					}
+					newItem.clearModifications();
 					this.items.add(newItem);
 				}
 			}
@@ -100,6 +108,7 @@ public class DefaultClass implements PlayerClass {
 					items.stream()
 							.filter(item -> mod.getNames().contains(item.getID()))
 							.forEach(item -> item.addModification(mod));
+					break;
 				case ACTION:
 				case ACTIVATOR:
 					items.forEach(item -> item.addModification(mod));

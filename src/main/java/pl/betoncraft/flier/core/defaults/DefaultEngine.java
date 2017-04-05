@@ -106,5 +106,10 @@ public abstract class DefaultEngine extends DefaultItem implements Engine {
 	public void removeModification(Modification mod) {
 		modMan.removeModification(mod);
 	}
+	
+	@Override
+	public void clearModifications() {
+		modMan.clear();
+	}
 
 }

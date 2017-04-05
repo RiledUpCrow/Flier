@@ -241,4 +241,9 @@ public class DefaultUsableItem extends DefaultItem implements UsableItem {
 			);
 		}
 	}
+	
+	@Override
+	public void clearModifications() {
+		modMan.clear();
+	}
 }
