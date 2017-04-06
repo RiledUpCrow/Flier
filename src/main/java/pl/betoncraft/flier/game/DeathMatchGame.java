@@ -149,7 +149,7 @@ public class DeathMatchGame extends DefaultGame {
 					.collect(Collectors.toList()));
 			String win = LangManager.getMessage(player, "player_win", teamNames);
 			Flier.getInstance().getFancyStuff().sendTitle(
-					player.getPlayer(), win, colors.get(uuid) + word, 0, 0, 0);
+					player.getPlayer(), win, colors.get(player.getPlayer().getName()) + word, 0, 0, 0);
 		}
 		// end game
 		lobby.endGame(this);
@@ -198,7 +198,7 @@ public class DeathMatchGame extends DefaultGame {
 		int s = scores.get(uuid) + score;
 		scores.put(uuid, s);
 		if (s >= pointsToWin) {
-			lobby.endGame(this);
+			endGame();
 		}
 	}
 
