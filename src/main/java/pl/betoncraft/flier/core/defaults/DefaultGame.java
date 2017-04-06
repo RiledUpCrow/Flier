@@ -55,8 +55,8 @@ import pl.betoncraft.flier.api.content.Lobby;
 import pl.betoncraft.flier.api.content.Wings;
 import pl.betoncraft.flier.api.core.Arena;
 import pl.betoncraft.flier.api.core.Damager;
-import pl.betoncraft.flier.api.core.FancyStuffWrapper;
 import pl.betoncraft.flier.api.core.Damager.DamageResult;
+import pl.betoncraft.flier.api.core.FancyStuffWrapper;
 import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.LoadingException;
 import pl.betoncraft.flier.api.core.PlayerClass;
@@ -105,6 +105,7 @@ public abstract class DefaultGame implements Listener, Game {
 	protected final Map<InGamePlayer, List<Button>> unlocked = new HashMap<>();
 	protected final List<String> leaveNames;
 	protected final RespawnAction respawnAction;
+	protected final boolean rounds;
 	protected final int maxPlayers;
 	protected final int maxTime;
 	protected final PlayerClass defClass;
@@ -129,6 +130,7 @@ public abstract class DefaultGame implements Listener, Game {
 	protected List<Block> leaveBlocks;
 	protected Location center;
 	protected int minX, minZ, maxX, maxZ;
+	protected boolean roundFinished = false;
 	
 	public DefaultGame(ConfigurationSection section) throws LoadingException {
 		id = section.getName();
@@ -136,6 +138,7 @@ public abstract class DefaultGame implements Listener, Game {
 		Flier flier = Flier.getInstance();
 		fancyStuff = flier.getFancyStuff();
 		listener = new EffectListener(section.getStringList("effects"), this);
+		rounds = loader.loadBoolean("rounds");
 		maxPlayers = loader.loadNonNegativeInt("max_players", 0);
 		maxTime = loader.loadNonNegativeInt("max_time", 0) * 20;
 		timeLeft = maxTime;
@@ -345,7 +348,7 @@ public abstract class DefaultGame implements Listener, Game {
 	 * Reason for making the player wait in the waiting room.
 	 */
 	protected enum WaitReason {
-		NO_WAIT, MORE_PLAYERS, START_DELAY, RESPAWN_DELAY
+		NO_WAIT, MORE_PLAYERS, START_DELAY, RESPAWN_DELAY, ROUND
 	}
 	
 	/**
@@ -423,7 +426,11 @@ public abstract class DefaultGame implements Listener, Game {
 				}
 			} else {
 				// the game has already started
-				if (respawnDelay == 0) {
+				if (rounds) {
+					// the round still in progress
+					reason = WaitReason.ROUND;
+					currentWaitingTime = respawnDelay;
+				} else if (respawnDelay == 0) {
 					// no respawn delay, start immediately
 					reason = WaitReason.NO_WAIT; // players teleported, no need to put them in the waiting room
 				} else {
@@ -469,27 +476,31 @@ public abstract class DefaultGame implements Listener, Game {
 				}
 			}
 			waitingPlayers.clear();
+			roundFinished = false;
 		}
 		
 		/**
 		 * Called every tick so waiting room can decrease the counters.
 		 */
 		public void tick() {
-			// start the game if the waiting time is exactly 0
-			// lower means the game was already started and the waiting room is idle
-			if (currentWaitingTime == 0) {
-				startPlayers();
-			} else {
-				// display countdown on specific seconds
-				if (displayTimes.contains(currentWaitingTime)) {
-					if (reason == WaitReason.RESPAWN_DELAY || reason == WaitReason.START_DELAY) {
-						waitingPlayers.forEach(
-								data -> LangManager.sendMessage(data, "countdown",
-										(double) currentWaitingTime / 20.0));
+			boolean shouldCountdown = !running || !rounds || roundFinished;
+			if (shouldCountdown) {
+				// start the game if the waiting time is exactly 0
+				// lower means the game was already started and the waiting room is idle
+				if (currentWaitingTime == 0) {
+					startPlayers();
+				} else {
+					// display countdown on specific seconds
+					if (displayTimes.contains(currentWaitingTime)) {
+						if (reason == WaitReason.RESPAWN_DELAY || reason == WaitReason.START_DELAY) {
+							waitingPlayers.forEach(
+									data -> LangManager.sendMessage(data, "countdown",
+											(double) currentWaitingTime / 20.0));
+						}
 					}
 				}
+				currentWaitingTime--;
 			}
-			currentWaitingTime--;
 		}
 		
 	}
@@ -570,6 +581,9 @@ public abstract class DefaultGame implements Listener, Game {
 			break;
 		case START_DELAY:
 			LangManager.sendMessage(player, "start_delay", (double) waitingRoom.currentWaitingTime / 20.0);
+			break;
+		case ROUND:
+			LangManager.sendMessage(player, "round_delay");
 			break;
 		}
 	}
@@ -656,11 +670,15 @@ public abstract class DefaultGame implements Listener, Game {
 			Bukkit.getPluginManager().callEvent(deathEvent);
 			pay(killed, suicideMoney);
 		}
-		Utils.clearPlayer(killed.getPlayer());
-		killed.setPlaying(false);
-		killed.setAttacker(null);
-		WaitReason reason = waitingRoom.addPlayer(killed);
-		waitMessage(killed.getPlayer(), reason);
+		moveToWaitingRoom(killed);
+	}
+	
+	protected void moveToWaitingRoom(InGamePlayer player) {
+		Utils.clearPlayer(player.getPlayer());
+		player.setPlaying(false);
+		player.setAttacker(null);
+		WaitReason reason = waitingRoom.addPlayer(player);
+		waitMessage(player.getPlayer(), reason);
 	}
 	
 	@Override

@@ -202,15 +202,39 @@ public class TeamDeathMatch extends DefaultGame {
 	@Override
 	public void handleKill(InGamePlayer killer, InGamePlayer killed, boolean fall) {
 		super.handleKill(killer, killed, fall);
-		if (killer == null) {
-			score(getTeam(killed), suicideScore);
-			return;
-		}
-		Attitude a = getAttitude(killer, killed);
-		if (a == Attitude.FRIENDLY) {
-			score(getTeam(killed), friendlyKillScore);
-		} else if (a == Attitude.HOSTILE) {
-			score(getTeam(killer), enemyKillScore);
+		if (rounds) {
+			// kills in rounded games don't increase points
+			// we should check if there are any opposite team players left
+			// and increase points if the round is finished
+			List<SimpleTeam> aliveTeams = teams.values().stream()
+					// filter teams which still have alive players
+					.filter(team -> players.entrySet().stream()
+							// get uuids of team players and check if any is playing
+							.filter(e -> e.getValue().equals(team))
+							.anyMatch(e -> dataMap.get(e.getKey()).isPlaying())
+					)
+					.collect(Collectors.toList());
+			if (aliveTeams.size() == 1) {
+				SimpleTeam winningTeam = aliveTeams.get(0);
+				score(winningTeam, 1);
+				roundFinished = true;
+				players.entrySet().stream()
+						.filter(e -> e.getValue().equals(winningTeam))
+						.map(e -> dataMap.get(e.getKey()))
+						.forEach(player -> moveToWaitingRoom(player));
+			}
+		} else {
+			// kills in continuous games increase points
+			if (killer == null) {
+				score(getTeam(killed), suicideScore);
+				return;
+			}
+			Attitude a = getAttitude(killer, killed);
+			if (a == Attitude.FRIENDLY) {
+				score(getTeam(killed), friendlyKillScore);
+			} else if (a == Attitude.HOSTILE) {
+				score(getTeam(killer), enemyKillScore);
+			}
 		}
 	}
 
