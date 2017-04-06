@@ -612,6 +612,9 @@ public abstract class DefaultGame implements Listener, Game {
 		for (Bonus bonus : bonuses) {
 			bonus.start();
 		}
+		for (InGamePlayer player : dataMap.values()) {
+			handleRespawn(player);
+		}
 	}
 
 	@Override

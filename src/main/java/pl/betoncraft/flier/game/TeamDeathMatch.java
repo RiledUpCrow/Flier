@@ -20,7 +20,6 @@ import org.bukkit.entity.Player;
 
 import pl.betoncraft.flier.api.Flier;
 import pl.betoncraft.flier.api.core.Arena;
-import pl.betoncraft.flier.api.core.Damager;
 import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.LoadingException;
 import pl.betoncraft.flier.api.core.SidebarLine;
@@ -182,22 +181,6 @@ public class TeamDeathMatch extends DefaultGame {
 		players.remove(player.getUniqueId());
 		updateColors();
 	}
-	
-	@Override
-	public void start() {
-		super.start();
-		for (InGamePlayer player : dataMap.values()) {
-			handleRespawn(player);
-		}
-	}
-	
-	@Override
-	public void stop() {
-		super.stop();
-		for (SimpleTeam team : teams.values()) {
-			team.setScore(0);
-		}
-	}
 
 	@Override
 	public void handleKill(InGamePlayer killer, InGamePlayer killed, boolean fall) {
@@ -236,11 +219,6 @@ public class TeamDeathMatch extends DefaultGame {
 				score(getTeam(killer), enemyKillScore);
 			}
 		}
-	}
-
-	@Override
-	public void handleHit(InGamePlayer attacker, InGamePlayer attacked, Damager damager) {
-		super.handleHit(attacker, attacked, damager);
 	}
 	
 	@Override

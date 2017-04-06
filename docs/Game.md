@@ -15,6 +15,7 @@ game_name:
   - other_effect
   height_limit: [positive integer]
   height_damage: [decimal]
+  rounds: [boolean]
   max_players: [non-negative integer]
   min_players: [positive integer]
   respawn_delay: [non-negative integer]
@@ -66,6 +67,7 @@ These settings apply to every game. Some of them have default values, so if you 
 * `effects` list of effects available in this game. You don't have to specify this if you don't want any effects.
 * `height_limit` (**default: 0**) a height at which players will receive suffocation damage (kind of simulating low air pressure). If it's 0 or lower, it doesn't apply.
 * `height_damage` (**default: 1**) the amount of suffocation damage per second. It can use fractions.
+* `rounds` (**required**) whenever the game has rounds or is continuous. Games with rounds will make dead players wait until only one winner remains and then increase that winner's score. Continuous games will keep respawning players and give points on a regular basis.
 * `max_players` (**default: 0**) the maximum amount of players in this game. If it's reached the lobby will try to create another game.
 * `min_players` (**default: 1**) the minimum amount of players required for this game to start. The players will sit in the waiting room until there are enough of them to start the game.
 * `respawn_delay` (**default: 0**) the time which needs to pass until the players are respawned after death. The counter starts when the first player dies and at the end all waiting players will be spawned in one batch.
@@ -151,9 +153,10 @@ This game divides players into teams. Each team's objective is to kill players f
 game_name:
   type: teamDeathMatch
   [default game settings]
-  suicide_score: 0
-  friendly_kill_score: 0
-  enemy_kill_score: 1
+  suicide_score: [integer]
+  friendly_kill_score: [integer]
+  enemy_kill_score: [integer]
+  points_to_win: [positive integer]
   teams:
     team_id:
       name: [team name]
@@ -166,7 +169,33 @@ game_name:
 * `suicide_score` (**default: 0**) points given to a team if one of its members commits a suicide.
 * `friendly_kill_score` (**default: 0**) points given to a team if one of its members kills an ally.
 * `enemy_kill_score` (**default: 1**) points given to a team if one of its members kills an enemy.
+* `points_to_win` (**default: 0**) points required for the team to win the game. 0 means infinite game.
 * `teams` list of teams in the game.
   * `name` (**required**) the name of the team.
   * `color` (**required**) the color of the team (from [this list](https://hub.spigotmc.org/javadocs/spigot/org/bukkit/ChatColor.html)).
   * `spawn` (**required**) the spawn location of the team as defined in _arenas.yml_.
+
+### DeathMatch
+
+**`deathMatch`**
+
+In this game everyone fight with everyone. There are no friendly players, only you. Spawn locations and colors will be assigned randomly. Wins the player who has the most kills.
+
+```
+game_name:
+  type: deathMatch
+  [default game settings]
+  suicide_score: [integer]
+  kill_score: [integer]
+  points_to_win: [positive integer]
+  spawns:
+  - [locations]
+  colors:
+  - [colors]
+```
+
+* `suicide_score` (**default: 0**) points given to a player if he commits a suicide.
+* `kill_score` (**default: 1**) points given to a player if he kills someone.
+* `points_to_win` (**default: 0**) points required for the player to win the game. 0 means infinite game.
+* `spawns` (**required**) list of spawn names (as defined in _arenas.yml_ file.)
+* `colors` (**optional**) list of [colors](https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/ChatColor.html) used in the game. Leave it empty to use the whole palette.

@@ -71,6 +71,7 @@ import pl.betoncraft.flier.effect.ParticleEffect;
 import pl.betoncraft.flier.effect.PrivateSoundEffect;
 import pl.betoncraft.flier.effect.PublicSoundEffect;
 import pl.betoncraft.flier.engine.MultiplyingEngine;
+import pl.betoncraft.flier.game.DeathMatchGame;
 import pl.betoncraft.flier.game.TeamDeathMatch;
 import pl.betoncraft.flier.integration.Integrations;
 import pl.betoncraft.flier.lobby.PhysicalLobby;
@@ -113,6 +114,7 @@ public class FlierPlugin extends JavaPlugin implements Flier {
 		registerWings("simpleWings", s -> new SimpleWings(s));
 		registerLobby("physicalLobby", s -> new PhysicalLobby(s));
 		registerGame("teamDeathMatch", s -> new TeamDeathMatch(s));
+		registerGame("deathMatch", s -> new DeathMatchGame(s));
 		registerBonus("entity", s -> new EntityBonus(s));
 		registerAction("leave", s -> new LeaveGameAction(s));
 		registerAction("projectileGun", s -> new ProjectileGun(s));

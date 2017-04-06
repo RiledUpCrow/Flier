@@ -36,8 +36,10 @@ Flier 0.5.0
 * Players will wait in the waiting room during these delays
 * The game can be locked after starting
 * Added optional maximum game time
+* Added support for optional rounds in games
 
  == Content ==
+* Added "deathMatch" game
 * Added "consume" action
 * Added "itemSet" action
 * Added "item" activator

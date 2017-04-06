@@ -38,6 +38,9 @@ en:
   speed: "S: {color}{speed}~"
   reload: "R: {color}{status}"
   time: "T: {color}{min}:{s}"
+  your_score: "&2Score: &e{score}"
+  best_score: "&2Best: &c{score}"
+  best_score:
   actionbar_ammo: "&f[%s%s%s%s&f]"
   ammo_char: "■"
   wrong_use: "&cWrong use of a command. Correct syntax:"
@@ -114,6 +117,8 @@ pl:
   speed: "S: {color}{speed}~"
   reload: "R: {color}{status}"
   time: "C: {color}{min}:{s}"
+  your_score: "&2Pkt: &e{score}"
+  best_score: "&2Top: &c{score}"
   actionbar_ammo: "&f[%s%s%s%s&f]"
   ammo_char: "■"
   wrong_use: "&cZłe użycie komendy. Poprawna składnia:"
