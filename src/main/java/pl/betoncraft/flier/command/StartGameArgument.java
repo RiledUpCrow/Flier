@@ -16,12 +16,12 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permission;
 
-import net.md_5.bungee.api.ChatColor;
 import pl.betoncraft.flier.api.Flier;
 import pl.betoncraft.flier.api.content.Lobby;
 import pl.betoncraft.flier.api.content.Lobby.JoinResult;
 import pl.betoncraft.flier.api.core.CommandArgument;
 import pl.betoncraft.flier.core.defaults.DefaultLobby;
+import pl.betoncraft.flier.util.LangManager;
 
 /**
  * Moves the player into the game.
@@ -52,7 +52,7 @@ public class StartGameArgument implements CommandArgument {
 			String playerName = it.next();
 			player = Bukkit.getPlayer(playerName);
 			if (player == null) {
-				sender.sendMessage(String.format("%s%s is offline.", ChatColor.RED, playerName));
+				LangManager.sendMessage(sender, "player_offline", playerName);
 				return;
 			}
 		} else {
@@ -74,9 +74,9 @@ public class StartGameArgument implements CommandArgument {
 		}
 		if (!found) {
 			if (player.equals(sender)) {
-				sender.sendMessage(String.format("%sYou are not in a lobby.", ChatColor.RED));
+				LangManager.sendMessage(sender, "you_not_in_lobby");
 			} else {
-				sender.sendMessage(String.format("%s%s is not in a lobby.", ChatColor.RED, player.getName()));
+				LangManager.sendMessage(sender, "player_not_in_lobby", player.getName());
 			}
 		}
 	}
@@ -94,12 +94,12 @@ public class StartGameArgument implements CommandArgument {
 	@Override
 	public String getDescription(CommandSender sender) {
 		if (CommandArgument.checkUser(sender, User.CONSOLE)) {
-			return "Force a player to start a game.";
+			return LangManager.getMessage(sender, "start_game_desc_1");
 		} else {
 			if (sender.hasPermission(force)) {
-				return "Start a game or force specified player to start game.";
+				return LangManager.getMessage(sender, "start_game_desc_2");
 			} else {
-				return "Start a game.";
+				return LangManager.getMessage(sender, "start_game_desc_3");
 			}
 		}
 	}

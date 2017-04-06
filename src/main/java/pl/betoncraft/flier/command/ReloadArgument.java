@@ -10,12 +10,12 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
-import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.permissions.Permission;
 
 import pl.betoncraft.flier.api.Flier;
 import pl.betoncraft.flier.api.core.CommandArgument;
+import pl.betoncraft.flier.util.LangManager;
 
 /**
  * Reloads the plugin.
@@ -30,7 +30,7 @@ class ReloadArgument implements CommandArgument {
 	public void parse(CommandSender sender, String currentCommand, Iterator<String> it) {
 		Flier f = Flier.getInstance();
 		f.reload();
-		sender.sendMessage(ChatColor.DARK_GREEN + "Reloaded!");
+		LangManager.sendMessage(sender, "reloaded");
 	}
 
 	@Override
@@ -45,7 +45,7 @@ class ReloadArgument implements CommandArgument {
 
 	@Override
 	public String getDescription(CommandSender sender) {
-		return "Reloads the plugin.";
+		return LangManager.getMessage(sender, "reload_desc");
 	}
 
 	@Override

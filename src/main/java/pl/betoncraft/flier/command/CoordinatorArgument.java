@@ -15,9 +15,9 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permission;
 
-import net.md_5.bungee.api.ChatColor;
 import pl.betoncraft.flier.api.core.CommandArgument;
 import pl.betoncraft.flier.util.Coordinator;
+import pl.betoncraft.flier.util.LangManager;
 
 /**
  * Toggles the Coordinator.
@@ -33,10 +33,10 @@ public class CoordinatorArgument implements CommandArgument {
 		UUID uuid = ((Player) sender).getUniqueId();
 		if (Coordinator.isActive(uuid)) {
 			Coordinator.removePlayer(uuid);
-			sender.sendMessage(ChatColor.GREEN + "Coordinator disabled!");
+			LangManager.sendMessage(sender, "coordinator_disabled");
 		} else {
 			Coordinator.addPlayer(uuid);
-			sender.sendMessage(ChatColor.GREEN + "Coordinator enabled!");
+			LangManager.sendMessage(sender, "coordinator_enabled");
 		}
 	}
 
@@ -52,7 +52,7 @@ public class CoordinatorArgument implements CommandArgument {
 
 	@Override
 	public String getDescription(CommandSender sender) {
-		return "Toggles the Coordinator.";
+		return LangManager.getMessage(sender, "coordinator_desc");
 	}
 
 	@Override

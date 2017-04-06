@@ -14,6 +14,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.permissions.Permission;
 
 import pl.betoncraft.flier.api.core.CommandArgument;
+import pl.betoncraft.flier.util.LangManager;
 
 /**
  * Contains lobby-related commands.
@@ -55,7 +56,7 @@ public class LobbyArgument implements CommandArgument {
 
 	@Override
 	public String getDescription(CommandSender sender) {
-		return "Contains lobby-related commands.";
+		return LangManager.getMessage(sender, "lobby_desc");
 	}
 
 	@Override

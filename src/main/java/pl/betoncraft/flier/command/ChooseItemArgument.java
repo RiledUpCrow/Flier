@@ -19,13 +19,13 @@ import org.bukkit.permissions.Permission;
 
 import com.google.common.collect.Sets;
 
-import net.md_5.bungee.api.ChatColor;
 import pl.betoncraft.flier.api.Flier;
 import pl.betoncraft.flier.api.content.Game;
 import pl.betoncraft.flier.api.content.Game.Button;
 import pl.betoncraft.flier.api.content.Lobby;
 import pl.betoncraft.flier.api.core.CommandArgument;
 import pl.betoncraft.flier.api.core.InGamePlayer;
+import pl.betoncraft.flier.util.LangManager;
 
 /**
  * Chooses a SetApplier for the player.
@@ -55,7 +55,7 @@ public class ChooseItemArgument implements CommandArgument {
 			} else if (b.equalsIgnoreCase("sell") || b.equalsIgnoreCase("s")) {
 				buy = false;
 			} else {
-				CommandArgument.displayObjects(sender, "buy", b, Sets.newHashSet("buy / b", "sell / s"));
+				CommandArgument.displayObjects(sender, "object_action", b, Sets.newHashSet("buy / b", "sell / s"));
 			}
 		} else {
 			CommandArgument.displayHelp(sender, currentCommand, this);
@@ -70,7 +70,7 @@ public class ChooseItemArgument implements CommandArgument {
 			String playerName = it.next();
 			player = Bukkit.getPlayer(playerName);
 			if (player == null) {
-				sender.sendMessage(String.format("%s%s is offline.", ChatColor.RED, playerName));
+				LangManager.sendMessage(sender, "player_offline", playerName);
 				return;
 			}
 		} else {
@@ -98,14 +98,14 @@ public class ChooseItemArgument implements CommandArgument {
 			if (button != null) {
 				data.getGame().applyButton(data, button, buy, player.equals(sender));
 			} else {
-				CommandArgument.displayObjects(sender, "button", item, data.getGame().getButtons().keySet());
+				CommandArgument.displayObjects(sender, "object_button", item, data.getGame().getButtons().keySet());
 				return;
 			}
 		} else {
 			if (player.equals(sender)) {
-				sender.sendMessage(String.format("%sYou are not in a lobby.", ChatColor.RED));
+				LangManager.sendMessage(sender, "you_not_in_lobby");
 			} else {
-				sender.sendMessage(String.format("%s%s is not in a lobby.", ChatColor.RED, player.getName()));
+				LangManager.sendMessage(sender, "player_not_in_lobby", player.getName());
 			}
 		}
 	}
@@ -123,12 +123,12 @@ public class ChooseItemArgument implements CommandArgument {
 	@Override
 	public String getDescription(CommandSender sender) {
 		if (CommandArgument.checkUser(sender, User.CONSOLE)) {
-			return "Force a player to choose an item.";
+			return LangManager.getMessage(sender, "item_desc_1");
 		} else {
 			if (sender.hasPermission(force)) {
-				return "Choose an item or force specified player to choose an item.";
+				return LangManager.getMessage(sender, "item_desc_2");
 			} else {
-				return "Choose an item.";
+				return LangManager.getMessage(sender, "item_desc_3");
 			}
 		}
 	}

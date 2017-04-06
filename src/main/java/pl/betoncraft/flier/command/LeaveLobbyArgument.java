@@ -11,7 +11,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permission;
@@ -19,6 +18,7 @@ import org.bukkit.permissions.Permission;
 import pl.betoncraft.flier.api.Flier;
 import pl.betoncraft.flier.api.content.Lobby;
 import pl.betoncraft.flier.api.core.CommandArgument;
+import pl.betoncraft.flier.util.LangManager;
 
 /**
  * Moves the player out of the lobby.
@@ -42,7 +42,7 @@ class LeaveLobbyArgument implements CommandArgument {
 			String playerName = it.next();
 			player = Bukkit.getPlayer(playerName);
 			if (player == null) {
-				sender.sendMessage(String.format("%s%s is offline.", ChatColor.RED, playerName));
+				LangManager.sendMessage(sender, "player_offline", playerName);
 				return;
 			}
 		} else {
@@ -71,12 +71,12 @@ class LeaveLobbyArgument implements CommandArgument {
 	@Override
 	public String getDescription(CommandSender sender) {
 		if (CommandArgument.checkUser(sender, User.CONSOLE)) {
-			return "Force the player to leave the lobby.";
+			return LangManager.getMessage(sender, "leave_lobby_desc_1");
 		} else {
 			if (sender.hasPermission(force)) {
-				return "Leave the lobby or force the player to leave the lobby.";
+				return LangManager.getMessage(sender, "leave_lobby_desc_2");
 			} else {
-				return "Leave the lobby.";
+				return LangManager.getMessage(sender, "leave_lobby_desc_3");
 			}
 		}
 	}

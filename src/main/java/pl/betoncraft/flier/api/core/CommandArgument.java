@@ -16,6 +16,8 @@ import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permission;
 
+import pl.betoncraft.flier.util.LangManager;
+
 /**
  * An argument in the Flier command.
  *
@@ -120,7 +122,7 @@ public interface CommandArgument {
 	 *            the argument which is being used incorrectly
 	 */
 	public static void displayHelp(CommandSender sender, String currentCommand, CommandArgument argument) {
-		sender.sendMessage(ChatColor.RED + "Wrong use of a command. Correct syntax:");
+		LangManager.sendMessage(sender, "wrong_use");
 		sender.sendMessage(ChatColor.DARK_GREEN + "/" + currentCommand + " " + argument.getHelp(sender));
 	}
 
@@ -133,7 +135,7 @@ public interface CommandArgument {
 	 *            list of arguments which are available in this context
 	 */
 	public static void displayHelp(CommandSender sender, List<CommandArgument> arguments) {
-		sender.sendMessage(ChatColor.RED + "Available arguments:");
+		LangManager.sendMessage(sender, "available_arguments");
 		for (CommandArgument a : arguments) {
 			// skip the argument if the sender can't use it
 			if (!checkUser(sender, a.getUser())) {
@@ -174,13 +176,13 @@ public interface CommandArgument {
 	 *            a set of available object names
 	 */
 	public static void displayObjects(CommandSender sender, String type, String name, Set<String> available) {
-		sender.sendMessage(String.format("%sNo such %s: %s%s", ChatColor.RED, type, ChatColor.DARK_RED, name));
+		type = LangManager.getMessage(sender, type);
+		LangManager.sendMessage(sender, "no_such_object", type, name);
 		StringBuilder builder = new StringBuilder();
 		for (String g : available) {
 			builder.append(String.format("%s%s%s, ", ChatColor.YELLOW, g, ChatColor.GREEN));
 		}
-		sender.sendMessage(String.format("%sAvailable names: %s",
-				ChatColor.GREEN, builder.toString().trim().substring(0, builder.lastIndexOf(","))));
+		LangManager.sendMessage(sender, "available_names", builder.toString().trim().substring(0, builder.lastIndexOf(",")));
 	}
 	
 	/**
@@ -189,7 +191,7 @@ public interface CommandArgument {
 	 * @param sender the sender of this command
 	 */
 	public static void noPermission(CommandSender sender) {
-		sender.sendMessage(String.format("%sYou don't have permission to use this command.", ChatColor.RED));
+		LangManager.sendMessage(sender, "no_permission");
 	}
 	
 	/**
@@ -199,9 +201,9 @@ public interface CommandArgument {
 	 */
 	public static void wrongUser(CommandSender sender) {
 		if (sender instanceof Player) {
-			sender.sendMessage(String.format("%sThis command must be used by the console.", ChatColor.RED));
+			LangManager.sendMessage(sender, "console_only");
 		} else {
-			sender.sendMessage(String.format("%sThis command must be used by a player.", ChatColor.RED));
+			LangManager.sendMessage(sender, "player_only");
 		}
 	}
 	

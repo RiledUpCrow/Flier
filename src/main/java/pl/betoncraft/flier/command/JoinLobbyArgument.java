@@ -16,10 +16,10 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permission;
 
-import net.md_5.bungee.api.ChatColor;
 import pl.betoncraft.flier.api.Flier;
 import pl.betoncraft.flier.api.content.Lobby;
 import pl.betoncraft.flier.api.core.CommandArgument;
+import pl.betoncraft.flier.util.LangManager;
 
 /**
  * The argument responsible for joining the lobby.
@@ -38,7 +38,7 @@ class JoinLobbyArgument implements CommandArgument {
 			String lobbyName = it.next();
 			Lobby lobby = flier.getLobbies().get(lobbyName);
 			if (lobby == null) {
-				CommandArgument.displayObjects(sender, "lobby", lobbyName, flier.getLobbies().keySet());
+				CommandArgument.displayObjects(sender, "object_lobby", lobbyName, flier.getLobbies().keySet());
 				return;
 			}
 			if (it.hasNext()) {
@@ -49,7 +49,7 @@ class JoinLobbyArgument implements CommandArgument {
 				String playerName = it.next();
 				Player player = Bukkit.getPlayer(playerName);
 				if (player == null) {
-					sender.sendMessage(String.format("%s%s is offline.", ChatColor.RED, playerName));
+					LangManager.sendMessage(sender, "player_offline", playerName);
 				} else {
 					lobby.addPlayer(player);
 				}
@@ -78,12 +78,12 @@ class JoinLobbyArgument implements CommandArgument {
 	@Override
 	public String getDescription(CommandSender sender) {
 		if (CommandArgument.checkUser(sender, User.CONSOLE)) {
-			return "Force a player to join the lobby.";
+			return LangManager.getMessage(sender, "join_lobby_desc_1");
 		} else {
 			if (sender.hasPermission(force)) {
-				return "Join a lobby or force specified player to join the lobby.";
+				return LangManager.getMessage(sender, "join_lobby_desc_2");
 			} else {
-				return "Join a lobby.";
+				return LangManager.getMessage(sender, "join_lobby_desc_3");
 			}
 		}
 	}

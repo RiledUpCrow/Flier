@@ -18,12 +18,12 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permission;
 
-import net.md_5.bungee.api.ChatColor;
 import pl.betoncraft.flier.api.Flier;
 import pl.betoncraft.flier.api.content.Game;
 import pl.betoncraft.flier.api.content.Lobby;
 import pl.betoncraft.flier.api.core.CommandArgument;
 import pl.betoncraft.flier.api.core.InGamePlayer;
+import pl.betoncraft.flier.util.LangManager;
 
 /**
  * Sets player's money in the game.
@@ -41,7 +41,7 @@ public class MoneyArgument implements CommandArgument {
 			int money = Integer.parseInt(it.next());
 			Player player = Bukkit.getPlayer(playerName);
 			if (player == null) {
-				sender.sendMessage(ChatColor.RED + playerName + " is offline.");
+				LangManager.sendMessage(sender, "player_offline", playerName);
 				return;
 			}
 			UUID uuid = player.getUniqueId();
@@ -57,15 +57,15 @@ public class MoneyArgument implements CommandArgument {
 				}
 			}
 			if (data == null) {
-				sender.sendMessage(ChatColor.RED + playerName + " is not in any game.");
+				LangManager.sendMessage(sender, "not_in_game", playerName);
 				return;
 			}
 			data.setMoney(money);
-			sender.sendMessage(ChatColor.GREEN + playerName + " has now $" + money + ".");
+			LangManager.sendMessage(sender, "money_set", playerName, money);
 		} catch (NoSuchElementException e) {
 			CommandArgument.displayHelp(sender, currentCommand, this);
 		} catch (NumberFormatException e) {
-			sender.sendMessage(ChatColor.RED + "Money amount must be an integer.");
+			LangManager.sendMessage(sender, "money_integer");
 		}
 	}
 
@@ -81,7 +81,7 @@ public class MoneyArgument implements CommandArgument {
 
 	@Override
 	public String getDescription(CommandSender sender) {
-		return "Sets player's money in the game.";
+		return LangManager.getMessage(sender, "money_desc");
 	}
 
 	@Override
