@@ -150,6 +150,8 @@ public class DeathMatchGame extends DefaultGame {
 			String win = LangManager.getMessage(player, "player_win", teamNames);
 			Flier.getInstance().getFancyStuff().sendTitle(
 					player.getPlayer(), win, colors.get(player.getPlayer().getName()) + word, 0, 0, 0);
+			LangManager.sendMessage(player, "game_ends");
+			player.getPlayer().sendMessage(win);
 		}
 		// end game
 		lobby.endGame(this);

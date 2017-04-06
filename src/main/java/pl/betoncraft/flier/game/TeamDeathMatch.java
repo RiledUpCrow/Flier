@@ -170,6 +170,8 @@ public class TeamDeathMatch extends DefaultGame {
 			String win = LangManager.getMessage(data, "team_win", teamNames);
 			Flier.getInstance().getFancyStuff().sendTitle(
 					data.getPlayer(), win, entry.getValue().getColor() + word, 0, 0, 0);
+			LangManager.sendMessage(data, "game_ends");
+			data.getPlayer().sendMessage(win);
 		}
 		// end game
 		lobby.endGame(this);
