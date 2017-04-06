@@ -42,17 +42,17 @@ public interface Game {
 		/**
 		 * @return the name of Location of this Button
 		 */
-		public String getLocationName();
+		public List<String> getLocationNames();
 		
 		/**
 		 * @return the Location of this Button
 		 */
-		public Location getLocation();
+		public List<Location> getLocations();
 		
 		/**
 		 * @param location the Location of this Bonus
 		 */
-		public void setLocation(Location location);
+		public void setLocations(List<Location> location);
 
 		/**
 		 * @return the set of Button names required for unlocking this Button

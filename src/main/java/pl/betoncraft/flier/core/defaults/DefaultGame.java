@@ -238,8 +238,8 @@ public abstract class DefaultGame implements Listener, Game {
 	public class DefaultButton implements Button {
 		
 		protected final String id;
-		protected final String locationName;
-		protected Location location;
+		protected final List<String> locationNames;
+		protected List<Location> locations;
 		protected final Set<String> requirements;
 		protected final Set<Permission> permissions;
 		protected final int buyCost;
@@ -252,7 +252,10 @@ public abstract class DefaultGame implements Listener, Game {
 		public DefaultButton(ConfigurationSection section) throws LoadingException {
 			id = section.getName();
 			ValueLoader loader = new ValueLoader(section);
-			locationName = loader.loadString("block");
+			locationNames = section.getStringList("blocks");
+			if (locationNames.isEmpty()) {
+				throw new LoadingException("Blocks must be specified.");
+			}
 			requirements = new HashSet<>(section.getStringList("required"));
 			permissions = new HashSet<>(
 					section.getStringList("permissions").stream()
@@ -288,18 +291,26 @@ public abstract class DefaultGame implements Listener, Game {
 		}
 		
 		@Override
-		public String getLocationName() {
-			return locationName;
+		public List<String> getLocationNames() {
+			return locationNames;
 		}
 		
 		@Override
-		public Location getLocation() {
-			return location;
+		public List<Location> getLocations() {
+			return locations;
 		}
 		
 		@Override
-		public void setLocation(Location location) {
-			this.location = new Location(location.getWorld(), location.getBlockX(), location.getBlockY(), location.getBlockZ());
+		public void setLocations(List<Location> locs) {
+			locations = new ArrayList<>(locs.size());
+			locs.forEach(location ->
+					locations.add(new Location(
+							location.getWorld(),
+							location.getBlockX(),
+							location.getBlockY(),
+							location.getBlockZ()
+					))
+			);
 		}
 		
 		@Override
@@ -905,7 +916,11 @@ public abstract class DefaultGame implements Listener, Game {
 			bonus.setLocation(arena.getLocation(bonus.getLocationName()));
 		}
 		for (Button button : buttons.values()) {
-			button.setLocation(arena.getLocation(button.getLocationName()));
+			List<Location> locations = new ArrayList<>(button.getLocationNames().size());
+			for (String name : button.getLocationNames()) {
+				locations.add(arena.getLocation(name));
+			}
+			button.setLocations(locations);
 		}
 	}
 	
@@ -934,7 +949,10 @@ public abstract class DefaultGame implements Listener, Game {
 				}
 				// apply the button
 				Button button = buttons.values().stream()
-						.filter(b -> b.getLocation().equals(event.getClickedBlock().getLocation()))
+						.filter(b -> b.getLocations().stream()
+								.map(loc -> loc.getBlock())
+								.anyMatch(block -> event.getClickedBlock().equals(block))
+						)
 						.findFirst()
 						.orElse(null);
 				if (button != null) {
