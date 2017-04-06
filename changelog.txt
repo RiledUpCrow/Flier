@@ -19,6 +19,7 @@ Flier 0.5.0
 * Disabled health regeneration while in-game
 * Compass points to lobby spawn if no players are present
 * Added requirements to item buttons
+* Players on the ground are flashing constantly
 
  == Lobby ==
 * Moved item buttons from lobby to game

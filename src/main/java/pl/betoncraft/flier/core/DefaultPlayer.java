@@ -41,6 +41,7 @@ import pl.betoncraft.flier.api.core.PlayerClass;
 import pl.betoncraft.flier.api.core.SidebarLine;
 import pl.betoncraft.flier.api.core.UsableItem;
 import pl.betoncraft.flier.api.core.Usage;
+import pl.betoncraft.flier.api.core.Usage.Where;
 import pl.betoncraft.flier.event.FlierCollectBonusEvent;
 import pl.betoncraft.flier.event.FlierEngineUseEvent;
 import pl.betoncraft.flier.event.FlierPlayerHitEvent;
@@ -72,6 +73,7 @@ public class DefaultPlayer implements InGamePlayer {
 	private ChatColor color = ChatColor.WHITE;
 	private long glowTimer;
 	private int money;
+	private int tickCounter = 0;
 	
 	public DefaultPlayer(Player player, Game game, PlayerClass clazz) {
 		this.player = player;
@@ -119,6 +121,10 @@ public class DefaultPlayer implements InGamePlayer {
 			}
 			if (!isAccelerating()) { // is not accelerating
 				regenerateFuel();
+			}
+			// if on ground glow for half a second every second
+			if (tickCounter++ % 20 == 0 && Position.check(player, Where.GROUND)) {
+				startGlowing(10);
 			}
 			checkBonuses();
 			displayReloadingTime();
