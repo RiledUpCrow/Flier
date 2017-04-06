@@ -437,7 +437,7 @@ public abstract class DefaultGame implements Listener, Game {
 				}
 			} else {
 				// the game has already started
-				if (rounds) {
+				if (rounds && !roundFinished) {
 					// the round still in progress
 					reason = WaitReason.ROUND;
 					currentWaitingTime = respawnDelay;
@@ -503,7 +503,9 @@ public abstract class DefaultGame implements Listener, Game {
 				} else {
 					// display countdown on specific seconds
 					if (displayTimes.contains(currentWaitingTime)) {
-						if (reason == WaitReason.RESPAWN_DELAY || reason == WaitReason.START_DELAY) {
+						if (reason == WaitReason.RESPAWN_DELAY ||
+								reason == WaitReason.START_DELAY ||
+								reason == WaitReason.ROUND) {
 							waitingPlayers.forEach(
 									data -> LangManager.sendMessage(data, "countdown",
 											(double) currentWaitingTime / 20.0));
