@@ -41,6 +41,7 @@ Flier 0.5.0
 
  == Content ==
 * Added "deathMatch" game
+* Added "invisible" bonus
 * Added "consume" action
 * Added "itemSet" action
 * Added "item" activator

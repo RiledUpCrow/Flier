@@ -8,52 +8,30 @@ package pl.betoncraft.flier.bonus;
 
 import java.util.Arrays;
 
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.HandlerList;
-import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import pl.betoncraft.flier.api.Flier;
-import pl.betoncraft.flier.api.content.Game;
-import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.LoadingException;
-import pl.betoncraft.flier.core.defaults.DefaultBonus;
 
 /**
  * An entity based Bonus type.
  *
  * @author Jakub Sapalski
  */
-public class EntityBonus extends DefaultBonus implements Listener {
+public class EntityBonus extends ProximityBonus {
 	
 	private EntityType type;
 	private Entity entity;
-	private Location location;
-	private final double distance;
-	private final String locationName;
 	private BukkitRunnable rotator;
 	
 	public EntityBonus(ConfigurationSection section) throws LoadingException {
 		super(section);
 		type = loader.loadEnum("entity", EntityType.class);
-		distance = Math.pow(loader.loadPositiveDouble("distance"), 2);
-		locationName = loader.loadString("location");
-	}
-	
-	@EventHandler(priority=EventPriority.MONITOR)
-	public void onMove(PlayerMoveEvent event) {
-		InGamePlayer player = game.getPlayers().get(event.getPlayer().getUniqueId());
-		if (player != null && player.isPlaying() && event.getTo().distanceSquared(location) <= distance) {
-			apply(player);
-		}
 	}
 
 	@EventHandler
@@ -85,15 +63,8 @@ public class EntityBonus extends DefaultBonus implements Listener {
 	}
 	
 	@Override
-	public void setGame(Game game) throws LoadingException {
-		super.setGame(game);
-		location = game.getArena().getLocation(locationName);
-	}
-	
-	@Override
 	public void release() {
 		super.release();
-		Bukkit.getPluginManager().registerEvents(this, Flier.getInstance());
 		rotator = new BukkitRunnable() {
 			@Override
 			public void run() {
@@ -119,7 +90,6 @@ public class EntityBonus extends DefaultBonus implements Listener {
 			rotator.cancel();
 			rotator = null;
 		}
-		HandlerList.unregisterAll(this);
 	}
 
 }

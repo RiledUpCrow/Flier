@@ -61,6 +61,7 @@ import pl.betoncraft.flier.api.core.LoadingException;
 import pl.betoncraft.flier.api.core.Modification;
 import pl.betoncraft.flier.api.core.UsableItem;
 import pl.betoncraft.flier.bonus.EntityBonus;
+import pl.betoncraft.flier.bonus.ProximityBonus;
 import pl.betoncraft.flier.command.FlierCommand;
 import pl.betoncraft.flier.core.DefaultArena;
 import pl.betoncraft.flier.core.DefaultModification;
@@ -116,6 +117,7 @@ public class FlierPlugin extends JavaPlugin implements Flier {
 		registerGame("teamDeathMatch", s -> new TeamDeathMatch(s));
 		registerGame("deathMatch", s -> new DeathMatchGame(s));
 		registerBonus("entity", s -> new EntityBonus(s));
+		registerBonus("invisible", s -> new ProximityBonus(s));
 		registerAction("leave", s -> new LeaveGameAction(s));
 		registerAction("projectileGun", s -> new ProjectileGun(s));
 		registerAction("particleGun", s -> new ParticleGun(s));
