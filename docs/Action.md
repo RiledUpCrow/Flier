@@ -124,6 +124,20 @@ wings_health_action:
 
 * `amount` (**required**) is the amount of health added to the Wings. Negative values remove health.
 
+### Health
+
+**`health`**
+
+This action modifies the player's health. If the amount is negative it will damage the player (won't change cause of death though, so other players can still get points/money for the kill) and if it's positive, it will heal them.
+
+```
+health_action:
+  type: health
+  amount: [decimal]
+```
+
+* `amount` (**required**) is the amount of health to modify. Negative values damage the player.
+
 ### Suicide
 
 **`suicide`**

@@ -8,10 +8,13 @@ package pl.betoncraft.flier.bonus;
 
 import java.util.Arrays;
 
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.HandlerList;
+import org.bukkit.event.Listener;
 import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -23,7 +26,7 @@ import pl.betoncraft.flier.api.core.LoadingException;
  *
  * @author Jakub Sapalski
  */
-public class EntityBonus extends ProximityBonus {
+public class EntityBonus extends ProximityBonus implements Listener {
 	
 	private EntityType type;
 	private Entity entity;
@@ -77,11 +80,13 @@ public class EntityBonus extends ProximityBonus {
 		entity.setInvulnerable(true);
 		entity.setSilent(true);
 		entity.setGlowing(true);
+		Bukkit.getPluginManager().registerEvents(this, Flier.getInstance());
 	}
 	
 	@Override
 	public void block() {
 		super.block();
+		HandlerList.unregisterAll(this);
 		if (entity != null) {
 			entity.remove();
 			entity = null;

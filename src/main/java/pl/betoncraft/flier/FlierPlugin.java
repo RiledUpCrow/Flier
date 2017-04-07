@@ -26,6 +26,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import pl.betoncraft.flier.action.ConsumeAction;
 import pl.betoncraft.flier.action.EffectAction;
 import pl.betoncraft.flier.action.FuelAction;
+import pl.betoncraft.flier.action.HealthAction;
 import pl.betoncraft.flier.action.ItemSetAction;
 import pl.betoncraft.flier.action.LaunchAction;
 import pl.betoncraft.flier.action.LeaveGameAction;
@@ -132,6 +133,7 @@ public class FlierPlugin extends JavaPlugin implements Flier {
 		registerAction("targetCompass", s -> new TargetAction(s));
 		registerAction("itemSet", s -> new ItemSetAction(s));
 		registerAction("consume", s -> new ConsumeAction(s));
+		registerAction("health", s -> new HealthAction(s));
 		registerActivator("leftClick", s -> new LeftClickActivator(s));
 		registerActivator("rightClick", s -> new RightClickActivator(s));
 		registerActivator("slowTick", s -> new SlowTickActivator(s));

@@ -6,14 +6,9 @@
  */
 package pl.betoncraft.flier.bonus;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.HandlerList;
-import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import pl.betoncraft.flier.api.Flier;
 import pl.betoncraft.flier.api.content.Game;
@@ -26,11 +21,12 @@ import pl.betoncraft.flier.core.defaults.DefaultBonus;
  *
  * @author Jakub Sapalski
  */
-public class ProximityBonus extends DefaultBonus implements Listener {
+public class ProximityBonus extends DefaultBonus {
 
 	protected Location location;
 	protected final double distance;
 	protected final String locationName;
+	protected BukkitRunnable checker;
 
 	public ProximityBonus(ConfigurationSection section) throws LoadingException {
 		super(section);
@@ -38,11 +34,13 @@ public class ProximityBonus extends DefaultBonus implements Listener {
 		locationName = loader.loadString("location");
 	}
 	
-	@EventHandler(priority=EventPriority.MONITOR)
-	public void onMove(PlayerMoveEvent event) {
-		InGamePlayer player = game.getPlayers().get(event.getPlayer().getUniqueId());
-		if (player != null && player.isPlaying() && event.getTo().distanceSquared(location) <= distance) {
-			apply(player);
+	public void check() {
+		for (InGamePlayer player : game.getPlayers().values()) {
+			if (player != null &&
+					player.isPlaying() &&
+					player.getPlayer().getLocation().distanceSquared(location) <= distance) {
+				apply(player);
+			}
 		}
 	}
 	
@@ -55,13 +53,19 @@ public class ProximityBonus extends DefaultBonus implements Listener {
 	@Override
 	public void release() {
 		super.release();
-		Bukkit.getPluginManager().registerEvents(this, Flier.getInstance());
+		checker = new BukkitRunnable() {
+			@Override
+			public void run() {
+				check();
+			}
+		};
+		checker.runTaskTimer(Flier.getInstance(), 1, 1);
 	}
 	
 	@Override
 	public void block() {
 		super.block();
-		HandlerList.unregisterAll(this);
+		checker.cancel();
 	}
 
 }
