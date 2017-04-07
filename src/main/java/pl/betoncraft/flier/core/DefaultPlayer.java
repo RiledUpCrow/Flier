@@ -29,20 +29,18 @@ import org.bukkit.util.Vector;
 import com.google.common.collect.Lists;
 
 import pl.betoncraft.flier.api.Flier;
-import pl.betoncraft.flier.api.content.Bonus;
 import pl.betoncraft.flier.api.content.Engine;
 import pl.betoncraft.flier.api.content.Game;
 import pl.betoncraft.flier.api.content.Wings;
 import pl.betoncraft.flier.api.core.Damager;
-import pl.betoncraft.flier.api.core.FancyStuffWrapper;
 import pl.betoncraft.flier.api.core.Damager.DamageResult;
+import pl.betoncraft.flier.api.core.FancyStuffWrapper;
 import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.PlayerClass;
 import pl.betoncraft.flier.api.core.SidebarLine;
 import pl.betoncraft.flier.api.core.UsableItem;
 import pl.betoncraft.flier.api.core.Usage;
 import pl.betoncraft.flier.api.core.Usage.Where;
-import pl.betoncraft.flier.event.FlierCollectBonusEvent;
 import pl.betoncraft.flier.event.FlierEngineUseEvent;
 import pl.betoncraft.flier.event.FlierPlayerHitEvent;
 import pl.betoncraft.flier.util.LangManager;
@@ -126,7 +124,6 @@ public class DefaultPlayer implements InGamePlayer {
 			if (tickCounter++ % 20 == 0 && Position.check(player, Where.GROUND)) {
 				startGlowing(10);
 			}
-			checkBonuses();
 			displayReloadingTime();
 			
 			// manage UsableItems
@@ -544,23 +541,6 @@ public class DefaultPlayer implements InGamePlayer {
 			team.setPrefix(string);
 		} else {
 			sb.resetScores(name);
-		}
-	}
-
-	private void checkBonuses() {
-		List<Bonus> bonuses = game.getBonuses();
-		for (Bonus bonus : bonuses) {
-			if (!bonus.isAvailable()) {
-				continue;
-			}
-			double distSqrd = bonus.getDistance() * bonus.getDistance();
-			if (bonus.getLocation().distanceSquared(player.getLocation()) <= distSqrd) {
-				FlierCollectBonusEvent event = new FlierCollectBonusEvent(this, bonus);
-				Bukkit.getPluginManager().callEvent(event);
-				if (!event.isCancelled()) {
-					bonus.apply(this);
-				}
-			}
 		}
 	}
 	

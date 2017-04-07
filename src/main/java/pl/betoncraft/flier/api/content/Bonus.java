@@ -8,9 +8,8 @@ package pl.betoncraft.flier.api.content;
 
 import java.util.List;
 
-import org.bukkit.Location;
-
 import pl.betoncraft.flier.api.core.InGamePlayer;
+import pl.betoncraft.flier.api.core.LoadingException;
 
 /**
  * Represents a collectable Entity on the Game map.
@@ -23,26 +22,6 @@ public interface Bonus {
 	 * @return the ID of this Bonus
 	 */
 	public String getID();
-	
-	/**
-	 * @return the name of this Bonus' Location
-	 */
-	public String getLocationName();
-
-	/**
-	 * @return the Location of a Bonus
-	 */
-	public Location getLocation();
-	
-	/**
-	 * @param location the Location of a Bonus
-	 */
-	public void setLocation(Location location);
-
-	/**
-	 * @return the minimum distance to activate this Bonus
-	 */
-	public double getDistance();
 
 	/**
 	 * @return true if the Bonus should be removed after using
@@ -64,12 +43,17 @@ public interface Bonus {
 	 *         -1 if it shouldn't respawn at all
 	 */
 	public int getRespawn();
-
+	
 	/**
-	 * Called in game fast tick to allow Bonus updating (for example rotating
-	 * the entity).
+	 * Sets the Game containing this Bonus.
+	 *
+	 * @param game
+	 *            the Game containing this Bonus
+	 * @throws LoadingException
+	 *             when there is an error while loading required information
+	 *             from the Game
 	 */
-	public void update();
+	public void setGame(Game game) throws LoadingException;
 
 	/**
 	 * Starts the bonus, for example spawning the entity.

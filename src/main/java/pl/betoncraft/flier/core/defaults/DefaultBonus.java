@@ -12,19 +12,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import org.bukkit.Location;
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import pl.betoncraft.flier.api.Flier;
 import pl.betoncraft.flier.api.content.Action;
 import pl.betoncraft.flier.api.content.Bonus;
+import pl.betoncraft.flier.api.content.Game;
 import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.LoadingException;
+import pl.betoncraft.flier.event.FlierCollectBonusEvent;
 import pl.betoncraft.flier.util.ValueLoader;
 
 /**
- * Default implementation of a Bonus.
+ * A default Bonus implementation.
  *
  * @author Jakub Sapalski
  */
@@ -33,26 +35,24 @@ public abstract class DefaultBonus implements Bonus {
 	protected final ValueLoader loader;
 	protected final String id;
 	
-	protected final double distance;
 	protected final boolean consumable;
 	protected final int cooldown;
 	protected final int respawn;
-	protected final String locationName;
 	protected final List<Action> actions = new ArrayList<>();
 
-	protected Location location;
 	protected boolean available = false;
-	protected Map<UUID, Long> cooldowns = new HashMap<>();
+	protected Map<UUID, Integer> cooldowns = new HashMap<>();
 	protected BukkitRunnable starter;
+	protected Game game;
+	protected int ticks = 0;
+	protected BukkitRunnable ticker;
 	
 	public DefaultBonus(ConfigurationSection section) throws LoadingException {
 		id = section.getName();
 		loader = new ValueLoader(section);
-		distance = loader.loadPositiveDouble("distance");
 		consumable = loader.loadBoolean("consumable");
 		cooldown = loader.loadNonNegativeInt("cooldown");
 		respawn = loader.loadNonNegativeInt("respawn");
-		locationName = loader.loadString("location");
 		Flier flier = Flier.getInstance();
 		for (String id : section.getStringList("actions")) {
 			actions.add(flier.getAction(id));
@@ -62,26 +62,6 @@ public abstract class DefaultBonus implements Bonus {
 	@Override
 	public String getID() {
 		return id;
-	}
-	
-	@Override
-	public String getLocationName() {
-		return locationName;
-	}
-
-	@Override
-	public Location getLocation() {
-		return location;
-	}
-	
-	@Override
-	public void setLocation(Location location) {
-		this.location = location;
-	}
-
-	@Override
-	public double getDistance() {
-		return distance;
 	}
 
 	@Override
@@ -116,24 +96,28 @@ public abstract class DefaultBonus implements Bonus {
 		}
 		UUID uuid = player.getPlayer().getUniqueId();
 		if (cooldown > 0) {
-			Long cd = cooldowns.get(uuid);
+			Integer cd = cooldowns.get(uuid);
 			if (cd != null) {
-				long time = System.currentTimeMillis();
-				if (time < cd) {
+				if (ticks < cd) {
 					return;
 				}
 			}
 		}
+		FlierCollectBonusEvent event = new FlierCollectBonusEvent(player, this);
+		Bukkit.getPluginManager().callEvent(event);
+		if (event.isCancelled()) {
+			return;
+		}
 		if (use(player)) {
 			if (cooldown > 0) {
-				cooldowns.put(uuid, System.currentTimeMillis() + (cooldown * 50));
+				cooldowns.put(uuid, ticks + cooldown);
 			}
 			if (consumable) {
-				stop();
+				block();
 				starter = new BukkitRunnable() {
 					@Override
 					public void run() {
-						start();
+						release();
 					}
 				};
 				starter.runTaskLater(Flier.getInstance(), respawn);
@@ -141,19 +125,48 @@ public abstract class DefaultBonus implements Bonus {
 		}
 	}
 	
+	/**
+	 * Called upon Bonus creation and after {@link #block()} when the respawn
+	 * time has passed.
+	 */
+	protected void release() {
+		available = true;
+		starter = null;
+	}
+	
+	/**
+	 * Called when the Bonus is taken by the player or upon Bonus removal.
+	 */
+	protected void block() {
+		available = false;
+	}
+	
+	@Override
+	public void setGame(Game game) throws LoadingException {
+		this.game = game;
+	}
+
 	@Override
 	public void start() {
-		stop();
 		available = true;
+		ticker = new BukkitRunnable() {
+			@Override
+			public void run() {
+				ticks++;
+			}
+		};
+		ticker.runTaskTimer(Flier.getInstance(), 0, 1);
+		release();
 	}
 	
 	@Override
 	public void stop() {
-		available = false;
 		if (starter != null) {
 			starter.cancel();
 			starter = null;
 		}
+		ticker.cancel();
+		block();
 	}
 	
 	private boolean use(InGamePlayer player) {

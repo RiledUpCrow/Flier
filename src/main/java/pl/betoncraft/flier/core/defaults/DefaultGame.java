@@ -202,9 +202,6 @@ public abstract class DefaultGame implements Listener, Game {
 				endGame();
 				return;
 			}
-			for (Bonus bonus : bonuses) {
-				bonus.update();
-			}
 			game.fastTick();
 			for (InGamePlayer data : getPlayers().values()) {
 				data.fastTick();
@@ -915,7 +912,7 @@ public abstract class DefaultGame implements Listener, Game {
 			leaveBlocks.add(arena.getLocation(name).getBlock());
 		}
 		for (Bonus bonus : bonuses) {
-			bonus.setLocation(arena.getLocation(bonus.getLocationName()));
+			bonus.setGame(this);
 		}
 		for (Button button : buttons.values()) {
 			List<Location> locations = new ArrayList<>(button.getLocationNames().size());
