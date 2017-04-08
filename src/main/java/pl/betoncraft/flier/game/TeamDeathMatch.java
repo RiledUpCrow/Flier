@@ -202,11 +202,14 @@ public class TeamDeathMatch extends DefaultGame {
 			if (aliveTeams.size() == 1) {
 				SimpleTeam winningTeam = aliveTeams.get(0);
 				score(winningTeam, 1);
-				roundFinished = true;
 				players.entrySet().stream()
 						.filter(e -> e.getValue().equals(winningTeam))
 						.map(e -> dataMap.get(e.getKey()))
 						.forEach(player -> moveToWaitingRoom(player));
+			}
+			// this is for test games where only one player is playing
+			if (aliveTeams.size() <= 1) {
+				roundFinished = true;
 			}
 		} else {
 			// kills in continuous games increase points

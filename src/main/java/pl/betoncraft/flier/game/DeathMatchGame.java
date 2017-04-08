@@ -179,10 +179,13 @@ public class DeathMatchGame extends DefaultGame {
 			if (alivePlayers.size() == 1) {
 				UUID winner = alivePlayers.get(0);
 				score(dataMap.get(winner), 1);
-				roundFinished = true;
 				alivePlayers.stream()
 						.map(uuid -> dataMap.get(uuid))
 						.forEach(player -> moveToWaitingRoom(player));
+			}
+			// this is for test games where only one player is playing
+			if (alivePlayers.size() <= 1) {
+				roundFinished = true;
 			}
 		} else {
 			// kills in continuous games increase points
