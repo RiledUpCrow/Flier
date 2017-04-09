@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
@@ -26,6 +27,7 @@ import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.LoadingException;
 import pl.betoncraft.flier.api.core.SidebarLine;
 import pl.betoncraft.flier.core.defaults.DefaultGame;
+import pl.betoncraft.flier.event.FlierPlayerSpawnEvent;
 import pl.betoncraft.flier.util.LangManager;
 
 /**
@@ -224,6 +226,8 @@ public class DeathMatchGame extends DefaultGame {
 			}
 		}
 		player.getPlayer().teleport(locations.get(spawnCounter++ % locations.size()));
+		FlierPlayerSpawnEvent event = new FlierPlayerSpawnEvent(player);
+		Bukkit.getPluginManager().callEvent(event);
 	}
 
 	@Override

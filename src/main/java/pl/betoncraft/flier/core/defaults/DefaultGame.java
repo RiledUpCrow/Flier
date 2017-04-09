@@ -69,7 +69,6 @@ import pl.betoncraft.flier.core.DefaultSetApplier;
 import pl.betoncraft.flier.event.FlierClickButtonEvent;
 import pl.betoncraft.flier.event.FlierPlayerKillEvent;
 import pl.betoncraft.flier.event.FlierPlayerKillEvent.Type;
-import pl.betoncraft.flier.event.FlierPlayerSpawnEvent;
 import pl.betoncraft.flier.sidebar.Altitude;
 import pl.betoncraft.flier.sidebar.Ammo;
 import pl.betoncraft.flier.sidebar.Fuel;
@@ -743,8 +742,7 @@ public abstract class DefaultGame implements Listener, Game {
 				player.setPlaying(true);
 			}
 		}.runTaskLater(Flier.getInstance(), 20);
-		FlierPlayerSpawnEvent event = new FlierPlayerSpawnEvent(player);
-		Bukkit.getPluginManager().callEvent(event);
+		// spawn event must be called after teleportation
 	}
 	
 	@Override

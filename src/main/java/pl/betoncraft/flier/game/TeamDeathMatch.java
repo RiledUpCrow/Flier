@@ -13,6 +13,7 @@ import java.util.Map.Entry;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
@@ -24,6 +25,7 @@ import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.LoadingException;
 import pl.betoncraft.flier.api.core.SidebarLine;
 import pl.betoncraft.flier.core.defaults.DefaultGame;
+import pl.betoncraft.flier.event.FlierPlayerSpawnEvent;
 import pl.betoncraft.flier.util.LangManager;
 import pl.betoncraft.flier.util.Utils;
 import pl.betoncraft.flier.util.ValueLoader;
@@ -239,6 +241,8 @@ public class TeamDeathMatch extends DefaultGame {
 			);
 		}
 		player.getPlayer().teleport(team.getSpawn());
+		FlierPlayerSpawnEvent event = new FlierPlayerSpawnEvent(player);
+		Bukkit.getPluginManager().callEvent(event);
 	}
 	
 	@Override
