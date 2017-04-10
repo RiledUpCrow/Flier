@@ -9,8 +9,10 @@ package pl.betoncraft.flier;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
+import org.bstats.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Entity;
@@ -166,6 +168,38 @@ public class FlierPlugin extends JavaPlugin implements Flier {
 		
 		// schedule loading after all plugins are enabled
 		Bukkit.getScheduler().runTask(this, () -> reload());
+		
+		// start metrics
+		Metrics metrics = new Metrics(this);
+		metrics.addCustomChart(new Metrics.SingleLineChart("ingame_players") {
+			@Override
+			public int getValue() {
+				return players.size();
+			}
+		});
+		metrics.addCustomChart(new Metrics.AdvancedPie("game_types") {
+			@Override
+			public HashMap<String, Integer> getValues(HashMap<String, Integer> map) {
+				for (Lobby lobby : lobbies.values()) {
+					for (Set<Game> set : lobby.getGames().values()) {
+						for (Game game : set) {
+							String name;
+							if (game instanceof DeathMatchGame) {
+								name = "DeathMatch";
+							} else if (game instanceof TeamDeathMatch) {
+								name = "Team DeathMatch";
+							} else {
+								name = "Custom";
+							}
+							int amount = map.computeIfAbsent(name, key -> 0);
+							amount++;
+							map.put(name, amount);
+						}
+					}
+				}
+				return map;
+			}
+		});
 		
 		getLogger().info("Flier enabled!");
 	}

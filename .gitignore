@@ -4,3 +4,4 @@
 /.project
 
 *.html
+/dependency-reduced-pom.xml
