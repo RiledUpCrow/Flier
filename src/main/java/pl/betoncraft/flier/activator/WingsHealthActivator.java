@@ -12,7 +12,6 @@ import pl.betoncraft.flier.api.content.Wings;
 import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.LoadingException;
 import pl.betoncraft.flier.api.core.UsableItem;
-import pl.betoncraft.flier.core.defaults.DefaultActivator;
 
 /**
  * Activates if wings health is in range.

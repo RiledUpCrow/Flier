@@ -11,7 +11,6 @@ import org.bukkit.configuration.ConfigurationSection;
 
 import pl.betoncraft.flier.api.Flier;
 import pl.betoncraft.flier.api.core.InGamePlayer;
-import pl.betoncraft.flier.core.defaults.DefaultAction;
 
 /**
  * Removes the player from his current Game.

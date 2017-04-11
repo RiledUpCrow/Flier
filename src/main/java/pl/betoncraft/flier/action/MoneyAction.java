@@ -10,7 +10,6 @@ import org.bukkit.configuration.ConfigurationSection;
 
 import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.LoadingException;
-import pl.betoncraft.flier.core.defaults.DefaultAction;
 
 /**
  * Adds or removes money from player.

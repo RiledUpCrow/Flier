@@ -14,7 +14,6 @@ import pl.betoncraft.flier.api.Flier;
 import pl.betoncraft.flier.api.content.Game;
 import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.LoadingException;
-import pl.betoncraft.flier.core.defaults.DefaultBonus;
 
 /**
  * A Bonus without physical manifestation, activated by proximity.

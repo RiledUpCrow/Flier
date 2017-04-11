@@ -4,13 +4,14 @@
  * To Public License, Version 2, as published by Sam Hocevar. See
  * http://www.wtfpl.net/ for more details.
  */
-package pl.betoncraft.flier.core.defaults;
+package pl.betoncraft.flier.engine;
 
 import org.bukkit.configuration.ConfigurationSection;
 
 import pl.betoncraft.flier.api.content.Engine;
 import pl.betoncraft.flier.api.core.LoadingException;
 import pl.betoncraft.flier.api.core.Modification;
+import pl.betoncraft.flier.core.DefaultItem;
 
 /**
  * Default Engine implementation.

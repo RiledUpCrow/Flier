@@ -17,7 +17,6 @@ import pl.betoncraft.flier.api.content.Action;
 import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.LoadingException;
 import pl.betoncraft.flier.api.core.Modification;
-import pl.betoncraft.flier.core.defaults.DefaultAction;
 
 /**
  * An action type which adds a specified effect.

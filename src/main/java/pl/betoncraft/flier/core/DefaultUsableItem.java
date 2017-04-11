@@ -21,7 +21,6 @@ import pl.betoncraft.flier.api.core.Modification;
 import pl.betoncraft.flier.api.core.Modification.ModificationTarget;
 import pl.betoncraft.flier.api.core.UsableItem;
 import pl.betoncraft.flier.api.core.Usage;
-import pl.betoncraft.flier.core.defaults.DefaultItem;
 import pl.betoncraft.flier.event.FlierUseEvent;
 
 /**

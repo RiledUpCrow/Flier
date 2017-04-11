@@ -11,7 +11,6 @@ import org.bukkit.util.Vector;
 
 import pl.betoncraft.flier.api.core.Item;
 import pl.betoncraft.flier.api.core.LoadingException;
-import pl.betoncraft.flier.core.defaults.DefaultEngine;
 
 /**
  * Engine which multiplies speed instead of adding a fixed acceleration.

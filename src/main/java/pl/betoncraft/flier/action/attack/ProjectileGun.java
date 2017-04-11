@@ -22,7 +22,6 @@ import org.bukkit.util.Vector;
 import pl.betoncraft.flier.api.Flier;
 import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.LoadingException;
-import pl.betoncraft.flier.core.defaults.DefaultAttack;
 import pl.betoncraft.flier.util.Utils;
 
 /**

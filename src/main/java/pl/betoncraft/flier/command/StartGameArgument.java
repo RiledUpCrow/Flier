@@ -20,7 +20,7 @@ import pl.betoncraft.flier.api.Flier;
 import pl.betoncraft.flier.api.content.Lobby;
 import pl.betoncraft.flier.api.content.Lobby.JoinResult;
 import pl.betoncraft.flier.api.core.CommandArgument;
-import pl.betoncraft.flier.core.defaults.DefaultLobby;
+import pl.betoncraft.flier.lobby.DefaultLobby;
 import pl.betoncraft.flier.util.LangManager;
 
 /**

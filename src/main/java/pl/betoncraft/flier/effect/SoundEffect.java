@@ -10,7 +10,6 @@ import org.bukkit.Sound;
 import org.bukkit.configuration.ConfigurationSection;
 
 import pl.betoncraft.flier.api.core.LoadingException;
-import pl.betoncraft.flier.core.defaults.DefaultEffect;
 
 /**
  * Plays a sound.

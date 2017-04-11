@@ -24,7 +24,6 @@ import pl.betoncraft.flier.api.core.Arena;
 import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.LoadingException;
 import pl.betoncraft.flier.api.core.SidebarLine;
-import pl.betoncraft.flier.core.defaults.DefaultGame;
 import pl.betoncraft.flier.event.FlierPlayerSpawnEvent;
 import pl.betoncraft.flier.util.LangManager;
 import pl.betoncraft.flier.util.Utils;

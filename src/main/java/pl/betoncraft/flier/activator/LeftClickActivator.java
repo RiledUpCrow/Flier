@@ -10,7 +10,6 @@ import org.bukkit.configuration.ConfigurationSection;
 
 import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.UsableItem;
-import pl.betoncraft.flier.core.defaults.DefaultActivator;
 
 /**
  * Activates when the player has left-clicked.

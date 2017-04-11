@@ -10,7 +10,6 @@ import org.bukkit.configuration.ConfigurationSection;
 
 import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.Usage.Where;
-import pl.betoncraft.flier.core.defaults.DefaultAction;
 import pl.betoncraft.flier.util.Position;
 
 /**

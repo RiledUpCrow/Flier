@@ -17,7 +17,6 @@ import pl.betoncraft.flier.api.core.LoadingException;
 import pl.betoncraft.flier.api.core.PlayerClass.AddResult;
 import pl.betoncraft.flier.api.core.SetApplier;
 import pl.betoncraft.flier.core.DefaultSetApplier;
-import pl.betoncraft.flier.core.defaults.DefaultAction;
 
 /**
  * Action which applies an ItemSet.
