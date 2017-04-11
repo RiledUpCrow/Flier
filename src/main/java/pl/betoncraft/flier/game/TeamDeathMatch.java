@@ -6,6 +6,7 @@
  */
 package pl.betoncraft.flier.game;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -69,31 +70,20 @@ public class TeamDeathMatch extends DefaultGame {
 		
 		private int score = 0;
 		private String name;
-		private String spawnName;
-		private Location spawn;
+		private List<String> spawnNames;
+		private List<Location> spawns;
+		private int spawnCounter = 0;
 		private ChatColor color;
 		
 		public SimpleTeam(ConfigurationSection section) throws LoadingException {
 			ValueLoader loader = new ValueLoader(section);
-			spawnName = loader.loadString("location");
+			spawnNames = section.getStringList("spawns");
 			color = loader.loadEnum("color", ChatColor.class);
 			name = ChatColor.translateAlternateColorCodes('&', loader.loadString("name"));
 		}
 
 		public int getScore() {
 			return score;
-		}
-		
-		public String getSpawnName() {
-			return spawnName;
-		}
-
-		public Location getSpawn() {
-			return spawn;
-		}
-		
-		public void setSpawn(Location spawn) {
-			this.spawn = spawn;
 		}
 
 		public ChatColor getColor() {
@@ -239,7 +229,7 @@ public class TeamDeathMatch extends DefaultGame {
 					.collect(Collectors.toList())
 			);
 		}
-		player.getPlayer().teleport(team.getSpawn());
+		player.getPlayer().teleport(team.spawns.get(team.spawnCounter++ % team.spawns.size()));
 		FlierPlayerSpawnEvent event = new FlierPlayerSpawnEvent(player);
 		Bukkit.getPluginManager().callEvent(event);
 	}
@@ -272,7 +262,13 @@ public class TeamDeathMatch extends DefaultGame {
 	public void setArena(Arena arena) throws LoadingException {
 		super.setArena(arena);
 		for (SimpleTeam team : teams.values()) {
-			team.setSpawn(arena.getLocation(team.getSpawnName()));
+			team.spawns = new ArrayList<>(team.spawnNames.size());
+			for (String name : team.spawnNames) {
+				team.spawns.add(arena.getLocation(name));
+			}
+			if (team.spawns.isEmpty()) {
+				throw new LoadingException(String.format("Spawn list for team %s is empty.", team.name));
+			}
 		}
 	}
 	
