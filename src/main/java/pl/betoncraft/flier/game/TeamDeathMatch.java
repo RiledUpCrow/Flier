@@ -153,11 +153,13 @@ public class TeamDeathMatch extends DefaultGame {
 			} else {
 				word = LangManager.getMessage(data, "lose");
 			}
-			String teamNames = String.join(", ", winners.stream().map(team -> {
+			String teamNames = String.join(", ", teams.values().stream()
+					.filter(team -> team.getScore() == maxPoints)
+					.map(team -> {
 				return team.getName().startsWith("$") ?
 						LangManager.getMessage(data, team.getName().substring(1)) :
 						team.getName();
-			}).collect(Collectors.toList()));
+			}).collect(Collectors.toSet()));
 			String win = LangManager.getMessage(data, "team_win", teamNames);
 			Flier.getInstance().getFancyStuff().sendTitle(
 					data.getPlayer(), win, entry.getValue().getColor() + word, 0, 0, 0);
