@@ -77,10 +77,10 @@ public class Utils {
 	 * @param player InGamePlayer object containing player's information
 	 * @return the formatted name
 	 */
-	public static String formatPlayer(InGamePlayer player) {
+	public static String formatPlayer(InGamePlayer player, InGamePlayer receiver) {
 		PlayerClass clazz = player.getClazz();
 		String clazzName = clazz.getName().startsWith("$") ?
-				LangManager.getMessage(player, clazz.getName().substring(1)) :
+				LangManager.getMessage(receiver, clazz.getName().substring(1)) :
 				clazz.getName();
 		String name = player.getPlayer().getName();
 		return player.getColor() + name + ChatColor.WHITE + " (" + ChatColor.AQUA + clazzName + ChatColor.WHITE + ")";

@@ -658,9 +658,9 @@ public abstract class DefaultGame implements Listener, Game {
 	public void handleKill(InGamePlayer killer, InGamePlayer killed, boolean fall) {
 		if (killer != null && !killer.equals(killed)) {
 			if (fall) {
-				notifyAllPlayers("shot_down", Utils.formatPlayer(killed), Utils.formatPlayer(killer));
+				shotDownMessage("shot_down", killed, killer);
 			} else {
-				notifyAllPlayers("killed", Utils.formatPlayer(killed), Utils.formatPlayer(killer));
+				killedMessage("killed", killed, killer);
 			}
 			// fire an event
 			FlierPlayerKillEvent deathEvent = new FlierPlayerKillEvent(killed, killer,
@@ -675,7 +675,7 @@ public abstract class DefaultGame implements Listener, Game {
 				pay(killed, byEnemyDeathMoney);
 			}
 		} else {
-			notifyAllPlayers("suicide", Utils.formatPlayer(killed));
+			suicideMessage("suicide", killed);
 			// fire an event
 			FlierPlayerKillEvent deathEvent = new FlierPlayerKillEvent(killed, killed,
 					fall ? Type.SHOT_DOWN : Type.KILLED);
@@ -711,7 +711,7 @@ public abstract class DefaultGame implements Listener, Game {
 			}
 			// display a message about the hit and play the sound to the shooter if he exists and if he hit someone else
 			if (attacker != null && !attacker.equals(this)) {
-				LangManager.sendMessage(attacker, "hit", Utils.formatPlayer(attacked));
+				LangManager.sendMessage(attacker, "hit", Utils.formatPlayer(attacked, attacker));
 			}
 		}
 		// handle taking wings off
@@ -1113,9 +1113,26 @@ public abstract class DefaultGame implements Listener, Game {
 		}
 	}
 	
-	private void notifyAllPlayers(String message, Object... variables) {
+	private void shotDownMessage(String message, InGamePlayer killed, InGamePlayer killer) {
 		for (InGamePlayer player : dataMap.values()) {
-			LangManager.sendMessage(player, message, variables);
+			LangManager.sendMessage(player, message,
+					Utils.formatPlayer(killed, player),
+					Utils.formatPlayer(killer, player));
+		}
+	}
+	
+	private void killedMessage(String message, InGamePlayer killed, InGamePlayer killer) {
+		for (InGamePlayer player : dataMap.values()) {
+			LangManager.sendMessage(player, message,
+					Utils.formatPlayer(killed, player),
+					Utils.formatPlayer(killer, player));
+		}
+	}
+	
+	private void suicideMessage(String message, InGamePlayer killed) {
+		for (InGamePlayer player : dataMap.values()) {
+			LangManager.sendMessage(player, message,
+					Utils.formatPlayer(killed, player));
 		}
 	}
 	
