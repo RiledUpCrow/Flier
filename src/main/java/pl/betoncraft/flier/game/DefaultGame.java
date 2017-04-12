@@ -548,6 +548,7 @@ public abstract class DefaultGame implements Listener, Game {
 		}
 		InGamePlayer data =  new DefaultPlayer(player, this, defClass.replicate());
 		dataMap.put(uuid, data);
+		Flier.getInstance().getPlayers().put(player.getUniqueId(), data);
 		// creating default stuff
 		data.getLines().add(new Fuel(data));
 		data.getLines().add(new Health(data));
@@ -606,6 +607,7 @@ public abstract class DefaultGame implements Listener, Game {
 		}
 		unlocked.remove(data);
 		waitingRoom.removePlayer(data);
+		Flier.getInstance().getPlayers().remove(player.getUniqueId());
 		data.exitGame();
 		data.getPlayer().teleport(lobby.getSpawn());
 	}
