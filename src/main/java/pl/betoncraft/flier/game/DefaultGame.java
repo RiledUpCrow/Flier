@@ -356,7 +356,7 @@ public abstract class DefaultGame implements Listener, Game {
 	 * Reason for making the player wait in the waiting room.
 	 */
 	protected enum WaitReason {
-		NO_WAIT, MORE_PLAYERS, START_DELAY, RESPAWN_DELAY, ROUND
+		NO_WAIT, MORE_PLAYERS, START_DELAY, RESPAWN_DELAY, ROUND, GAME_ENDS
 	}
 	
 	/**
@@ -413,6 +413,11 @@ public abstract class DefaultGame implements Listener, Game {
 		 */
 		public WaitReason addPlayer(InGamePlayer player) {
 			waitingPlayers.add(player);
+			// if the game has ended just move the player
+			if (reason == WaitReason.GAME_ENDS) {
+				player.getPlayer().teleport(location);
+				return WaitReason.GAME_ENDS;
+			}
 			if (!running) {
 				// the game hasn't started yet
 				if (waitingPlayers.size() >= minPlayers) {
@@ -491,7 +496,7 @@ public abstract class DefaultGame implements Listener, Game {
 		 * Called every tick so waiting room can decrease the counters.
 		 */
 		public void tick() {
-			boolean shouldCountdown = !running || !rounds || roundFinished;
+			boolean shouldCountdown = reason != WaitReason.GAME_ENDS && (!running || !rounds || roundFinished);
 			if (shouldCountdown) {
 				// start the game if the waiting time is exactly 0
 				// lower means the game was already started and the waiting room is idle
@@ -528,7 +533,19 @@ public abstract class DefaultGame implements Listener, Game {
 	/**
 	 * Ends the game by selecting the winner.
 	 */
-	public abstract void endGame();
+	public void endGame() {
+		// move all players to the waiting room
+		running = false;
+		waitingRoom.reason = WaitReason.GAME_ENDS;
+		dataMap.values().stream()
+				.filter(player -> !waitingRoom.waitingPlayers.contains(player))
+				.forEach(player -> moveToWaitingRoom(player));
+		// display message
+		dataMap.values().forEach(player -> LangManager.sendMessage(player, "game_ends"));
+		// end game
+		int delay = waitingRoom.respawnDelay == 0 ? 20 * 10 : waitingRoom.respawnDelay;
+		Bukkit.getScheduler().scheduleSyncDelayedTask(Flier.getInstance(), () -> lobby.endGame(this), delay);
+	}
 	
 	@Override
 	public String getID() {
@@ -595,6 +612,8 @@ public abstract class DefaultGame implements Listener, Game {
 			break;
 		case ROUND:
 			LangManager.sendMessage(player, "round_delay");
+			break;
+		default:
 			break;
 		}
 	}
@@ -685,7 +704,6 @@ public abstract class DefaultGame implements Listener, Game {
 			Bukkit.getPluginManager().callEvent(deathEvent);
 			pay(killed, suicideMoney);
 		}
-		moveToWaitingRoom(killed);
 	}
 	
 	protected void moveToWaitingRoom(InGamePlayer player) {

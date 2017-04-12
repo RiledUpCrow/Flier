@@ -79,7 +79,7 @@ public interface Lobby {
 	 * @param game
 	 *            Game to end
 	 */
-	void endGame(Game game);
+	public void endGame(Game game);
 
 	/**
 	 * @return a set with UUIDs of players in this Lobby

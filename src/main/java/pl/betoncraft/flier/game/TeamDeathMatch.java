@@ -136,6 +136,7 @@ public class TeamDeathMatch extends DefaultGame {
 	
 	@Override
 	public void endGame() {
+		super.endGame();
 		// get the winning team
 		int maxPoints = players.values().stream()
 				.max((teamA, teamB) -> teamA.getScore() - teamB.getScore())
@@ -163,11 +164,8 @@ public class TeamDeathMatch extends DefaultGame {
 			String win = LangManager.getMessage(data, "team_win", teamNames);
 			Flier.getInstance().getFancyStuff().sendTitle(
 					data.getPlayer(), win, entry.getValue().getColor() + word, 0, 0, 0);
-			LangManager.sendMessage(data, "game_ends");
 			data.getPlayer().sendMessage(win);
 		}
-		// end game
-		lobby.endGame(this);
 	}
 	
 	@Override
@@ -189,7 +187,8 @@ public class TeamDeathMatch extends DefaultGame {
 					.filter(team -> players.entrySet().stream()
 							// get uuids of team players and check if any is playing
 							.filter(e -> e.getValue().equals(team))
-							.anyMatch(e -> dataMap.get(e.getKey()).isPlaying())
+							.anyMatch(e -> !e.getKey().equals(killed.getPlayer().getUniqueId()) &&
+									dataMap.get(e.getKey()).isPlaying())
 					)
 					.collect(Collectors.toList());
 			if (aliveTeams.size() == 1) {
@@ -217,6 +216,7 @@ public class TeamDeathMatch extends DefaultGame {
 				score(getTeam(killer), enemyKillScore);
 			}
 		}
+		moveToWaitingRoom(killed);
 	}
 	
 	@Override

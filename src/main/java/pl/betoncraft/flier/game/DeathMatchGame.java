@@ -129,6 +129,7 @@ public class DeathMatchGame extends DefaultGame {
 
 	@Override
 	public void endGame() {
+		super.endGame();
 		// get the winning player
 		int maxPoints = scores.values().stream()
 				.max((a, b) -> a - b)
@@ -151,11 +152,8 @@ public class DeathMatchGame extends DefaultGame {
 			String win = LangManager.getMessage(player, "player_win", teamNames);
 			Flier.getInstance().getFancyStuff().sendTitle(
 					player.getPlayer(), win, colors.get(player.getPlayer().getName()) + word, 0, 0, 0);
-			LangManager.sendMessage(player, "game_ends");
 			player.getPlayer().sendMessage(win);
 		}
-		// end game
-		lobby.endGame(this);
 	}
 	
 	@Override
@@ -174,7 +172,7 @@ public class DeathMatchGame extends DefaultGame {
 			// and increase points if the round is finished
 			List<UUID> alivePlayers = dataMap.values().stream()
 					// filter teams which still have alive players
-					.filter(player -> player.isPlaying())
+					.filter(player -> !player.equals(killed) && player.isPlaying())
 					.map(player -> player.getPlayer().getUniqueId())
 					.collect(Collectors.toList());
 			if (alivePlayers.size() == 1) {
@@ -192,11 +190,11 @@ public class DeathMatchGame extends DefaultGame {
 			// kills in continuous games increase points
 			if (killer == null || killer.equals(killed)) {
 				score(killed, suicideScore);
-				return;
 			} else {
 				score(killer, killScore);
 			}
 		}
+		moveToWaitingRoom(killed);
 	}
 	
 	private void score(InGamePlayer player, int score) {
