@@ -38,18 +38,20 @@ Flier 0.5.0
 * The game can be locked after starting
 * Added optional maximum game time
 * Added support for optional rounds in games
+* Team DeathMatch game can now have lists of spawns for teams
 
  == Content ==
 * Added "deathMatch" game
 * Added "invisible" bonus
+* Added "health" action
 * Added "consume" action
 * Added "itemSet" action
-* Added "item" activator
-* Added "particleGun" attack
-* Renamed "machineGun" attack to "projectileGun"
 * Added "bomb" action
 * Added "leave" action
 * Added "ammo" activator
+* Added "item" activator
+* Added "particleGun" attack
+* Renamed "machineGun" attack to "projectileGun"
 * Replaced "autodestruct" with "suicide"
 
 == Integrations ==

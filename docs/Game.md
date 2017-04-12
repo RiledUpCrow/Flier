@@ -7,6 +7,7 @@ Every game is run on an "arena" - a set of locations required by the game, like 
 ```
 game_name:
   type: [game type]
+  rounds: [boolean]
   bonuses:
   - some_bonus
   - other_bonus
@@ -63,6 +64,7 @@ game_name:
 These settings apply to every game. Some of them have default values, so if you don't specify them explicitly these will be used. Some values however are required.
 
 * `type` (**required**) type of the game. The value used here will determine what additional settings are available. Types are listed below.
+* `rounds` (**required**) whenever the game uses rounds or not. Rounds are managed by each game differently, so they are described in the _Game types_ section below. Generally in continuous games players will respawn immediately (delay may apply though) and in games with rounds players will have to wait until the round is finished to respawn.
 * `bonuses` list of bonuses available in the game. You don't have to specify this if you don't want any bonuses.
 * `effects` list of effects available in this game. You don't have to specify this if you don't want any effects.
 * `height_limit` (**default: 0**) a height at which players will receive suffocation damage (kind of simulating low air pressure). If it's 0 or lower, it doesn't apply.
@@ -149,6 +151,8 @@ Each game type adds additional settings to configure game-specific rules, for ex
 
 This game divides players into teams. Each team's objective is to kill players from other teams. Every team has a separate spawn location, color and name.
 
+If the game is continuous, points will be given for each kill. Otherwise the last team alive scores a point.
+
 ```
 game_name:
   type: teamDeathMatch
@@ -161,7 +165,8 @@ game_name:
     team_id:
       name: [team name]
       color: [color]
-      spawn: [location]
+      spawns:
+      - [locations]
     another_team_id:
       [...]
 ```
@@ -173,13 +178,15 @@ game_name:
 * `teams` list of teams in the game.
   * `name` (**required**) the name of the team.
   * `color` (**required**) the color of the team (from [this list](https://hub.spigotmc.org/javadocs/spigot/org/bukkit/ChatColor.html)).
-  * `spawn` (**required**) the spawn location of the team as defined in _arenas.yml_.
+  * `spawns` (**required**) the list of spawn locations of the team as defined in _arenas.yml_.
 
 ### DeathMatch
 
 **`deathMatch`**
 
 In this game everyone fight with everyone. There are no friendly players, only you. Spawn locations and colors will be assigned randomly. Wins the player who has the most kills.
+
+If the game is continuous, points will be given for each kill. Otherwise only the last player alive in the round will receive points.
 
 ```
 game_name:

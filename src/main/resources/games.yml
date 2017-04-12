@@ -8,14 +8,17 @@
 default:
   type: teamDeathMatch                 # type of the Game
   points_to_win: 25                    # points required to win the Game
+  rounds: true                         # whenever the game is continuous or uses rounds
   teams:                               # list of teams
     blue:
       name: 'Blue'                     # name of the team
-      location: blue_spawn             # spawn location for the team (defined in arenas,yml)
+      spawns:
+      - blue_spawn                     # spawn locations for the team (defined in arenas.yml)
       color: blue                      # color of the team
     red:
       name: 'Red'
-      location: red_spawn
+      spawns: 
+      - red_spawn
       color: red
   money:                               # money settings for the Game
     enabled: true                      # whenever the money system is enabled at all
@@ -60,7 +63,8 @@ default:
         item_set: the_rocket           # it's the same as above
         add_type: decrease             # but we're decreasing instead of increasing
         conflict_action: skip
-      block: rocket_button             # location of the block to click
+      blocks:
+      - rocket_button                  # locations of the block to click
     launcher_button:
       buy_cost: 10
       on_buy:
@@ -72,7 +76,8 @@ default:
         item_set: the_launcher
         add_type: decrease
         conflict_action: skip
-      block: launcher_button
+      blocks:
+      - launcher_button
     repair_kit_button:
       buy_cost: 20
       on_buy:
@@ -84,35 +89,40 @@ default:
         item_set: the_repair_kit
         add_type: decrease
         conflict_action: skip
-      block: repair_kit_button
+      blocks:
+      - repair_kit_button
     compass_button:
       unlock_cost: 5
       on_unlock:
         item_set: the_compass
         add_type: fill
         conflict_action: skip
-      block: compass_button
+      blocks:
+      - compass_button
     fast_button:
       on_buy:
         item_set: fast_class
         add_type: fill
         conflict_action: replace
         saving: true
-      block: fast_button
+      blocks:
+      - fast_button
     balanced_button:
       on_buy:
         item_set: balanced_class
         add_type: fill
         conflict_action: replace
         saving: true
-      block: balanced_button
+      blocks:
+      - balanced_button
     strong_button:
       on_buy:
         item_set: strong_class
         add_type: fill
         conflict_action: replace
         saving: true
-      block: strong_button
+      blocks:
+      - strong_button
   respawn_action: combine              # what happens with items after respawn (see docs)
   center: center                       # center of the map
   radius: 1000                         # the radius defining map borders
