@@ -17,6 +17,7 @@ import pl.betoncraft.flier.api.content.Action;
 import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.LoadingException;
 import pl.betoncraft.flier.api.core.Modification;
+import pl.betoncraft.flier.api.core.UsableItem;
 
 /**
  * An action type which adds a specified effect.
@@ -40,7 +41,7 @@ public class EffectAction extends DefaultAction {
 	}
 
 	@Override
-	public boolean act(InGamePlayer player) {
+	public boolean act(InGamePlayer player, UsableItem item) {
 		new BukkitRunnable() {
 			private int i = (int) modMan.modifyNumber(DURATION, EffectAction.this.duration);
 			@Override
@@ -49,7 +50,7 @@ public class EffectAction extends DefaultAction {
 					cancel();
 				}
 				for (Action action : actions) {
-					action.act(player);
+					action.act(player, item);
 				}
 			}
 		}.runTaskTimer(Flier.getInstance(), 0, 1);

@@ -184,7 +184,7 @@ public class DefaultUsableItem extends DefaultItem implements UsableItem {
 				}
 				setAmmo(ammo - usage.getAmmoUse());
 				for (Action action : usage.getActions()) {
-					action.act(player);
+					action.act(player, this);
 				}
 			}
 		}

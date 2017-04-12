@@ -8,6 +8,7 @@ package pl.betoncraft.flier.api.content;
 
 import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.Modification;
+import pl.betoncraft.flier.api.core.UsableItem;
 
 /**
  * Represents a one time action, as opposed to the repeating Effect.
@@ -21,9 +22,11 @@ public interface Action {
 	 * 
 	 * @param player
 	 *            the player on which the action needs to be performed
+	 * @param item
+	 *            the optional item which was used in this action
 	 * @return whenever the action was performed or not
 	 */
-	public boolean act(InGamePlayer player);
+	public boolean act(InGamePlayer player, UsableItem item);
 
 	/**
 	 * @return the ID of this Action, under which it is defined in actions.yml

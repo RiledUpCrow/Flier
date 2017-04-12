@@ -28,8 +28,8 @@ public class ConsumeAction extends DefaultAction {
 	}
 
 	@Override
-	public boolean act(InGamePlayer player) {
-		player.consumeItem(item);
+	public boolean act(InGamePlayer player, UsableItem item) {
+		player.consumeItem(this.item);
 		return true;
 	}
 

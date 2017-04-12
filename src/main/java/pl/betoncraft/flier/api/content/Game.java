@@ -21,6 +21,7 @@ import pl.betoncraft.flier.api.core.Damager;
 import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.LoadingException;
 import pl.betoncraft.flier.api.core.SetApplier;
+import pl.betoncraft.flier.api.core.UsableItem;
 
 /**
  * Represents a game.
@@ -222,8 +223,10 @@ public interface Game {
 	 *            the player who was attacked
 	 * @param damager
 	 *            Damager used in the attack
+	 * @param weapon
+	 *            optional weapon used which fired the damager
 	 */
-	public void handleHit(InGamePlayer attacker, InGamePlayer attacked, Damager damager);
+	public void handleHit(InGamePlayer attacker, InGamePlayer attacked, Damager damager, UsableItem weapon);
 
 	/**
 	 * Contains logic for game-specific kill handling. Called by Flier when a

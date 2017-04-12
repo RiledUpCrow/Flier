@@ -22,6 +22,7 @@ import org.bukkit.util.Vector;
 import pl.betoncraft.flier.api.Flier;
 import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.LoadingException;
+import pl.betoncraft.flier.api.core.UsableItem;
 import pl.betoncraft.flier.util.Utils;
 
 /**
@@ -51,7 +52,7 @@ public class ProjectileGun extends DefaultAttack {
 	}
 	
 	@Override
-	public boolean act(InGamePlayer data) {
+	public boolean act(InGamePlayer data, UsableItem weapon) {
 		Player player = data.getPlayer();
 		int burstAmount = (int) modMan.modifyNumber(BURST_AMOUNT, this.burstAmount);
 		Map<Projectile, Vector> projectiles = new HashMap<>(burstAmount);
@@ -75,7 +76,7 @@ public class ProjectileGun extends DefaultAttack {
 					explosive.setIsIncendiary(false);
 					explosive.setYield(0);
 				}
-				Utils.saveDamager(projectile, ProjectileGun.this, data);
+				Utils.saveDamager(projectile, ProjectileGun.this, data, weapon);
 				projectiles.put(projectile, velocity);
 				counter --;
 				if (counter <= 0) {

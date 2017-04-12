@@ -63,6 +63,7 @@ import pl.betoncraft.flier.api.core.PlayerClass;
 import pl.betoncraft.flier.api.core.PlayerClass.AddResult;
 import pl.betoncraft.flier.api.core.PlayerClass.RespawnAction;
 import pl.betoncraft.flier.api.core.SetApplier;
+import pl.betoncraft.flier.api.core.UsableItem;
 import pl.betoncraft.flier.core.DefaultClass;
 import pl.betoncraft.flier.core.DefaultPlayer;
 import pl.betoncraft.flier.core.DefaultSetApplier;
@@ -694,7 +695,7 @@ public abstract class DefaultGame implements Listener, Game {
 	}
 	
 	@Override
-	public void handleHit(InGamePlayer attacker, InGamePlayer attacked, Damager damager) {
+	public void handleHit(InGamePlayer attacker, InGamePlayer attacked, Damager damager, UsableItem weapon) {
 		List<DamageResult> results = attacked.damage(attacker, damager);
 		// handle a general hit
 		if (results.contains(DamageResult.HIT) && attacker != null) {
@@ -709,9 +710,22 @@ public abstract class DefaultGame implements Listener, Game {
 				pay(attacker, enemyHitMoney);
 				pay(attacked, byEnemyHitMoney);
 			}
-			// display a message about the hit and play the sound to the shooter if he exists and if he hit someone else
-			if (attacker != null && !attacker.equals(this)) {
-				LangManager.sendMessage(attacker, "hit", Utils.formatPlayer(attacked, attacker));
+			// display a message about the hit and play the sound to the shooter if he exists and if he hits someone else
+			if (attacker != null && !attacker.equals(attacked)) {
+				if (weapon == null) {
+					LangManager.sendMessage(attacker, "hit", Utils.formatPlayer(attacked, attacker));
+				} else {
+					LangManager.sendMessage(attacker, "hit_weapon", Utils.formatPlayer(attacked, attacker),
+							Utils.formatItem(weapon, attacker));
+				}
+			}
+			if (attacked != null && !attacked.equals(attacker)) {
+				if (weapon == null) {
+					LangManager.sendMessage(attacked, "get_hit", Utils.formatPlayer(attacker, attacked));
+				} else {
+					LangManager.sendMessage(attacked, "get_hit_weapon", Utils.formatPlayer(attacker, attacked),
+							Utils.formatItem(weapon, attacked));
+				}
 			}
 		}
 		// handle taking wings off
@@ -1001,21 +1015,21 @@ public abstract class DefaultGame implements Listener, Game {
 		}
 		// get stuff involved in the attack
 		InGamePlayer player = getPlayers().get(event.getEntity().getUniqueId());
-		Utils.Attacker weapon = Utils.getDamager(event.getDamager());
+		Utils.Attacker attacker = Utils.getDamager(event.getDamager());
 		// it's a weapon, so remove the attacking entity
-		if (weapon != null) {
+		if (attacker != null) {
 			event.getDamager().remove();
 		}
 		// cancel event if it's involved in the game
-		if (weapon != null || player != null) {
+		if (attacker != null || player != null) {
 			event.setCancelled(true);
 		}
 		// stop if the weapon was not used or in-game player was not attacked
-		if (weapon == null || player == null) {
+		if (attacker == null || player == null) {
 			return;
 		}
 		// weapon was used on in-game player, process the attack
-		handleHit(weapon.getAttacker(), player, weapon.getDamager());
+		handleHit(attacker.getShooter(), player, attacker.getDamager(), attacker.getWeapon());
 	}
 	
 	@EventHandler(priority=EventPriority.HIGH)

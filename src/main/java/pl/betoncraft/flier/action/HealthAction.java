@@ -10,6 +10,7 @@ import org.bukkit.configuration.ConfigurationSection;
 
 import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.LoadingException;
+import pl.betoncraft.flier.api.core.UsableItem;
 
 /**
  * Modifies player's health.
@@ -28,7 +29,7 @@ public class HealthAction extends DefaultAction {
 	}
 
 	@Override
-	public boolean act(InGamePlayer player) {
+	public boolean act(InGamePlayer player, UsableItem item) {
 		if (amount < 0) {
 			player.getPlayer().damage(amount);
 			return true;

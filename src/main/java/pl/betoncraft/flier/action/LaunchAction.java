@@ -14,6 +14,7 @@ import org.bukkit.util.Vector;
 import pl.betoncraft.flier.api.Flier;
 import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.LoadingException;
+import pl.betoncraft.flier.api.core.UsableItem;
 
 /**
  * Launches players in the direction of looking.
@@ -32,7 +33,7 @@ public class LaunchAction extends DefaultAction {
 	}
 
 	@Override
-	public boolean act(InGamePlayer player) {
+	public boolean act(InGamePlayer player, UsableItem item) {
 		Runnable launch = () -> {
 			Vector vel = player.getPlayer().getLocation().getDirection().multiply(modMan.modifyNumber(SPEED, speed));
 			player.getPlayer().setVelocity(vel);

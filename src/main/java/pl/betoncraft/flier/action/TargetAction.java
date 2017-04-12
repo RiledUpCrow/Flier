@@ -11,6 +11,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import pl.betoncraft.flier.api.content.Game.Attitude;
 import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.LoadingException;
+import pl.betoncraft.flier.api.core.UsableItem;
 
 /**
  * Targets other players with a compass.
@@ -29,7 +30,7 @@ public class TargetAction extends DefaultAction {
 	}
 
 	@Override
-	public boolean act(InGamePlayer data) {
+	public boolean act(InGamePlayer data, UsableItem item) {
 		if (data.isPlaying()) {
 			InGamePlayer nearest = null;
 			double distance = 0;

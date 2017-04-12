@@ -19,6 +19,7 @@ import pl.betoncraft.flier.api.Flier;
 import pl.betoncraft.flier.api.content.Game.Attitude;
 import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.LoadingException;
+import pl.betoncraft.flier.api.core.UsableItem;
 import pl.betoncraft.flier.util.ImmutableVector;
 import pl.betoncraft.flier.util.Utils;
 
@@ -54,7 +55,7 @@ public class HomingMissile extends DefaultAttack {
 	}
 
 	@Override
-	public boolean act(InGamePlayer data) {
+	public boolean act(InGamePlayer data, UsableItem weapon) {
 		Player player = data.getPlayer();
 		double speed = modMan.modifyNumber(SPEED, this.speed);
 		Vector velocity = player.getLocation().getDirection().clone().multiply(speed);
@@ -65,7 +66,7 @@ public class HomingMissile extends DefaultAttack {
 		missile.setShooter(player);
 		missile.setGravity(false);
 		missile.setGlowing(true);
-		Utils.saveDamager(missile, HomingMissile.this, data);
+		Utils.saveDamager(missile, HomingMissile.this, data, weapon);
 		new BukkitRunnable() {
 			int i = 0;
 			Location lastLoc;

@@ -17,6 +17,7 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.potion.PotionEffectType;
@@ -27,6 +28,7 @@ import pl.betoncraft.flier.api.core.Damager;
 import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.LoadingException;
 import pl.betoncraft.flier.api.core.PlayerClass;
+import pl.betoncraft.flier.api.core.UsableItem;
 
 /**
  * Various static utility methods.
@@ -84,6 +86,11 @@ public class Utils {
 				clazz.getName();
 		String name = player.getPlayer().getName();
 		return player.getColor() + name + ChatColor.WHITE + " (" + ChatColor.AQUA + clazzName + ChatColor.WHITE + ")";
+	}
+	
+	public static String formatItem(UsableItem item, InGamePlayer receiver) {
+		ItemStack stack = item.getItem(receiver);
+		return ChatColor.WHITE + "[" + stack.getItemMeta().getDisplayName() + ChatColor.WHITE + "]";
 	}
 
 	/**
@@ -165,9 +172,10 @@ public class Utils {
 	 * @param damager
 	 *            Damager which is the source of that projectile
 	 */
-	public static void saveDamager(Entity entity, Damager damager, InGamePlayer attacker) {
+	public static void saveDamager(Entity entity, Damager damager, InGamePlayer attacker, UsableItem weapon) {
 		entity.setMetadata("flier-damager", new FixedMetadataValue(Flier.getInstance(), damager));
 		entity.setMetadata("flier-attacker", new FixedMetadataValue(Flier.getInstance(), attacker));
+		entity.setMetadata("flier-weapon", new FixedMetadataValue(Flier.getInstance(), weapon));
 	}
 
 	/**
@@ -181,13 +189,15 @@ public class Utils {
 	public static Attacker getDamager(Entity entity) {
 		List<MetadataValue> listD = entity.getMetadata("flier-damager");
 		List<MetadataValue> listA = entity.getMetadata("flier-attacker");
+		List<MetadataValue> listW = entity.getMetadata("flier-weapon");
 		if (!listD.isEmpty() && !listA.isEmpty()) {
 			Object d = listD.get(0).value();
 			Object a = listA.get(0).value();
-			if (d instanceof Damager && a instanceof InGamePlayer) {
-				return new Attacker((Damager) d, (InGamePlayer) a);
+			Object w = listW == null || listW.isEmpty() ? null : listW.get(0).value();
+			if (d instanceof Damager && a instanceof InGamePlayer && (w == null || w instanceof UsableItem)) {
+				return new Attacker((Damager) d, (InGamePlayer) a, w == null ? null : (UsableItem) w);
 			} else {
-				return new Attacker(DummyDamager.DUMMY, null);
+				return new Attacker(DummyDamager.DUMMY, null, null);
 			}
 		}
 		return null;
@@ -202,18 +212,24 @@ public class Utils {
 	
 		private Damager damager;
 		private InGamePlayer attacker;
+		private UsableItem weapon;
 	
-		public Attacker(Damager damager, InGamePlayer attacker) {
+		public Attacker(Damager damager, InGamePlayer attacker, UsableItem weapon) {
 			this.damager = damager;
 			this.attacker = attacker;
+			this.weapon = weapon;
 		}
 	
 		public Damager getDamager() {
 			return damager;
 		}
 	
-		public InGamePlayer getAttacker() {
+		public InGamePlayer getShooter() {
 			return attacker;
+		}
+		
+		public UsableItem getWeapon() {
+			return weapon;
 		}
 	}
 

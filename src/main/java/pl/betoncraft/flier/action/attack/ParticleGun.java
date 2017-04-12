@@ -20,6 +20,7 @@ import org.bukkit.util.Vector;
 import pl.betoncraft.flier.api.Flier;
 import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.LoadingException;
+import pl.betoncraft.flier.api.core.UsableItem;
 
 /**
  * Burst shooting weapon with unguided particle-based bullets.
@@ -79,7 +80,7 @@ public class ParticleGun extends DefaultAttack {
 	}
 	
 	@Override
-	public boolean act(InGamePlayer data) {
+	public boolean act(InGamePlayer data, UsableItem weapon) {
 
 		new BukkitRunnable() {
 			
@@ -114,7 +115,7 @@ public class ParticleGun extends DefaultAttack {
 				
 				// launch projectiles
 				for (int i = 0; i < am; i++) {
-					new ParticleTracker(start.clone(), data, projectileSpeed, proximity, spread);
+					new ParticleTracker(start.clone(), data, projectileSpeed, proximity, spread, weapon);
 				}
 			}
 			
@@ -127,6 +128,7 @@ public class ParticleGun extends DefaultAttack {
 		private Location start;
 		private InGamePlayer shooter;
 		private double proximity;
+		private UsableItem weapon;
 		
 		private World world;
 		private Vector dir;
@@ -141,11 +143,12 @@ public class ParticleGun extends DefaultAttack {
 		private double squared;
 		private boolean early = false;
 		
-		public ParticleTracker(Location start, InGamePlayer shooter, double projectileSpeed, double proximity, double spread) {
+		public ParticleTracker(Location start, InGamePlayer shooter, double projectileSpeed, double proximity, double spread, UsableItem weapon) {
 			// get starting parameters
 			this.start = start;
 			this.shooter = shooter;
 			this.proximity = proximity;
+			this.weapon = weapon;
 			world = start.getWorld();
 			dir = start.getDirection();
 			
@@ -225,7 +228,7 @@ public class ParticleGun extends DefaultAttack {
 			// hit closest player
 			if (foundPlayer != null) {
 				earlyEnd(foundPlayer.getPlayer().getLocation());
-				foundPlayer.getGame().handleHit(shooter, foundPlayer, ParticleGun.this);
+				foundPlayer.getGame().handleHit(shooter, foundPlayer, ParticleGun.this, weapon);
 			}
 			
 			// spawn particles 

@@ -11,6 +11,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import pl.betoncraft.flier.api.content.Wings;
 import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.LoadingException;
+import pl.betoncraft.flier.api.core.UsableItem;
 
 /**
  * Changes wings health.
@@ -29,7 +30,7 @@ public class WingsHealthAction extends DefaultAction {
 	}
 
 	@Override
-	public boolean act(InGamePlayer player) {
+	public boolean act(InGamePlayer player, UsableItem item) {
 		Wings wings = player.getClazz().getWings();
 		double amount = modMan.modifyNumber(AMOUNT, this.amount);
 		if (amount >= 0) {

@@ -12,6 +12,7 @@ import org.bukkit.entity.TNTPrimed;
 
 import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.LoadingException;
+import pl.betoncraft.flier.api.core.UsableItem;
 import pl.betoncraft.flier.util.Utils;
 
 /**
@@ -34,10 +35,10 @@ public class Bomb extends DefaultAttack {
 	}
 
 	@Override
-	public boolean act(InGamePlayer player) {
+	public boolean act(InGamePlayer player, UsableItem weapon) {
 		TNTPrimed tnt = (TNTPrimed) player.getPlayer().getWorld().spawnEntity(
 				player.getPlayer().getLocation(), EntityType.PRIMED_TNT);
-		Utils.saveDamager(tnt, this, player);
+		Utils.saveDamager(tnt, this, player, weapon);
 		tnt.setIsIncendiary(false);
 		tnt.setVelocity(player.getPlayer().getVelocity());
 		tnt.setYield((float) modMan.modifyNumber(POWER, yield));

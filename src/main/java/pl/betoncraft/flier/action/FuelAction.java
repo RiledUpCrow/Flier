@@ -11,6 +11,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import pl.betoncraft.flier.api.content.Engine;
 import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.LoadingException;
+import pl.betoncraft.flier.api.core.UsableItem;
 
 /**
  * Adds fuel to the player's engine.
@@ -29,7 +30,7 @@ public class FuelAction extends DefaultAction {
 	}
 
 	@Override
-	public boolean act(InGamePlayer player) {
+	public boolean act(InGamePlayer player, UsableItem item) {
 		Engine engine = player.getClazz().getEngine();
 		double amount = modMan.modifyNumber(AMOUNT, this.amount);
 		if (amount >= 0) {

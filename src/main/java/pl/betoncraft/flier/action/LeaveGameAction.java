@@ -11,6 +11,7 @@ import org.bukkit.configuration.ConfigurationSection;
 
 import pl.betoncraft.flier.api.Flier;
 import pl.betoncraft.flier.api.core.InGamePlayer;
+import pl.betoncraft.flier.api.core.UsableItem;
 
 /**
  * Removes the player from his current Game.
@@ -24,7 +25,7 @@ public class LeaveGameAction extends DefaultAction {
 	}
 
 	@Override
-	public boolean act(InGamePlayer player) {
+	public boolean act(InGamePlayer player, UsableItem item) {
 		Bukkit.getScheduler().scheduleSyncDelayedTask(Flier.getInstance(),
 				() -> player.getGame().getLobby().leaveGame(player.getPlayer()));
 		return true;
