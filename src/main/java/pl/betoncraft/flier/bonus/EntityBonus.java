@@ -28,9 +28,9 @@ import pl.betoncraft.flier.api.core.LoadingException;
  */
 public class EntityBonus extends ProximityBonus implements Listener {
 	
-	private EntityType type;
-	private Entity entity;
-	private BukkitRunnable rotator;
+	protected EntityType type;
+	protected Entity entity;
+	protected BukkitRunnable rotator;
 	
 	public EntityBonus(ConfigurationSection section) throws LoadingException {
 		super(section);

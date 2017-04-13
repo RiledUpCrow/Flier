@@ -213,7 +213,7 @@ public class ParticleGun extends DefaultAttack {
 				if (!target.isTargetable() || target.equals(shooter)) {
 					continue;
 				}
-				Location loc = target.getLocation();
+				Location loc = target.getLocation().clone();
 				double dist = loc.subtract(start).toVector().crossProduct(dir).lengthSquared();
 				if (dist < proximity) {
 					// found player in bullet's path

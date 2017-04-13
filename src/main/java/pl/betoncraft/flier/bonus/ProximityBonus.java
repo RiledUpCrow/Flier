@@ -29,7 +29,7 @@ public class ProximityBonus extends DefaultBonus {
 
 	public ProximityBonus(ConfigurationSection section) throws LoadingException {
 		super(section);
-		distance = Math.pow(loader.loadPositiveDouble("distance"), 2);
+		distance = Math.pow(loader.loadNonNegativeDouble("distance"), 1);
 		locationName = loader.loadString("location");
 	}
 	
