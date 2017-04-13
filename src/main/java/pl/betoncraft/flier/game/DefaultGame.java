@@ -198,36 +198,37 @@ public abstract class DefaultGame implements Listener, Game {
 
 		@Override
 		public void run() {
-			if (maxTime != 0 && --timeLeft <= 0) {
+			if (maxTime != 0 && --timeLeft == 0) {
 				endGame();
-				return;
 			}
-			game.fastTick();
-			for (InGamePlayer data : getPlayers().values()) {
-				data.fastTick();
-				Location loc = data.getPlayer().getLocation();
-				// height damage
-				if (loc.getBlockX() < minX || loc.getBlockX() > maxX ||
-						loc.getBlockZ() < minZ || loc.getBlockZ() > maxZ) {
-					data.getPlayer().damage(data.getPlayer().getHealth() + 1);
-				}
-			}
-			if (i % 4 == 0) {
-				game.slowTick();
+			if (running) {
+				game.fastTick();
 				for (InGamePlayer data : getPlayers().values()) {
-					data.slowTick();
-				}
-			}
-			if (heightLimit > 0 && i % 20 == 0) {
-				for (InGamePlayer data : getPlayers().values()) {
-					if (data.getPlayer().getLocation().getY() > heightLimit) {
-						data.getPlayer().damage(heightDamage);
+					data.fastTick();
+					Location loc = data.getPlayer().getLocation();
+					// height damage
+					if (loc.getBlockX() < minX || loc.getBlockX() > maxX ||
+							loc.getBlockZ() < minZ || loc.getBlockZ() > maxZ) {
+						data.getPlayer().damage(data.getPlayer().getHealth() + 1);
 					}
 				}
-			}
-			i++;
-			if (i > 1000) {
-				i = 0;
+				if (i % 4 == 0) {
+					game.slowTick();
+					for (InGamePlayer data : getPlayers().values()) {
+						data.slowTick();
+					}
+				}
+				if (heightLimit > 0 && i % 20 == 0) {
+					for (InGamePlayer data : getPlayers().values()) {
+						if (data.getPlayer().getLocation().getY() > heightLimit) {
+							data.getPlayer().damage(heightDamage);
+						}
+					}
+				}
+				i++;
+				if (i > 1000) {
+					i = 0;
+				}
 			}
 		}
 	}
@@ -381,6 +382,7 @@ public abstract class DefaultGame implements Listener, Game {
 		protected int currentWaitingTime;
 		protected Location location;
 		protected BukkitRunnable ticker;
+		protected boolean locked = false;
 		
 		public WaitingRoom(Game game) throws LoadingException {
 			this.game = game;
@@ -402,7 +404,7 @@ public abstract class DefaultGame implements Listener, Game {
 		 * @return whenever the waiting room is locked for new players
 		 */
 		public boolean isLocked() {
-			return locking && game.isRunning();
+			return locked;
 		}
 		
 		/**
@@ -646,19 +648,18 @@ public abstract class DefaultGame implements Listener, Game {
 		for (InGamePlayer player : dataMap.values()) {
 			handleRespawn(player);
 		}
+		if (waitingRoom.locking) {
+			waitingRoom.locked = true;
+		}
 	}
 
 	@Override
 	public void stop() {
 		HandlerList.unregisterAll(this);
-		if (running) {
-			running = false;
-			heartBeat.cancel();
-			for (Bonus bonus : bonuses) {
-				bonus.stop();
-			}
+		for (Bonus bonus : bonuses) {
+			bonus.stop();
 		}
-		timeLeft = maxTime;
+		heartBeat.cancel();
 		waitingRoom.ticker.cancel();
 		Collection<InGamePlayer> copy = new ArrayList<>(dataMap.values());
 		for (InGamePlayer data : copy) {
