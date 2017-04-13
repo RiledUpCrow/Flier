@@ -11,9 +11,9 @@ import java.util.List;
 
 import org.bukkit.event.Cancellable;
 
-import pl.betoncraft.flier.api.core.Damager;
-import pl.betoncraft.flier.api.core.Damager.DamageResult;
+import pl.betoncraft.flier.api.core.Attacker;
 import pl.betoncraft.flier.api.core.InGamePlayer;
+import pl.betoncraft.flier.api.core.InGamePlayer.DamageResult;
 import pl.betoncraft.flier.core.MatchingTwoPlayersEvent;
 
 /**
@@ -26,7 +26,7 @@ public class FlierPlayerHitEvent extends MatchingTwoPlayersEvent implements Canc
 	private static final List<DamageResult> all = Arrays.asList(DamageResult.values());
 
 	private List<DamageResult> result;
-	private Damager damager;
+	private Attacker attacker;
 	private boolean cancel = false;
 
 	/**
@@ -34,23 +34,23 @@ public class FlierPlayerHitEvent extends MatchingTwoPlayersEvent implements Canc
 	 * 
 	 * @param player
 	 */
-	public FlierPlayerHitEvent(InGamePlayer target, InGamePlayer shooter, List<DamageResult> results, Damager damager) {
-		super(target, shooter, "shooter_", "target_");
+	public FlierPlayerHitEvent(InGamePlayer target, List<DamageResult> results, Attacker attacker) {
+		super(target, attacker.getShooter(), "shooter_", "target_");
 		this.result = results;
-		this.damager = damager;
-		setBool("self_hit", shooter.equals(target));
+		this.attacker = attacker;
+		setBool("self_hit", attacker.getShooter().equals(target));
 		for (DamageResult result : all) {
 			setBool(result.toString().toLowerCase(), results.contains(result));
 		}
-		setNumber("damage_to_wings", damager.getDamage());
-		setNumber("damage_to_health", damager.getPhysical());
+		setNumber("damage_to_wings", attacker.getDamager().getDamage());
+		setNumber("damage_to_health", attacker.getDamager().getPhysical());
 	}
 
 	/**
 	 * @return the damager which hit the other player
 	 */
-	public Damager getDamager() {
-		return damager;
+	public Attacker getAttacker() {
+		return attacker;
 	}
 	
 	/**

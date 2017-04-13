@@ -20,7 +20,9 @@ import org.bukkit.util.Vector;
 import pl.betoncraft.flier.api.Flier;
 import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.LoadingException;
+import pl.betoncraft.flier.api.core.Target;
 import pl.betoncraft.flier.api.core.UsableItem;
+import pl.betoncraft.flier.core.DefaultAttacker;
 
 /**
  * Burst shooting weapon with unguided particle-based bullets.
@@ -202,18 +204,16 @@ public class ParticleGun extends DefaultAttack {
 				}
 			}
 			
-			// check players in proximity of the bullet's path
-			// we're looking only for the closest player
-			InGamePlayer foundPlayer = null;
+			// check targets in proximity of the bullet's path
+			// we're looking only for the closest target
+			Target foundTarget = null;
 			double smallestDistance = squared;
-			for (InGamePlayer player : shooter.getGame().getPlayers().values()) {
+			for (Target target : shooter.getGame().getTargets().values()) {
 				// don't hit the shooter
-				if (player.equals(shooter)) {
+				if (!target.isTargetable() || target.equals(shooter)) {
 					continue;
 				}
-				Location loc = player.getPlayer().getLocation().toVector()
-						.midpoint(player.getPlayer().getEyeLocation().toVector())
-						.toLocation(world);
+				Location loc = target.getLocation();
 				double dist = loc.subtract(start).toVector().crossProduct(dir).lengthSquared();
 				if (dist < proximity) {
 					// found player in bullet's path
@@ -221,14 +221,14 @@ public class ParticleGun extends DefaultAttack {
 					double thisDistance = loc.lengthSquared();
 					if (thisDistance < smallestDistance) {
 						smallestDistance = thisDistance;
-						foundPlayer = player;
+						foundTarget = target;
 					}
 				}
 			}
 			// hit closest player
-			if (foundPlayer != null) {
-				earlyEnd(foundPlayer.getPlayer().getLocation());
-				foundPlayer.getGame().handleHit(shooter, foundPlayer, ParticleGun.this, weapon);
+			if (foundTarget != null) {
+				earlyEnd(foundTarget.getLocation());
+				foundTarget.getGame().handleHit(foundTarget, new DefaultAttacker(ParticleGun.this, shooter, weapon));
 			}
 			
 			// spawn particles 

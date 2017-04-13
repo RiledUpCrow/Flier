@@ -32,7 +32,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityExplodeEvent;
@@ -54,8 +53,7 @@ import pl.betoncraft.flier.api.content.Game;
 import pl.betoncraft.flier.api.content.Lobby;
 import pl.betoncraft.flier.api.content.Wings;
 import pl.betoncraft.flier.api.core.Arena;
-import pl.betoncraft.flier.api.core.Damager;
-import pl.betoncraft.flier.api.core.Damager.DamageResult;
+import pl.betoncraft.flier.api.core.Attacker;
 import pl.betoncraft.flier.api.core.FancyStuffWrapper;
 import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.LoadingException;
@@ -63,7 +61,7 @@ import pl.betoncraft.flier.api.core.PlayerClass;
 import pl.betoncraft.flier.api.core.PlayerClass.AddResult;
 import pl.betoncraft.flier.api.core.PlayerClass.RespawnAction;
 import pl.betoncraft.flier.api.core.SetApplier;
-import pl.betoncraft.flier.api.core.UsableItem;
+import pl.betoncraft.flier.api.core.Target;
 import pl.betoncraft.flier.core.DefaultClass;
 import pl.betoncraft.flier.core.DefaultPlayer;
 import pl.betoncraft.flier.core.DefaultSetApplier;
@@ -89,6 +87,12 @@ import pl.betoncraft.flier.util.ValueLoader;
  * @author Jakub Sapalski
  */
 public abstract class DefaultGame implements Listener, Game {
+	
+	protected static final List<DamageCause> allowedDamage = Arrays.asList(new DamageCause[]{
+			DamageCause.CONTACT, DamageCause.CUSTOM, DamageCause.FALL, DamageCause.FLY_INTO_WALL,
+			DamageCause.HOT_FLOOR, DamageCause.DROWNING, DamageCause.FALLING_BLOCK, DamageCause.FIRE,
+			DamageCause.FIRE_TICK, DamageCause.LAVA, DamageCause.LIGHTNING, DamageCause.SUFFOCATION
+	});
 
 	protected final String id;
 	protected final ValueLoader loader;
@@ -96,6 +100,7 @@ public abstract class DefaultGame implements Listener, Game {
 	protected WaitingRoom waitingRoom;
 	
 	protected final Map<UUID, InGamePlayer> dataMap = new HashMap<>();
+	protected final Map<UUID, Target> targets = new HashMap<>();
 	protected final FancyStuffWrapper fancyStuff;
 	protected final EffectListener listener;
 	protected final List<String> availableArenas;
@@ -567,6 +572,7 @@ public abstract class DefaultGame implements Listener, Game {
 		}
 		InGamePlayer data =  new DefaultPlayer(player, this, defClass.replicate());
 		dataMap.put(uuid, data);
+		targets.put(uuid, data);
 		Flier.getInstance().getPlayers().put(player.getUniqueId(), data);
 		// creating default stuff
 		data.getLines().add(new Fuel(data));
@@ -626,6 +632,7 @@ public abstract class DefaultGame implements Listener, Game {
 		if (data == null) {
 			return;
 		}
+		targets.remove(player.getUniqueId());
 		unlocked.remove(data);
 		waitingRoom.removePlayer(data);
 		Flier.getInstance().getPlayers().remove(player.getUniqueId());
@@ -636,6 +643,11 @@ public abstract class DefaultGame implements Listener, Game {
 	@Override
 	public Map<UUID, InGamePlayer> getPlayers() {
 		return Collections.unmodifiableMap(dataMap);
+	}
+	
+	@Override
+	public Map<UUID, Target> getTargets() {
+		return targets;
 	}
 
 	@Override
@@ -678,7 +690,10 @@ public abstract class DefaultGame implements Listener, Game {
 	}
 	
 	@Override
-	public void handleKill(InGamePlayer killer, InGamePlayer killed, boolean fall) {
+	public void handleKill(InGamePlayer killed, DamageCause cause) {
+		Attacker attacker = killed.getAttacker();
+		InGamePlayer killer = attacker == null ? null : attacker.getShooter();
+		boolean fall = cause == DamageCause.FALL;
 		if (killer != null && !killer.equals(killed)) {
 			if (fall) {
 				shotDownMessage("shot_down", killed, killer);
@@ -710,58 +725,26 @@ public abstract class DefaultGame implements Listener, Game {
 	protected void moveToWaitingRoom(InGamePlayer player) {
 		Utils.clearPlayer(player.getPlayer());
 		player.setPlaying(false);
-		player.setAttacker(null);
 		WaitReason reason = waitingRoom.addPlayer(player);
 		waitMessage(player.getPlayer(), reason);
 	}
 	
 	@Override
-	public void handleHit(InGamePlayer attacker, InGamePlayer attacked, Damager damager, UsableItem weapon) {
-		List<DamageResult> results = attacked.damage(attacker, damager);
+	public void handleHit(Target attacked, Attacker attacker) {
+		InGamePlayer shooter = attacker.getShooter();
+		boolean hit = attacked.handleHit(attacker);
 		// handle a general hit
-		if (results.contains(DamageResult.HIT) && attacker != null) {
-			attacked.setAttacker(attacker);
-			attacked.setNoDamageTicks(damager.getNoDamageTicks());
+		if (hit && shooter != null && attacked instanceof InGamePlayer) {
 			// pay money for a hit
-			Attitude a = getAttitude(attacker, attacked);
+			InGamePlayer attackedPlayer = (InGamePlayer) attacked;
+			Attitude a = getAttitude(shooter, attacked);
 			if (a == Attitude.FRIENDLY) {
-				pay(attacker, friendlyHitMoney);
-				pay(attacked, byFriendlyHitMoney);
+				pay(shooter, friendlyHitMoney);
+				pay(attackedPlayer, byFriendlyHitMoney);
 			} else if (a == Attitude.HOSTILE) {
-				pay(attacker, enemyHitMoney);
-				pay(attacked, byEnemyHitMoney);
+				pay(shooter, enemyHitMoney);
+				pay(attackedPlayer, byEnemyHitMoney);
 			}
-			// display a message about the hit and play the sound to the shooter if he exists and if he hits someone else
-			if (attacker != null && !attacker.equals(attacked)) {
-				if (weapon == null) {
-					LangManager.sendMessage(attacker, "hit", Utils.formatPlayer(attacked, attacker));
-				} else {
-					LangManager.sendMessage(attacker, "hit_weapon", Utils.formatPlayer(attacked, attacker),
-							Utils.formatItem(weapon, attacker));
-				}
-			}
-			if (attacked != null && !attacked.equals(attacker)) {
-				if (weapon == null) {
-					LangManager.sendMessage(attacked, "get_hit", Utils.formatPlayer(attacker, attacked));
-				} else {
-					LangManager.sendMessage(attacked, "get_hit_weapon", Utils.formatPlayer(attacker, attacked),
-							Utils.formatItem(weapon, attacked));
-				}
-			}
-		}
-		// handle taking wings off
-		if (results.contains(DamageResult.WINGS_OFF)) {
-			attacked.takeWingsOff();
-		}
-		// handle wing damage
-		if (results.contains(DamageResult.WINGS_DAMAGE)) {
-			attacked.getClazz().getWings().removeHealth(damager.getDamage());
-		}
-		// handle physical damage
-		// it's the last one to avoid modifying stuff after respawn
-		if (results.contains(DamageResult.REGULAR_DAMAGE)) {
-			attacked.getPlayer().setNoDamageTicks(0);
-			attacked.getPlayer().damage(damager.getPhysical());
 		}
 	}
 	
@@ -1027,44 +1010,25 @@ public abstract class DefaultGame implements Listener, Game {
 		}
 	}
 	
-	@EventHandler(priority=EventPriority.LOW)
-	public void onHit(EntityDamageByEntityEvent event) {
-		// if the damager is another player, cancel the event - melee not allowed
-		if (event.getDamager() instanceof Player && getPlayers().containsKey(event.getDamager().getUniqueId())) {
-			event.setCancelled(true);
-			return;
-		}
-		// get stuff involved in the attack
-		InGamePlayer player = getPlayers().get(event.getEntity().getUniqueId());
-		Utils.Attacker attacker = Utils.getDamager(event.getDamager());
-		// it's a weapon, so remove the attacking entity
-		if (attacker != null) {
-			event.getDamager().remove();
-		}
-		// cancel event if it's involved in the game
-		if (attacker != null || player != null) {
-			event.setCancelled(true);
-		}
-		// stop if the weapon was not used or in-game player was not attacked
-		if (attacker == null || player == null) {
-			return;
-		}
-		// weapon was used on in-game player, process the attack
-		handleHit(attacker.getShooter(), player, attacker.getDamager(), attacker.getWeapon());
-	}
-	
 	@EventHandler(priority=EventPriority.HIGH)
 	public void onDamage(EntityDamageEvent event) {
 		if (event.isCancelled()) {
 			return;
 		}
-		// handle death
-		InGamePlayer killed = getPlayers().get(event.getEntity().getUniqueId());
-		if (killed != null && killed.getPlayer().getHealth() - event.getFinalDamage() <= 0) {
-			event.setCancelled(true);
-			InGamePlayer lastHit = killed.getAttacker();
-			InGamePlayer killer = lastHit == null ? null : getPlayers().get(lastHit.getPlayer().getUniqueId());
-			handleKill(killer, killed, event.getCause() == DamageCause.FALL);
+		// prevent out-of-game damage to targets
+		Target target = getTargets().get(event.getEntity().getUniqueId());
+		if (target != null) {
+			if (!allowedDamage.contains(event.getCause())) {
+				event.setCancelled(true);
+			}
+			// handle death of players
+			if (target instanceof InGamePlayer) {
+				InGamePlayer data = (InGamePlayer) target;
+				if (data.getPlayer().getHealth() - event.getFinalDamage() <= 0) {
+					event.setCancelled(true);
+					handleKill(data, event.getCause());
+				}
+			}
 		}
 	}
 	
@@ -1073,7 +1037,7 @@ public abstract class DefaultGame implements Listener, Game {
 		if (event.isCancelled()) {
 			return;
 		}
-		Utils.Attacker weapon = Utils.getDamager(event.getEntity());
+		Attacker weapon = Attacker.getAttacker(event.getEntity());
 		if (weapon == null) {
 			return;
 		}
@@ -1101,7 +1065,7 @@ public abstract class DefaultGame implements Listener, Game {
 	
 	@EventHandler
 	public void onBlockExplode(EntityExplodeEvent event) {
-		if (Utils.getDamager(event.getEntity()) != null) {
+		if (Attacker.getAttacker(event.getEntity()) != null) {
 			event.blockList().clear();
 		}
 	}

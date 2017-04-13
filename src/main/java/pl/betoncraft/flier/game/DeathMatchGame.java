@@ -20,12 +20,15 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
 import pl.betoncraft.flier.api.Flier;
 import pl.betoncraft.flier.api.core.Arena;
+import pl.betoncraft.flier.api.core.Attacker;
 import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.LoadingException;
 import pl.betoncraft.flier.api.core.SidebarLine;
+import pl.betoncraft.flier.api.core.Target;
 import pl.betoncraft.flier.event.FlierPlayerSpawnEvent;
 import pl.betoncraft.flier.util.LangManager;
 
@@ -164,8 +167,10 @@ public class DeathMatchGame extends DefaultGame {
 	}
 
 	@Override
-	public void handleKill(InGamePlayer killer, InGamePlayer killed, boolean fall) {
-		super.handleKill(killer, killed, fall);
+	public void handleKill(InGamePlayer killed, DamageCause cause) {
+		super.handleKill(killed, cause);
+		Attacker attacker = killed.getAttacker();
+		InGamePlayer killer = attacker == null ? null : attacker.getShooter();
 		if (rounds) {
 			// kills in rounded games don't increase points
 			// we should check if there are any other players alive
@@ -228,7 +233,7 @@ public class DeathMatchGame extends DefaultGame {
 	}
 
 	@Override
-	public Attitude getAttitude(InGamePlayer toThisOne, InGamePlayer ofThisOne) {
+	public Attitude getAttitude(Target toThisOne, Target ofThisOne) {
 		return toThisOne.equals(ofThisOne) ? Attitude.FRIENDLY : Attitude.HOSTILE;
 	}
 

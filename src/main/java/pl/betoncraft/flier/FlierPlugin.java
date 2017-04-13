@@ -56,6 +56,7 @@ import pl.betoncraft.flier.api.content.Game;
 import pl.betoncraft.flier.api.content.Lobby;
 import pl.betoncraft.flier.api.content.Wings;
 import pl.betoncraft.flier.api.core.Arena;
+import pl.betoncraft.flier.api.core.Attacker;
 import pl.betoncraft.flier.api.core.ConfigManager;
 import pl.betoncraft.flier.api.core.FancyStuffWrapper;
 import pl.betoncraft.flier.api.core.InGamePlayer;
@@ -153,7 +154,7 @@ public class FlierPlugin extends JavaPlugin implements Flier {
 			public void onChunkUnload(ChunkUnloadEvent event) {
 				Entity[] entities = event.getChunk().getEntities();
 				for (int i = 0; i < entities.length; i++) {
-					if (entities[i] instanceof Projectile && Utils.getDamager((Projectile) entities[i]) != null) {
+					if (entities[i] instanceof Projectile && Attacker.getAttacker((Projectile) entities[i]) != null) {
 						entities[i].remove();
 					}
 				}

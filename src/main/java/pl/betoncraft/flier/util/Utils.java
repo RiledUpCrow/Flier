@@ -6,7 +6,6 @@
  */
 package pl.betoncraft.flier.util;
 
-import java.util.List;
 import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
@@ -15,19 +14,15 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.metadata.FixedMetadataValue;
-import org.bukkit.metadata.MetadataValue;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
-import pl.betoncraft.flier.api.Flier;
-import pl.betoncraft.flier.api.core.Damager;
 import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.LoadingException;
 import pl.betoncraft.flier.api.core.PlayerClass;
+import pl.betoncraft.flier.api.core.Target;
 import pl.betoncraft.flier.api.core.UsableItem;
 
 /**
@@ -73,10 +68,14 @@ public class Utils {
 
 	
 	/**
-	 * Formats the player name in team's color and appends class name.
-	 * The String ends in white color.
+	 * Formats the player name in team's color and appends class name. The
+	 * String ends in white color.
 	 * 
-	 * @param player InGamePlayer object containing player's information
+	 * @param player
+	 *            InGamePlayer object containing player's information
+	 * @param receiver
+	 *            InGamePlayer who will receive this message (for translation
+	 *            purposes)
 	 * @return the formatted name
 	 */
 	public static String formatPlayer(InGamePlayer player, InGamePlayer receiver) {
@@ -88,14 +87,34 @@ public class Utils {
 		return player.getColor() + name + ChatColor.WHITE + " (" + ChatColor.AQUA + clazzName + ChatColor.WHITE + ")";
 	}
 	
+	public static String formatTarget(Target target, InGamePlayer receiver) {
+		if (target instanceof InGamePlayer) {
+			return formatPlayer((InGamePlayer) target, receiver);
+		}
+		return "TARGET"; // TODO target formatting
+	}
+	
+	/**
+	 * Formats the item into a readable string.
+	 * 
+	 * @param item
+	 *            the item to format
+	 * @param receiver
+	 *            the receive of this message (for translation purposes)
+	 * @return the formatted item
+	 */
 	public static String formatItem(UsableItem item, InGamePlayer receiver) {
 		ItemStack stack = item.getItem(receiver);
 		return ChatColor.WHITE + "[" + stack.getItemMeta().getDisplayName() + ChatColor.WHITE + "]";
 	}
 
 	/**
+	 * Parses the Location from string.
+	 * 
 	 * @param string
-	 * @throws LoadingException 
+	 *            the location in x;y;z;world;yaw;pitch format
+	 * @throws LoadingException
+	 *             when something's wrong while parsing
 	 */
 	public static Location parseLocation(String string) throws LoadingException {
 		if (string == null) {
@@ -160,76 +179,6 @@ public class Utils {
 		for (PotionEffectType type : player.getActivePotionEffects().stream()
 				.map(effect -> effect.getType()).collect(Collectors.toList())) {
 			player.removePotionEffect(type);
-		}
-	}
-
-	/**
-	 * Adds Damager to metadata of the projectile, so Flier can handle it once
-	 * it hits someone.
-	 * 
-	 * @param entity
-	 *            projectile which was launched by Damager
-	 * @param damager
-	 *            Damager which is the source of that projectile
-	 */
-	public static void saveDamager(Entity entity, Damager damager, InGamePlayer attacker, UsableItem weapon) {
-		entity.setMetadata("flier-damager", new FixedMetadataValue(Flier.getInstance(), damager));
-		entity.setMetadata("flier-attacker", new FixedMetadataValue(Flier.getInstance(), attacker));
-		entity.setMetadata("flier-weapon", new FixedMetadataValue(Flier.getInstance(), weapon));
-	}
-
-	/**
-	 * Reads the Damager from the projectile. It will return null if the
-	 * projectile source is not a Damager.
-	 * 
-	 * @param entity
-	 *            projectile which was launched by Damager
-	 * @return Attacker or null
-	 */
-	public static Attacker getDamager(Entity entity) {
-		List<MetadataValue> listD = entity.getMetadata("flier-damager");
-		List<MetadataValue> listA = entity.getMetadata("flier-attacker");
-		List<MetadataValue> listW = entity.getMetadata("flier-weapon");
-		if (!listD.isEmpty() && !listA.isEmpty()) {
-			Object d = listD.get(0).value();
-			Object a = listA.get(0).value();
-			Object w = listW == null || listW.isEmpty() ? null : listW.get(0).value();
-			if (d instanceof Damager && a instanceof InGamePlayer && (w == null || w instanceof UsableItem)) {
-				return new Attacker((Damager) d, (InGamePlayer) a, w == null ? null : (UsableItem) w);
-			} else {
-				return new Attacker(DummyDamager.DUMMY, null, null);
-			}
-		}
-		return null;
-	}
-	
-	/**
-	 * Represents an Entity which is a Damager and was launched by InGamePlayer.
-	 *
-	 * @author Jakub Sapalski
-	 */
-	public static class Attacker {
-	
-		private Damager damager;
-		private InGamePlayer attacker;
-		private UsableItem weapon;
-	
-		public Attacker(Damager damager, InGamePlayer attacker, UsableItem weapon) {
-			this.damager = damager;
-			this.attacker = attacker;
-			this.weapon = weapon;
-		}
-	
-		public Damager getDamager() {
-			return damager;
-		}
-	
-		public InGamePlayer getShooter() {
-			return attacker;
-		}
-		
-		public UsableItem getWeapon() {
-			return weapon;
 		}
 	}
 

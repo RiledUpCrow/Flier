@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -32,8 +33,8 @@ import pl.betoncraft.flier.api.Flier;
 import pl.betoncraft.flier.api.content.Engine;
 import pl.betoncraft.flier.api.content.Game;
 import pl.betoncraft.flier.api.content.Wings;
+import pl.betoncraft.flier.api.core.Attacker;
 import pl.betoncraft.flier.api.core.Damager;
-import pl.betoncraft.flier.api.core.Damager.DamageResult;
 import pl.betoncraft.flier.api.core.FancyStuffWrapper;
 import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.PlayerClass;
@@ -67,7 +68,7 @@ public class DefaultPlayer implements InGamePlayer {
 	private boolean rightClicked = false;
 	private int noDamageTicks = 0;
 	private List<SidebarLine> lines = new LinkedList<>();
-	private InGamePlayer lastHit = null;
+	private Attacker lastHit = null;
 	private ChatColor color = ChatColor.WHITE;
 	private long glowTimer;
 	private int money;
@@ -199,38 +200,83 @@ public class DefaultPlayer implements InGamePlayer {
 	}
 	
 	@Override
-	public List<DamageResult> damage(InGamePlayer shooter, Damager damager) {
+	public boolean handleHit(Attacker attacker) {
+		InGamePlayer shooter = attacker.getShooter();
+		Damager damager = attacker.getDamager();
+		UsableItem weapon = attacker.getWeapon();
 		// empty list means no damage was dealt
 		List<DamageResult> results = new ArrayList<>(3);
 		// if player can't be damaged yet, return
-		if (noDamageTicks > 0) {
-			return results;
-		}
-		// player is not playing, nothing happens
-		// ignore if you can's commit suicide with this weapon
-		if (isPlaying() || !(shooter != null && shooter.equals(this) && !damager.suicidal())) {
-			if (Position.check(getPlayer(), Usage.Where.NO_FALL)) {
-				results.add(DamageResult.HIT);
-				if (Position.check(getPlayer(), Usage.Where.AIR)) {
-					if (damager.wingsOff()) {
-						results.add(DamageResult.WINGS_OFF);
-					}
-					if (damager.midAirPhysicalDamage()) {
+		if (noDamageTicks <= 0) {
+			// player is not playing, nothing happens
+			// ignore if you can's commit suicide with this weapon
+			if (isPlaying() || !(shooter != null &&
+					shooter.equals(this) &&
+					!damager.suicidal())) {
+				if (Position.check(getPlayer(), Usage.Where.NO_FALL)) {
+					results.add(DamageResult.HIT);
+					if (Position.check(getPlayer(), Usage.Where.AIR)) {
+						if (damager.wingsOff()) {
+							results.add(DamageResult.WINGS_OFF);
+						}
+						if (damager.midAirPhysicalDamage()) {
+							results.add(DamageResult.REGULAR_DAMAGE);
+						}
+						results.add(DamageResult.WINGS_DAMAGE);
+					} else if (Position.check(getPlayer(), Usage.Where.GROUND)) {
 						results.add(DamageResult.REGULAR_DAMAGE);
 					}
-					results.add(DamageResult.WINGS_DAMAGE);
-				} else if (Position.check(getPlayer(), Usage.Where.GROUND)) {
-					results.add(DamageResult.REGULAR_DAMAGE);
+				}
+			}
+			// fire an event
+			FlierPlayerHitEvent hitEvent = new FlierPlayerHitEvent(this, results, attacker);
+			Bukkit.getPluginManager().callEvent(hitEvent);
+			if (hitEvent.isCancelled()) {
+				results.clear();
+			}
+		}
+		// handle a general hit
+		if (results.contains(DamageResult.HIT) && shooter != null) {
+			lastHit = attacker;
+			noDamageTicks = damager.getNoDamageTicks();
+			// display a message about the hit and play the sound to the shooter if he exists and if he hits someone else
+			if (shooter != null && !shooter.equals(this)) {
+				if (weapon == null) {
+					LangManager.sendMessage(shooter, "hit", Utils.formatPlayer(this, shooter));
+				} else {
+					LangManager.sendMessage(shooter, "hit_weapon", Utils.formatPlayer(this, shooter),
+							Utils.formatItem(weapon, shooter));
+				}
+			}
+			if (!this.equals(shooter)) {
+				if (weapon == null) {
+					LangManager.sendMessage(this, "get_hit", Utils.formatPlayer(shooter, this));
+				} else {
+					LangManager.sendMessage(this, "get_hit_weapon", Utils.formatPlayer(shooter, this),
+							Utils.formatItem(weapon, this));
 				}
 			}
 		}
-		// fire an event
-		FlierPlayerHitEvent hitEvent = new FlierPlayerHitEvent(this, shooter, results, damager);
-		Bukkit.getPluginManager().callEvent(hitEvent);
-		if (hitEvent.isCancelled()) {
-			results.clear();
+		// handle taking wings off
+		if (results.contains(DamageResult.WINGS_OFF)) {
+			takeWingsOff();
 		}
-		return results;
+		// handle wing damage
+		if (results.contains(DamageResult.WINGS_DAMAGE)) {
+			getClazz().getWings().removeHealth(damager.getDamage());
+		}
+		// handle physical damage
+		// it's the last one because it triggers a respawn
+		if (results.contains(DamageResult.REGULAR_DAMAGE)) {
+			getPlayer().setNoDamageTicks(0);
+			getPlayer().damage(damager.getPhysical());
+		}
+		return results.contains(DamageResult.HIT);
+	}
+
+	@Override
+	public int getNoDamageTicks() {
+		return noDamageTicks;
 	}
 	
 	@Override
@@ -323,6 +369,18 @@ public class DefaultPlayer implements InGamePlayer {
 	}
 	
 	@Override
+	public Location getLocation() {
+		return player.getLocation().toVector()
+			.midpoint(player.getEyeLocation().toVector())
+			.toLocation(player.getLocation().getWorld());
+	}
+	
+	@Override
+	public Vector getVelocity() {
+		return player.getVelocity();
+	}
+	
+	@Override
 	public double getWeight() {
 		double weight = 0;
 		weight += clazz.getEngine().getWeight();
@@ -336,6 +394,11 @@ public class DefaultPlayer implements InGamePlayer {
 	@Override
 	public String getLanguage() {
 		return lang;
+	}
+
+	@Override
+	public boolean isTargetable() {
+		return isPlaying();
 	}
 
 	@Override
@@ -375,13 +438,13 @@ public class DefaultPlayer implements InGamePlayer {
 	}
 	
 	@Override
-	public InGamePlayer getAttacker() {
+	public Attacker getAttacker() {
 		return lastHit;
 	}
-	
+
 	@Override
-	public void setAttacker(InGamePlayer player) {
-		this.lastHit = player;
+	public void setAttacker(Attacker attacker) {
+		lastHit = attacker;
 	}
 
 	@Override

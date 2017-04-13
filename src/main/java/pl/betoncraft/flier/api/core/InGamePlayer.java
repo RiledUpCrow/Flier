@@ -12,15 +12,42 @@ import java.util.Map;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
-import pl.betoncraft.flier.api.content.Game;
-import pl.betoncraft.flier.api.core.Damager.DamageResult;
-
 /**
  * Represents a player who is in a Game.
  *
  * @author Jakub Sapalski
  */
-public interface InGamePlayer {
+public interface InGamePlayer extends Target {
+
+	/**
+	 * Represents a result of player being hit by Damager. There can be multiple
+	 * results.
+	 *
+	 * @author Jakub Sapalski
+	 */
+	public enum DamageResult {
+
+		/**
+		 * When the player is gliding and Damager has "wings off" option
+		 */
+		WINGS_OFF,
+
+		/**
+		 * When the player is gliding and his wings can receive damage.
+		 */
+		WINGS_DAMAGE,
+
+		/**
+		 * When the player is on ground and was not instantly killed.
+		 */
+		REGULAR_DAMAGE,
+
+		/**
+		 * When a hit is accepted at all.
+		 */
+		HIT,
+
+	}
 
 	/**
 	 * Stuff which needs to happen to the player to let him fly. Speeding up,
@@ -82,11 +109,6 @@ public interface InGamePlayer {
 	public void consumeItem(UsableItem item);
 
 	/**
-	 * @return the the Game this player is in
-	 */
-	public Game getGame();
-
-	/**
 	 * @return the Player object of this player
 	 */
 	public Player getPlayer();
@@ -121,17 +143,6 @@ public interface InGamePlayer {
 	 * Updates the player with his class items.
 	 */
 	public void updateClass();
-
-	/**
-	 * @return the player who last attacked this player
-	 */
-	public InGamePlayer getAttacker();
-
-	/**
-	 * @param attacker
-	 *            the player who last attacked this player
-	 */
-	public void setAttacker(InGamePlayer attacker);
 
 	/**
 	 * @return the amount of money the player has
@@ -175,25 +186,5 @@ public interface InGamePlayer {
 	 * Makes the player leave the game back to the lobby.
 	 */
 	public void exitGame();
-
-	/**
-	 * Deals Damager's damage from the shooter to the player.
-	 * 
-	 * @param shooter
-	 *            the player who shot the Damager; can be null or equal to
-	 *            player
-	 * @param damager
-	 *            the Damager used for the attack; cannot be null
-	 * @return list of damage results, never null; if it's empty the damage was
-	 *         not dealt
-	 */
-	public List<DamageResult> damage(InGamePlayer shooter, Damager damager);
-
-	/**
-	 * Sets the amount of ticks when there can be no damage to the player
-	 * 
-	 * @param noDamageTicks amount of ticks
-	 */
-	public void setNoDamageTicks(int noDamageTicks);
 
 }

@@ -14,36 +14,6 @@ package pl.betoncraft.flier.api.core;
 public interface Damager {
 
 	/**
-	 * Represents a result of player being hit by Damager. There can be multiple
-	 * results.
-	 *
-	 * @author Jakub Sapalski
-	 */
-	public enum DamageResult {
-
-		/**
-		 * When the player is gliding and Damager has "wings off" option
-		 */
-		WINGS_OFF,
-
-		/**
-		 * When the player is gliding and his wings can receive damage.
-		 */
-		WINGS_DAMAGE,
-
-		/**
-		 * When the player is on ground and was not instantly killed.
-		 */
-		REGULAR_DAMAGE,
-
-		/**
-		 * When a hit is accepted at all.
-		 */
-		HIT,
-
-	}
-
-	/**
 	 * This damage is dealt to wings. If they don't have enough health, they
 	 * should be destroyed.
 	 * 

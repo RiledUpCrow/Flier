@@ -19,12 +19,15 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
 import pl.betoncraft.flier.api.Flier;
 import pl.betoncraft.flier.api.core.Arena;
+import pl.betoncraft.flier.api.core.Attacker;
 import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.LoadingException;
 import pl.betoncraft.flier.api.core.SidebarLine;
+import pl.betoncraft.flier.api.core.Target;
 import pl.betoncraft.flier.event.FlierPlayerSpawnEvent;
 import pl.betoncraft.flier.util.LangManager;
 import pl.betoncraft.flier.util.Utils;
@@ -176,8 +179,10 @@ public class TeamDeathMatch extends DefaultGame {
 	}
 
 	@Override
-	public void handleKill(InGamePlayer killer, InGamePlayer killed, boolean fall) {
-		super.handleKill(killer, killed, fall);
+	public void handleKill(InGamePlayer killed, DamageCause cause) {
+		super.handleKill(killed, cause);
+		Attacker attacker = killed.getAttacker();
+		InGamePlayer killer = attacker == null ? null : attacker.getShooter();
 		if (rounds) {
 			// kills in rounded games don't increase points
 			// we should check if there are any opposite team players left
@@ -237,10 +242,7 @@ public class TeamDeathMatch extends DefaultGame {
 	}
 	
 	@Override
-	public Attitude getAttitude(InGamePlayer toThisOne, InGamePlayer ofThisOne) {
-		if (!toThisOne.isPlaying()) {
-			return Attitude.NEUTRAL;
-		}
+	public Attitude getAttitude(Target toThisOne, Target ofThisOne) {
 		if (getTeam(toThisOne).equals(getTeam(ofThisOne))) {
 			return Attitude.FRIENDLY;
 		} else {
@@ -274,8 +276,11 @@ public class TeamDeathMatch extends DefaultGame {
 		}
 	}
 	
-	private  SimpleTeam getTeam(InGamePlayer data) {
-		return players.get(data.getPlayer().getUniqueId());
+	private  SimpleTeam getTeam(Target target) {
+		if (target instanceof InGamePlayer) {
+			return players.get(((InGamePlayer) target).getPlayer().getUniqueId());
+		}
+		return null; // TODO rewrite teams to include targets, not only players
 	}
 	
 	private void setTeam(InGamePlayer data, SimpleTeam team) {

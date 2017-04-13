@@ -14,14 +14,15 @@ import java.util.UUID;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.permissions.Permission;
 
 import pl.betoncraft.flier.api.core.Arena;
-import pl.betoncraft.flier.api.core.Damager;
+import pl.betoncraft.flier.api.core.Attacker;
 import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.LoadingException;
 import pl.betoncraft.flier.api.core.SetApplier;
-import pl.betoncraft.flier.api.core.UsableItem;
+import pl.betoncraft.flier.api.core.Target;
 
 /**
  * Represents a game.
@@ -145,6 +146,11 @@ public interface Game {
 	 * @return the map of players
 	 */
 	public Map<UUID, InGamePlayer> getPlayers();
+	
+	/**
+	 * @return a set containing all targets in this Game
+	 */
+	public Map<UUID, Target> getTargets();
 
 	/**
 	 * This method will be called by the Lobby when the game needs to be started.
@@ -183,7 +189,7 @@ public interface Game {
 	 * @return the attitude of the second player to the first one (this relation
 	 *         is usually symmetric)
 	 */
-	public Attitude getAttitude(InGamePlayer toThisOne, InGamePlayer ofThisOne);
+	public Attitude getAttitude(Target toThisOne, Target ofThisOne);
 
 	/**
 	 * Returns a map where the key is player's name and the value is his color.
@@ -215,31 +221,25 @@ public interface Game {
 
 	/**
 	 * Contains logic for game-specific hit handling. Called by Flier when a
-	 * player gets hit with a Damager.
+	 * Target gets hit with an Attacker.
 	 * 
+	 * @param target
+	 *            Target which was hit
 	 * @param attacker
-	 *            the player who attacked, can be null or equal to attacked
-	 * @param attacked
-	 *            the player who was attacked
-	 * @param damager
-	 *            Damager used in the attack
-	 * @param weapon
-	 *            optional weapon used which fired the damager
+	 *            the Attacker which is responsible for the hit
 	 */
-	public void handleHit(InGamePlayer attacker, InGamePlayer attacked, Damager damager, UsableItem weapon);
+	public void handleHit(Target target, Attacker attacker);
 
 	/**
 	 * Contains logic for game-specific kill handling. Called by Flier when a
 	 * player is killed.
 	 * 
-	 * @param killer
-	 *            the player who killed, can be null or equal to attacked
 	 * @param killed
-	 *            the player who was killed
-	 * @param fall
-	 *            whenever the player died because of fall damage
+	 *            the player who got killed
+	 * @param cause
+	 *            the direct cause of death
 	 */
-	public void handleKill(InGamePlayer killer, InGamePlayer killed, boolean fall);
+	public void handleKill(InGamePlayer killed, DamageCause cause);
 
 	/**
 	 * This method is called for the respawned player. Use it if you want to do

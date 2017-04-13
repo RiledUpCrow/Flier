@@ -10,20 +10,27 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Explosive;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import pl.betoncraft.flier.api.Flier;
+import pl.betoncraft.flier.api.core.Attacker;
 import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.LoadingException;
+import pl.betoncraft.flier.api.core.Target;
 import pl.betoncraft.flier.api.core.UsableItem;
-import pl.betoncraft.flier.util.Utils;
+import pl.betoncraft.flier.core.DefaultAttacker;
 
 /**
  * Burst shooting weapon with unguided projectile-based bullets.
@@ -36,6 +43,8 @@ public class ProjectileGun extends DefaultAttack {
 	private static final String BURST_AMOUNT = "burst_amount";
 	private static final String BURST_TICKS = "burst_ticks";
 	private static final String PROJECTILE_SPEED = "projectile_speed";
+	
+	private static ProjectileListener listener;
 
 	private final EntityType entity;
 	private final int burstAmount;
@@ -49,6 +58,11 @@ public class ProjectileGun extends DefaultAttack {
 		burstAmount = loader.loadPositiveInt(BURST_AMOUNT);
 		burstTicks = loader.loadPositiveInt(BURST_TICKS);
 		projectileSpeed = loader.loadPositiveDouble(PROJECTILE_SPEED);
+		// register a single listener for all ProjectileGuns
+		if (listener == null) {
+			listener = new ProjectileListener();
+			Bukkit.getPluginManager().registerEvents(listener, Flier.getInstance());
+		}
 	}
 	
 	@Override
@@ -76,7 +90,7 @@ public class ProjectileGun extends DefaultAttack {
 					explosive.setIsIncendiary(false);
 					explosive.setYield(0);
 				}
-				Utils.saveDamager(projectile, ProjectileGun.this, data, weapon);
+				Attacker.saveAttacker(projectile, new DefaultAttacker(ProjectileGun.this, data, weapon));
 				projectiles.put(projectile, velocity);
 				counter --;
 				if (counter <= 0) {
@@ -99,6 +113,26 @@ public class ProjectileGun extends DefaultAttack {
 			}
 		}.runTaskTimer(Flier.getInstance(), 0, 1);
 		return true;
+	}
+	
+	public class ProjectileListener implements Listener {
+		
+		@EventHandler(priority=EventPriority.LOW)
+		public void onHit(EntityDamageByEntityEvent event) {
+			if (event.isCancelled()) {
+				return;
+			}
+			Attacker attacker = Attacker.getAttacker(event.getDamager());
+			if (attacker != null && attacker.getDamager() instanceof ProjectileGun) {
+				event.setCancelled(true);
+				event.getDamager().remove();
+				Target target = attacker.getShooter().getGame().getTargets().get(event.getEntity().getUniqueId());
+				if (target != null && target.isTargetable()) {
+					attacker.getShooter().getGame().handleHit(target, attacker);
+				}
+			}
+		}
+		
 	}
 
 }
