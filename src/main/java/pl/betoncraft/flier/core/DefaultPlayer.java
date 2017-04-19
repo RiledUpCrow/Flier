@@ -421,9 +421,9 @@ public class DefaultPlayer implements InGamePlayer {
 		Engine engine = clazz.getEngine();
 		Wings wings = clazz.getWings();
 		List<UsableItem> items = clazz.getItems();
-		getPlayer().getInventory().clear();
-		getPlayer().getInventory().setItemInOffHand(engine.getItem(this));
-		getPlayer().getInventory().setChestplate(wings.getItem(this));
+		player.getInventory().clear();
+		player.getInventory().setItemInOffHand(engine.getItem(this));
+		player.getInventory().setChestplate(wings.getItem(this));
 		for (UsableItem item : items) {
 			int amount = item.getAmount();
 			int slot = item.slot();
@@ -432,7 +432,15 @@ public class DefaultPlayer implements InGamePlayer {
 			if (slot >= 0) {
 				player.getInventory().setItem(slot, itemStack);
 			} else {
-				getPlayer().getInventory().addItem(itemStack);
+				ItemStack[] content = player.getInventory().getContents();
+				int i = 9;
+				while (i < 36) {
+					if (content[i] == null) {
+						content[i] = itemStack;
+						break;
+					}
+				}
+				player.getInventory().setContents(content);
 			}
 		}
 	}
