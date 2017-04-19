@@ -47,8 +47,9 @@ public abstract class DefaultBonus implements Bonus {
 	protected int ticks = 0;
 	protected BukkitRunnable ticker;
 	
-	public DefaultBonus(ConfigurationSection section) throws LoadingException {
+	public DefaultBonus(ConfigurationSection section, Game game) throws LoadingException {
 		id = section.getName();
+		this.game = game;
 		loader = new ValueLoader(section);
 		consumable = loader.loadBoolean("consumable");
 		cooldown = loader.loadNonNegativeInt("cooldown");
@@ -140,11 +141,6 @@ public abstract class DefaultBonus implements Bonus {
 	protected void block() {
 		available = false;
 	}
-	
-	@Override
-	public void setGame(Game game) throws LoadingException {
-		this.game = game;
-	}
 
 	@Override
 	public void start() {
@@ -165,7 +161,10 @@ public abstract class DefaultBonus implements Bonus {
 			starter.cancel();
 			starter = null;
 		}
-		ticker.cancel();
+		if (ticker != null) {
+			ticker.cancel();
+			ticker = null;
+		}
 		block();
 	}
 	

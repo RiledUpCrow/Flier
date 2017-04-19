@@ -19,6 +19,7 @@ import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import pl.betoncraft.flier.api.Flier;
+import pl.betoncraft.flier.api.content.Game;
 import pl.betoncraft.flier.api.core.LoadingException;
 
 /**
@@ -32,8 +33,8 @@ public class EntityBonus extends ProximityBonus implements Listener {
 	protected Entity entity;
 	protected BukkitRunnable rotator;
 	
-	public EntityBonus(ConfigurationSection section) throws LoadingException {
-		super(section);
+	public EntityBonus(ConfigurationSection section, Game game) throws LoadingException {
+		super(section, game);
 		type = loader.loadEnum("entity", EntityType.class);
 	}
 

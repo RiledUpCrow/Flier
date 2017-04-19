@@ -18,8 +18,8 @@ import pl.betoncraft.flier.api.core.Item;
 public interface Engine extends Item {
 
 	/**
-	 * Launches the player in the direction he's looking, making modifications
-	 * to his velocity. Use this method to implement your engine's mechanics.
+	 * Calculates the Engine's acceleration vector from player's velocity and
+	 * head direction vectors. Use it to implement your Engine's mechanics.
 	 * 
 	 * @param velocity
 	 *            velocity Vector of the player

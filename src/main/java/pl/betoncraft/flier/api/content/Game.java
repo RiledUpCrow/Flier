@@ -20,7 +20,6 @@ import org.bukkit.permissions.Permission;
 import pl.betoncraft.flier.api.core.Arena;
 import pl.betoncraft.flier.api.core.Attacker;
 import pl.betoncraft.flier.api.core.InGamePlayer;
-import pl.betoncraft.flier.api.core.LoadingException;
 import pl.betoncraft.flier.api.core.SetApplier;
 import pl.betoncraft.flier.api.core.Target;
 
@@ -40,11 +39,6 @@ public interface Game {
 		 * @return the ID of the Button
 		 */
 		public String getID();
-		
-		/**
-		 * @return the name of Location of this Button
-		 */
-		public List<String> getLocationNames();
 		
 		/**
 		 * @return the Location of this Button
@@ -169,15 +163,6 @@ public interface Game {
 	public Lobby getLobby();
 
 	/**
-	 * This method must be used on newly created Game to let it know what
-	 * created it.
-	 * 
-	 * @param lobby
-	 *            the Lobby this Game is in
-	 */
-	public void setLobby(Lobby lobby);
-
-	/**
 	 * Returns the Attitude of one player towards another. The game should tell
 	 * if these players are enemies or friends, so other components can behave
 	 * accordingly.
@@ -260,16 +245,6 @@ public interface Game {
 	 * @return the Arena currently used by this Game
 	 */
 	public Arena getArena();
-
-	/**
-	 * @param arena Arena to set for this Game or null to remove the Arena
-	 */
-	public void setArena(Arena arena) throws LoadingException;
-
-	/**
-	 * @return the list of names of Arenas which can be used for this Game
-	 */
-	public List<String> getViableArenas();
 	
 	/**
 	 * @return the maximum amount of players this Game can have or 0 if there is no limit

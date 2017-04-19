@@ -24,13 +24,12 @@ public class ProximityBonus extends DefaultBonus {
 
 	protected Location location;
 	protected final double distance;
-	protected final String locationName;
 	protected BukkitRunnable checker;
 
-	public ProximityBonus(ConfigurationSection section) throws LoadingException {
-		super(section);
+	public ProximityBonus(ConfigurationSection section, Game game) throws LoadingException {
+		super(section, game);
 		distance = Math.pow(loader.loadNonNegativeDouble("distance"), 1);
-		locationName = loader.loadString("location");
+		location = game.getArena().getLocation(loader.loadString("location"));
 	}
 	
 	public void check() {
@@ -41,12 +40,6 @@ public class ProximityBonus extends DefaultBonus {
 				apply(player);
 			}
 		}
-	}
-	
-	@Override
-	public void setGame(Game game) throws LoadingException {
-		super.setGame(game);
-		location = game.getArena().getLocation(locationName);
 	}
 	
 	@Override
@@ -64,7 +57,10 @@ public class ProximityBonus extends DefaultBonus {
 	@Override
 	public void block() {
 		super.block();
-		checker.cancel();
+		if (checker != null) {
+			checker.cancel();
+			checker = null;
+		}
 	}
 
 }

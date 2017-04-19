@@ -23,10 +23,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
 import pl.betoncraft.flier.api.Flier;
-import pl.betoncraft.flier.api.core.Arena;
+import pl.betoncraft.flier.api.content.Lobby;
 import pl.betoncraft.flier.api.core.Attacker;
 import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.LoadingException;
+import pl.betoncraft.flier.api.core.NoArenaException;
 import pl.betoncraft.flier.api.core.SidebarLine;
 import pl.betoncraft.flier.api.core.Target;
 import pl.betoncraft.flier.event.FlierPlayerSpawnEvent;
@@ -42,8 +43,7 @@ public class DeathMatchGame extends DefaultGame {
 	protected final Map<UUID, Integer> scores = new HashMap<>();
 	protected final Map<String, ChatColor> colors = new HashMap<>();
 	
-	protected final List<String> spawnNames;
-	protected final List<Location> locations;
+	protected final List<Location> locations = new ArrayList<>();
 	protected int spawnCounter = 0;
 	
 	protected final List<ChatColor> usedColors;
@@ -53,13 +53,11 @@ public class DeathMatchGame extends DefaultGame {
 	protected final int killScore;
 	protected final int pointsToWin;
 
-	public DeathMatchGame(ConfigurationSection section) throws LoadingException {
-		super(section);
+	public DeathMatchGame(ConfigurationSection section, Lobby lobby) throws LoadingException, NoArenaException {
+		super(section, lobby);
 		suicideScore = loader.loadInt("suicide_score", 0);
 		killScore = loader.loadInt("kill_score", 1);
 		pointsToWin = loader.loadPositiveInt("points_to_win");
-		spawnNames = section.getStringList("spawns");
-		locations = new ArrayList<>(spawnNames.size());
 		List<String> colors = section.getStringList("colors");
 		if (colors.size() > 0) {
 			usedColors = new ArrayList<>(colors.size());
@@ -73,7 +71,10 @@ public class DeathMatchGame extends DefaultGame {
 		} else {
 			usedColors = Arrays.asList(ChatColor.values());
 		}
-		if (spawnNames.isEmpty()) {
+		for (String name : section.getStringList("spawns")) {
+			locations.add(arena.getLocation(name));
+		}
+		if (locations.isEmpty()) {
 			throw new LoadingException("Spawn list cannot be empty");
 		}
 	}
@@ -123,12 +124,6 @@ public class DeathMatchGame extends DefaultGame {
 		}
 		
 	}
-
-	@Override
-	public void fastTick() {}
-
-	@Override
-	public void slowTick() {}
 
 	@Override
 	public void endGame() {
@@ -240,15 +235,6 @@ public class DeathMatchGame extends DefaultGame {
 	@Override
 	public Map<String, ChatColor> getColors() {
 		return colors;
-	}
-	
-	@Override
-	public void setArena(Arena arena) throws LoadingException {
-		super.setArena(arena);
-		locations.clear();
-		for (String name : spawnNames) {
-			locations.add(arena.getLocation(name));
-		}
 	}
 
 }

@@ -19,12 +19,11 @@ import pl.betoncraft.flier.api.core.Item;
 public interface Wings extends Item {
 
 	/**
-	 * Applies modifications to player's velocity vector. Use this method to
+	 * Calculates modified player's velocity vector. Use this method to
 	 * apply your wings' flight model.
 	 * 
-	 * @param velocity
-	 *            player's velocity Vector
-	 * @return the same Vector, modified
+	 * @param data the Player whose modified velocity must be calculated
+	 * @return new velocity Vector
 	 */
 	public Vector applyFlightModifications(InGamePlayer data);
 

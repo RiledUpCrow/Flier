@@ -26,8 +26,8 @@ public class TargetBonus extends EntityBonus implements Target {
 	protected Attacker attacker;
 	protected int noDamageTicks = 0;
 
-	public TargetBonus(ConfigurationSection section) throws LoadingException {
-		super(section);
+	public TargetBonus(ConfigurationSection section, Game game) throws LoadingException {
+		super(section, game);
 	}
 	
 	@Override

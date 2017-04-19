@@ -22,10 +22,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
 import pl.betoncraft.flier.api.Flier;
-import pl.betoncraft.flier.api.core.Arena;
+import pl.betoncraft.flier.api.content.Lobby;
 import pl.betoncraft.flier.api.core.Attacker;
 import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.LoadingException;
+import pl.betoncraft.flier.api.core.NoArenaException;
 import pl.betoncraft.flier.api.core.SidebarLine;
 import pl.betoncraft.flier.api.core.Target;
 import pl.betoncraft.flier.event.FlierPlayerSpawnEvent;
@@ -49,22 +50,22 @@ public class TeamDeathMatch extends DefaultGame {
 	
 	protected final int pointsToWin;
 	
-	public TeamDeathMatch(ConfigurationSection section) throws LoadingException {
-		super(section);
+	public TeamDeathMatch(ConfigurationSection section, Lobby lobby) throws LoadingException, NoArenaException {
+		super(section, lobby);
 		suicideScore = loader.loadInt("suicide_score", 0);
 		friendlyKillScore = loader.loadInt("friendly_kill_score", 0);
 		enemyKillScore = loader.loadInt("enemy_kill_score", 1);
 		pointsToWin = loader.loadPositiveInt("points_to_win");
-		ConfigurationSection teams = section.getConfigurationSection("teams");
-		if (teams != null) for (String t : teams.getKeys(false)) {
+		ConfigurationSection teamConfig = section.getConfigurationSection("teams");
+		if (teamConfig != null) for (String teamID : teamConfig.getKeys(false)) {
 			try {
-				SimpleTeam team = new SimpleTeam(teams.getConfigurationSection(t));
-				this.teams.put(t, team);
+				SimpleTeam team = new SimpleTeam(teamConfig.getConfigurationSection(teamID));
+				teams.put(teamID, team);
 			} catch (LoadingException e) {
-				throw (LoadingException) new LoadingException(String.format("Error in '%s' team.", t)).initCause(e);
+				throw (LoadingException) new LoadingException(String.format("Error in '%s' team.", teamID)).initCause(e);
 			}
 		}
-		if (this.teams.isEmpty()) {
+		if (teams.isEmpty()) {
 			throw new LoadingException("Teams must be defined.");
 		}
 	}
@@ -73,16 +74,20 @@ public class TeamDeathMatch extends DefaultGame {
 		
 		private int score = 0;
 		private String name;
-		private List<String> spawnNames;
-		private List<Location> spawns;
+		private List<Location> spawns = new ArrayList<>();
 		private int spawnCounter = 0;
 		private ChatColor color;
 		
 		public SimpleTeam(ConfigurationSection section) throws LoadingException {
 			ValueLoader loader = new ValueLoader(section);
-			spawnNames = section.getStringList("spawns");
 			color = loader.loadEnum("color", ChatColor.class);
 			name = ChatColor.translateAlternateColorCodes('&', loader.loadString("name"));
+			for (String name : section.getStringList("spawns")) {
+				spawns.add(arena.getLocation(name));
+			}
+			if (spawns.isEmpty()) {
+				throw new LoadingException(String.format("Spawn list for team %s is empty.", name));
+			}
 		}
 
 		public int getScore() {
@@ -130,12 +135,6 @@ public class TeamDeathMatch extends DefaultGame {
 			return lastString;
 		}
 	}
-	
-	@Override
-	public void fastTick() {}
-	
-	@Override
-	public void slowTick() {}
 	
 	@Override
 	public void endGame() {
@@ -260,20 +259,6 @@ public class TeamDeathMatch extends DefaultGame {
 			}
 		}
 		return map;
-	}
-	
-	@Override
-	public void setArena(Arena arena) throws LoadingException {
-		super.setArena(arena);
-		for (SimpleTeam team : teams.values()) {
-			team.spawns = new ArrayList<>(team.spawnNames.size());
-			for (String name : team.spawnNames) {
-				team.spawns.add(arena.getLocation(name));
-			}
-			if (team.spawns.isEmpty()) {
-				throw new LoadingException(String.format("Spawn list for team %s is empty.", team.name));
-			}
-		}
 	}
 	
 	private  SimpleTeam getTeam(Target target) {

@@ -28,6 +28,7 @@ import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.ItemSet;
 import pl.betoncraft.flier.api.core.LoadingException;
 import pl.betoncraft.flier.api.core.Modification;
+import pl.betoncraft.flier.api.core.NoArenaException;
 import pl.betoncraft.flier.api.core.UsableItem;
 
 /**
@@ -104,8 +105,10 @@ public interface Flier extends Plugin {
 	 * @return the Game with specified name, never null
 	 * @throws LoadingException
 	 *             when the Game cannot be created due to an error
+	 * @throws NoArenaException
+	 *             when the Lobby has no free arenas for this Game
 	 */
-	public Game getGame(String id) throws LoadingException;
+	public Game getGame(String id, Lobby lobby) throws LoadingException, NoArenaException;
 
 	/**
 	 * @param id ID of the Action
@@ -129,7 +132,7 @@ public interface Flier extends Plugin {
 	 * @throws LoadingException
 	 *             when the Bonus cannot be created due to an error, type is not defined or Bonus is not defined
 	 */
-	public Bonus getBonus(String id) throws LoadingException;
+	public Bonus getBonus(String id, Game game) throws LoadingException;
 	
 	/**
 	 * @param id ID of the Modification
@@ -172,7 +175,7 @@ public interface Flier extends Plugin {
 	 * @param factory
 	 *            factory which creates instances of that type
 	 */
-	public void registerEngine(String name, Factory<Engine> factory);
+	public void registerEngine(String name, EngineFactory factory);
 
 	/**
 	 * Registers a new Wings type with specified name. The factory will be used
@@ -183,7 +186,7 @@ public interface Flier extends Plugin {
 	 * @param factory
 	 *            factory which creates instances of that type
 	 */
-	public void registerWings(String name, Factory<Wings> factory);
+	public void registerWings(String name, WingsFactory factory);
 
 	/**
 	 * Registers a new Lobby type with specified name. The factory will be used
@@ -194,7 +197,7 @@ public interface Flier extends Plugin {
 	 * @param factory
 	 *            factory which creates instances of that type
 	 */
-	public void registerLobby(String name, Factory<Lobby> factory);
+	public void registerLobby(String name, LobbyFactory factory);
 
 	/**
 	 * Registers a new Game type with specified name. The factory will be used
@@ -205,7 +208,7 @@ public interface Flier extends Plugin {
 	 * @param factory
 	 *            factory which creates instances of that type
 	 */
-	public void registerGame(String name, Factory<Game> factory);
+	public void registerGame(String name, GameFactory factory);
 
 	/**
 	 * Registers a new Bonus type with specified name. The factory will be used
@@ -216,7 +219,7 @@ public interface Flier extends Plugin {
 	 * @param factory
 	 *            factory which creates instances of that type
 	 */
-	public void registerBonus(String name, Factory<Bonus> factory);
+	public void registerBonus(String name, BonusFactory factory);
 
 	/**
 	 * Registers a new Action type with specified name. The factory will be used
@@ -227,7 +230,7 @@ public interface Flier extends Plugin {
 	 * @param factory
 	 *            factory which creates instances of that type
 	 */
-	public void registerAction(String name, Factory<Action> factory);
+	public void registerAction(String name, ActionFactory factory);
 
 	/**
 	 * Registers a new Activator type with specified name. The factory will be used
@@ -238,7 +241,7 @@ public interface Flier extends Plugin {
 	 * @param factory
 	 *            factory which creates instances of that type
 	 */
-	public void registerActivator(String name, Factory<Activator> factory);
+	public void registerActivator(String name, ActivatorFactory factory);
 
 	/**
 	 * Registers a new Effect type with specified name. The factory will be used
@@ -249,16 +252,102 @@ public interface Flier extends Plugin {
 	 * @param factory
 	 *            factory which creates instances of that type
 	 */
-	void registerEffect(String name, Factory<Effect> factory);
-
+	public void registerEffect(String name, EffectFactory factory);
+	
 	/**
-	 * Factory which creates instances of a type, using ConfigurationSections to
-	 * get data.
-	 *
-	 * @author Jakub Sapalski
+	 * Gets the Lobby factory method for the given Lobby type.
+	 * 
+	 * @param name name of the Lobby factory
+	 * @return the Lobby factory
 	 */
-	public interface Factory<T> {
-		public T get(ConfigurationSection settings) throws LoadingException;
+	public LobbyFactory getLobbyFactory(String name);
+	
+	/**
+	 * Gets the Game factory method for the given Game type.
+	 * 
+	 * @param name name of the Game factory
+	 * @return the Game factory
+	 */
+	public GameFactory getGameFactory(String name);
+	
+	/**
+	 * Gets the Engine factory method for the given Engine type.
+	 * 
+	 * @param name name of the Engine factory
+	 * @return the Engine factory
+	 */
+	public EngineFactory getEngineFactory(String name);
+	
+	/**
+	 * Gets the Wings factory method for the given Wings type.
+	 * 
+	 * @param name name of the Wings factory
+	 * @return the Wings factory
+	 */
+	public WingsFactory getWingsFactory(String name);
+	
+	/**
+	 * Gets the Bonus factory method for the given Bonus type.
+	 * 
+	 * @param name name of the Bonus factory
+	 * @return the Bonus factory
+	 */
+	public BonusFactory getBonusFactory(String name);
+	
+	/**
+	 * Gets the Action factory method for the given Action type.
+	 * 
+	 * @param name name of the Action factory
+	 * @return the Action factory
+	 */
+	public ActionFactory getActionFactory(String name);
+	
+	/**
+	 * Gets the Activator factory method for the given Activator type.
+	 * 
+	 * @param name name of the Activator factory
+	 * @return the Activator factory
+	 */
+	public ActivatorFactory getActivatorFactory(String name);
+	
+	/**
+	 * Gets the Effect factory method for the given Effect type.
+	 * 
+	 * @param name name of the Effect factory
+	 * @return the Effect factory
+	 */
+	public EffectFactory getEffectFactory(String name);
+	
+	public interface LobbyFactory {
+		public Lobby get(ConfigurationSection settings) throws LoadingException;
+	}
+	
+	public interface GameFactory {
+		public Game get(ConfigurationSection settings, Lobby lobby) throws LoadingException, NoArenaException;
+	}
+	
+	public interface EngineFactory {
+		public Engine get(ConfigurationSection settings) throws LoadingException;
+	}
+	
+	public interface WingsFactory {
+		public Wings get(ConfigurationSection settings) throws LoadingException;
+	}
+	
+	public interface BonusFactory {
+		public Bonus get(ConfigurationSection settings, Game game) throws LoadingException;
+	}
+	
+	public interface ActionFactory {
+		public Action get(ConfigurationSection settings) throws LoadingException;
+	}
+	
+	public interface ActivatorFactory {
+		public Activator get(ConfigurationSection settings) throws LoadingException;
+	}
+	
+	public interface EffectFactory {
+		public Effect get(ConfigurationSection settings) throws LoadingException;
 	}
 
 }

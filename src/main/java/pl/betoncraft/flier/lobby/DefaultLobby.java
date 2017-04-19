@@ -32,6 +32,7 @@ import pl.betoncraft.flier.api.content.Game;
 import pl.betoncraft.flier.api.content.Lobby;
 import pl.betoncraft.flier.api.core.Arena;
 import pl.betoncraft.flier.api.core.LoadingException;
+import pl.betoncraft.flier.api.core.NoArenaException;
 import pl.betoncraft.flier.event.FlierPlayerJoinGameEvent;
 import pl.betoncraft.flier.event.FlierPlayerJoinLobbyEvent;
 import pl.betoncraft.flier.util.LangManager;
@@ -68,13 +69,12 @@ public abstract class DefaultLobby implements Lobby, Listener {
 			arenas.put(arenaName, flier.getArena(arenaName));
 		}
 		for (String gameName : gameNames) {
-			Game game = flier.getGame(gameName);
-			for (String arenaName : game.getViableArenas()) {
-				Arena arena = arenas.get(arenaName);
-				if (arena == null) {
-					throw new LoadingException(String.format("Game '%s' refers to non-existing arena '%s'.", gameName, arenaName));
-				}
-				game.setArena(arena);
+			try {
+				Game game = flier.getGame(gameName, this);
+				game.stop();
+			} catch (NoArenaException e) {
+				throw new LoadingException(String.format(
+						"Game '%s' does not have any viable arena to be played on.", gameName));
 			}
 			gameSets.put(gameName, new HashSet<>());
 		}
@@ -135,6 +135,8 @@ public abstract class DefaultLobby implements Lobby, Listener {
 	
 	@Override
 	public JoinResult joinGame(Player player, String gameName) {
+		
+		// check if the player is already in some game
 		if (gameSets.values().stream().anyMatch(
 				set -> set.stream().anyMatch(
 						game -> game.getPlayers().containsKey(player.getUniqueId())
@@ -142,10 +144,14 @@ public abstract class DefaultLobby implements Lobby, Listener {
 		)) {
 			return JoinResult.ALREADY_IN_GAME;
 		}
+		
+		// find the correct set of games
 		Set<Game> games = gameSets.get(gameName);
 		if (games == null) {
 			return JoinResult.NO_SUCH_GAME;
 		}
+		
+		// search for open games
 		Game game = null;
 		for (Game g : games) {
 			if (!g.isLocked() && (g.getMaxPlayers() == 0 || g.getPlayers().size() < g.getMaxPlayers())) {
@@ -153,7 +159,9 @@ public abstract class DefaultLobby implements Lobby, Listener {
 				break;
 			}
 		}
+
 		if (game != null) {
+			// if the game exists, join it
 			if (!event(player, game)) {
 				game.addPlayer(player);
 				return JoinResult.GAME_JOINED;
@@ -161,30 +169,28 @@ public abstract class DefaultLobby implements Lobby, Listener {
 				return JoinResult.BLOCKED;
 			}
 		} else {
+			// create a new game if there's room for it
 			try {
 				int amount = gameSets.values().stream().flatMapToInt(set -> IntStream.of(set.size())).sum();
 				if (amount < maxGames || maxGames == 0) {
-					game = Flier.getInstance().getGame(gameName);
-					List<String> viable = game.getViableArenas();
-					for (String arenaName : viable) {
-						Arena arena = arenas.get(arenaName);
-						if (!arena.isUsed()) {
-							if (!event(player, game)) {
-								arena.setUsed(true);
-								games.add(game);
-								game.setLobby(this);
-								game.setArena(arena);
-								Flier.getInstance().getPlayers().put(player.getUniqueId(), game.addPlayer(player));
-								return JoinResult.GAME_CREATED;
-							} else {
-								return JoinResult.BLOCKED;
-							}
+					try {
+						game = Flier.getInstance().getGame(gameName, this);
+						if (!event(player, game)) {
+							games.add(game);
+							Flier.getInstance().getPlayers().put(player.getUniqueId(), game.addPlayer(player));
+							return JoinResult.GAME_CREATED;
+						} else {
+							game.stop();
+							return JoinResult.BLOCKED;
 						}
+					} catch (NoArenaException e) {
+						return JoinResult.GAMES_FULL;
 					}
 				}
 				return JoinResult.GAMES_FULL;
 			} catch (LoadingException e) {
 				// won't throw, it's checked
+				e.printStackTrace();
 				return null;
 			}
 		}

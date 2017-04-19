@@ -63,6 +63,7 @@ import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.ItemSet;
 import pl.betoncraft.flier.api.core.LoadingException;
 import pl.betoncraft.flier.api.core.Modification;
+import pl.betoncraft.flier.api.core.NoArenaException;
 import pl.betoncraft.flier.api.core.UsableItem;
 import pl.betoncraft.flier.bonus.EntityBonus;
 import pl.betoncraft.flier.bonus.ProximityBonus;
@@ -95,14 +96,14 @@ public class FlierPlugin extends JavaPlugin implements Flier {
 	private FlierCommand flierCommand;
 	private Listener autoJoin;
 
-	private Map<String, Factory<Engine>> engineTypes = new HashMap<>();
-	private Map<String, Factory<Wings>> wingTypes = new HashMap<>();
-	private Map<String, Factory<Game>> gameTypes = new HashMap<>();
-	private Map<String, Factory<Lobby>> lobbyTypes = new HashMap<>();
-	private Map<String, Factory<Bonus>> bonusTypes = new HashMap<>();
-	private Map<String, Factory<Action>> actionTypes = new HashMap<>();
-	private Map<String, Factory<Activator>> activatorTypes = new HashMap<>();
-	private Map<String, Factory<Effect>> effectTypes = new HashMap<>();
+	private Map<String, EngineFactory> engineTypes = new HashMap<>();
+	private Map<String, WingsFactory> wingTypes = new HashMap<>();
+	private Map<String, GameFactory> gameTypes = new HashMap<>();
+	private Map<String, LobbyFactory> lobbyTypes = new HashMap<>();
+	private Map<String, BonusFactory> bonusTypes = new HashMap<>();
+	private Map<String, ActionFactory> actionTypes = new HashMap<>();
+	private Map<String, ActivatorFactory> activatorTypes = new HashMap<>();
+	private Map<String, EffectFactory> effectTypes = new HashMap<>();
 	
 	private Map<String, Lobby> lobbies = new HashMap<>();
 	private Map<UUID, InGamePlayer> players = new HashMap<>();
@@ -119,11 +120,11 @@ public class FlierPlugin extends JavaPlugin implements Flier {
 		registerEngine("multiplyingEngine", s -> new MultiplyingEngine(s));
 		registerWings("simpleWings", s -> new SimpleWings(s));
 		registerLobby("physicalLobby", s -> new PhysicalLobby(s));
-		registerGame("teamDeathMatch", s -> new TeamDeathMatch(s));
-		registerGame("deathMatch", s -> new DeathMatchGame(s));
-		registerBonus("entity", s -> new EntityBonus(s));
-		registerBonus("invisible", s -> new ProximityBonus(s));
-		registerBonus("target", s -> new TargetBonus(s));
+		registerGame("teamDeathMatch", (s, l) -> new TeamDeathMatch(s, l));
+		registerGame("deathMatch", (s, l) -> new DeathMatchGame(s, l));
+		registerBonus("entity", (s, g) -> new EntityBonus(s, g));
+		registerBonus("invisible", (s, g) -> new ProximityBonus(s, g));
+		registerBonus("target", (s, g) -> new TargetBonus(s, g));
 		registerAction("leave", s -> new LeaveGameAction(s));
 		registerAction("projectileGun", s -> new ProjectileGun(s));
 		registerAction("particleGun", s -> new ParticleGun(s));
@@ -229,8 +230,13 @@ public class FlierPlugin extends JavaPlugin implements Flier {
 			// load new lobbies and games
 			ConfigurationSection lobbySection = configManager.getLobbies();
 			if (lobbySection != null) {
-				for (String section : lobbySection.getKeys(false)) {
-					lobbies.put(section, getObject(section, "lobby", lobbySection, lobbyTypes));
+				for (String id : lobbySection.getKeys(false)) {
+					String name = "lobby";
+					ConfigurationSection section = lobbySection.getConfigurationSection(id);
+					String type = getType(section);
+					LobbyFactory factory = getLobbyFactory(type);
+					checkFactory(factory, name, type);
+					lobbies.put(id, factory.get(section));
 				}
 			}
 			// unregister the old automatic lobby joining
@@ -296,126 +302,249 @@ public class FlierPlugin extends JavaPlugin implements Flier {
 
 	@Override
 	public Engine getEngine(String id) throws LoadingException {
-		return getObject(id, "engine", configManager.getEngines(), engineTypes);
+		String name = "engine";
+		ConfigurationSection section = getSection(configManager.getEngines(), id, name);
+		String type = getType(section);
+		EngineFactory factory = getEngineFactory(type);
+		checkFactory(factory, name, type);
+		try {
+			return factory.get(section);
+		} catch (LoadingException e) {
+			throw loadingError(e, id, name);
+		}
 	}
 
 	@Override
 	public UsableItem getItem(String id) throws LoadingException {
-		return getObject(id, "item", configManager.getItems(), s -> new DefaultUsableItem(s));
+		String name = "item";
+		ConfigurationSection section = getSection(configManager.getItems(), id, name);
+		try {
+			return new DefaultUsableItem(section);
+		} catch (LoadingException e) {
+			throw loadingError(e, id, name);
+		}
 	}
 
 	@Override
 	public Wings getWing(String id) throws LoadingException {
-		return getObject(id, "wing", configManager.getWings(), wingTypes);
+		String name = "wings";
+		ConfigurationSection section = getSection(configManager.getWings(), id, name);
+		String type = getType(section);
+		WingsFactory factory = getWingsFactory(type);
+		checkFactory(factory, name, type);
+		try {
+			return factory.get(section);
+		} catch (LoadingException e) {
+			throw loadingError(e, id, name);
+		}
 	}
 	
 	@Override
-	public Game getGame(String id) throws LoadingException {
-		return getObject(id, "game", configManager.getGames(), gameTypes);
+	public Game getGame(String id, Lobby lobby) throws LoadingException, NoArenaException {
+		String name = "game";
+		ConfigurationSection section = getSection(configManager.getGames(), id, name);
+		String type = getType(section);
+		GameFactory factory = getGameFactory(type);
+		checkFactory(factory, name, type);
+		try {
+			return factory.get(section, lobby);
+		} catch (LoadingException e) {
+			throw loadingError(e, id, name);
+		}
 	}
 	
 	@Override
 	public Action getAction(String id) throws LoadingException {
-		return getObject(id, "action", configManager.getActions(), actionTypes);
+		String name = "action";
+		ConfigurationSection section = getSection(configManager.getActions(), id, name);
+		String type = getType(section);
+		ActionFactory factory = getActionFactory(type);
+		checkFactory(factory, name, type);
+		try {
+			return factory.get(section);
+		} catch (LoadingException e) {
+			throw loadingError(e, id, name);
+		}
 	}
 	
 	@Override
 	public Activator getActivator(String id) throws LoadingException {
-		return getObject(id, "activator", configManager.getActivators(), activatorTypes);
+		String name = "activator";
+		ConfigurationSection section = getSection(configManager.getActivators(), id, name);
+		String type = getType(section);
+		ActivatorFactory factory = getActivatorFactory(type);
+		checkFactory(factory, name, type);
+		try {
+			return factory.get(section);
+		} catch (LoadingException e) {
+			throw loadingError(e, id, name);
+		}
 	}
 	
 	@Override
-	public Bonus getBonus(String id) throws LoadingException {
-		return getObject(id, "bonus", configManager.getBonuses(), bonusTypes);
+	public Bonus getBonus(String id, Game game) throws LoadingException {
+		String name = "bonus";
+		ConfigurationSection section = getSection(configManager.getBonuses(), id, name);
+		String type = getType(section);
+		BonusFactory factory = getBonusFactory(type);
+		checkFactory(factory, name, type);
+		try {
+			return factory.get(section, game);
+		} catch (LoadingException e) {
+			throw loadingError(e, id, name);
+		}
 	}
 
 	@Override
 	public Modification getModification(String id) throws LoadingException {
-		return getObject(id, "modification", configManager.getModifications(), s -> new DefaultModification(s));
+		String name = "modification";
+		ConfigurationSection section = getSection(configManager.getModifications(), id, name);
+		try {
+			return new DefaultModification(section);
+		} catch (LoadingException e) {
+			throw loadingError(e, id, name);
+		}
 	}
 	
 	@Override
 	public ItemSet getItemSet(String id) throws LoadingException {
-		return getObject(id, "item set", configManager.getItemSets(), s -> new DefaultSet(s));
+		String name = "item set";
+		ConfigurationSection section = getSection(configManager.getItemSets(), id, name);
+		try {
+			return new DefaultSet(section);
+		} catch (LoadingException e) {
+			throw loadingError(e, id, name);
+		}
 	}
 	
 	@Override
 	public Effect getEffect(String id) throws LoadingException {
-		return getObject(id, "effect", configManager.getEffects(), effectTypes);
+		String name = "effect";
+		ConfigurationSection section = getSection(configManager.getEffects(), id, name);
+		String type = getType(section);
+		EffectFactory factory = getEffectFactory(type);
+		checkFactory(factory, name, type);
+		try {
+			return factory.get(section);
+		} catch (LoadingException e) {
+			throw loadingError(e, id, name);
+		}
 	}
 
 	@Override
 	public Arena getArena(String id) throws LoadingException {
-		return getObject(id, "arena", configManager.getArenas(), s -> new DefaultArena(s));
-	}
-
-	private <T> T getObject(String id, String name, ConfigurationSection section, Map<String, Factory<T>> factories)
-			throws LoadingException {
-		ConfigurationSection config = section.getConfigurationSection(id);
-		if (config == null || config.getKeys(false).size() == 0) {
-			throw new LoadingException(String.format("%s with ID '%s' does not exist.", Utils.capitalize(name), id));
-		}
-		String type = config.getString("type");
-		Factory<T> factory = factories.get(type);
-		if (factory == null) {
-			throw new LoadingException(String.format("%s type '%s' does not exist.", Utils.capitalize(name), type));
-		}
+		String name = "arena";
+		ConfigurationSection section = getSection(configManager.getArenas(), id, name);
 		try {
-			return factory.get(config);
+			return new DefaultArena(section);
 		} catch (LoadingException e) {
-			throw (LoadingException) new LoadingException(String.format("Error in '%s' %s.", id, name)).initCause(e);
+			throw loadingError(e, id, name);
 		}
 	}
 	
-	private <T> T getObject(String id, String name, ConfigurationSection section, Factory<T> factory) throws LoadingException {
-		ConfigurationSection config = section.getConfigurationSection(id);
-		if (config == null) {
+	private ConfigurationSection getSection(ConfigurationSection file, String id, String name) throws LoadingException {
+		ConfigurationSection section = file.getConfigurationSection(id);
+		if (section == null || section.getKeys(false).size() == 0) {
 			throw new LoadingException(String.format("%s with ID '%s' does not exist.", Utils.capitalize(name), id));
 		}
-		try {
-			return factory.get(config);
-		} catch (LoadingException e) {
-			throw (LoadingException) new LoadingException(String.format("Error in '%s' %s.", id, name)).initCause(e);
+		return section;
+	}
+	
+	private String getType(ConfigurationSection section) throws LoadingException {
+		String type = section.getString("type");
+		if (type == null) {
+			throw new LoadingException("Type is not defined.");
 		}
+		return type;
+	}
+	
+	private void checkFactory(Object object, String name, String type) throws LoadingException {
+		if (object == null) {
+			throw new LoadingException(String.format("%s type '%s' does not exist.", Utils.capitalize(name), type));
+		}
+	}
+	
+	private LoadingException loadingError(LoadingException e, String id, String name) {
+		return (LoadingException) new LoadingException(String.format("Error in '%s' %s.", id, name)).initCause(e);
+	}
+	
+	@Override
+	public EngineFactory getEngineFactory(String name) {
+		return engineTypes.get(name);
+	}
+	
+	@Override
+	public WingsFactory getWingsFactory(String name) {
+		return wingTypes.get(name);
+	}
+	
+	@Override
+	public LobbyFactory getLobbyFactory(String name) {
+		return lobbyTypes.get(name);
+	}
+	
+	@Override
+	public GameFactory getGameFactory(String name) {
+		return gameTypes.get(name);
+	}
+	
+	@Override
+	public BonusFactory getBonusFactory(String name) {
+		return bonusTypes.get(name);
+	}
+	
+	@Override
+	public ActionFactory getActionFactory(String name) {
+		return actionTypes.get(name);
+	}
+	
+	@Override
+	public ActivatorFactory getActivatorFactory(String name) {
+		return activatorTypes.get(name);
+	}
+	
+	@Override
+	public EffectFactory getEffectFactory(String name) {
+		return effectTypes.get(name);
 	}
 
 	@Override
-	public void registerEngine(String name, Factory<Engine> factory) {
+	public void registerEngine(String name, EngineFactory factory) {
 		engineTypes.put(name, factory);
 	}
 
 	@Override
-	public void registerWings(String name, Factory<Wings> factory) {
+	public void registerWings(String name, WingsFactory factory) {
 		wingTypes.put(name, factory);
 	}
 
 	@Override
-	public void registerLobby(String name, Factory<Lobby> factory) {
+	public void registerLobby(String name, LobbyFactory factory) {
 		lobbyTypes.put(name, factory);
 	}
 
 	@Override
-	public void registerGame(String name, Factory<Game> factory) {
+	public void registerGame(String name, GameFactory factory) {
 		gameTypes.put(name, factory);
 	}
 	
 	@Override
-	public void registerBonus(String name, Factory<Bonus> factory) {
+	public void registerBonus(String name, BonusFactory factory) {
 		bonusTypes.put(name, factory);
 	}
 	
 	@Override
-	public void registerAction(String name, Factory<Action> factory) {
+	public void registerAction(String name, ActionFactory factory) {
 		actionTypes.put(name, factory);
 	}
 	
 	@Override
-	public void registerActivator(String name, Factory<Activator> factory) {
+	public void registerActivator(String name, ActivatorFactory factory) {
 		activatorTypes.put(name, factory);
 	}
 	
 	@Override
-	public void registerEffect(String name, Factory<Effect> factory) {
+	public void registerEffect(String name, EffectFactory factory) {
 		effectTypes.put(name, factory);
 	}
 

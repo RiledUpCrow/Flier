@@ -9,7 +9,6 @@ package pl.betoncraft.flier.api.content;
 import java.util.List;
 
 import pl.betoncraft.flier.api.core.InGamePlayer;
-import pl.betoncraft.flier.api.core.LoadingException;
 
 /**
  * Represents a collectable Entity on the Game map.
@@ -43,17 +42,6 @@ public interface Bonus {
 	 *         -1 if it shouldn't respawn at all
 	 */
 	public int getRespawn();
-	
-	/**
-	 * Sets the Game containing this Bonus.
-	 *
-	 * @param game
-	 *            the Game containing this Bonus
-	 * @throws LoadingException
-	 *             when there is an error while loading required information
-	 *             from the Game
-	 */
-	public void setGame(Game game) throws LoadingException;
 
 	/**
 	 * Starts the bonus, for example spawning the entity.

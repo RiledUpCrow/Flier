@@ -15,6 +15,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -57,6 +58,7 @@ import pl.betoncraft.flier.api.core.Attacker;
 import pl.betoncraft.flier.api.core.FancyStuffWrapper;
 import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.LoadingException;
+import pl.betoncraft.flier.api.core.NoArenaException;
 import pl.betoncraft.flier.api.core.PlayerClass;
 import pl.betoncraft.flier.api.core.PlayerClass.AddResult;
 import pl.betoncraft.flier.api.core.PlayerClass.RespawnAction;
@@ -103,12 +105,9 @@ public abstract class DefaultGame implements Listener, Game {
 	protected final Map<UUID, Target> targets = new HashMap<>();
 	protected final FancyStuffWrapper fancyStuff;
 	protected final EffectListener listener;
-	protected final List<String> availableArenas;
-	protected final String centerName;
 	protected final List<Bonus> bonuses = new ArrayList<>();
 	protected final Map<String, Button> buttons = new HashMap<>();
 	protected final Map<InGamePlayer, List<Button>> unlocked = new HashMap<>();
-	protected final List<String> leaveNames;
 	protected final RespawnAction respawnAction;
 	protected final boolean rounds;
 	protected final int maxPlayers;
@@ -116,7 +115,6 @@ public abstract class DefaultGame implements Listener, Game {
 	protected final PlayerClass defClass;
 	protected final int heightLimit;
 	protected final double heightDamage;
-	protected final int radius;
 	protected final boolean useMoney;
 	protected final int enemyKillMoney;
 	protected final int enemyHitMoney;
@@ -132,15 +130,47 @@ public abstract class DefaultGame implements Listener, Game {
 	protected Arena arena;
 	protected boolean running = false;
 	protected int timeLeft;
-	protected List<Block> leaveBlocks;
+	protected List<Block> leaveBlocks = new ArrayList<>();
 	protected Location center;
 	protected int minX, minZ, maxX, maxZ;
 	protected boolean roundFinished = false;
 	
-	public DefaultGame(ConfigurationSection section) throws LoadingException {
+	public DefaultGame(ConfigurationSection section, Lobby lobby) throws LoadingException, NoArenaException {
+		
+		Flier flier = Flier.getInstance();
+		this.lobby = lobby;
 		id = section.getName();
 		loader = new ValueLoader(section);
-		Flier flier = Flier.getInstance();
+		
+		// select an arena
+		List<String> viableArenas = section.getStringList("viable_arenas");
+		if (viableArenas.isEmpty()) {
+			throw new LoadingException("No viable arenas are specified.");
+		}
+		for (Entry<String, Arena> entry : lobby.getArenas().entrySet()) {
+			if (viableArenas.contains(entry.getKey()) && !entry.getValue().isUsed()) {
+				arena = entry.getValue();
+				arena.setUsed(true);
+				break;
+			}
+		}
+		if (arena == null) {
+			throw new NoArenaException();
+		}
+		
+		// calculate borders
+		center = arena.getLocation(loader.loadString("center"));
+		int radius = loader.loadPositiveInt("radius");
+		minX = center.getBlockX() - radius;
+		maxX = center.getBlockX() + radius;
+		minZ = center.getBlockZ() - radius;
+		maxZ = center.getBlockZ() + radius;
+		
+		// load "leave" blocks
+		for (String name : section.getStringList("leave_blocks")) {
+			leaveBlocks.add(arena.getLocation(name).getBlock());
+		}
+		
 		fancyStuff = flier.getFancyStuff();
 		listener = new EffectListener(section.getStringList("effects"), this);
 		rounds = loader.loadBoolean("rounds");
@@ -148,15 +178,9 @@ public abstract class DefaultGame implements Listener, Game {
 		maxTime = loader.loadNonNegativeInt("max_time", 0) * 20;
 		timeLeft = maxTime;
 		respawnAction = loader.loadEnum("respawn_action", RespawnAction.class);
-		centerName = loader.loadString("center");
 		waitingRoom = new WaitingRoom(this);
-		leaveNames = section.getStringList("leave_blocks");
-		availableArenas = section.getStringList("viable_arenas");
-		if (availableArenas.isEmpty()) {
-			throw new LoadingException("No viable arenas are specified.");
-		}
 		for (String bonusName : section.getStringList("bonuses")) {
-			bonuses.add(flier.getBonus(bonusName));
+			bonuses.add(flier.getBonus(bonusName, this));
 		}
 		ConfigurationSection buttonsSection = section.getConfigurationSection("buttons");
 		if (buttonsSection != null) for (String button : buttonsSection.getKeys(false)) {
@@ -177,7 +201,6 @@ public abstract class DefaultGame implements Listener, Game {
 		}
 		heightLimit = loader.loadInt("height_limit", 512);
 		heightDamage = loader.loadNonNegativeDouble("height_damage", 0.5);
-		radius = loader.loadPositiveInt("radius");
 		useMoney = loader.loadBoolean("money.enabled", false);
 		enemyKillMoney = loader.loadInt("money.enemy_kill", 0);
 		enemyHitMoney = loader.loadInt("money.enemy_hit", 0);
@@ -194,10 +217,8 @@ public abstract class DefaultGame implements Listener, Game {
 	protected class GameHeartBeat extends BukkitRunnable {
 		
 		private int i = 0;
-		private DefaultGame game;
 		
 		public GameHeartBeat(DefaultGame game) {
-			this.game = game;
 			runTaskTimer(Flier.getInstance(), 1, 1);
 		}
 
@@ -207,7 +228,6 @@ public abstract class DefaultGame implements Listener, Game {
 				endGame();
 			}
 			if (running) {
-				game.fastTick();
 				for (InGamePlayer data : getPlayers().values()) {
 					data.fastTick();
 					Location loc = data.getPlayer().getLocation();
@@ -218,7 +238,6 @@ public abstract class DefaultGame implements Listener, Game {
 					}
 				}
 				if (i % 4 == 0) {
-					game.slowTick();
 					for (InGamePlayer data : getPlayers().values()) {
 						data.slowTick();
 					}
@@ -241,8 +260,7 @@ public abstract class DefaultGame implements Listener, Game {
 	public class DefaultButton implements Button {
 		
 		protected final String id;
-		protected final List<String> locationNames;
-		protected List<Location> locations;
+		protected List<Location> locations = new ArrayList<>();
 		protected final Set<String> requirements;
 		protected final Set<Permission> permissions;
 		protected final int buyCost;
@@ -255,8 +273,10 @@ public abstract class DefaultGame implements Listener, Game {
 		public DefaultButton(ConfigurationSection section) throws LoadingException {
 			id = section.getName();
 			ValueLoader loader = new ValueLoader(section);
-			locationNames = section.getStringList("blocks");
-			if (locationNames.isEmpty()) {
+			for (String locationName : section.getStringList("blocks")) {
+				locations.add(arena.getLocation(locationName));
+			}
+			if (locations.isEmpty()) {
 				throw new LoadingException("Blocks must be specified.");
 			}
 			requirements = new HashSet<>(section.getStringList("required"));
@@ -291,11 +311,6 @@ public abstract class DefaultGame implements Listener, Game {
 		@Override
 		public String getID() {
 			return id;
-		}
-		
-		@Override
-		public List<String> getLocationNames() {
-			return locationNames;
 		}
 		
 		@Override
@@ -380,12 +395,11 @@ public abstract class DefaultGame implements Listener, Game {
 		protected final int respawnDelay;
 		protected final int startDelay;
 		protected final boolean locking;
-		protected final String locationName;
+		protected final Location location;
 
 		protected List<InGamePlayer> waitingPlayers = new ArrayList<>();
 		protected WaitReason reason = WaitReason.NO_WAIT;
 		protected int currentWaitingTime;
-		protected Location location;
 		protected BukkitRunnable ticker;
 		protected boolean locked = false;
 		
@@ -395,7 +409,7 @@ public abstract class DefaultGame implements Listener, Game {
 			respawnDelay = loader.loadNonNegativeInt("respawn_delay", 0);
 			startDelay = loader.loadNonNegativeInt("start_delay", 0);
 			locking = loader.loadBoolean("locking", false);
-			locationName = loader.loadString("waiting_room");
+			location = arena.getLocation(loader.loadString("waiting_room"));
 			ticker = new BukkitRunnable() {
 				public void run() {
 					tick();
@@ -526,16 +540,6 @@ public abstract class DefaultGame implements Listener, Game {
 		}
 		
 	}
-
-	/**
-	 * The game should do game-specific stuff in a fast tick here.
-	 */
-	public abstract void fastTick();
-
-	/**
-	 * The game should do game-specific stuff in a slow tick here.
-	 */
-	public abstract void slowTick();
 	
 	/**
 	 * Ends the game by selecting the winner.
@@ -668,11 +672,16 @@ public abstract class DefaultGame implements Listener, Game {
 	@Override
 	public void stop() {
 		HandlerList.unregisterAll(this);
+		arena.setUsed(false);
 		for (Bonus bonus : bonuses) {
 			bonus.stop();
 		}
-		heartBeat.cancel();
-		waitingRoom.ticker.cancel();
+		if (heartBeat != null) {
+			heartBeat.cancel();
+		}
+		if (waitingRoom.ticker != null) {
+			waitingRoom.ticker.cancel();
+		}
 		Collection<InGamePlayer> copy = new ArrayList<>(dataMap.values());
 		for (InGamePlayer data : copy) {
 			removePlayer(data.getPlayer());
@@ -885,11 +894,6 @@ public abstract class DefaultGame implements Listener, Game {
 	}
 	
 	@Override
-	public void setLobby(Lobby lobby) {
-		this.lobby = lobby;
-	}
-	
-	@Override
 	public List<Bonus> getBonuses() {
 		return bonuses;
 	}
@@ -905,38 +909,8 @@ public abstract class DefaultGame implements Listener, Game {
 	}
 	
 	@Override
-	public List<String> getViableArenas() {
-		return availableArenas;
-	}
-	
-	@Override
 	public Arena getArena() {
 		return arena;
-	}
-	
-	@Override
-	public void setArena(Arena arena) throws LoadingException {
-		this.arena = arena;
-		waitingRoom.location = arena.getLocation(waitingRoom.locationName);
-		center = arena.getLocation(centerName);
-		minX = center.getBlockX() - radius;
-		maxX = center.getBlockX() + radius;
-		minZ = center.getBlockZ() - radius;
-		maxZ = center.getBlockZ() + radius;
-		leaveBlocks = new ArrayList<>(leaveNames.size());
-		for (String name : leaveNames) {
-			leaveBlocks.add(arena.getLocation(name).getBlock());
-		}
-		for (Bonus bonus : bonuses) {
-			bonus.setGame(this);
-		}
-		for (Button button : buttons.values()) {
-			List<Location> locations = new ArrayList<>(button.getLocationNames().size());
-			for (String name : button.getLocationNames()) {
-				locations.add(arena.getLocation(name));
-			}
-			button.setLocations(locations);
-		}
 	}
 	
 	@Override
