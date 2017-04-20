@@ -1,4 +1,16 @@
-Flier 0.5.0
+###############
+# Flier 0.5.1 #
+###############
+
+== Fixes ==
+* Items without slot are no longer placed on hotbar
+
+== Content ==
+* Add "sprintStarting" action
+
+###############
+# Flier 0.5.0 #
+###############
 
  == API ==
 * Added Modification API

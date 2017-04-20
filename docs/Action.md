@@ -79,6 +79,24 @@ launch_action:
 
 * `speed` (**required**) is the speed with which you will be launched.
 
+### Sprint starting
+
+**`sprintStarting`**
+
+This action allows the player to take-off when sprinting on a runway. It needs to be constantly used/activated in order to work (for example when having no activators in an usage). The player needs to be sprinting in a straight line on a flat surface.
+
+The player's sprinting speed will increase during `time` seconds up to the `max` speed, at which the player will be slightly thrown into the air. Gliding will be enabled and the engine will be turned on (as if the player was sneaking). To turn the engine off you need to press sneaking key once.
+
+```
+takeoff:
+  type: sprintStarting
+  max: [0-1 decimal]
+  time: [non-negative decimal]
+```
+
+* `max` (**default: 0.8**) the speed at which the player will take-off.
+* `time` (**default: 5**) the time in seconds it takes to reach `max` speed when sprinting.
+
 ### Money
 
 **`money`**
