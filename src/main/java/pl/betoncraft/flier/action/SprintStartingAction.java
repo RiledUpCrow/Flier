@@ -62,12 +62,14 @@ public class SprintStartingAction extends DefaultAction {
 				} else {
 					// speed maxed, take-off
 					Vector vel = player.getLocation().getDirection().setY(0.3).normalize().multiply(max);
-					player.setVelocity(vel.multiply(2));
-					Bukkit.getScheduler().runTaskLater(Flier.getInstance(), () -> {
+					Runnable takeoff = () -> {
 						player.setGliding(true);
-						player.setVelocity(vel.multiply(0.5));
+						player.setVelocity(vel);
 						player.setSneaking(true);
-					}, 1);
+					};
+					for (int i = 0; i < 4; i++) {
+						Bukkit.getScheduler().runTaskLater(Flier.getInstance(), takeoff, i);
+					}
 				}
 			}
 		}
