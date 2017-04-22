@@ -28,7 +28,7 @@ public class ProximityBonus extends DefaultBonus {
 
 	public ProximityBonus(ConfigurationSection section, Game game) throws LoadingException {
 		super(section, game);
-		distance = Math.pow(loader.loadNonNegativeDouble("distance"), 1);
+		distance = Math.pow(loader.loadNonNegativeDouble("distance"), 2);
 		location = game.getArena().getLocation(loader.loadString("location"));
 	}
 	
