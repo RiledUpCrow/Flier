@@ -262,6 +262,7 @@ gun_action:
   burst_ticks: [positive integer]
   spread: [non-negative integer]
   projectile_speed: [positive decimal]
+  range: [positive decimal]
 ```
 
 * `particle` (**required**) is the type of [the particle](https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Particle.html).
@@ -274,6 +275,7 @@ gun_action:
 * `burst_ticks` (**required**) is the total time of the burst.
 * `spread` (**default: 0**) is the precision of the bullets, where 0 means perfect.
 * `projectile_speed` (**required**) is the speed of the bullets.
+* `range` (**default: 256**) the range of bullets - they will disappear after traveling that distance in blocks.
 
 ### Bomb
 

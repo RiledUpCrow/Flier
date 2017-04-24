@@ -44,6 +44,7 @@ public class ParticleGun extends DefaultAttack {
 	private static final String OFFSET_Z = "offset_z";
 	private static final String EXTRA = "speed";
 	private static final String DENSITY = "density";
+	private static final String RANGE = "range";
 
 	private final Flier flier;
 	private final Random random;
@@ -52,6 +53,7 @@ public class ParticleGun extends DefaultAttack {
 	private final double spread;
 	private final double projectileSpeed;
 	private final double proximity;
+	private final double range;
 
 	private final Particle particle;
 	private final int amount;
@@ -79,6 +81,7 @@ public class ParticleGun extends DefaultAttack {
 		offsetZ = loader.loadNonNegativeDouble(OFFSET_Z, offset);
 		extra = loader.loadNonNegativeDouble(EXTRA, 0.0);
 		density = loader.loadPositiveDouble(DENSITY, 0.5);
+		range = loader.loadPositiveDouble(RANGE, 256.0);
 	}
 	
 	@Override
@@ -117,7 +120,7 @@ public class ParticleGun extends DefaultAttack {
 				
 				// launch projectiles
 				for (int i = 0; i < am; i++) {
-					new ParticleTracker(start.clone(), data, projectileSpeed, proximity, spread, weapon);
+					new ParticleTracker(start.clone(), data, projectileSpeed, proximity, spread, range, weapon);
 				}
 			}
 			
@@ -136,21 +139,23 @@ public class ParticleGun extends DefaultAttack {
 		private Vector dir;
 		private Vector vel;
 		private double speed;
+		private double range;
 
 		private final BlockIterator tracer;
-		private double range = 256;
 		private Location end;
 		private Vector currentVel;
 		private double currentSpeed;
 		private double squared;
 		private boolean early = false;
 		
-		public ParticleTracker(Location start, InGamePlayer shooter, double projectileSpeed, double proximity, double spread, UsableItem weapon) {
+		public ParticleTracker(Location start, InGamePlayer shooter, double projectileSpeed, double proximity,
+				double spread, double range, UsableItem weapon) {
 			// get starting parameters
 			this.start = start;
 			this.shooter = shooter;
 			this.proximity = proximity;
 			this.weapon = weapon;
+			this.range = range;
 			world = start.getWorld();
 			dir = start.getDirection();
 			
