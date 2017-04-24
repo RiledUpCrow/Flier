@@ -161,12 +161,9 @@ public class ParticleGun extends DefaultAttack {
 			
 			// calculate random spread
 			if (spread > 0) {
-				double x = random.nextDouble();
-				double y = random.nextDouble();
-				double z = random.nextDouble();
-				if (random.nextBoolean()) x = -x;
-				if (random.nextBoolean()) y = -y;
-				if (random.nextBoolean()) z = -z;
+				double x = random.nextGaussian();
+				double y = random.nextGaussian();
+				double z = random.nextGaussian();
 				Vector perpendicular = new Vector(x, y, z).normalize().multiply(spread);
 				dir.add(perpendicular).normalize();
 			}
