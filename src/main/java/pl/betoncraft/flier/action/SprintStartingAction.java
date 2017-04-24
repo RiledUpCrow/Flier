@@ -9,6 +9,7 @@ package pl.betoncraft.flier.action;
 import java.util.Optional;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -33,6 +34,7 @@ public class SprintStartingAction extends DefaultAction {
 	
 	private Optional<BukkitRunnable> stopper = Optional.empty();
 	private Optional<Float> direction = Optional.empty();
+	private Optional<Location> lastLoc = Optional.empty();
 
 	public SprintStartingAction(ConfigurationSection section) throws LoadingException {
 		super(section);
@@ -47,11 +49,17 @@ public class SprintStartingAction extends DefaultAction {
 	public boolean act(InGamePlayer data, UsableItem item) {
 		Player player = data.getPlayer();
 		if (player.isSprinting() && ((Entity) player).isOnGround()) {
-			// record player's direction
-			float dir = player.getLocation().getYaw();
-			if (!direction.isPresent()) {
-				direction = Optional.of(dir);
+			Location loc = player.getLocation().clone();
+			Vector vec;
+			// record player's location and direction
+			if (!lastLoc.isPresent() || !direction.isPresent()) {
+				direction = Optional.of(loc.getYaw());
+				vec = loc.getDirection();
+			} else {
+				vec = loc.toVector().subtract(lastLoc.get().toVector());
 			}
+			float dir = loc.clone().setDirection(vec).getYaw();
+			lastLoc = Optional.of(loc);
 			// direction must be correct (player is running straight)
 			if (Math.abs(dir - direction.get()) < 15) {
 				// reset the stopper so it doesn't break this speed up
@@ -85,6 +93,7 @@ public class SprintStartingAction extends DefaultAction {
 			public void run() {
 				stopper = Optional.empty();
 				direction = Optional.empty();
+				lastLoc = Optional.empty();
 				player.setWalkSpeed(WALK_SPEED);
 			}
 		});
