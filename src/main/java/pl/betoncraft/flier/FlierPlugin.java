@@ -60,6 +60,7 @@ import pl.betoncraft.flier.api.content.Wings;
 import pl.betoncraft.flier.api.core.Arena;
 import pl.betoncraft.flier.api.core.Attacker;
 import pl.betoncraft.flier.api.core.ConfigManager;
+import pl.betoncraft.flier.api.core.DatabaseManager;
 import pl.betoncraft.flier.api.core.FancyStuffWrapper;
 import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.ItemSet;
@@ -84,7 +85,9 @@ import pl.betoncraft.flier.game.DeathMatchGame;
 import pl.betoncraft.flier.game.TeamDeathMatch;
 import pl.betoncraft.flier.integration.Integrations;
 import pl.betoncraft.flier.lobby.PhysicalLobby;
+import pl.betoncraft.flier.stats.StatisticWriter;
 import pl.betoncraft.flier.util.Coordinator;
+import pl.betoncraft.flier.util.DefaultDatabaseManager;
 import pl.betoncraft.flier.util.DefaultConfigManager;
 import pl.betoncraft.flier.util.DefaultFancyStuffWrapper;
 import pl.betoncraft.flier.util.LangManager;
@@ -94,6 +97,7 @@ import pl.betoncraft.flier.wings.SimpleWings;
 public class FlierPlugin extends JavaPlugin implements Flier {
 	
 	private ConfigManager configManager;
+	private DatabaseManager databaseManager;
 	private FancyStuffWrapper fancyStuff;
 	private FlierCommand flierCommand;
 	private Listener autoJoin;
@@ -209,6 +213,10 @@ public class FlierPlugin extends JavaPlugin implements Flier {
 			}
 		});
 		
+		// database stuff
+		databaseManager = new DefaultDatabaseManager();
+		new StatisticWriter(databaseManager);
+		
 		getLogger().info("Flier enabled!");
 	}
 
@@ -217,6 +225,7 @@ public class FlierPlugin extends JavaPlugin implements Flier {
 		for (Lobby lobby : lobbies.values()) {
 			lobby.stop();
 		}
+		databaseManager.disconnect();
 	}
 
 	@Override
@@ -287,6 +296,11 @@ public class FlierPlugin extends JavaPlugin implements Flier {
 	@Override
 	public ConfigManager getConfigManager() {
 		return configManager;
+	}
+	
+	@Override
+	public DatabaseManager getDatabaseManager() {
+		return databaseManager;
 	}
 	
 	@Override

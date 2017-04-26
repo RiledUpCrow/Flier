@@ -16,6 +16,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -97,6 +98,7 @@ public abstract class DefaultGame implements Listener, Game {
 	});
 
 	protected final String id;
+	protected final int uniqueNumber = new Random().nextInt(Integer.MAX_VALUE);
 	protected final ValueLoader loader;
 	protected GameHeartBeat heartBeat;
 	protected WaitingRoom waitingRoom;
@@ -561,6 +563,11 @@ public abstract class DefaultGame implements Listener, Game {
 	@Override
 	public String getID() {
 		return id;
+	}
+	
+	@Override
+	public int getUniqueNumber() {
+		return uniqueNumber;
 	}
 
 	@Override

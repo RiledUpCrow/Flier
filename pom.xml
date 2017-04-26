@@ -55,12 +55,17 @@
 							<artifactSet>
 								<includes>
 									<include>org.bstats:*</include>
+									<include>pl.betoncraft:BetonDB</include>
 								</includes>
 							</artifactSet>
 							<relocations>
 								<relocation>
 									<pattern>org.bstats</pattern>
 									<shadedPattern>pl.betoncraft.flier.bstats</shadedPattern>
+								</relocation>
+								<relocation>
+									<pattern>pl.betoncraft.betondb</pattern>
+									<shadedPattern>pl.betoncraft.flier.database</shadedPattern>
 								</relocation>
 							</relocations>
 							<minimizeJar>${minimize}</minimizeJar>
@@ -110,6 +115,11 @@
 			<groupId>org.bstats</groupId>
 			<artifactId>bstats-bukkit</artifactId>
 			<version>1.1</version>
+		</dependency>
+		<dependency>
+			<groupId>pl.betoncraft</groupId>
+			<artifactId>BetonDB</artifactId>
+			<version>0.1.0</version>
 		</dependency>
 	</dependencies>
 </project>

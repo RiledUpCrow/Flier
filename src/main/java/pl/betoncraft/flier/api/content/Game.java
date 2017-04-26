@@ -97,6 +97,11 @@ public interface Game {
 	public String getID();
 
 	/**
+	 * @return the unique number generated for this game, used to distinguish different matches
+	 */
+	public int getUniqueNumber();
+
+	/**
 	 * @return the map containing all Buttons in this Game and their names.
 	 */
 	public Map<String, Button> getButtons();

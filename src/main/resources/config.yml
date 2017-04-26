@@ -1,9 +1,39 @@
-### Flier configuration
-#
-# This only contains language right now - the rest is managed by other files.
-#
+###########################
+### Flier configuration ###
+###########################
 
+# the language used by the plugin if there is no BetonLangAPI
 language: en
+
+# automatically move players to lobby upon joining the server
 autojoin:
+
+  # whenever autojoin is enabled or not
   enabled: false
+
+  # the lobby where the players will be moved
   lobby: default
+
+# database settings for storing statistics
+database:
+
+  # database table prefix - change it if you want to start collecting statistics from scratch
+  prefix: flier_
+
+  # whenever MySQL is used or not (fill correct credentials below)
+  mysql: false
+
+  # MySQL database name
+  base: default
+
+  # MySQL user
+  user: root
+
+  # MySQL password
+  pass: password
+
+  # MySQL address or IP
+  host: localhost
+
+  # MySQL port
+  port: '3306'
