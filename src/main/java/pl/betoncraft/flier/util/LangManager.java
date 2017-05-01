@@ -12,9 +12,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
-import java.util.IllegalFormatException;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -168,13 +168,13 @@ public class LangManager {
 					.warning(String.format("Message '%s' in language '%s' is not defined.", message, lang));
 			return "";
 		}
-		try {
-			return String.format(string, variables).replace('&', '§');
-		} catch (IllegalFormatException e) {
-			instance.flier.getLogger().warning(String.format("Error in '%s' message ('%s' language) formatting: %s",
-					message, lang, e.getMessage()));
-			return "";
+		for (int i = 0; i < variables.length; i++) {
+			String value = (variables[i] instanceof Float || variables[i] instanceof Double) ?
+					String.format("%.0f", variables[i]) :
+					variables[i].toString();
+			string = string.replace(String.format("{%d}", i + 1), value);
 		}
+		return string.replace('&', ChatColor.COLOR_CHAR);
 	}
 
 	/**

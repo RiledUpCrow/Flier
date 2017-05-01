@@ -178,7 +178,7 @@ public class DefaultPlayer implements InGamePlayer {
 					empty += ammoChar;
 				}
 				fancyStuff.sendActionBar(player,
-						LangManager.getMessage(this, "actionbar_ammo", color, full, ChatColor.BLACK, empty));
+						LangManager.getMessage(this, "actionbar_ammo", color + full + ChatColor.BLACK + empty));
 			} else {
 				fancyStuff.sendActionBar(player, "");
 			}
