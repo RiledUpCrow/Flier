@@ -4,21 +4,25 @@ echo Checking requirements...
 where git >nul 2>nul
 if %ERRORLEVEL% NEQ 0 (
   echo Error: git is missing
+  pause >nul
   goto :eof
 )
 where mvn >nul 2>nul
 if %ERRORLEVEL% NEQ 0 (
   echo Error: mvn is missing
+  pause >nul
   goto :eof
 )
 where pandoc >nul 2>nul
 if %ERRORLEVEL% NEQ 0 (
   echo Error: pandoc is missing
+  pause >nul
   goto :eof
 )
 where 7z >nul 2>nul
 if %ERRORLEVEL% NEQ 0 (
   echo Error: 7-zip is missing
+  pause >nul
   goto :eof
 )
 
@@ -26,6 +30,7 @@ echo Compiling plugin...
 call mvn package >nul 2>nul
 if %ERRORLEVEL% NEQ 0 (
   echo Error: could not compile the plugin
+  pause >nul
   goto :eof
 )
 
@@ -52,6 +57,7 @@ pandoc^
  -o target\Documentation.pdf >nul 2>nul
 if %ERRORLEVEL% NEQ 0 (
   echo Error: could not generate documentation
+  pause >nul
   goto :eof
 )
 
@@ -59,6 +65,7 @@ echo Zipping source code...
 git archive -o target\SourceCode.zip HEAD docs src pom.xml README.md LICENSE >nul 2>nul
 if %ERRORLEVEL% NEQ 0 (
   echo Error: could not zip the source code
+  pause >nul
   goto :eof
 )
 
@@ -68,6 +75,7 @@ cd target
 7z a Flier.zip Flier.jar Documentation.pdf SourceCode.zip ChangeLog.txt >nul 2>nul
 if %ERRORLEVEL% NEQ 0 (
   echo Error: could not bundle all items together
+  pause >nul
   goto :eof
 )
 del Flier.jar Documentation.pdf SourceCode.zip ChangeLog.txt >nul 2>nul
