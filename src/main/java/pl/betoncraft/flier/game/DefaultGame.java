@@ -417,7 +417,7 @@ public abstract class DefaultGame implements Listener, Game {
 					tick();
 				};
 			};
-			ticker.runTaskTimer(Flier.getInstance(), 0, 1);
+			ticker.runTaskTimer(Flier.getInstance(), 1, 1);
 			currentWaitingTime = -1; // lower than 0 means the waiting room is idle
 		}
 		
@@ -621,7 +621,7 @@ public abstract class DefaultGame implements Listener, Game {
 			}
 			break;
 		case NO_WAIT:
-			LangManager.sendMessage(player, "no_waiting");
+			// nothing
 			break;
 		case RESPAWN_DELAY:
 			LangManager.sendMessage(player, "respawn_delay", (double) waitingRoom.currentWaitingTime / 20.0);
@@ -776,6 +776,7 @@ public abstract class DefaultGame implements Listener, Game {
 				player.setPlaying(true);
 			}
 		}.runTaskLater(Flier.getInstance(), 20);
+		LangManager.sendMessage(player, "no_waiting");
 		// spawn event must be called after teleportation
 	}
 	
