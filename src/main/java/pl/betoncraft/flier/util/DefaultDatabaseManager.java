@@ -121,8 +121,10 @@ public class DefaultDatabaseManager implements DatabaseManager {
 		db.update("add_kill", new Object[]{
 				game.getID(), 
 				game.getUniqueNumber(), 
-				killed.getPlayer().getUniqueId().toString(), 
+				killed.getPlayer().getUniqueId().toString(),
+				killed.getClazz().getName(),
 				killer == null ? null : killer.getPlayer().getUniqueId().toString(),
+				killer == null ? null : killer.getClazz().getName(),
 				weapon == null ? null : weapon.getID(),
 				new Date()
 		});
