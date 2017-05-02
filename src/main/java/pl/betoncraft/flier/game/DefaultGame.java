@@ -218,7 +218,7 @@ public abstract class DefaultGame implements Listener, Game {
 	
 	protected class GameHeartBeat extends BukkitRunnable {
 		
-		private int i = 0;
+		private int tickCounter = 0;
 		
 		public GameHeartBeat(DefaultGame game) {
 			runTaskTimer(Flier.getInstance(), 1, 1);
@@ -231,7 +231,6 @@ public abstract class DefaultGame implements Listener, Game {
 			}
 			if (running) {
 				for (InGamePlayer data : getPlayers().values()) {
-					data.fastTick();
 					Location loc = data.getPlayer().getLocation();
 					// height damage
 					if (loc.getBlockX() < minX || loc.getBlockX() > maxX ||
@@ -239,21 +238,16 @@ public abstract class DefaultGame implements Listener, Game {
 						data.getPlayer().damage(data.getPlayer().getHealth() + 1);
 					}
 				}
-				if (i % 4 == 0) {
-					for (InGamePlayer data : getPlayers().values()) {
-						data.slowTick();
-					}
-				}
-				if (heightLimit > 0 && i % 20 == 0) {
+				if (heightLimit > 0 && tickCounter % 20 == 0) {
 					for (InGamePlayer data : getPlayers().values()) {
 						if (data.getPlayer().getLocation().getY() > heightLimit) {
 							data.getPlayer().damage(heightDamage);
 						}
 					}
 				}
-				i++;
-				if (i > 1000) {
-					i = 0;
+				tickCounter++;
+				if (tickCounter > 1000) {
+					tickCounter = 0;
 				}
 			}
 		}
@@ -979,11 +973,11 @@ public abstract class DefaultGame implements Listener, Game {
 				switch (event.getAction()) {
 				case LEFT_CLICK_AIR:
 				case LEFT_CLICK_BLOCK:
-					data.leftClick();
+					data.addOccurrence("left_click");
 					break;
 				case RIGHT_CLICK_AIR:
 				case RIGHT_CLICK_BLOCK:
-					data.rightClick();
+					data.addOccurrence("right_click");
 					break;
 				default:
 					break;

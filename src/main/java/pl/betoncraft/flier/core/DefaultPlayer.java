@@ -20,6 +20,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Score;
@@ -62,34 +63,45 @@ public class DefaultPlayer implements InGamePlayer {
 	private Scoreboard oldSb;
 	private Scoreboard sb;
 	private FancyStuffWrapper fancyStuff;
+	private BukkitRunnable ticker;
+	private int tickCounter = 0;
 
 	private boolean isPlaying;
-	private boolean leftClicked = false;
-	private boolean rightClicked = false;
+	private List<String> occurrences = new ArrayList<>();
 	private int noDamageTicks = 0;
 	private List<SidebarLine> lines = new LinkedList<>();
 	private Attacker lastHit = null;
 	private ChatColor color = ChatColor.WHITE;
 	private long glowTimer;
 	private int money;
-	private int tickCounter = 0;
 	
 	public DefaultPlayer(Player player, Game game, PlayerClass clazz) {
+		Flier flier = Flier.getInstance();
 		this.player = player;
 		this.game = game;
 		this.clazz = clazz;
 		lang = LangManager.getLanguage(player);
 		oldSb = player.getScoreboard();
 		sb = Bukkit.getScoreboardManager().getNewScoreboard();
-		fancyStuff = Flier.getInstance().getFancyStuff();
+		fancyStuff = flier.getFancyStuff();
 		Objective stats = sb.registerNewObjective("stats", "dummy");
 		stats.setDisplaySlot(DisplaySlot.SIDEBAR);
 		stats.setDisplayName("Stats");
 		Utils.clearPlayer(player);
 		updateClass();
+		ticker = new BukkitRunnable() {
+			@Override
+			public void run() {
+				fastTick();
+				if (tickCounter % 4 == 0) {
+					slowTick();
+				}
+				tickCounter++;
+			}
+		};
+		ticker.runTaskTimer(flier, 1, 1);
 	}
 
-	@Override
 	public void fastTick() {
 		if (isPlaying()) {
 			boolean hasWings = hasWings();
@@ -122,20 +134,18 @@ public class DefaultPlayer implements InGamePlayer {
 				regenerateFuel();
 			}
 			// if on ground glow for half a second every second
-			if (tickCounter++ % 20 == 0 && Position.check(player, Where.GROUND)) {
+			if (tickCounter % 20 == 0 && Position.check(player, Where.GROUND)) {
 				startGlowing(10);
 			}
-			displayReloadingTime();
 			
 			// manage UsableItems
 			use();
-			leftClicked = false;
-			rightClicked = false;
+			occurrences.clear();
 			noDamageTicks--;
 		}
+		displayReloadingTime();
 	}
 
-	@Override
 	public void slowTick() {
 		stopGlowing();
 		updateStats();
@@ -184,19 +194,17 @@ public class DefaultPlayer implements InGamePlayer {
 			}
 		}
 	}
-
+	
 	@Override
-	public void leftClick() {
+	public void addOccurrence(String name) {
 		if (isPlaying()) {
-			leftClicked = true;
+			occurrences .add(name);
 		}
 	}
 	
 	@Override
-	public void rightClick() {
-		if (isPlaying()) {
-			rightClicked = true;
-		}
+	public List<String> getOccurrences() {
+		return occurrences;
 	}
 	
 	@Override
@@ -282,16 +290,6 @@ public class DefaultPlayer implements InGamePlayer {
 	@Override
 	public void setNoDamageTicks(int noDamageTicks) {
 		this.noDamageTicks = noDamageTicks;
-	}
-	
-	@Override
-	public boolean didLeftClick() {
-		return leftClicked;
-	}
-	
-	@Override
-	public boolean didRightClick() {
-		return rightClicked;
 	}
 	
 	@Override
@@ -507,6 +505,7 @@ public class DefaultPlayer implements InGamePlayer {
 	
 	@Override
 	public void exitGame() {
+		ticker.cancel();
 		Utils.clearPlayer(player);
 		player.setScoreboard(oldSb);
 	}

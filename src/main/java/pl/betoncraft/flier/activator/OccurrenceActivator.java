@@ -9,22 +9,26 @@ package pl.betoncraft.flier.activator;
 import org.bukkit.configuration.ConfigurationSection;
 
 import pl.betoncraft.flier.api.core.InGamePlayer;
+import pl.betoncraft.flier.api.core.LoadingException;
 import pl.betoncraft.flier.api.core.UsableItem;
 
 /**
- * Activates when the player has right-clicked.
+ * Activates when the player has specified occurrence on this tick.
  *
  * @author Jakub Sapalski
  */
-public class RightClickActivator extends DefaultActivator {
+public class OccurrenceActivator extends DefaultActivator {
+	
+	private String occurrence;
 
-	public RightClickActivator(ConfigurationSection section) {
+	public OccurrenceActivator(ConfigurationSection section) throws LoadingException {
 		super(section);
+		occurrence = loader.loadString("occurrence");
 	}
 
 	@Override
 	public boolean isActive(InGamePlayer player, UsableItem item) {
-		return player.didRightClick() && player.isHolding(item);
+		return player.getOccurrences().contains(occurrence);
 	}
 
 }

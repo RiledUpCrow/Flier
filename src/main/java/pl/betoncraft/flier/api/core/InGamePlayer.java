@@ -50,36 +50,18 @@ public interface InGamePlayer extends Target {
 	}
 
 	/**
-	 * Stuff which needs to happen to the player to let him fly. Speeding up,
-	 * taking fuel, regenerating stuff.
+	 * Adds an occurrence to the list. Occurrences are events that happen on
+	 * this particular tick, like left or right clicks.
+	 *
+	 * @param name
+	 *            name of the occurrence
 	 */
-	public void fastTick();
-
+	public void addOccurrence(String name);
+	
 	/**
-	 * Stuff which helps the player fly, but is not critical to the game, like
-	 * updating displayed statistics.
+	 * @return the list of occurrences which happened during this tick
 	 */
-	public void slowTick();
-
-	/**
-	 * Called to indicate the player left clicked.
-	 */
-	public void leftClick();
-
-	/**
-	 * @return whenever the player left clicked;
-	 */
-	public boolean didLeftClick();
-
-	/**
-	 * Called to indicate the player right clicked.
-	 */
-	public void rightClick();
-
-	/**
-	 * @return whenever the player right clicked;
-	 */
-	public boolean didRightClick();
+	public List<String> getOccurrences();
 
 	/**
 	 * @return the UsableItem which is currently held by the player

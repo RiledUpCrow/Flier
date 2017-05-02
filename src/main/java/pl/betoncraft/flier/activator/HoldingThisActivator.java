@@ -12,19 +12,20 @@ import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.UsableItem;
 
 /**
- * Activates when the player has left-clicked.
+ * Activates when the player is holding the item on which this activator is
+ * defined.
  *
  * @author Jakub Sapalski
  */
-public class LeftClickActivator extends DefaultActivator {
+public class HoldingThisActivator extends DefaultActivator {
 
-	public LeftClickActivator(ConfigurationSection section) {
+	public HoldingThisActivator(ConfigurationSection section) {
 		super(section);
 	}
 
 	@Override
 	public boolean isActive(InGamePlayer player, UsableItem item) {
-		return player.didLeftClick() && player.isHolding(item);
+		return item != null && player.isHolding(item);
 	}
 
 }
