@@ -89,6 +89,11 @@ public class TeamDeathMatch extends DefaultGame {
 				throw new LoadingException(String.format("Spawn list for team %s is empty.", name));
 			}
 		}
+		
+		public SimpleTeam() {
+			name = "Neutral";
+			color = ChatColor.WHITE;
+		}
 
 		public int getScore() {
 			return score;
@@ -247,6 +252,7 @@ public class TeamDeathMatch extends DefaultGame {
 		} else {
 			return Attitude.HOSTILE;
 		}
+		// TODO handle neutral teams
 	}
 
 	@Override
@@ -265,7 +271,7 @@ public class TeamDeathMatch extends DefaultGame {
 		if (target instanceof InGamePlayer) {
 			return players.get(((InGamePlayer) target).getPlayer().getUniqueId());
 		}
-		return null; // TODO rewrite teams to include targets, not only players
+		return new SimpleTeam();
 	}
 	
 	private void setTeam(InGamePlayer data, SimpleTeam team) {

@@ -9,24 +9,28 @@ package pl.betoncraft.flier.activator;
 import org.bukkit.configuration.ConfigurationSection;
 
 import pl.betoncraft.flier.api.core.InGamePlayer;
+import pl.betoncraft.flier.api.core.LoadingException;
 import pl.betoncraft.flier.api.core.UsableItem;
 
 /**
- * Activates once in 4 times. Should be used
+ * Activates once in "interval" times.
  *
  * @author Jakub Sapalski
  */
-public class SlowTickActivator extends DefaultActivator {
+public class IntervalActivator extends DefaultActivator {
 	
-	private int i = 0;
+	private int counter = 0;
+	private final int interval;
 
-	public SlowTickActivator(ConfigurationSection section) {
+	public IntervalActivator(ConfigurationSection section) throws LoadingException {
 		super(section);
+		interval = loader.loadPositiveInt("interval");
+		counter += loader.loadNonNegativeInt("offset", 0);
 	}
 
 	@Override
 	public boolean isActive(InGamePlayer player, UsableItem item) {
-		return i++ % 4 == 0;
+		return counter++ % interval == 0;
 	}
 
 }
