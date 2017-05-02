@@ -61,9 +61,20 @@ public class SprintStartingAction extends DefaultAction {
 			float dir = loc.clone().setDirection(vec).getYaw();
 			lastLoc = Optional.of(loc);
 			// direction must be correct (player is running straight)
-			if (Math.abs(dir - direction.get()) < 15) {
+			if (Math.abs(standarize(dir) - standarize(direction.get())) < 15) {
 				// reset the stopper so it doesn't break this speed up
-				reset(player);
+				if (stopper.isPresent()) {
+					stopper.get().cancel();
+				}
+				// schedule it again to reset the speed in case the player stops
+				stopper = Optional.of(new BukkitRunnable() {
+					@Override
+					public void run() {
+						reset(player);
+					}
+				});
+				stopper.get().runTaskLater(Flier.getInstance(), 1);
+				// increase the speed or start if it's maxed
 				if (player.getWalkSpeed() < max) {
 					// increase the speed
 					player.setWalkSpeed(Math.min(max, player.getWalkSpeed() + step));
@@ -79,25 +90,26 @@ public class SprintStartingAction extends DefaultAction {
 						Bukkit.getScheduler().runTaskLater(Flier.getInstance(), takeoff, i);
 					}
 				}
+			} else {
+				reset(player);
 			}
 		}
 		return true;
 	}
 	
 	private void reset(Player player) {
-		if (stopper.isPresent()) {
-			stopper.get().cancel();
+		stopper = Optional.empty();
+		direction = Optional.empty();
+		lastLoc = Optional.empty();
+		player.setWalkSpeed(WALK_SPEED);
+	}
+	
+	private float standarize(float yaw) {
+		if (yaw > 0) {
+			return yaw;
+		} else {
+			return 360 + yaw;
 		}
-		stopper = Optional.of(new BukkitRunnable() {
-			@Override
-			public void run() {
-				stopper = Optional.empty();
-				direction = Optional.empty();
-				lastLoc = Optional.empty();
-				player.setWalkSpeed(WALK_SPEED);
-			}
-		});
-		stopper.get().runTaskLater(Flier.getInstance(), 1);
 	}
 
 }
