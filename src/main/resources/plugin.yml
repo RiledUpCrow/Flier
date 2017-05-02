@@ -6,7 +6,7 @@ version: 0.5.1
 softdepend: [Multiverse-Core, BetonLangAPI, BountifulAPI, BetonQuest]
 commands:
   flier:
-    description: Gives you flying items
+    description: Main command.
     usage: /<command>
     permission: flier.command
     aliases: [f, fl]
