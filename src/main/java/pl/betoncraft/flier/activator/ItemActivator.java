@@ -29,7 +29,7 @@ public class ItemActivator extends DefaultActivator {
 
 	@Override
 	public boolean isActive(InGamePlayer player, UsableItem item) {
-		UsableItem found = player.getClazz().getItems().stream()
+		UsableItem found = player.getKit().getItems().stream()
 				.filter(i -> i.isSimilar(this.item))
 				.findFirst()
 				.orElse(null);

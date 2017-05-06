@@ -122,9 +122,9 @@ public class DefaultDatabaseManager implements DatabaseManager {
 				game.getID(), 
 				game.getUniqueNumber(), 
 				killed.getPlayer().getUniqueId().toString(),
-				killed.getClazz().getName(),
+				killed.getKit().getClassName(),
 				killer == null ? null : killer.getPlayer().getUniqueId().toString(),
-				killer == null ? null : killer.getClazz().getName(),
+				killer == null ? null : killer.getKit().getClassName(),
 				weapon == null ? null : weapon.getID(),
 				new Date()
 		});

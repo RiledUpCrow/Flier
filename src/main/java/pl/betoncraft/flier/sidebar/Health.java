@@ -10,7 +10,7 @@ import org.bukkit.ChatColor;
 
 import pl.betoncraft.flier.api.content.Wings;
 import pl.betoncraft.flier.api.core.InGamePlayer;
-import pl.betoncraft.flier.api.core.PlayerClass;
+import pl.betoncraft.flier.api.core.Kit;
 import pl.betoncraft.flier.api.core.SidebarLine;
 import pl.betoncraft.flier.util.LangManager;
 
@@ -33,7 +33,7 @@ public class Health implements SidebarLine {
 
 	@Override
 	public String getText() {
-		PlayerClass c = player.getClazz();
+		Kit c = player.getKit();
 		Wings wings = c == null ? null : c.getWings();
 		double h = wings == null ? 0 : 100 * wings.getHealth() / wings.getMaxHealth();
 		if (lastString == null || h != lastValue) {

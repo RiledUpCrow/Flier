@@ -13,11 +13,11 @@ import pl.betoncraft.flier.api.content.Engine;
 import pl.betoncraft.flier.api.content.Wings;
 
 /**
- * The player class stores and manages the items for the player.
+ * The Kit stores and manages the items for the player.
  *
  * @author Jakub Sapalski
  */
-public interface PlayerClass {
+public interface Kit {
 
 	/**
 	 * What happens when the player is respawned. CLEAR will remove all current
@@ -34,11 +34,11 @@ public interface PlayerClass {
 
 	/**
 	 * Returns the name of the class, as specified by the last applied ItemSet
-	 * with a name.
+	 * with a name. A Kit must have a class name to be used by the player.
 	 * 
 	 * @return the name of the class
 	 */
-	public String getName();
+	public String getClassName();
 
 	/**
 	 * Returns the Engine of the player.
@@ -94,7 +94,7 @@ public interface PlayerClass {
 	public void refill();
 
 	/**
-	 * Resets the class to default values.
+	 * Resets the Kit to default values.
 	 */
 	public void reset();
 
@@ -141,10 +141,10 @@ public interface PlayerClass {
 	public Map<String, List<SetApplier>> getDefault();
 
 	/**
-	 * Replicates the current state of this Class.
+	 * Replicates the current state of this Kit.
 	 * 
-	 * @return the copy of this class
+	 * @return the copy of this Kit
 	 */
-	public PlayerClass replicate();
+	public Kit replicate();
 
 }

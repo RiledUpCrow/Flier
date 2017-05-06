@@ -12,7 +12,7 @@ import pl.betoncraft.flier.api.content.Engine;
 import pl.betoncraft.flier.api.content.Wings;
 
 /**
- * Represents a set of items which can be applied to PlayerClass.
+ * Represents a set of items which can be applied to Kit.
  *
  * @author Jakub Sapalski
  */

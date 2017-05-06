@@ -19,16 +19,16 @@ import pl.betoncraft.flier.api.content.Engine;
 import pl.betoncraft.flier.api.content.Wings;
 import pl.betoncraft.flier.api.core.ItemSet;
 import pl.betoncraft.flier.api.core.LoadingException;
-import pl.betoncraft.flier.api.core.PlayerClass;
+import pl.betoncraft.flier.api.core.Kit;
 import pl.betoncraft.flier.api.core.SetApplier;
 import pl.betoncraft.flier.api.core.UsableItem;
 
 /**
- * Default implementation of PlayerClass.
+ * Default implementation of Kit.
  *
  * @author Jakub Sapalski
  */
-public class DefaultClass implements PlayerClass {
+public class DefaultKit implements Kit {
 	
 	private final RespawnAction respawnAction;
 	
@@ -38,7 +38,7 @@ public class DefaultClass implements PlayerClass {
 	private final Map<String, List<SetApplier>> stored = new HashMap<>();
 	private final Map<String, List<SetApplier>> def;
 	
-	public DefaultClass(List<String> sets, RespawnAction respAct) throws LoadingException {
+	public DefaultKit(List<String> sets, RespawnAction respAct) throws LoadingException {
 		respawnAction = respAct;
 		Map<String, List<SetApplier>> map = new HashMap<>(sets.size());
 		for (String set : sets) {
@@ -50,7 +50,7 @@ public class DefaultClass implements PlayerClass {
 		load();
 	}
 	
-	private DefaultClass(Map<String, List<SetApplier>> map, RespawnAction respawnAction) {
+	private DefaultKit(Map<String, List<SetApplier>> map, RespawnAction respawnAction) {
 		this.respawnAction = respawnAction;
 		def = Collections.unmodifiableMap(map);
 		reset();
@@ -146,7 +146,7 @@ public class DefaultClass implements PlayerClass {
 	}
 
 	@Override
-	public String getName() {
+	public String getClassName() {
 		return compiled.name;
 	}
 	
@@ -370,8 +370,8 @@ public class DefaultClass implements PlayerClass {
 	}
 
 	@Override
-	public PlayerClass replicate() {
-		return new DefaultClass(getDefault(), respawnAction);
+	public Kit replicate() {
+		return new DefaultKit(getDefault(), respawnAction);
 	}
 
 }

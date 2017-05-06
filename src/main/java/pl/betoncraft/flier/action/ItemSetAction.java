@@ -14,7 +14,7 @@ import com.google.common.collect.Sets;
 
 import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.LoadingException;
-import pl.betoncraft.flier.api.core.PlayerClass.AddResult;
+import pl.betoncraft.flier.api.core.Kit.AddResult;
 import pl.betoncraft.flier.api.core.SetApplier;
 import pl.betoncraft.flier.api.core.UsableItem;
 import pl.betoncraft.flier.core.DefaultSetApplier;
@@ -42,9 +42,9 @@ public class ItemSetAction extends DefaultAction {
 	@Override
 	public boolean act(InGamePlayer player, UsableItem item) {
 		if (accepted.contains(applier.isSaving() ?
-				player.getClazz().addStored(applier) :
-				player.getClazz().addCurrent(applier))) {
-			player.updateClass();
+				player.getKit().addStored(applier) :
+				player.getKit().addCurrent(applier))) {
+			player.updateKit();
 			return true;
 		}
 		return false;

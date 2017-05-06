@@ -31,7 +31,7 @@ public class WingsHealthAction extends DefaultAction {
 
 	@Override
 	public boolean act(InGamePlayer player, UsableItem item) {
-		Wings wings = player.getClazz().getWings();
+		Wings wings = player.getKit().getWings();
 		double amount = modMan.modifyNumber(AMOUNT, this.amount);
 		if (amount >= 0) {
 			return wings.addHealth(amount);

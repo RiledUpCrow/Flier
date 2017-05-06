@@ -36,7 +36,7 @@ public class Ammo implements SidebarLine {
 	public String getText() {
 		int slot = player.getPlayer().getInventory().getHeldItemSlot();
 		UsableItem item = null;
-		for (UsableItem i : player.getClazz().getItems()) {
+		for (UsableItem i : player.getKit().getItems()) {
 			if (i.slot() == slot) {
 				item = i;
 				break;

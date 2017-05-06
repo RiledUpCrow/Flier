@@ -84,7 +84,7 @@ public interface InGamePlayer extends Target {
 	public void takeWingsOff();
 
 	/**
-	 * Consumes the UsableItem, removing it both from the class and from the player's inventory.
+	 * Consumes the UsableItem, removing it both from the kit and from the player's inventory.
 	 * 
 	 * @param item
 	 */
@@ -117,14 +117,14 @@ public interface InGamePlayer extends Target {
 	public void setPlaying(boolean isPlaying);
 
 	/**
-	 * @return the PlayerClass object of this player
+	 * @return the Kit object of this player
 	 */
-	public PlayerClass getClazz();
+	public Kit getKit();
 
 	/**
-	 * Updates the player with his class items.
+	 * Updates the player with his kit items.
 	 */
-	public void updateClass();
+	public void updateKit();
 
 	/**
 	 * @return the amount of money the player has

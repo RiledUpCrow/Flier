@@ -10,7 +10,7 @@ import org.bukkit.ChatColor;
 
 import pl.betoncraft.flier.api.content.Engine;
 import pl.betoncraft.flier.api.core.InGamePlayer;
-import pl.betoncraft.flier.api.core.PlayerClass;
+import pl.betoncraft.flier.api.core.Kit;
 import pl.betoncraft.flier.api.core.SidebarLine;
 import pl.betoncraft.flier.util.LangManager;
 
@@ -33,7 +33,7 @@ public class Fuel implements SidebarLine {
 
 	@Override
 	public String getText() {
-		PlayerClass c = player.getClazz();
+		Kit c = player.getKit();
 		Engine engine = c == null ? null : c.getEngine();
 		double f = engine == null ? 0 : 100 * engine.getFuel() / engine.getMaxFuel();
 		if (lastString == null || f != lastValue) {

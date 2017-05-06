@@ -31,7 +31,7 @@ public class FuelAction extends DefaultAction {
 
 	@Override
 	public boolean act(InGamePlayer player, UsableItem item) {
-		Engine engine = player.getClazz().getEngine();
+		Engine engine = player.getKit().getEngine();
 		double amount = modMan.modifyNumber(AMOUNT, this.amount);
 		if (amount >= 0) {
 			return engine.addFuel(amount);

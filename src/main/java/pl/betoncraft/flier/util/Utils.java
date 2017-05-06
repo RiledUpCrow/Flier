@@ -21,7 +21,7 @@ import org.bukkit.util.Vector;
 
 import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.LoadingException;
-import pl.betoncraft.flier.api.core.PlayerClass;
+import pl.betoncraft.flier.api.core.Kit;
 import pl.betoncraft.flier.api.core.Target;
 import pl.betoncraft.flier.api.core.UsableItem;
 
@@ -79,12 +79,12 @@ public class Utils {
 	 * @return the formatted name
 	 */
 	public static String formatPlayer(InGamePlayer player, InGamePlayer receiver) {
-		PlayerClass clazz = player.getClazz();
-		String clazzName = clazz.getName().startsWith("$") ?
-				LangManager.getMessage(receiver, clazz.getName().substring(1)) :
-				clazz.getName();
+		Kit kit = player.getKit();
+		String className = kit.getClassName().startsWith("$") ?
+				LangManager.getMessage(receiver, kit.getClassName().substring(1)) :
+				kit.getClassName();
 		String name = player.getPlayer().getName();
-		return player.getColor() + name + ChatColor.WHITE + " (" + ChatColor.AQUA + clazzName + ChatColor.WHITE + ")";
+		return player.getColor() + name + ChatColor.WHITE + " (" + ChatColor.AQUA + className + ChatColor.WHITE + ")";
 	}
 	
 	public static String formatTarget(Target target, InGamePlayer receiver) {

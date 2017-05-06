@@ -54,12 +54,12 @@ import pl.betoncraft.flier.api.core.FancyStuffWrapper;
 import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.LoadingException;
 import pl.betoncraft.flier.api.core.NoArenaException;
-import pl.betoncraft.flier.api.core.PlayerClass;
-import pl.betoncraft.flier.api.core.PlayerClass.AddResult;
-import pl.betoncraft.flier.api.core.PlayerClass.RespawnAction;
+import pl.betoncraft.flier.api.core.Kit;
+import pl.betoncraft.flier.api.core.Kit.AddResult;
+import pl.betoncraft.flier.api.core.Kit.RespawnAction;
 import pl.betoncraft.flier.api.core.SetApplier;
 import pl.betoncraft.flier.api.core.Target;
-import pl.betoncraft.flier.core.DefaultClass;
+import pl.betoncraft.flier.core.DefaultKit;
 import pl.betoncraft.flier.core.DefaultPlayer;
 import pl.betoncraft.flier.core.DefaultSetApplier;
 import pl.betoncraft.flier.event.FlierClickButtonEvent;
@@ -108,7 +108,7 @@ public abstract class DefaultGame implements Listener, Game {
 	protected final boolean rounds;
 	protected final int maxPlayers;
 	protected final int maxTime;
-	protected final PlayerClass defClass;
+	protected final Kit defKit;
 	protected final int heightLimit;
 	protected final double heightDamage;
 	protected final boolean useMoney;
@@ -191,9 +191,9 @@ public abstract class DefaultGame implements Listener, Game {
 			}
 		}
 		try {
-			defClass = new DefaultClass(section.getStringList("default_class"), respawnAction);
+			defKit = new DefaultKit(section.getStringList("default_kit"), respawnAction);
 		} catch (LoadingException e) {
-			throw (LoadingException) new LoadingException("Error in default class.").initCause(e);
+			throw (LoadingException) new LoadingException("Error in default kit.").initCause(e);
 		}
 		heightLimit = loader.loadInt("height_limit", 512);
 		heightDamage = loader.loadNonNegativeDouble("height_damage", 0.5);
@@ -569,7 +569,7 @@ public abstract class DefaultGame implements Listener, Game {
 		if (dataMap.containsKey(uuid)) {
 			throw new IllegalStateException("Player is already in game.");
 		}
-		InGamePlayer data =  new DefaultPlayer(player, this, defClass.replicate());
+		InGamePlayer data =  new DefaultPlayer(player, this, defKit.replicate());
 		dataMap.put(uuid, data);
 		targets.put(uuid, data);
 		Flier.getInstance().getPlayers().put(player.getUniqueId(), data);
@@ -727,9 +727,9 @@ public abstract class DefaultGame implements Listener, Game {
 	protected void moveToWaitingRoom(InGamePlayer player) {
 		Utils.clearPlayer(player.getPlayer());
 		player.setPlaying(false);
-		PlayerClass clazz = player.getClazz();
-		clazz.onRespawn();
-		player.updateClass();
+		Kit kit = player.getKit();
+		kit.onRespawn();
+		player.updateKit();
 		WaitReason reason = waitingRoom.addPlayer(player);
 		waitMessage(player.getPlayer(), reason);
 	}
@@ -790,7 +790,7 @@ public abstract class DefaultGame implements Listener, Game {
 					Runnable run = () -> {
 						ul.add(button);
 						player.setMoney(player.getMoney() - button.getUnlockCost());
-						player.updateClass();
+						player.updateKit();
 					};
 					String message;
 					if (applier == null) {
@@ -798,8 +798,8 @@ public abstract class DefaultGame implements Listener, Game {
 						applied = true;
 						message = "unlocked";
 					} else {
-						AddResult result = applier.isSaving() ? player.getClazz().addStored(applier) :
-							player.getClazz().addCurrent(applier);
+						AddResult result = applier.isSaving() ? player.getKit().addStored(applier) :
+							player.getKit().addCurrent(applier);
 						switch (result) {
 						case ADDED:
 						case FILLED:
@@ -829,11 +829,11 @@ public abstract class DefaultGame implements Listener, Game {
 				}
 				if (applier != null) {
 					if (cost <= player.getMoney()) {
-						AddResult result = applier.isSaving() ? player.getClazz().addStored(applier) :
-							player.getClazz().addCurrent(applier);
+						AddResult result = applier.isSaving() ? player.getKit().addStored(applier) :
+							player.getKit().addCurrent(applier);
 						Runnable run = () -> {
 							player.setMoney(player.getMoney() - cost);
-							player.updateClass();
+							player.updateKit();
 						};
 						String message = null;
 						switch (result) {
@@ -953,7 +953,7 @@ public abstract class DefaultGame implements Listener, Game {
 			}
 			// not a button
 			ItemStack item = event.getPlayer().getInventory().getItemInMainHand();
-			Wings wings = data.getClazz().getWings();
+			Wings wings = data.getKit().getWings();
 			if (item != null && wings != null && item.isSimilar(wings.getItem(data))) {
 				// handle wearing wings
 				event.getPlayer().getInventory().setChestplate(item);

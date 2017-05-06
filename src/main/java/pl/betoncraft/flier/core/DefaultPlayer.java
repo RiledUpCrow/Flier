@@ -38,7 +38,7 @@ import pl.betoncraft.flier.api.core.Attacker;
 import pl.betoncraft.flier.api.core.Damager;
 import pl.betoncraft.flier.api.core.FancyStuffWrapper;
 import pl.betoncraft.flier.api.core.InGamePlayer;
-import pl.betoncraft.flier.api.core.PlayerClass;
+import pl.betoncraft.flier.api.core.Kit;
 import pl.betoncraft.flier.api.core.SidebarLine;
 import pl.betoncraft.flier.api.core.UsableItem;
 import pl.betoncraft.flier.api.core.Usage;
@@ -58,7 +58,7 @@ public class DefaultPlayer implements InGamePlayer {
 	
 	private Player player;
 	private Game game;
-	private PlayerClass clazz;
+	private Kit kit;
 	private String lang;
 	private Scoreboard oldSb;
 	private Scoreboard sb;
@@ -75,11 +75,11 @@ public class DefaultPlayer implements InGamePlayer {
 	private long glowTimer;
 	private int money;
 	
-	public DefaultPlayer(Player player, Game game, PlayerClass clazz) {
+	public DefaultPlayer(Player player, Game game, Kit kit) {
 		Flier flier = Flier.getInstance();
 		this.player = player;
 		this.game = game;
-		this.clazz = clazz;
+		this.kit = kit;
 		lang = LangManager.getLanguage(player);
 		oldSb = player.getScoreboard();
 		sb = Bukkit.getScoreboardManager().getNewScoreboard();
@@ -88,7 +88,7 @@ public class DefaultPlayer implements InGamePlayer {
 		stats.setDisplaySlot(DisplaySlot.SIDEBAR);
 		stats.setDisplayName("Stats");
 		Utils.clearPlayer(player);
-		updateClass();
+		updateKit();
 		ticker = new BukkitRunnable() {
 			@Override
 			public void run() {
@@ -105,8 +105,8 @@ public class DefaultPlayer implements InGamePlayer {
 	public void fastTick() {
 		if (isPlaying()) {
 			boolean hasWings = hasWings();
-			boolean wingsDead = clazz.getWings().getHealth() == 0;
-			boolean wingsDisabled = clazz.getWings().areDisabled();
+			boolean wingsDead = kit.getWings().getHealth() == 0;
+			boolean wingsDisabled = kit.getWings().areDisabled();
 
 			if (hasWings) { // has wings
 				if (wingsDead) { // wings should be dead, destroying
@@ -159,7 +159,7 @@ public class DefaultPlayer implements InGamePlayer {
 		if (fancyStuff.hasActionBarHandler()) {
 			int slot = player.getInventory().getHeldItemSlot();
 			UsableItem item = null;
-			for (UsableItem i : clazz.getItems()) {
+			for (UsableItem i : kit.getItems()) {
 				if (i.slot() == slot) {
 					item = i;
 					break;
@@ -271,7 +271,7 @@ public class DefaultPlayer implements InGamePlayer {
 		}
 		// handle wing damage
 		if (results.contains(DamageResult.WINGS_DAMAGE)) {
-			getClazz().getWings().removeHealth(damager.getDamage());
+			getKit().getWings().removeHealth(damager.getDamage());
 		}
 		// handle physical damage
 		// it's the last one because it triggers a respawn
@@ -299,7 +299,7 @@ public class DefaultPlayer implements InGamePlayer {
 			return null;
 		}
 		int heldSlot = player.getInventory().getHeldItemSlot();
-		for (UsableItem item : clazz.getItems()) {
+		for (UsableItem item : kit.getItems()) {
 			if (item.slot() == heldSlot && isHolding(item)) {
 				return item;
 			}
@@ -320,7 +320,7 @@ public class DefaultPlayer implements InGamePlayer {
 	
 	@Override
 	public void consumeItem(UsableItem match) {
-		UsableItem item = clazz.getItems().stream()
+		UsableItem item = kit.getItems().stream()
 				.filter(i -> i.isSimilar(match))
 				.findFirst()
 				.orElse(null);
@@ -353,7 +353,7 @@ public class DefaultPlayer implements InGamePlayer {
 			stack.setAmount(amount);
 			item.setAmmo(item.getMaxAmmo());
 		}
-		clazz.removeItem(item);
+		kit.removeItem(item);
 	}
 
 	@Override
@@ -381,9 +381,9 @@ public class DefaultPlayer implements InGamePlayer {
 	@Override
 	public double getWeight() {
 		double weight = 0;
-		weight += clazz.getEngine().getWeight();
-		weight += clazz.getWings().getWeight();
-		for (UsableItem item : clazz.getItems()) {
+		weight += kit.getEngine().getWeight();
+		weight += kit.getWings().getWeight();
+		for (UsableItem item : kit.getItems()) {
 			weight += item.getWeight();
 		}
 		return weight;
@@ -410,15 +410,15 @@ public class DefaultPlayer implements InGamePlayer {
 	}
 	
 	@Override
-	public PlayerClass getClazz() {
-		return clazz;
+	public Kit getKit() {
+		return kit;
 	}
 	
 	@Override
-	public void updateClass() {
-		Engine engine = clazz.getEngine();
-		Wings wings = clazz.getWings();
-		List<UsableItem> items = clazz.getItems();
+	public void updateKit() {
+		Engine engine = kit.getEngine();
+		Wings wings = kit.getWings();
+		List<UsableItem> items = kit.getItems();
 		player.getInventory().clear();
 		player.getInventory().setItemInOffHand(engine.getItem(this));
 		player.getInventory().setChestplate(wings.getItem(this));
@@ -522,7 +522,7 @@ public class DefaultPlayer implements InGamePlayer {
 	}
 	
 	private void speedUp() {
-		Engine engine = clazz.getEngine();
+		Engine engine = kit.getEngine();
 		if (engine == null) {
 			return;
 		}
@@ -539,7 +539,7 @@ public class DefaultPlayer implements InGamePlayer {
 	}
 	
 	private void regenerateFuel() {
-		Engine engine = clazz.getEngine();
+		Engine engine = kit.getEngine();
 		if (engine == null) {
 			return;
 		}
@@ -547,7 +547,7 @@ public class DefaultPlayer implements InGamePlayer {
 	}
 	
 	private void regenerateWings() {
-		Wings wings = clazz.getWings();
+		Wings wings = kit.getWings();
 		if (wings == null) {
 			return;
 		}
@@ -569,7 +569,7 @@ public class DefaultPlayer implements InGamePlayer {
 	}
 	
 	private boolean hasWings() {
-		ItemStack wings = clazz.getWings().getItem(this);
+		ItemStack wings = kit.getWings().getItem(this);
 		ItemStack chestPlate = player.getInventory().getChestplate();
 		if (chestPlate != null && chestPlate.isSimilar(wings)) {
 			return true;
@@ -617,7 +617,7 @@ public class DefaultPlayer implements InGamePlayer {
 	private void displayReloadingTime() {
 		int slot = player.getInventory().getHeldItemSlot();
 		UsableItem item = null;
-		for (UsableItem i : clazz.getItems()) {
+		for (UsableItem i : kit.getItems()) {
 			if (i.slot() == slot) {
 				item = i;
 				break;
@@ -642,15 +642,15 @@ public class DefaultPlayer implements InGamePlayer {
 	}
 
 	private void createWings() {
-		player.getInventory().setItem(1, clazz.getWings().getItem(this));
+		player.getInventory().setItem(1, kit.getWings().getItem(this));
 	}
 
 	private void enableWings() {
-		clazz.getWings().setDisabled(false);
+		kit.getWings().setDisabled(false);
 	}
 
 	private void modifyFlight() {
-		Vector velocity = clazz.getWings().applyFlightModifications(this);
+		Vector velocity = kit.getWings().applyFlightModifications(this);
 		if (Double.isNaN(velocity.length())) {
 			velocity = new Vector();
 		}
@@ -662,7 +662,7 @@ public class DefaultPlayer implements InGamePlayer {
 			return;
 		}
 		// iterate over copied list to avoid concurrent modifications
-		List<UsableItem> copy = new ArrayList<>(clazz.getItems());
+		List<UsableItem> copy = new ArrayList<>(kit.getItems());
 		for (UsableItem item : copy) {
 			if (item.use(this) && item.getAmmo() == 0 && item.isConsumable()) {
 				consumeItem(item);
