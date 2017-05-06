@@ -228,6 +228,8 @@ rocket_action:
 
 This action is an attack which shoots a burst of straight-flying projectile-based bullets in the direction the player is looking.
 
+This weapon type is very limited because of how the server handles projectile collisions and there are visual bugs in client with fast projectiles. It's recommended that you use Particle Weapon described below as your main weapon and leave this one for simple pistols and such.
+
 ```
 gun_action:
   type: projectileGun

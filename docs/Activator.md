@@ -6,37 +6,32 @@ Technically speaking, Activators in Usages are checked every tick (20 times per 
 
 ## Activator types
 
-### Left Click
+### Trigger
 
-**`leftClick`**
+**`trigger`**
 
-This activator is activated by the player clicking with a left mouse button while holding an Item. It doesn't have any additional settings.
+This activator is activated when a specified trigger occurs. Currently there are these triggers:
 
-```
-left:
-  type: leftClick
-```
-
-### Right click
-
-**`rightClick`**
-
-This activator is activated by the player clicking with a right mouse button while holding an Item. It doesn't have any additional settings.
+* left_click
+* right_click
 
 ```
-right:
-  type: rightClick
+leftClick:
+  type: trigger
+  trigger: left_click
+```
 ```
 
-### Slow Tick
+### Interval
 
-**`slowTick`**
+**`interval`**
 
-This activator is activated once in four ticks. It doesn't have any additional settings.
+This activator is activated once in _n_ checks. Since activators are checked every tick in the order they were defined and the check fails as soon as some activator fails, placing `interval` correctly is essential. For example when it's _after_ the `trigger` activator, it will pass every _n_ times that trigger happens. However, placing it _before_ makes the behavior undefined because you never know if the `trigger` will happen at the nth tick.
 
 ```
 slow:
-  type: slowTick
+  type: interval
+  interval: 4
 ```
 
 ### Wings health

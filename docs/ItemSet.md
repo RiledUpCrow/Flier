@@ -20,7 +20,7 @@ items:
 
 ## Item set settings
 
-* `name` (**optional**) is the name of the class; the player's class will have this name if he chooses this item set. This setting is generally optional, but must be specified in at least one item set - the player cannot have only the sets without a name.
+* `name` (**optional**) is the name of the class; the player's class will have this name if he chooses this item set. This setting is generally optional, but must be specified in at least one item set in the kit - the player cannot have only sets without a name.
 * `engine` (**optional**) is the name of the Engine, as defined in _engines.yml_.
 * `wings` (**optional**) is the name of the Wings, as defined in _wings.yml_.
 * `items` (**optional**) is the list of items in this set, as defined in _items.yml_.

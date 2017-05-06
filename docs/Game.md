@@ -7,31 +7,29 @@ Every game is run on an "arena" - a set of locations required by the game, like 
 ```
 game_name:
   type: [game type]
-  rounds: [boolean]
+  rounds: [true/false]
   bonuses:
-  - some_bonus
-  - other_bonus
+  - [bonus name]
   effects:
-  - some_effect
-  - other_effect
+  - [effect name]
   height_limit: [positive integer]
   height_damage: [decimal]
-  rounds: [boolean]
+  rounds: [true/false]
   max_players: [non-negative integer]
   min_players: [positive integer]
   respawn_delay: [non-negative integer]
   start_delay: [non-negative integer]
-  locking: [boolean]
+  locking: [true/false]
   waiting_room: [location]
   center: [location]
   radius: [integer]
   viable_arenas:
   - [arena name]
   respawn_action: [action]
-  default_class:
-  - item_set_name
+  default_kit:
+  - [item set name]
   money:
-    enabled: false
+    enabled: [true/false]
     enemy_kill: [integer]
     enemy_hit: [integer]
     friendly_kill: [integer]
@@ -96,7 +94,7 @@ These settings apply to every game. Some of them have default values, so if you 
 
 ***
 
-* `default_class` is the list of item sets which will be applied to the player when he joins the lobby. All these sets are applied as `fill`, `replace`, saving and single (amount is 1). The sets specified here must be defined in the _items_ section (the one described above).
+* `default_kit` is the list of item sets which will be applied to the player when he joins the lobby. All these sets are applied as `fill`, `replace`, `saving: true` and `amount: 1`. The sets specified here must be defined in the _items_ section (the one described above).
 
 ***
 
