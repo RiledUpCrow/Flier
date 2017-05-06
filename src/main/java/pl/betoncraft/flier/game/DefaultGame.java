@@ -589,9 +589,7 @@ public abstract class DefaultGame implements Listener, Game {
 			data.getLines().add(new Time(data));
 		}
 		// move into waiting room
-		WaitReason reason = waitingRoom.addPlayer(data);
-		// run on next tick, so the message is shown after lobby join message
-		Bukkit.getScheduler().runTask(Flier.getInstance(), () -> waitMessage(player, reason));
+		moveToWaitingRoom(data);
 		return data;
 	}
 	
@@ -729,6 +727,9 @@ public abstract class DefaultGame implements Listener, Game {
 	protected void moveToWaitingRoom(InGamePlayer player) {
 		Utils.clearPlayer(player.getPlayer());
 		player.setPlaying(false);
+		PlayerClass clazz = player.getClazz();
+		clazz.onRespawn();
+		player.updateClass();
 		WaitReason reason = waitingRoom.addPlayer(player);
 		waitMessage(player.getPlayer(), reason);
 	}
@@ -754,9 +755,6 @@ public abstract class DefaultGame implements Listener, Game {
 	
 	@Override
 	public void handleRespawn(InGamePlayer player) {
-		PlayerClass clazz = player.getClazz();
-		clazz.onRespawn();
-		player.updateClass();
 		player.getPlayer().getInventory().setHeldItemSlot(0);
 		new BukkitRunnable() {
 			@Override
