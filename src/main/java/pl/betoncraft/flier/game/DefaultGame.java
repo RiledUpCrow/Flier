@@ -32,19 +32,13 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityExplodeEvent;
-import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.ExplosionPrimeEvent;
-import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerPickupItemEvent;
-import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.permissions.Permission;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -1006,6 +1000,14 @@ public abstract class DefaultGame implements Listener, Game {
 				}
 			}
 		}
+		// prevent damage to entities caused by in-game targets
+		if (event instanceof EntityDamageByEntityEvent) {
+			EntityDamageByEntityEvent entityEvent = (EntityDamageByEntityEvent) event;
+			Target attacker = getTargets().get(entityEvent.getDamager().getUniqueId());
+			if (attacker != null) {
+				event.setCancelled(true);
+			}
+		}
 	}
 	
 	@EventHandler
@@ -1023,23 +1025,6 @@ public abstract class DefaultGame implements Listener, Game {
 	}
 	
 	@EventHandler
-	public void onRegen(EntityRegainHealthEvent event) {
-		if (event.getEntity() instanceof Player) {
-			Player player = (Player) event.getEntity();
-			if (dataMap.containsKey(player.getUniqueId())) {
-				event.setCancelled(true);
-			}
-		}
-	}
-	
-	@EventHandler
-	public void onHunger(FoodLevelChangeEvent event) {
-		if (dataMap.containsKey(event.getEntity().getUniqueId())) {
-			event.setCancelled(true);
-		}
-	}
-	
-	@EventHandler
 	public void onBlockExplode(EntityExplodeEvent event) {
 		if (Attacker.getAttacker(event.getEntity()) != null) {
 			event.blockList().clear();
@@ -1047,43 +1032,8 @@ public abstract class DefaultGame implements Listener, Game {
 	}
 	
 	@EventHandler
-	public void onDrop(PlayerDropItemEvent event) {
-		if (getPlayers().containsKey(event.getPlayer().getUniqueId())) {
-			event.setCancelled(true);
-		}
-	}
-	
-	@EventHandler
-	public void onPickup(PlayerPickupItemEvent event) {
-		if (getPlayers().containsKey(event.getPlayer().getUniqueId())) {
-			event.setCancelled(true);
-		}
-	}
-	
-	@EventHandler
-	public void onSwap(PlayerSwapHandItemsEvent event) {
-		if (getPlayers().containsKey(event.getPlayer().getUniqueId())) {
-			event.setCancelled(true);
-		}
-	}
-	
-	@EventHandler
 	public void onInvInteract(InventoryClickEvent event) {
 		if (getPlayers().containsKey(event.getWhoClicked().getUniqueId())) {
-			event.setCancelled(true);
-		}
-	}
-	
-	@EventHandler
-	public void onPlace(BlockPlaceEvent event) {
-		if (getPlayers().containsKey(event.getPlayer().getUniqueId())) {
-			event.setCancelled(true);
-		}
-	}
-	
-	@EventHandler
-	public void onBreak(BlockBreakEvent event) {
-		if (getPlayers().containsKey(event.getPlayer().getUniqueId())) {
 			event.setCancelled(true);
 		}
 	}

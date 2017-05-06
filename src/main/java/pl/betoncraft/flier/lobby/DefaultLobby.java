@@ -22,10 +22,21 @@ import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityRegainHealthEvent;
+import org.bukkit.event.entity.FoodLevelChangeEvent;
+import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 
 import pl.betoncraft.flier.api.Flier;
 import pl.betoncraft.flier.api.content.Game;
@@ -284,13 +295,87 @@ public abstract class DefaultLobby implements Lobby, Listener {
 	
 	@EventHandler
 	public void onDamage(EntityDamageEvent event) {
-		UUID uuid = event.getEntity().getUniqueId();
-		if (players.contains(uuid) &&
-				!gameSets.values().stream().anyMatch(
-						set -> set.stream().anyMatch(
-								game -> game.getPlayers().containsKey(uuid)
-						)
-				)) {
+		UUID[] uuid = new UUID[2];
+		uuid[0] = event.getEntity().getUniqueId();
+		if (event instanceof EntityDamageByEntityEvent) {
+			EntityDamageByEntityEvent entityEvent = (EntityDamageByEntityEvent) event;
+			uuid[1] = entityEvent.getDamager().getUniqueId();
+		}
+		for (UUID u : uuid) {
+			if (u != null && players.contains(u) &&
+					!gameSets.values().stream().anyMatch(
+							set -> set.stream().anyMatch(
+									game -> game.getPlayers().containsKey(u)
+							)
+					)) {
+				event.setCancelled(true);
+				break;
+			}
+		}
+	}
+	
+	@EventHandler
+	public void onItemFrame(PlayerInteractEntityEvent event) {
+		if (getPlayers().contains(event.getPlayer().getUniqueId())) {
+			event.setCancelled(true);
+		}
+	}
+	
+	@EventHandler(priority=EventPriority.HIGH)
+	public void onInteract(PlayerInteractEvent event) {
+		if (getPlayers().contains(event.getPlayer().getUniqueId())) {
+			event.setCancelled(true);
+		}
+	}
+	
+	@EventHandler
+	public void onDrop(PlayerDropItemEvent event) {
+		if (getPlayers().contains(event.getPlayer().getUniqueId())) {
+			event.setCancelled(true);
+		}
+	}
+	
+	@EventHandler
+	public void onPickup(PlayerPickupItemEvent event) {
+		if (getPlayers().contains(event.getPlayer().getUniqueId())) {
+			event.setCancelled(true);
+		}
+	}
+	
+	@EventHandler
+	public void onSwap(PlayerSwapHandItemsEvent event) {
+		if (getPlayers().contains(event.getPlayer().getUniqueId())) {
+			event.setCancelled(true);
+		}
+	}
+	
+	@EventHandler
+	public void onPlace(BlockPlaceEvent event) {
+		if (getPlayers().contains(event.getPlayer().getUniqueId())) {
+			event.setCancelled(true);
+		}
+	}
+	
+	@EventHandler
+	public void onBreak(BlockBreakEvent event) {
+		if (getPlayers().contains(event.getPlayer().getUniqueId())) {
+			event.setCancelled(true);
+		}
+	}
+	
+	@EventHandler
+	public void onRegen(EntityRegainHealthEvent event) {
+		if (event.getEntity() instanceof Player) {
+			Player player = (Player) event.getEntity();
+			if (getPlayers().contains(player.getUniqueId())) {
+				event.setCancelled(true);
+			}
+		}
+	}
+	
+	@EventHandler
+	public void onHunger(FoodLevelChangeEvent event) {
+		if (getPlayers().contains(event.getEntity().getUniqueId())) {
 			event.setCancelled(true);
 		}
 	}
