@@ -965,11 +965,11 @@ public abstract class DefaultGame implements Listener, Game {
 				switch (event.getAction()) {
 				case LEFT_CLICK_AIR:
 				case LEFT_CLICK_BLOCK:
-					data.addOccurrence("left_click");
+					data.addTrigger("left_click");
 					break;
 				case RIGHT_CLICK_AIR:
 				case RIGHT_CLICK_BLOCK:
-					data.addOccurrence("right_click");
+					data.addTrigger("right_click");
 					break;
 				default:
 					break;

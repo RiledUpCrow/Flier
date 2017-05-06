@@ -46,7 +46,7 @@ import pl.betoncraft.flier.activator.BlockStandingActivator;
 import pl.betoncraft.flier.activator.HoldingThisActivator;
 import pl.betoncraft.flier.activator.IntervalActivator;
 import pl.betoncraft.flier.activator.ItemActivator;
-import pl.betoncraft.flier.activator.OccurrenceActivator;
+import pl.betoncraft.flier.activator.TriggerActivator;
 import pl.betoncraft.flier.activator.WingsHealthActivator;
 import pl.betoncraft.flier.api.Flier;
 import pl.betoncraft.flier.api.content.Action;
@@ -147,7 +147,7 @@ public class FlierPlugin extends JavaPlugin implements Flier {
 		registerAction("consume", s -> new ConsumeAction(s));
 		registerAction("health", s -> new HealthAction(s));
 		registerAction("sprintStarting", s -> new SprintStartingAction(s));
-		registerActivator("occurrence", s -> new OccurrenceActivator(s));
+		registerActivator("trigger", s -> new TriggerActivator(s));
 		registerActivator("holdingThis", s -> new HoldingThisActivator(s));
 		registerActivator("interval", s -> new IntervalActivator(s));
 		registerActivator("wingsHealth", s -> new WingsHealthActivator(s));

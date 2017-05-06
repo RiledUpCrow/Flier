@@ -67,7 +67,7 @@ public class DefaultPlayer implements InGamePlayer {
 	private int tickCounter = 0;
 
 	private boolean isPlaying;
-	private List<String> occurrences = new ArrayList<>();
+	private List<String> triggers = new ArrayList<>();
 	private int noDamageTicks = 0;
 	private List<SidebarLine> lines = new LinkedList<>();
 	private Attacker lastHit = null;
@@ -140,7 +140,7 @@ public class DefaultPlayer implements InGamePlayer {
 			
 			// manage UsableItems
 			use();
-			occurrences.clear();
+			triggers.clear();
 			noDamageTicks--;
 		}
 		displayReloadingTime();
@@ -196,15 +196,15 @@ public class DefaultPlayer implements InGamePlayer {
 	}
 	
 	@Override
-	public void addOccurrence(String name) {
+	public void addTrigger(String name) {
 		if (isPlaying()) {
-			occurrences .add(name);
+			triggers.add(name);
 		}
 	}
 	
 	@Override
-	public List<String> getOccurrences() {
-		return occurrences;
+	public List<String> getTriggers() {
+		return triggers;
 	}
 	
 	@Override

@@ -50,18 +50,18 @@ public interface InGamePlayer extends Target {
 	}
 
 	/**
-	 * Adds an occurrence to the list. Occurrences are events that happen on
+	 * Adds a trigger to the list. Triggers are events that happen on
 	 * this particular tick, like left or right clicks.
 	 *
 	 * @param name
-	 *            name of the occurrence
+	 *            name of the trigger
 	 */
-	public void addOccurrence(String name);
+	public void addTrigger(String name);
 	
 	/**
-	 * @return the list of occurrences which happened during this tick
+	 * @return the list of triggers which happened during this tick
 	 */
-	public List<String> getOccurrences();
+	public List<String> getTriggers();
 
 	/**
 	 * @return the UsableItem which is currently held by the player

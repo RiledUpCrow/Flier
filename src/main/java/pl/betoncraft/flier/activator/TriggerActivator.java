@@ -13,22 +13,22 @@ import pl.betoncraft.flier.api.core.LoadingException;
 import pl.betoncraft.flier.api.core.UsableItem;
 
 /**
- * Activates when the player has specified occurrence on this tick.
+ * Activates when the player has specified trigger on this tick.
  *
  * @author Jakub Sapalski
  */
-public class OccurrenceActivator extends DefaultActivator {
+public class TriggerActivator extends DefaultActivator {
 	
-	private String occurrence;
+	private String trigger;
 
-	public OccurrenceActivator(ConfigurationSection section) throws LoadingException {
+	public TriggerActivator(ConfigurationSection section) throws LoadingException {
 		super(section);
-		occurrence = loader.loadString("occurrence");
+		trigger = loader.loadString("trigger");
 	}
 
 	@Override
 	public boolean isActive(InGamePlayer player, UsableItem item) {
-		return player.getOccurrences().contains(occurrence);
+		return player.getTriggers().contains(trigger);
 	}
 
 }
