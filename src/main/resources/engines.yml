@@ -8,10 +8,10 @@
 balancedEngine:
   type: multiplyingEngine                    # type of the Engine
   material: sugar cane                       # material of the item
-  name: '&2Balanced Engine'                  # name of the item
+  name: '$custom.balancedEngine'             # name of the item, as in messages.yml
   lore:                                      # lore (text under item's name)
-  - '&bMedium speed, acceleration and fuel.'
-  - '&aHold shift to accelerate.'
+  - '$custom.balancedEngineDesc'             # you don't have to use these pointers
+  - '$custom.engineUse'                      # you can simply put text here
   max_speed: 1.5                             # maximum speed of this Engine (see docs)
   min_speed: 0.75                            # minimum speed of this Engine (see docs)
   acceleration: 0.025                        # acceleration power
@@ -22,11 +22,11 @@ balancedEngine:
 fastEngine:
   type: multiplyingEngine
   material: feather
-  name: '&2Fast Engine'
+  name: '$custom.fastEngine'
   lore:
-  - '&bHigh maximum speed and fuel regeneration.'
-  - '&bLow acceleration and fuel reserves.'
-  - '&aHold shift to accelerate.'
+  - '$custom.fastEngineDesc1'
+  - '$custom.fastEngineDesc2'
+  - '$custom.engineUse'
   max_speed: 2.5
   min_speed: 0.5
   acceleration: 0.0125
@@ -37,11 +37,11 @@ fastEngine:
 strongEngine:
   type: multiplyingEngine
   material: wheat
-  name: '&2Strong Engine'
+  name: '$custom.strongEngine'
   lore:
-  - '&bLow speed and fuel regeneration.'
-  - '&bHigh acceleration and fuel reserves.'
-  - '&aHold shift to accelerate.'
+  - '$custom.strongEngineDesc1'
+  - '$custom.strongEngineDesc2'
+  - '$custom.engineUse'
   max_speed: 1
   min_speed: 1
   acceleration: 0.05

@@ -1,47 +1,69 @@
-fast_class:                  # ID of the item set (used in the `buttons` section)
-  name: Fast                 # name of the player's class
+### Sets
+#
+# Item sets are collections of items which can be combined together to form
+# a kit. The kit must have a name, which means that at least one item
+# set in the kit must have a name. Item sets can also have modifications
+# for other items.
+
+fast:                  # ID of the item set (used in the `buttons` section)
+  name: '$custom.fast'                 # name of the player's class
   category: main             # name of this set's category
   engine: fastEngine         # engine added in this item set
   wings: lightWings          # wings added in this item set
   items:                     # list of items
   - fastWeapon               # ID of the item (from "items.yml")
   - gun
-  - bomb
-balanced_class:
-  name: Balanced
+  - ammo
+  - radar
+balanced:
+  name: '$custom.balanced'
   category: main             # the category here is the same as in Fast
   engine: balancedEngine
   wings: balancedWings
   items:
   - balancedWeapon
   - gun
-  - bomb
-strong_class:
-  name: Strong
+  - ammo
+  - radar
+strong:
+  name: '$custom.strong'
   category: main
   engine: strongEngine
   wings: heavyWings
   items:
   - strongWeapon
   - gun
-  - bomb
-the_rocket:
+  - ammo
+  - radar
+rocket:
   category: rocket           # this category is different because rockets are not main class items
   items:
   - rocket
-the_launcher:
+launcher:
   category: launcher
   items:
   - launcher
-the_compass:
-  category: compass
-  items:
-  - radar
-the_repair_kit:
+repair:
   category: repair
   items:
-  - wings
-ammo:
-  category: ammo
+  - repair
+bomb:
+  category: bomb
   items:
-  - ammo
+  - bomb
+upgrade_ammo:
+  category: upgrade
+  modifications:
+  - bigger_magazine
+upgrade_wings:
+  category: upgrade
+  modifications:
+  - more_health
+upgrade_engine:
+  category: upgrade
+  modifications:
+  - more_fuel
+upgrade_damage:
+  category: upgrade
+  modifications:
+  - stronger_weapon

@@ -27,4 +27,15 @@ fix:
   actions:
   - fixAll
   - refuel
-  - refill
+  - refill_fast
+  - refill_balanced
+  - refill_strong
+heal:
+  type: invisible
+  location: heal_bonus
+  distance: 3
+  consumable: false
+  cooldown: 10
+  respawn: 0
+  actions:
+  - heal

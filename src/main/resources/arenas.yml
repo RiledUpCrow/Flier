@@ -1,14 +1,29 @@
+### Arenas
+#
+# Arenas are sets of locations which represent a single game map.
+# Each lobby contains at least one arena. Games can then choose an arena
+# they will be hosted on. The game can have multiple arenas available and
+# can be createn on any of them, but there can be only one game on an
+# arena at a time. Names of these locations are not hardcoded, so
+# you can use any other name here - for example change 'blue_spawn' to
+# 'first_spawn' here and in the games.yml file, it will work the same.
+
 default:
   money_bonus: 100;200;300;world
   fix_bonus: 100;200;300;world
+  heal_bonus: 100;200;300;world
   blue_spawn: 100;200;300;world
   red_spawn: 100;200;300;world
   center: 100;200;300;world
   room: 100;200;300;world
   rocket_button: 100;200;300;world
   launcher_button: 100;200;300;world
-  repair_kit_button: 100;200;300;world
-  compass_button: 100;200;300;world
+  repair_button: 100;200;300;world
+  bomb_button: 100;200;300;world
   fast_button: 100;200;300;world
   balanced_button: 100;200;300;world
   strong_button: 100;200;300;world
+  upgrade_ammo: 100;200;300;world
+  upgrade_wings: 100;200;300;world
+  upgrade_engine: 100;200;300;world
+  upgrade_damage: 100;200;300;world

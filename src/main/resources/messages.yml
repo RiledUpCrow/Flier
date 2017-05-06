@@ -81,6 +81,59 @@ en:
   start_game_desc_1: "Force a player to start a game."
   start_game_desc_2: "Start a game or force specified player to start game."
   start_game_desc_3: "Start a game."
+  custom:
+    blue: Blue
+    red: Red
+    fast: Fast
+    balanced: Balanced
+    strong: Strong
+    machineGun: '&4Machine Gun'
+    machineGunDesc: '&bContinous burst with decent damage.'
+    disable: '&bDisables wings.'
+    shoot: '&aLeft click to shoot, right click to reload.'
+    shotgun: '&4Shotgun'
+    shotgunDesc: '&bMulti-bullet single burst with low damage.'
+    sniper: '&4Sniper Rifle'
+    sniperDesc: '&bShort, high-precision bursts with high damage.'
+    gun: '&4Gun'
+    gunDesc: '&bCan shoot from the ground.'
+    rocket: '&eRocket'
+    rocketDesc: '&bTracks players. Disables wings. High damage.'
+    rocketUse: '&aLeft click to launch.'
+    radar: '&aRadar'
+    radarDesc: '&bShows nearby hostiles.'
+    killUse: '&aLeft click to self destruct.'
+    leaveUse: '&aRight click to leave the game.'
+    launcher: '&5Launcher'
+    launcherDesc: '&bLaunches you in the direction you''re looking.'
+    launcherUse: '&aLeft click to use.'
+    repair: '&dEmergency Wings'
+    repairDesc: '&bRestores destroyed wings.'
+    repairUse: '&aLeft click to use.'
+    bomb: '&cBomb'
+    bombDesc: '&bDrops a bomb.'
+    bombUse: '&aLeft click to use.'
+    ammunition: '&0Ammo clip'
+    ammunitionDesc: '&bAllows reloading.'
+    balancedEngine: '&2Balanced Engine'
+    balancedEngineDesc: '&bMedium speed, acceleration and fuel.'
+    fastEngine: '&2Fast Engine'
+    fastEngineDesc1: '&bHigh maximum speed and fuel regeneration.'
+    fastEngineDesc2: '&bLow acceleration and fuel reserves.'
+    strongEngine: '&2Strong Engine'
+    strongEngineDesc1: '&bLow speed and fuel regeneration.'
+    strongEngineDesc2: '&bHigh acceleration and fuel reserves.'
+    engineUse: '&aHold shift to accelerate.'
+    balancedWings: '&3Balanced Wings'
+    balancedWingsDesc1: '&bDefault Elytra fight.'
+    balancedWingsDesc2: '&bMedium durability.'
+    fastWings: '&3Light Wings'
+    fastWingsDesc1: '&bFast wings with strong lifting force.'
+    fastWingsDesc2: '&bQuite fragile.'
+    strongWings: '&3Heavy Wings'
+    strongWingsDesc1: '&bSlow, heavy wings.'
+    strongWingsDesc2: '&bVery sturdy.'
+    wingsUse: '&aPress space while falling to fly.'
 pl:
   no_permission: "&cNie masz uprawnień aby tego użyć."
   no_money_unlock: "&cNie masz pieniędzy aby to odblokować."
@@ -164,3 +217,57 @@ pl:
   start_game_desc_1: "Zmusza gracza do rozpoczęcia gry."
   start_game_desc_2: "Rozpoczyna grę albo zmusza podanego gracza do rozpoczęcia gry."
   start_game_desc_3: "Rozpoczyna grę."
+  custom:
+    blue: Niebiescy
+    red: Czerwoni
+    fast: Szybki
+    balanced: Zbalansowany
+    strong: Silny
+    machineGun: '&4Karabin Maszynowy'
+    machineGunDesc: '&bCiągła seria z przyzwoitymi obrażeniami.'
+    disable: '&bBlokuje skrzydła.'
+    shoot: '&aKliknij lewym, aby strzelić; prawym, aby przeładować.'
+    shotgun: '&4Shotgun'
+    shotgunDesc: '&bWielopociskowe pojedyncze strzały z niskimi obrażeniami.'
+    sniper: '&4Karabin Snajperski'
+    sniperDesc: '&bKrótkie, precyzyjne serie z wysokimi obrażeniami.'
+    gun: '&4Pistolet'
+    gunDesc: '&bMoże strzelać z ziemi.'
+    rocket: '&eRakieta'
+    rocketDesc: '&bŚledzi graczy. Blokuje skrzydła. Duże obrażenia.'
+    rocketUse: '&aKliknij lewym, aby odpalić.'
+    radar: '&aRadar'
+    radarDesc: '&bPokazuje pobliskich przeciwników.'
+    killUse: '&aKliknij lewym, aby popełnić samobójstwo.'
+    leaveUse: '&aKliknij prawym, aby wyjść z gry.'
+    launcher: '&5Wyrzutnia'
+    launcherDesc: '&bWystrzeliwuje Cię w kierunku, w którym patrzysz.'
+    launcherUse: '&aKliknij lewym, aby użyć.'
+    repair: '&dZapasowe Skrzydła'
+    repairDesc: '&bPrzywraca zniszczone skrzydła.'
+    repairUse: '&aKliknij lewym, aby użyć.'
+    ammunition: '&0Magazynek amunicji'
+    ammunitionDesc: '&bPozwala przeładowywać broń.'
+    bomb: '&cBomba'
+    bombDesc: '&bZrzuca bombę.'
+    bombUse: '&aKliknij lewym, aby użyć.'
+    balancedEngine: '&2Zbalansowany silnik'
+    balancedEngineDesc: '&bŚrednia prędkość, przyspieszenie i paliwo.'
+    fastEngine: '&2Szybki silnik'
+    fastEngineDesc1: '&bWysoka prędkość i regeneracja paliwa.'
+    fastEngineDesc2: '&bNiskie przyspieszenie i rezerwa paliwa.'
+    strongEngine: '&2Mocny silnik'
+    strongEngineDesc1: '&bNiska prędkość i regeneracja paliwa.'
+    strongEngineDesc2: '&bWysokie przyspieszenie i rezerwa paliwa.'
+    engineUse: '&aPrzytrzymaj shift aby przyspieszyć.'
+    balancedWings: '&3Zbalansowane Skrzydła'
+    balancedWingsDesc1: '&bDomyślny lot Elytrą.'
+    balancedWingsDesc2: '&bŚrednia wytrzymałość.'
+    fastWings: '&3Lekkie Skrzydła'
+    fastWingsDesc1: '&bSzybkie skrzydła z dużą siłą nośną.'
+    fastWingsDesc2: '&bDość kruche.'
+    strongWings: '&3Ciężkie Skrzydła'
+    strongWingsDesc1: '&bWolne, ciężkie skrzydła.'
+    strongWingsDesc2: '&bBardzo wytrzymałe.'
+    wingsUse: '&aWciśnij spację w trakcie spadania aby zacząć lecieć.'
+

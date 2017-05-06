@@ -8,21 +8,21 @@
 balancedWings:
   type: simpleWings                             # type of the Wings
   material: elytra                              # material of the item
-  name: '&3Balanced Wings'                      # name of the item
+  name: '$custom.balancedWings'                      # name of the item
   lore:                                         # lore (text under item's name)
-  - '&bDefault Elytra fight.'
-  - '&bMedium durability.'
-  - '&aPress space while falling to fly.'
+  - '$custom.balancedWingsDesc1'
+  - '$custom.balancedWingsDesc2'
+  - '$custom.wingsUse'
   max_health: 2800                              # health of these Wings
-  regeneration: 0.5                             # regeneration per tick                           
+  regeneration: 0.5                             # regeneration per tick
 lightWings:
   type: simpleWings
   material: elytra
-  name: '&3Light Wings'
+  name: '$custom.fastWings'
   lore:
-  - '&bFast wings with strong lifting force.'
-  - '&bQuite fragile.'
-  - '&aPress space while falling to fly.'
+  - '$custom.fastWingsDesc1'
+  - '$custom.fastWingsDesc2'
+  - '$custom.wingsUse'
   max_health: 2000
   regeneration: 0.5
   aerodynamics: 0.002                           # air resistance factor of these Wings
@@ -31,12 +31,14 @@ lightWings:
 heavyWings:
   type: simpleWings
   material: elytra
-  name: '&3Heavy Wings'
+  name: '$custom.strongWings'
   lore:
-  - '&bSlow, heavy wings.'
-  - '&bVery sturdy.'
-  - '&aPress space while falling to fly.'
+  - '$custom.strongWingsDesc1'
+  - '$custom.strongWingsDesc2'
+  - '$custom.wingsUse'
   max_health: 3600
   regeneration: 0.5
   aerodynamics: -0.0025
+  liftingforce: 0
+  maxLift: 0
   weight: 0.01

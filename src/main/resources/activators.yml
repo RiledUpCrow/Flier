@@ -10,11 +10,22 @@ wingsDead:
   type: wingsHealth     # type of the Activator
   min: 0                # minimum health of wings
 left:
-  type: leftClick       # this type does not have any additional options
+  type: trigger
+  trigger: left_click
 right:
-  type: rightClick
+  type: trigger
+  trigger: right_click
+holding:
+  type: holdingThis
 slow:
-  type: slowTick
+  type: interval
+  interval: 4
 hasAmmo:
   type: item
   item: ammo
+emptyClip:
+  type: ammo
+  amount: 0%
+notFullClip:
+  type: ammo
+  amount: "<100%"

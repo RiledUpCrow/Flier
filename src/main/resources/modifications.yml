@@ -1,8 +1,39 @@
-bigger_magazine:
-  target: usable item
-  names:
+### Modifications
+#
+# This file contains modifications for items, actions and activators. They can
+# modify properties specified in configuration files dynamically, as long
+# as they are applied to the player.
+#
+
+bigger_magazine:                       # name of the modification
+  target: usable item                  # target type
+  names:                               # list of items this modification applies to
   - fastWeapon
   - balancedWeapon
   - strongWeapon
+  modifiers:                           # list of modifiers to the item
+    ammo: "*(1)"                       # this will increase ammunition twice
+more_fuel:
+  target: engine
+  names:
+  - fastEngine
+  - strongEngine
+  - balancedEngine
   modifiers:
-    ammo: "*(0.5)"
+    max_fuel: "*(0.75)"
+more_health:
+  target: wings
+  names:
+  - lightWings
+  - heavyWings
+  - balancedWings
+  modifiers:
+    max_health: "*(0.33)"
+stronger_weapon:
+  target: action
+  names:
+  - balancedShot
+  - strongShot
+  - fastShot
+  modifiers:
+    damage: "*(0.33)"

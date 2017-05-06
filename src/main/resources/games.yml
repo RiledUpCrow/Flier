@@ -6,17 +6,17 @@
 #
 
 default:
-  type: teamDeathMatch                 # type of the Game
-  points_to_win: 25                    # points required to win the Game
+  type: teamDeathMatch                 # type of the game
+  points_to_win: 25                    # points required to win the game
   rounds: true                         # whenever the game is continuous or uses rounds
   teams:                               # list of teams
     blue:
-      name: 'Blue'                     # name of the team
+      name: '$custom.blue'                     # name of the team
       spawns:
       - blue_spawn                     # spawn locations for the team (defined in arenas.yml)
       color: blue                      # color of the team
     red:
-      name: 'Red'
+      name: '$custom.red'
       spawns: 
       - red_spawn
       color: red
@@ -29,12 +29,13 @@ default:
     suicide: -1                        #
   height_limit: 512                    # maximum height of the map
   height_damage: 0.5                   # damage taken when flying above the height limit
-  waiting_room: room                   # location of the waiting room
+  waiting_room: room                   # location of the waiting room as in arenas.yml
   viable_arenas:                       # list of arenas this game can use
   - default
   bonuses:                             # list of Bonuses in this Game
   - money
   - fix
+  - heal
   effects:                             # list of Effects in this Game
   - click
   - shoot
@@ -48,19 +49,18 @@ default:
   - chicken_sound
   - sheep_sound
   - engine_smoke
-  default_class:                       # list of item sets for default class
-  - balanced_class
-  - ammo
+  default_kit:                       # list of item sets for default kit
+  - balanced
   buttons:                             # list of buttons with item sets
     rocket_button:
       buy_cost: 15                     # cost of buying this item set
       on_buy:                          # items to apply when buying
-        item_set: the_rocket           # ID of the item set
+        item_set: rocket           # ID of the item set
         add_type: increase             # how it's added, see docs
         conflict_action: skip          # what happens, when there already is something of that category
       sell_cost: -15                   # negative, because we're giving the money back
       on_sell:                         # items to apply when selling
-        item_set: the_rocket           # it's the same as above
+        item_set: rocket           # it's the same as above
         add_type: decrease             # but we're decreasing instead of increasing
         conflict_action: skip
       blocks:
@@ -68,40 +68,45 @@ default:
     launcher_button:
       buy_cost: 10
       on_buy:
-        item_set: the_launcher
+        item_set: launcher
         add_type: increase
         conflict_action: skip
       sell_cost: -10
       on_sell:
-        item_set: the_launcher
+        item_set: launcher
         add_type: decrease
         conflict_action: skip
       blocks:
       - launcher_button
-    repair_kit_button:
+    repair_button:
       buy_cost: 20
       on_buy:
-        item_set: the_repair_kit
+        item_set: repair
         add_type: increase
         conflict_action: skip
       sell_cost: -20
       on_sell:
-        item_set: the_repair_kit
+        item_set: repair
         add_type: decrease
         conflict_action: skip
       blocks:
-      - repair_kit_button
-    compass_button:
-      unlock_cost: 5
-      on_unlock:
-        item_set: the_compass
-        add_type: fill
+      - repair_button
+    bomb_button:
+      buy_cost: 5
+      on_buy:
+        item_set: bomb
+        add_type: increase
+        conflict_action: skip
+      sell_cost: -5
+      on_sell:
+        item_set: bomb
+        add_type: decrease
         conflict_action: skip
       blocks:
-      - compass_button
+      - bomb_button
     fast_button:
       on_buy:
-        item_set: fast_class
+        item_set: fast
         add_type: fill
         conflict_action: replace
         saving: true
@@ -109,7 +114,7 @@ default:
       - fast_button
     balanced_button:
       on_buy:
-        item_set: balanced_class
+        item_set: balanced
         add_type: fill
         conflict_action: replace
         saving: true
@@ -117,12 +122,68 @@ default:
       - balanced_button
     strong_button:
       on_buy:
-        item_set: strong_class
+        item_set: strong
         add_type: fill
         conflict_action: replace
         saving: true
       blocks:
       - strong_button
+    upgrade_ammo:
+      unlock_cost: 30
+      on_unlock:
+        item_set: upgrade_ammo
+        add_type: fill
+        conflict_action: replace
+        saving: true
+      on_buy:
+        item_set: upgrade_ammo
+        add_type: fill
+        conflict_action: replace
+        saving: true
+      blocks:
+      - upgrade_ammo
+    upgrade_wings:
+      unlock_cost: 30
+      on_unlock:
+        item_set: upgrade_wings
+        add_type: fill
+        conflict_action: replace
+        saving: true
+      on_buy:
+        item_set: upgrade_wings
+        add_type: fill
+        conflict_action: replace
+        saving: true
+      blocks:
+      - upgrade_wings
+    upgrade_engine:
+      unlock_cost: 30
+      on_unlock:
+        item_set: upgrade_engine
+        add_type: fill
+        conflict_action: replace
+        saving: true
+      on_buy:
+        item_set: upgrade_engine
+        add_type: fill
+        conflict_action: replace
+        saving: true
+      blocks:
+      - upgrade_engine
+    upgrade_damage:
+      unlock_cost: 30
+      on_unlock:
+        item_set: upgrade_damage
+        add_type: fill
+        conflict_action: replace
+        saving: true
+      on_buy:
+        item_set: upgrade_damage
+        add_type: fill
+        conflict_action: replace
+        saving: true
+      blocks:
+      - upgrade_damage
   respawn_action: combine              # what happens with items after respawn (see docs)
   center: center                       # center of the map
   radius: 1000                         # the radius defining map borders
