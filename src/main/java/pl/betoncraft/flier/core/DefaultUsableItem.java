@@ -33,6 +33,7 @@ public class DefaultUsableItem extends DefaultItem implements UsableItem {
 	private static final String AMMO = "ammo";
 	private static final String CONSUMABLE = "consumable";
 
+	protected final int startingCooldown;
 	protected final boolean consumable;
 	protected final int maxAmmo;
 	protected final List<Usage> usages = new ArrayList<>();
@@ -41,12 +42,13 @@ public class DefaultUsableItem extends DefaultItem implements UsableItem {
 	protected final int minAmount;
 
 	protected int amount;
-	protected int time = 0;
-	protected int whole = 0;
+	protected int time;
+	protected int whole;
 	protected int ammo;
 
 	public DefaultUsableItem(ConfigurationSection section) throws LoadingException {
 		super(section);
+		whole = time = startingCooldown = loader.loadNonNegativeInt("starting_cooldown", 0);
 		consumable = loader.loadBoolean(CONSUMABLE, false);
 		maxAmmo = loader.loadNonNegativeInt(AMMO, 0);
 		ammo = maxAmmo;
@@ -177,7 +179,7 @@ public class DefaultUsableItem extends DefaultItem implements UsableItem {
 					continue;
 				}
 				used = true;
-				int cooldown = usage.getCooldown();;
+				int cooldown = usage.getCooldown();
 				if (time < cooldown) {
 					time = cooldown;
 					whole = time;
@@ -205,8 +207,8 @@ public class DefaultUsableItem extends DefaultItem implements UsableItem {
 	@Override
 	public void refill() {
 		ammo = getMaxAmmo();
-		time = 0;
-		whole = 0;
+		time = startingCooldown;
+		whole = startingCooldown;
 	}
 
 	@Override

@@ -623,17 +623,15 @@ public class DefaultPlayer implements InGamePlayer {
 				break;
 			}
 		}
-		if (item == null || !item.getUsages().stream().filter(usage -> usage.canUse(this)).findAny().isPresent()) {
-			player.setExp(0);
+		if (item == null || item.getAmount() == 0) {
+			player.setExp(0.9999f);
 			return;
 		}
 		int ticks = item.getCooldown();
 		int max = item.getWholeCooldown();
 		float amount;
-		if (ticks == 0) {
-			amount = (float) 0.9999; 
-		} else if (max == 0) {
-			amount = 0;
+		if (ticks == 0 || max == 0) {
+			amount = 0.9999f;
 		} else {
 			amount = (float) (max - ticks) / (float) max;
 		}
