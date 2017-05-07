@@ -2,6 +2,9 @@
 ### Flier configuration ###
 ###########################
 
+# DO NOT CHANGE THIS MANUALLY!
+version: 1
+
 # the language used by the plugin if there is no BetonLangAPI
 language: en
 
