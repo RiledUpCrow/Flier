@@ -731,7 +731,8 @@ public abstract class DefaultGame implements Listener, Game {
 		kit.onRespawn();
 		player.updateKit();
 		WaitReason reason = waitingRoom.addPlayer(player);
-		waitMessage(player.getPlayer(), reason);
+		Bukkit.getScheduler().scheduleSyncDelayedTask(Flier.getInstance(), () ->
+				waitMessage(player.getPlayer(), reason));
 	}
 	
 	@Override
