@@ -25,6 +25,7 @@ import pl.betoncraft.flier.api.content.Game;
 import pl.betoncraft.flier.api.core.DatabaseManager;
 import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.UsableItem;
+import pl.betoncraft.flier.event.FlierPlayerKillEvent.KillType;
 
 /**
  * Manages the database connection, table creation and queries.
@@ -114,7 +115,7 @@ public class DefaultDatabaseManager implements DatabaseManager {
 	}
 	
 	@Override
-	public void saveKill(Game game, InGamePlayer killed, InGamePlayer killer, UsableItem weapon) {
+	public void saveKill(Game game, InGamePlayer killed, InGamePlayer killer, UsableItem weapon, KillType type) {
 		if (!enabled) {
 			return;
 		}
@@ -126,6 +127,7 @@ public class DefaultDatabaseManager implements DatabaseManager {
 				killer == null ? null : killer.getPlayer().getUniqueId().toString(),
 				killer == null ? null : killer.getKit().getClassName(),
 				weapon == null ? null : weapon.getID(),
+				type.get(),
 				new Date()
 		});
 	}

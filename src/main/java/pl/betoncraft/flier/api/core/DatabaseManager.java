@@ -7,16 +7,17 @@
 package pl.betoncraft.flier.api.core;
 
 import pl.betoncraft.flier.api.content.Game;
+import pl.betoncraft.flier.event.FlierPlayerKillEvent.KillType;
 
 /**
- * 
+ * Manages the communication between the plugin and database.
  *
  * @author Jakub Sapalski
  */
 public interface DatabaseManager {
 
-	void disconnect();
+	public void disconnect();
 
-	void saveKill(Game game, InGamePlayer killed, InGamePlayer killer, UsableItem weapon);
+	public void saveKill(Game game, InGamePlayer killed, InGamePlayer killer, UsableItem weapon, KillType type);
 
 }

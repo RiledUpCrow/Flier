@@ -35,7 +35,8 @@ public class StatisticWriter implements Listener {
 				event.getGame(),
 				event.getPlayer(),
 				event.getOther(),
-				Optional.ofNullable(event.getPlayer().getAttacker()).map(attacker -> attacker.getWeapon()).orElse(null));
+				Optional.ofNullable(event.getPlayer().getAttacker()).map(attacker -> attacker.getWeapon()).orElse(null),
+				event.getType());
 		event.setSwitched(original);
 	}
 

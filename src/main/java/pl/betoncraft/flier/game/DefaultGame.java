@@ -64,7 +64,7 @@ import pl.betoncraft.flier.core.DefaultPlayer;
 import pl.betoncraft.flier.core.DefaultSetApplier;
 import pl.betoncraft.flier.event.FlierClickButtonEvent;
 import pl.betoncraft.flier.event.FlierPlayerKillEvent;
-import pl.betoncraft.flier.event.FlierPlayerKillEvent.Type;
+import pl.betoncraft.flier.event.FlierPlayerKillEvent.KillType;
 import pl.betoncraft.flier.sidebar.Altitude;
 import pl.betoncraft.flier.sidebar.Ammo;
 import pl.betoncraft.flier.sidebar.Fuel;
@@ -704,7 +704,7 @@ public abstract class DefaultGame implements Listener, Game {
 			}
 			// fire an event
 			FlierPlayerKillEvent deathEvent = new FlierPlayerKillEvent(killed, killer,
-					fall ? Type.SHOT_DOWN : Type.KILLED);
+					fall ? KillType.SHOT_DOWN : KillType.KILLED);
 			Bukkit.getPluginManager().callEvent(deathEvent);
 			Attitude a = getAttitude(killer, killed);
 			if (a == Attitude.FRIENDLY) {
@@ -718,7 +718,7 @@ public abstract class DefaultGame implements Listener, Game {
 			suicideMessage("suicide", killed);
 			// fire an event
 			FlierPlayerKillEvent deathEvent = new FlierPlayerKillEvent(killed, killed,
-					fall ? Type.SHOT_DOWN : Type.KILLED);
+					fall ? KillType.SHOT_DOWN : KillType.KILLED);
 			Bukkit.getPluginManager().callEvent(deathEvent);
 			pay(killed, suicideMoney);
 		}
