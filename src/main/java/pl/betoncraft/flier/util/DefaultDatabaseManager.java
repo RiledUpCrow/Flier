@@ -120,7 +120,6 @@ public class DefaultDatabaseManager implements DatabaseManager {
 			return;
 		}
 		db.update("add_kill", new Object[]{
-				game.getID(), 
 				game.getUniqueNumber(), 
 				killed.getPlayer().getUniqueId().toString(),
 				killed.getKit().getClassName(),
@@ -128,6 +127,7 @@ public class DefaultDatabaseManager implements DatabaseManager {
 				killer == null ? null : killer.getKit().getClassName(),
 				weapon == null ? null : weapon.getID(),
 				type.get(),
+				game.getAttitude(killed, killer).get(),
 				new Date()
 		});
 	}

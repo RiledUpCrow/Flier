@@ -206,7 +206,19 @@ public interface Game {
 	 * @author Jakub Sapalski
 	 */
 	public enum Attitude {
-		FRIENDLY, NEUTRAL, HOSTILE
+		FRIENDLY(0),
+		HOSTILE(1),
+		NEUTRAL(2);
+		private int type;
+		private Attitude(int type) {
+			this.type = type;
+		}
+		/**
+		 * @return the magic number for database storage
+		 */
+		public int get() {
+			return type;
+		}
 	}
 
 	/**

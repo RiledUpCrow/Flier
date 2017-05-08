@@ -1,8 +1,8 @@
 mysql:
   ping: SELECT 1
-  create_kills: "CREATE TABLE IF NOT EXISTS `kills` (`id` INT NOT NULL AUTO_INCREMENT, `game` VARCHAR(256) NOT NULL, `game_id` INT NOT NULL, `killed` CHAR(36) NOT NULL, `killed_class` VARCHAR(256) NOT NULL, `killer` CHAR(36) NULL, `killer_class` VARCHAR(256) NULL, `weapon` VARCHAR(256) NULL, `kill_type` INT NOT NULL, `date` DATETIME NOT NULL, PRIMARY KEY (`id`), UNIQUE INDEX `id_UNIQUE` (`id` ASC))"
-  add_kill: "INSERT INTO kills (game, game_id, killed, killed_class, killer, killer_class, weapon, kill_type, date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
+  create_kills: "CREATE TABLE IF NOT EXISTS `kills` (`id` INT NOT NULL AUTO_INCREMENT, `game` INT NOT NULL, `killed` CHAR(36) NOT NULL, `killed_class` VARCHAR(256) NOT NULL, `killer` CHAR(36) NULL, `killer_class` VARCHAR(256) NULL, `weapon` VARCHAR(256) NULL, `kill_type` INT NOT NULL, `attitude` INT NOT NULL, `date` DATETIME NOT NULL, PRIMARY KEY (`id`), UNIQUE INDEX `id_UNIQUE` (`id` ASC))"
+  add_kill: "INSERT INTO kills (game, killed, killed_class, killer, killer_class, weapon, kill_type, attitude date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
 sqlite:
   ping: SELECT 1
-  create_kills: "CREATE TABLE IF NOT EXISTS `kills` (`id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, `game` VARCHAR(256) NOT NULL, `game_id` INTEGER NOT NULL, `killed` CHAR(36) NOT NULL, `killed_class` VARCHAR(256) NOT NULL, `killer` CHAR(36), `killer_class` VARCHAR(256), `weapon` VARCHAR(256), `kill_type` INTEGER NOT NULL, `date` DATETIME NOT NULL)"
-  add_kill: "INSERT INTO kills (game, game_id, killed, killed_class, killer, killer_class, weapon, kill_type, date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
+  create_kills: "CREATE TABLE IF NOT EXISTS `kills` (`id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, `game` INTEGER NOT NULL, `killed` CHAR(36) NOT NULL, `killed_class` VARCHAR(256) NOT NULL, `killer` CHAR(36), `killer_class` VARCHAR(256), `weapon` VARCHAR(256), `kill_type` INTEGER NOT NULL, `attitude` INTEGER NOT NULL, `date` DATETIME NOT NULL)"
+  add_kill: "INSERT INTO kills (game, killed, killed_class, killer, killer_class, weapon, kill_type, attitude, date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
