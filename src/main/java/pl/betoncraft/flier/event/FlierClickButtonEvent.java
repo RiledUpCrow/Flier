@@ -19,12 +19,15 @@ import pl.betoncraft.flier.core.MatchingPlayerEvent;
  */
 public class FlierClickButtonEvent extends MatchingPlayerEvent implements Cancellable {
 	
+	private static final String BUTTON = "button";
+	
 	public Button button;
 	public boolean cancel = false;
 
 	public FlierClickButtonEvent(InGamePlayer player, Button button) {
 		super(player);
 		this.button = button;
+		setString(BUTTON, button.getID());
 	}
 	
 	public Button getButton() {

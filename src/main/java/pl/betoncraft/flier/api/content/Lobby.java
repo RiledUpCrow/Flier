@@ -14,6 +14,7 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 import pl.betoncraft.flier.api.core.Arena;
+import pl.betoncraft.flier.event.FlierGameEndEvent.GameEndCause;
 
 /**
  * Represents a lobby.
@@ -30,6 +31,18 @@ public interface Lobby {
 	 * @return the ID of this lobby
 	 */
 	public String getID();
+	
+	/**
+	 * @return whenever the Lobby is open for players or not
+	 */
+	public boolean isOpen();
+	
+	/**
+	 * Opens or closes the Lobby.
+	 *
+	 * @param open whenever the Lobby should be open or closed
+	 */
+	public void setOpen(boolean open);
 
 	/**
 	 * Adds player to the lobby. Creates an InGamePlayer instance and adds the
@@ -78,8 +91,10 @@ public interface Lobby {
 	 * 
 	 * @param game
 	 *            Game to end
+	 * @param cause
+	 *            cause of the game ending
 	 */
-	public void endGame(Game game);
+	public void endGame(Game game, GameEndCause cause);
 
 	/**
 	 * @return a set with UUIDs of players in this Lobby

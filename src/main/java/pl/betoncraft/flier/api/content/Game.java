@@ -22,6 +22,7 @@ import pl.betoncraft.flier.api.core.Attacker;
 import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.SetApplier;
 import pl.betoncraft.flier.api.core.Target;
+import pl.betoncraft.flier.event.FlierGameEndEvent.GameEndCause;
 
 /**
  * Represents a game.
@@ -159,8 +160,11 @@ public interface Game {
 	/**
 	 * This method will be called by the Lobby once the game is forced to end.
 	 * It should clean up all its data so it can be freshly started again.
+	 *
+	 * @param cause
+	 *            cause of the game ending
 	 */
-	public void stop();
+	public void stop(GameEndCause cause);
 
 	/**
 	 * @return the Lobby this Game is in

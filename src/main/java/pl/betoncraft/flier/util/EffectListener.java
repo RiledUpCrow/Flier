@@ -15,6 +15,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
+import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 
 import pl.betoncraft.flier.api.Flier;
@@ -27,6 +28,9 @@ import pl.betoncraft.flier.core.MatchingPlayerEvent;
 import pl.betoncraft.flier.event.FlierClickButtonEvent;
 import pl.betoncraft.flier.event.FlierCollectBonusEvent;
 import pl.betoncraft.flier.event.FlierEngineUseEvent;
+import pl.betoncraft.flier.event.FlierGameCreateEvent;
+import pl.betoncraft.flier.event.FlierGameEndEvent;
+import pl.betoncraft.flier.event.FlierGameStartEvent;
 import pl.betoncraft.flier.event.FlierPlayerHitEvent;
 import pl.betoncraft.flier.event.FlierPlayerKillEvent;
 import pl.betoncraft.flier.event.FlierPlayerSpawnEvent;
@@ -51,7 +55,10 @@ public class EffectListener implements Listener {
 		ENGINE(true),
 		SPAWN(true),
 		BONUS(true),
-		BUTTON(true);
+		BUTTON(true),
+		GAME_CREATE(false),
+		GAME_START(false),
+		GAME_END(false);
 
 		private boolean player;
 
@@ -140,6 +147,21 @@ public class EffectListener implements Listener {
 	public void onButton(FlierClickButtonEvent event) {
 		fireEffects(EventType.BUTTON, event);
 	}
+	
+	@EventHandler
+	public void onGameCreate(FlierGameCreateEvent event) {
+		fireEffects(EventType.GAME_CREATE, event);
+	}
+	
+	@EventHandler
+	public void onGameStart(FlierGameStartEvent event) {
+		fireEffects(EventType.GAME_START, event);
+	}
+	
+	@EventHandler
+	public void onGameEnd(FlierGameEndEvent event) {
+		fireEffects(EventType.GAME_END, event);
+	}
 
 	/**
 	 * Fires Effects for specified Event type, matching the supplied event.
@@ -206,6 +228,13 @@ public class EffectListener implements Listener {
 			}
 		}
 		return true;
+	}
+	
+	/**
+	 * Unregisters this EffectListener.
+	 */
+	public void stop() {
+		HandlerList.unregisterAll(this);
 	}
 
 }

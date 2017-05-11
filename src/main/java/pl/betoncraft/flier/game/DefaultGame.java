@@ -52,17 +52,21 @@ import pl.betoncraft.flier.api.core.Arena;
 import pl.betoncraft.flier.api.core.Attacker;
 import pl.betoncraft.flier.api.core.FancyStuffWrapper;
 import pl.betoncraft.flier.api.core.InGamePlayer;
-import pl.betoncraft.flier.api.core.LoadingException;
-import pl.betoncraft.flier.api.core.NoArenaException;
 import pl.betoncraft.flier.api.core.Kit;
 import pl.betoncraft.flier.api.core.Kit.AddResult;
 import pl.betoncraft.flier.api.core.Kit.RespawnAction;
+import pl.betoncraft.flier.api.core.LoadingException;
+import pl.betoncraft.flier.api.core.NoArenaException;
 import pl.betoncraft.flier.api.core.SetApplier;
 import pl.betoncraft.flier.api.core.Target;
 import pl.betoncraft.flier.core.DefaultKit;
 import pl.betoncraft.flier.core.DefaultPlayer;
 import pl.betoncraft.flier.core.DefaultSetApplier;
 import pl.betoncraft.flier.event.FlierClickButtonEvent;
+import pl.betoncraft.flier.event.FlierGameCreateEvent;
+import pl.betoncraft.flier.event.FlierGameEndEvent;
+import pl.betoncraft.flier.event.FlierGameEndEvent.GameEndCause;
+import pl.betoncraft.flier.event.FlierGameStartEvent;
 import pl.betoncraft.flier.event.FlierPlayerKillEvent;
 import pl.betoncraft.flier.event.FlierPlayerKillEvent.KillType;
 import pl.betoncraft.flier.sidebar.Altitude;
@@ -208,6 +212,12 @@ public abstract class DefaultGame implements Listener, Game {
 		byFriendlyHitMoney = loader.loadInt("money.by_friendly_hit", 0);
 		suicideMoney = loader.loadInt("money.suicide", 0);
 		Bukkit.getPluginManager().registerEvents(this, Flier.getInstance());
+		
+		// game created, fire an event
+		if (lobby.isOpen()) {
+			FlierGameCreateEvent event = new FlierGameCreateEvent(this);
+			Bukkit.getPluginManager().callEvent(event);
+		}
 	}
 	
 	protected class GameHeartBeat extends BukkitRunnable {
@@ -545,7 +555,8 @@ public abstract class DefaultGame implements Listener, Game {
 		dataMap.values().forEach(player -> LangManager.sendMessage(player, "game_ends"));
 		// end game
 		int delay = waitingRoom.respawnDelay == 0 ? 20 * 10 : waitingRoom.respawnDelay;
-		Bukkit.getScheduler().scheduleSyncDelayedTask(Flier.getInstance(), () -> lobby.endGame(this), delay);
+		Bukkit.getScheduler().scheduleSyncDelayedTask(Flier.getInstance(),
+				() -> lobby.endGame(this, GameEndCause.FINISHED), delay);
 	}
 	
 	@Override
@@ -660,10 +671,15 @@ public abstract class DefaultGame implements Listener, Game {
 		if (waitingRoom.locking) {
 			waitingRoom.locked = true;
 		}
+		// game started, fire an event
+		if (lobby.isOpen()) {
+			FlierGameStartEvent event = new FlierGameStartEvent(this);
+			Bukkit.getPluginManager().callEvent(event);
+		}
 	}
 
 	@Override
-	public void stop() {
+	public void stop(GameEndCause cause) {
 		HandlerList.unregisterAll(this);
 		arena.setUsed(false);
 		for (Bonus bonus : bonuses) {
@@ -679,6 +695,13 @@ public abstract class DefaultGame implements Listener, Game {
 		for (InGamePlayer data : copy) {
 			removePlayer(data.getPlayer());
 		}
+		// game ended, fire an event
+		if (lobby.isOpen()) {
+			FlierGameEndEvent event = new FlierGameEndEvent(this, cause);
+			Bukkit.getPluginManager().callEvent(event);
+		}
+		// after firing the event unregister all listeners
+		listener.stop();
 	}
 	
 	@Override

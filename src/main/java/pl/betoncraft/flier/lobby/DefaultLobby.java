@@ -44,6 +44,7 @@ import pl.betoncraft.flier.api.content.Lobby;
 import pl.betoncraft.flier.api.core.Arena;
 import pl.betoncraft.flier.api.core.LoadingException;
 import pl.betoncraft.flier.api.core.NoArenaException;
+import pl.betoncraft.flier.event.FlierGameEndEvent.GameEndCause;
 import pl.betoncraft.flier.event.FlierPlayerJoinGameEvent;
 import pl.betoncraft.flier.event.FlierPlayerJoinLobbyEvent;
 import pl.betoncraft.flier.util.LangManager;
@@ -59,6 +60,7 @@ public abstract class DefaultLobby implements Lobby, Listener {
 	
 	protected ValueLoader loader;
 	protected String id;
+	protected boolean open = false;
 
 	protected Map<String, Set<Game>> gameSets = new HashMap<>();
 	protected Map<String, Arena> arenas = new HashMap<>();
@@ -82,7 +84,7 @@ public abstract class DefaultLobby implements Lobby, Listener {
 		for (String gameName : gameNames) {
 			try {
 				Game game = flier.getGame(gameName, this);
-				game.stop();
+				game.stop(GameEndCause.ABORTED);
 			} catch (NoArenaException e) {
 				throw new LoadingException(String.format(
 						"Game '%s' does not have any viable arena to be played on.", gameName));
@@ -96,15 +98,27 @@ public abstract class DefaultLobby implements Lobby, Listener {
 			autoJoinGame = loader.loadString("autojoin");
 			if (!gameSets.containsKey(autoJoinGame)) {
 				throw new LoadingException(
-						String.format("Automatic joining impossible because game '%s' is not on the list.", autoJoinGame));
+						String.format("Automatic joining impossible because game '%s' is not on the list.",
+								autoJoinGame));
 			}
 		}
 		Bukkit.getPluginManager().registerEvents(this, Flier.getInstance());
+		open = true;
 	}
 	
 	@Override
 	public String getID() {
 		return id;
+	}
+	
+	@Override
+	public boolean isOpen() {
+		return open;
+	}
+	
+	@Override
+	public void setOpen(boolean open) {
+		this.open = open;
 	}
 
 	@Override
@@ -191,7 +205,7 @@ public abstract class DefaultLobby implements Lobby, Listener {
 							Flier.getInstance().getPlayers().put(player.getUniqueId(), game.addPlayer(player));
 							return JoinResult.GAME_CREATED;
 						} else {
-							game.stop();
+							game.stop(GameEndCause.ABORTED);
 							return JoinResult.BLOCKED;
 						}
 					} catch (NoArenaException e) {
@@ -221,7 +235,7 @@ public abstract class DefaultLobby implements Lobby, Listener {
 				if (game.getPlayers().containsKey(player.getUniqueId())) {
 					game.removePlayer(player);
 					if (game.getPlayers().isEmpty()) {
-						endGame(game);
+						endGame(game, GameEndCause.ABANDONED);
 					}
 					break loop;
 				}
@@ -230,8 +244,8 @@ public abstract class DefaultLobby implements Lobby, Listener {
 	}
 	
 	@Override
-	public void endGame(Game game) {
-		game.stop();
+	public void endGame(Game game, GameEndCause cause) {
+		game.stop(cause);
 		game.getArena().setUsed(false);
 		gameSets.get(game.getID()).remove(game);
 	}
@@ -281,10 +295,13 @@ public abstract class DefaultLobby implements Lobby, Listener {
 	
 	@Override
 	public void stop() {
+		// abort all games
+		gameSets.values().forEach(set -> set.forEach(game -> endGame(game, GameEndCause.ABORTED)));
+		// move players out of the lobby
 		for (Player player : players.stream().map(uuid -> Bukkit.getPlayer(uuid)).collect(Collectors.toList())) {
 			removePlayer(player);
 		}
-		// no need to stop the game, it's not running without players
+		// unregister the listener
 		HandlerList.unregisterAll(this);
 	}
 	

@@ -27,7 +27,6 @@ public class FlierCollectBonusEvent extends MatchingPlayerEvent implements Cance
 	public FlierCollectBonusEvent(InGamePlayer player, Bonus bonus) {
 		super(player);
 		this.bonus = bonus;
-		parsePlayer(player, "");
 		setString(BONUS, bonus.getID());
 	}
 	
