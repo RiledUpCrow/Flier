@@ -235,6 +235,12 @@ public abstract class DefaultGame implements Listener, Game {
 			}
 			if (running) {
 				for (InGamePlayer data : getPlayers().values()) {
+					// invisibility fix
+					if (tickCounter % 20 == 0) {
+						getPlayers().values().stream().filter(other -> !other.equals(data)).forEach(other -> {
+							data.getPlayer().showPlayer(other.getPlayer());
+						});
+					}
 					Location loc = data.getPlayer().getLocation();
 					// height damage
 					if (loc.getBlockX() < minX || loc.getBlockX() > maxX ||
