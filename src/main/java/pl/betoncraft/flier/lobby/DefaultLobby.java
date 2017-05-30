@@ -42,6 +42,7 @@ import pl.betoncraft.flier.api.Flier;
 import pl.betoncraft.flier.api.content.Game;
 import pl.betoncraft.flier.api.content.Lobby;
 import pl.betoncraft.flier.api.core.Arena;
+import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.LoadingException;
 import pl.betoncraft.flier.api.core.NoArenaException;
 import pl.betoncraft.flier.event.FlierGameEndEvent.GameEndCause;
@@ -232,10 +233,17 @@ public abstract class DefaultLobby implements Lobby, Listener {
 		loop: for (Set<Game> set : gameSets.values()) {
 			for (Iterator<Game> it = set.iterator(); it.hasNext();) {
 				Game game = it.next();
-				if (game.getPlayers().containsKey(player.getUniqueId())) {
+				InGamePlayer data = game.getPlayers().get(player.getUniqueId());
+				if (data != null) {
 					game.removePlayer(player);
 					if (game.getPlayers().isEmpty()) {
 						endGame(game, GameEndCause.ABANDONED);
+					} else {
+						game.getPlayers().values().stream()
+								.filter(
+										inGame -> inGame.getAttacker() != null &&
+										inGame.getAttacker().getShooter().equals(data)
+								).forEach(inGame -> inGame.setAttacker(null));
 					}
 					break loop;
 				}
