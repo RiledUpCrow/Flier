@@ -80,11 +80,15 @@ public class Utils {
 	 */
 	public static String formatPlayer(InGamePlayer player, InGamePlayer receiver) {
 		Kit kit = player.getKit();
-		String className = kit.getClassName().startsWith("$") ?
-				LangManager.getMessage(receiver, kit.getClassName().substring(1)) :
-				kit.getClassName();
+		String className = kit.getClassName();
+		if (className != null) {
+			className = className.startsWith("$") ?
+					LangManager.getMessage(receiver, kit.getClassName().substring(1)) :
+					kit.getClassName();
+		}
 		String name = player.getPlayer().getName();
-		return player.getColor() + name + ChatColor.WHITE + " (" + ChatColor.AQUA + className + ChatColor.WHITE + ")";
+		return player.getColor() + name + (className == null ? "" :
+						ChatColor.WHITE + " (" + ChatColor.AQUA + className + ChatColor.WHITE + ")");
 	}
 	
 	public static String formatTarget(Target target, InGamePlayer receiver) {
