@@ -6,6 +6,8 @@
  */
 package pl.betoncraft.flier.bonus;
 
+import java.util.Optional;
+
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -14,6 +16,7 @@ import pl.betoncraft.flier.api.Flier;
 import pl.betoncraft.flier.api.content.Game;
 import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.LoadingException;
+import pl.betoncraft.flier.api.core.UsableItem;
 
 /**
  * A Bonus without physical manifestation, activated by proximity.
@@ -26,8 +29,9 @@ public class ProximityBonus extends DefaultBonus {
 	protected final double distance;
 	protected BukkitRunnable checker;
 
-	public ProximityBonus(ConfigurationSection section, Game game) throws LoadingException {
-		super(section, game);
+	public ProximityBonus(ConfigurationSection section, Game game, Optional<InGamePlayer> creator,
+			Optional<UsableItem> item) throws LoadingException {
+		super(section, game, creator, item);
 		distance = Math.pow(loader.loadNonNegativeDouble("distance"), 2);
 		location = game.getArena().getLocation(loader.loadString("location"));
 	}

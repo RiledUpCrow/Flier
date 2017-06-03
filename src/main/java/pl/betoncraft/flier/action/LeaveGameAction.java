@@ -6,6 +6,8 @@
  */
 package pl.betoncraft.flier.action;
 
+import java.util.Optional;
+
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 
@@ -21,13 +23,13 @@ import pl.betoncraft.flier.api.core.UsableItem;
 public class LeaveGameAction extends DefaultAction {
 
 	public LeaveGameAction(ConfigurationSection section) {
-		super(section);
+		super(section, false, false);
 	}
 
 	@Override
-	public boolean act(InGamePlayer player, UsableItem item) {
+	public boolean act(Optional<InGamePlayer> source, InGamePlayer target, Optional<UsableItem> item) {
 		Bukkit.getScheduler().scheduleSyncDelayedTask(Flier.getInstance(),
-				() -> player.getGame().getLobby().leaveGame(player.getPlayer()));
+				() -> target.getGame().getLobby().leaveGame(target.getPlayer()));
 		return true;
 	}
 

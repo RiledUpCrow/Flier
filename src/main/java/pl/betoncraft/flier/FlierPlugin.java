@@ -9,6 +9,7 @@ package pl.betoncraft.flier;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -128,9 +129,9 @@ public class FlierPlugin extends JavaPlugin implements Flier {
 		registerLobby("physicalLobby", s -> new PhysicalLobby(s));
 		registerGame("teamDeathMatch", (s, l) -> new TeamDeathMatch(s, l));
 		registerGame("deathMatch", (s, l) -> new DeathMatchGame(s, l));
-		registerBonus("entity", (s, g) -> new EntityBonus(s, g));
-		registerBonus("invisible", (s, g) -> new ProximityBonus(s, g));
-		registerBonus("target", (s, g) -> new TargetBonus(s, g));
+		registerBonus("entity", (s, g, c, i) -> new EntityBonus(s, g, c, i));
+		registerBonus("invisible", (s, g, c, i) -> new ProximityBonus(s, g, c, i));
+		registerBonus("target", (s, g, c, i) -> new TargetBonus(s, g, c, i));
 		registerAction("leave", s -> new LeaveGameAction(s));
 		registerAction("projectileGun", s -> new ProjectileGun(s));
 		registerAction("particleGun", s -> new ParticleGun(s));
@@ -400,14 +401,15 @@ public class FlierPlugin extends JavaPlugin implements Flier {
 	}
 	
 	@Override
-	public Bonus getBonus(String id, Game game) throws LoadingException {
+	public Bonus getBonus(String id, Game game, Optional<InGamePlayer> creator, Optional<UsableItem> item)
+			throws LoadingException {
 		String name = "bonus";
 		ConfigurationSection section = getSection(configManager.getBonuses(), id, name);
 		String type = getType(section);
 		BonusFactory factory = getBonusFactory(type);
 		checkFactory(factory, name, type);
 		try {
-			return factory.get(section, game);
+			return factory.get(section, game, creator, item);
 		} catch (LoadingException e) {
 			throw loadingError(e, id, name);
 		}

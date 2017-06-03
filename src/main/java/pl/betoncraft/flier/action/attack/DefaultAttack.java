@@ -38,7 +38,7 @@ public abstract class DefaultAttack extends DefaultAction implements Attack {
 	protected final boolean isExploding;
 	
 	public DefaultAttack(ConfigurationSection section) throws LoadingException {
-		super(section);
+		super(section, true, false);
 		damage = loader.loadDouble(DAMAGE);
 		physicalDamage = loader.loadDouble(PHYSICAL_DAMAGE);
 		noDamageTicks = loader.loadPositiveInt(NO_DAMAGE_TICKS, 20);

@@ -6,6 +6,7 @@
  */
 package pl.betoncraft.flier.action.attack;
 
+import java.util.Optional;
 import java.util.Random;
 
 import org.bukkit.Location;
@@ -85,7 +86,7 @@ public class ParticleGun extends DefaultAttack {
 	}
 	
 	@Override
-	public boolean act(InGamePlayer data, UsableItem weapon) {
+	public boolean act(Optional<InGamePlayer> source, InGamePlayer target, Optional<UsableItem> item) {
 
 		new BukkitRunnable() {
 			
@@ -112,15 +113,15 @@ public class ParticleGun extends DefaultAttack {
 				burstAmount -= am;
 				
 				// get starting values
-				Location start = (data.getPlayer().isGliding() ?
-								data.getPlayer().getLocation() :
-								data.getPlayer().getEyeLocation()
-						).add(data.getPlayer().getVelocity())
-						.add(data.getPlayer().getLocation().getDirection());
+				Location start = (target.getPlayer().isGliding() ?
+								target.getPlayer().getLocation() :
+								target.getPlayer().getEyeLocation()
+						).add(target.getPlayer().getVelocity())
+						.add(target.getPlayer().getLocation().getDirection());
 				
 				// launch projectiles
 				for (int i = 0; i < am; i++) {
-					new ParticleTracker(start.clone(), data, projectileSpeed, proximity, spread, range, weapon);
+					new ParticleTracker(start.clone(), target, projectileSpeed, proximity, spread, range, item.orElse(null));
 				}
 			}
 			

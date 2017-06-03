@@ -7,6 +7,7 @@
 package pl.betoncraft.flier.bonus;
 
 import java.util.Arrays;
+import java.util.Optional;
 
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
@@ -20,7 +21,9 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import pl.betoncraft.flier.api.Flier;
 import pl.betoncraft.flier.api.content.Game;
+import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.LoadingException;
+import pl.betoncraft.flier.api.core.UsableItem;
 
 /**
  * An entity based Bonus type.
@@ -33,8 +36,9 @@ public class EntityBonus extends ProximityBonus implements Listener {
 	protected Entity entity;
 	protected BukkitRunnable rotator;
 	
-	public EntityBonus(ConfigurationSection section, Game game) throws LoadingException {
-		super(section, game);
+	public EntityBonus(ConfigurationSection section, Game game, Optional<InGamePlayer> creator,
+			Optional<UsableItem> item) throws LoadingException {
+		super(section, game, creator, item);
 		type = loader.loadEnum("entity", EntityType.class);
 	}
 

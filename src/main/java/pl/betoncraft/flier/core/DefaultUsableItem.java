@@ -8,6 +8,7 @@ package pl.betoncraft.flier.core;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
@@ -186,7 +187,7 @@ public class DefaultUsableItem extends DefaultItem implements UsableItem {
 				}
 				setAmmo(ammo - usage.getAmmoUse());
 				for (Action action : usage.getActions()) {
-					action.act(player, this);
+					action.act(Optional.of(player), player, Optional.of(this));
 				}
 			}
 		}

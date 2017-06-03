@@ -6,6 +6,8 @@
  */
 package pl.betoncraft.flier.action;
 
+import java.util.Optional;
+
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Entity;
@@ -28,24 +30,24 @@ public class LaunchAction extends DefaultAction {
 	private final double speed;
 
 	public LaunchAction(ConfigurationSection section) throws LoadingException {
-		super(section);
+		super(section, false, false);
 		speed = loader.loadPositiveDouble(SPEED);
 	}
 
 	@Override
-	public boolean act(InGamePlayer player, UsableItem item) {
+	public boolean act(Optional<InGamePlayer> source, InGamePlayer target, Optional<UsableItem> item) {
 		Runnable launch = () -> {
-			Vector vel = player.getPlayer().getLocation().getDirection().multiply(modMan.modifyNumber(SPEED, speed));
-			player.getPlayer().setVelocity(vel);
-			if (!player.getPlayer().isGliding()) {
+			Vector vel = target.getPlayer().getLocation().getDirection().multiply(modMan.modifyNumber(SPEED, speed));
+			target.getPlayer().setVelocity(vel);
+			if (!target.getPlayer().isGliding()) {
 				Bukkit.getScheduler().runTask(Flier.getInstance(), () -> {
-					player.getPlayer().setGliding(true);
-					player.getPlayer().setVelocity(vel);
+					target.getPlayer().setGliding(true);
+					target.getPlayer().setVelocity(vel);
 				});
 			}
 		};
-		if (((Entity) player.getPlayer()).isOnGround()) {
-			player.getPlayer().setVelocity(new Vector(0, 2, 0));
+		if (((Entity) target.getPlayer()).isOnGround()) {
+			target.getPlayer().setVelocity(new Vector(0, 2, 0));
 			Bukkit.getScheduler().runTaskLater(Flier.getInstance(), launch, 5);
 		} else {
 			launch.run();

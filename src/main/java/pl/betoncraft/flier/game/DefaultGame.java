@@ -16,6 +16,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
@@ -180,7 +181,7 @@ public abstract class DefaultGame implements Listener, Game {
 		respawnAction = loader.loadEnum("respawn_action", RespawnAction.class);
 		waitingRoom = new WaitingRoom(this);
 		for (String bonusName : section.getStringList("bonuses")) {
-			bonuses.add(flier.getBonus(bonusName, this));
+			bonuses.add(flier.getBonus(bonusName, this, Optional.empty(), Optional.empty()));
 		}
 		ConfigurationSection buttonsSection = section.getConfigurationSection("buttons");
 		if (buttonsSection != null) for (String button : buttonsSection.getKeys(false)) {

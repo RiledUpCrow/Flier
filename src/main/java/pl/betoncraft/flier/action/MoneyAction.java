@@ -6,6 +6,8 @@
  */
 package pl.betoncraft.flier.action;
 
+import java.util.Optional;
+
 import org.bukkit.configuration.ConfigurationSection;
 
 import pl.betoncraft.flier.api.core.InGamePlayer;
@@ -24,13 +26,13 @@ public class MoneyAction extends DefaultAction {
 	private final int money;
 
 	public MoneyAction(ConfigurationSection section) throws LoadingException {
-		super(section);
+		super(section, false, false);
 		money = loader.loadInt(MONEY);
 	}
 
 	@Override
-	public boolean act(InGamePlayer player, UsableItem item) {
-		player.setMoney(player.getMoney() + (int) modMan.modifyNumber(MONEY, money));
+	public boolean act(Optional<InGamePlayer> source, InGamePlayer target, Optional<UsableItem> item) {
+		target.setMoney(target.getMoney() + (int) modMan.modifyNumber(MONEY, money));
 		return true;
 	}
 

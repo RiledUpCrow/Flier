@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
@@ -22,6 +23,7 @@ import pl.betoncraft.flier.api.content.Bonus;
 import pl.betoncraft.flier.api.content.Game;
 import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.LoadingException;
+import pl.betoncraft.flier.api.core.UsableItem;
 import pl.betoncraft.flier.event.FlierCollectBonusEvent;
 import pl.betoncraft.flier.util.ValueLoader;
 
@@ -34,6 +36,8 @@ public abstract class DefaultBonus implements Bonus {
 	
 	protected final ValueLoader loader;
 	protected final String id;
+	protected final Optional<InGamePlayer> creator;
+	protected final Optional<UsableItem> item;
 	
 	protected final boolean consumable;
 	protected final int cooldown;
@@ -47,16 +51,28 @@ public abstract class DefaultBonus implements Bonus {
 	protected int ticks = 0;
 	protected BukkitRunnable ticker;
 	
-	public DefaultBonus(ConfigurationSection section, Game game) throws LoadingException {
+	public DefaultBonus(ConfigurationSection section, Game game, Optional<InGamePlayer> creator,
+			Optional<UsableItem> item) throws LoadingException {
 		id = section.getName();
 		this.game = game;
+		this.creator = creator;
+		this.item = item;
 		loader = new ValueLoader(section);
 		consumable = loader.loadBoolean("consumable");
 		cooldown = loader.loadNonNegativeInt("cooldown");
 		respawn = loader.loadNonNegativeInt("respawn", 0);
 		Flier flier = Flier.getInstance();
 		for (String id : section.getStringList("actions")) {
-			actions.add(flier.getAction(id));
+			Action action = flier.getAction(id);
+			if (action.needsItem() && !item.isPresent()) {
+				throw new LoadingException(
+						String.format("Action '%s' needs to be fired from an item, thus can't be used in a bonus.", id));
+			}
+			if (action.needsSource() && !creator.isPresent()) {
+				throw new LoadingException(
+						String.format("Action '%s' needs to be fired by a player, thus can't be used in a bonus.", id));
+			}
+			actions.add(action);
 		}
 	}
 	
@@ -171,7 +187,7 @@ public abstract class DefaultBonus implements Bonus {
 	private boolean use(InGamePlayer player) {
 		boolean used = false;
 		for (Action action : actions) {
-			if (action.act(player, null)) {
+			if (action.act(creator, player, item)) {
 				used = true;
 			}
 		}

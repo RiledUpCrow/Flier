@@ -8,6 +8,7 @@ package pl.betoncraft.flier.action;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -32,7 +33,7 @@ public class EffectAction extends DefaultAction {
 	private final int duration;
 
 	public EffectAction(ConfigurationSection section) throws LoadingException {
-		super(section);
+		super(section, false, false);
 		Flier flier = Flier.getInstance();
 		for (String actionName : section.getStringList("actions")) {
 			actions.add(flier.getAction(actionName));
@@ -41,7 +42,7 @@ public class EffectAction extends DefaultAction {
 	}
 
 	@Override
-	public boolean act(InGamePlayer player, UsableItem item) {
+	public boolean act(Optional<InGamePlayer> source, InGamePlayer target, Optional<UsableItem> item) {
 		new BukkitRunnable() {
 			private int i = (int) modMan.modifyNumber(DURATION, EffectAction.this.duration);
 			@Override
@@ -50,7 +51,7 @@ public class EffectAction extends DefaultAction {
 					cancel();
 				}
 				for (Action action : actions) {
-					action.act(player, item);
+					action.act(source, target, item);
 				}
 			}
 		}.runTaskTimer(Flier.getInstance(), 0, 1);

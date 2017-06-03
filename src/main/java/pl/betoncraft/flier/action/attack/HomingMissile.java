@@ -6,6 +6,8 @@
  */
 package pl.betoncraft.flier.action.attack;
 
+import java.util.Optional;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -70,8 +72,8 @@ public class HomingMissile extends DefaultAttack {
 	}
 
 	@Override
-	public boolean act(InGamePlayer data, UsableItem weapon) {
-		Player player = data.getPlayer();
+	public boolean act(Optional<InGamePlayer> source, InGamePlayer target, Optional<UsableItem> item) {
+		Player player = target.getPlayer();
 		double speed = modMan.modifyNumber(SPEED, this.speed);
 		Vector velocity = player.getLocation().getDirection().clone().multiply(speed);
 		Vector pointer = player.getLocation().getDirection().clone().multiply(player.getVelocity().length() * 3);
@@ -81,7 +83,7 @@ public class HomingMissile extends DefaultAttack {
 		missile.setShooter(player);
 		missile.setGravity(false);
 		missile.setGlowing(true);
-		Attacker.saveAttacker(missile, new DefaultAttacker(HomingMissile.this, data, weapon));
+		Attacker.saveAttacker(missile, new DefaultAttacker(HomingMissile.this, target, item.orElse(null)));
 		new BukkitRunnable() {
 			int i = 0;
 			Location lastLoc;
@@ -125,25 +127,28 @@ public class HomingMissile extends DefaultAttack {
 				ImmutableVector direction = vec.normalize();
 				Location searchCenter = missile.getLocation().clone().add(direction.multiply(radius).toVector());
 				// find a target in the area
-				Target target = null;
+				Target missileTarget = null;
 				double distance = radiusSqr;
-				for (Target t : data.getGame().getTargets().values()) {
+				for (Target t : target.getGame().getTargets().values()) {
 					// skip the player if he shouldn't be targeted
-					Attitude attitude = data.getGame().getAttitude(t, data);
+					Attitude attitude = missileTarget.getGame().getAttitude(t, missileTarget);
 					if (attitude == Attitude.NEUTRAL) {
 						continue;
 					}
 					if (!friendlyFire && attitude == Attitude.FRIENDLY) {
 						continue;
 					}
-					if (!suicidal && data.equals(t)) {
+					if (!suicidal && missileTarget.equals(t)) {
 						continue;
 					}
 					// get the nearest player
 					double d = t.getLocation().distanceSquared(searchCenter);
 					if (d < distance) {
-						target = t;
+						missileTarget = t;
 						distance = d;
+						// TODO decoys will be trivial to implement if it always tracked
+						// nearest target, so this should probably be removed...
+						// 
 						// if the missile tracked someone previously and he's still in the area,
 						// it should track him even if he's not the closest one
 						if (nearest != null && t.equals(nearest)) {
@@ -151,7 +156,7 @@ public class HomingMissile extends DefaultAttack {
 						}
 					}
 				}
-				nearest = target;
+				nearest = missileTarget;
 				ImmutableVector newVec;
 				if (nearest != null) {
 					// target found, fly towards it

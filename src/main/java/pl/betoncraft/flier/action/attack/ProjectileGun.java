@@ -8,6 +8,7 @@ package pl.betoncraft.flier.action.attack;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Map.Entry;
 
 import org.bukkit.Bukkit;
@@ -66,8 +67,8 @@ public class ProjectileGun extends DefaultAttack {
 	}
 	
 	@Override
-	public boolean act(InGamePlayer data, UsableItem weapon) {
-		Player player = data.getPlayer();
+	public boolean act(Optional<InGamePlayer> source, InGamePlayer target, Optional<UsableItem> item) {
+		Player player = target.getPlayer();
 		int burstAmount = (int) modMan.modifyNumber(BURST_AMOUNT, this.burstAmount);
 		Map<Projectile, Vector> projectiles = new HashMap<>(burstAmount);
 		new BukkitRunnable() {
@@ -90,7 +91,7 @@ public class ProjectileGun extends DefaultAttack {
 					explosive.setIsIncendiary(false);
 					explosive.setYield(0);
 				}
-				Attacker.saveAttacker(projectile, new DefaultAttacker(ProjectileGun.this, data, weapon));
+				Attacker.saveAttacker(projectile, new DefaultAttacker(ProjectileGun.this, target, item.orElse(null)));
 				projectiles.put(projectile, velocity);
 				counter --;
 				if (counter <= 0) {

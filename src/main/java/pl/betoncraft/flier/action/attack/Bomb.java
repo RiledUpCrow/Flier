@@ -6,6 +6,8 @@
  */
 package pl.betoncraft.flier.action.attack;
 
+import java.util.Optional;
+
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.EntityType;
@@ -50,12 +52,12 @@ public class Bomb extends DefaultAttack {
 	}
 
 	@Override
-	public boolean act(InGamePlayer player, UsableItem weapon) {
-		TNTPrimed tnt = (TNTPrimed) player.getPlayer().getWorld().spawnEntity(
-				player.getPlayer().getLocation(), EntityType.PRIMED_TNT);
-		Attacker.saveAttacker(tnt, new DefaultAttacker(this, player, weapon));
+	public boolean act(Optional<InGamePlayer> source, InGamePlayer target, Optional<UsableItem> item) {
+		TNTPrimed tnt = (TNTPrimed) target.getPlayer().getWorld().spawnEntity(
+				target.getPlayer().getLocation(), EntityType.PRIMED_TNT);
+		Attacker.saveAttacker(tnt, new DefaultAttacker(this, target, item.orElse(null)));
 		tnt.setIsIncendiary(false);
-		tnt.setVelocity(player.getPlayer().getVelocity());
+		tnt.setVelocity(target.getPlayer().getVelocity());
 		tnt.setYield((float) modMan.modifyNumber(POWER, yield));
 		tnt.setFuseTicks((int) modMan.modifyNumber(FUSE, fuse));
 		return true;

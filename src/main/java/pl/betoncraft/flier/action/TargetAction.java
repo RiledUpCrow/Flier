@@ -6,6 +6,8 @@
  */
 package pl.betoncraft.flier.action;
 
+import java.util.Optional;
+
 import org.bukkit.configuration.ConfigurationSection;
 
 import pl.betoncraft.flier.api.content.Game.Attitude;
@@ -25,29 +27,29 @@ public class TargetAction extends DefaultAction {
 	private final Attitude target;
 	
 	public TargetAction(ConfigurationSection section) throws LoadingException {
-		super(section);
+		super(section, false, false);
 		this.target = loader.loadEnum(TARGET, Attitude.HOSTILE, Attitude.class);
 	}
 
 	@Override
-	public boolean act(InGamePlayer data, UsableItem item) {
-		if (data.isPlaying()) {
+	public boolean act(Optional<InGamePlayer> source, InGamePlayer player, Optional<UsableItem> item) {
+		if (player.isPlaying()) {
 			InGamePlayer nearest = null;
 			double distance = 0;
 			Attitude target = modMan.modifyEnum(TARGET, this.target);
-			for (InGamePlayer d : data.getGame().getPlayers().values()) {
-				if (data.getGame().getAttitude(d, data) == target) {
-					double dist = data.getPlayer().getLocation().distanceSquared(d.getPlayer().getLocation());
+			for (InGamePlayer data : player.getGame().getPlayers().values()) {
+				if (player.getGame().getAttitude(data, player) == target) {
+					double dist = player.getPlayer().getLocation().distanceSquared(data.getPlayer().getLocation());
 					if (distance == 0 || dist < distance) {
 						distance = dist;
-						nearest = d;
+						nearest = data;
 					}
 				}
 			}
 			if (nearest != null) {
-				data.getPlayer().setCompassTarget(nearest.getPlayer().getLocation());
+				player.getPlayer().setCompassTarget(nearest.getPlayer().getLocation());
 			} else {
-				data.getPlayer().setCompassTarget(data.getGame().getCenter());
+				player.getPlayer().setCompassTarget(player.getGame().getCenter());
 			}
 		}
 		return true;

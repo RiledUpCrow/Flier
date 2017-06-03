@@ -7,6 +7,7 @@
 package pl.betoncraft.flier.api;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
@@ -133,12 +134,21 @@ public interface Flier extends Plugin {
 	public Activator getActivator(String id) throws LoadingException;
 
 	/**
-	 * @param id ID of the Bonus
+	 * @param id
+	 *            ID of the Bonus
+	 * @param game
+	 *            the Game in which this Bonus was created
+	 * @param creator
+	 *            optional player who created this Bonus
+	 * @param item
+	 *            optional item used while creating this Bonus
 	 * @return the Bonus with specified name, never null
 	 * @throws LoadingException
-	 *             when the Bonus cannot be created due to an error, type is not defined or Bonus is not defined
+	 *             when the Bonus cannot be created due to an error, type is not
+	 *             defined or Bonus is not defined
 	 */
-	public Bonus getBonus(String id, Game game) throws LoadingException;
+	public Bonus getBonus(String id, Game game, Optional<InGamePlayer> creator, Optional<UsableItem> item)
+			throws LoadingException;
 	
 	/**
 	 * @param id ID of the Modification
@@ -341,7 +351,8 @@ public interface Flier extends Plugin {
 	}
 	
 	public interface BonusFactory {
-		public Bonus get(ConfigurationSection settings, Game game) throws LoadingException;
+		public Bonus get(ConfigurationSection settings, Game game, Optional<InGamePlayer> creator, Optional<UsableItem> item)
+				throws LoadingException;
 	}
 	
 	public interface ActionFactory {

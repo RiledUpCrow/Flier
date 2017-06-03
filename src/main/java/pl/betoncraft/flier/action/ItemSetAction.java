@@ -6,6 +6,7 @@
  */
 package pl.betoncraft.flier.action;
 
+import java.util.Optional;
 import java.util.Set;
 
 import org.bukkit.configuration.ConfigurationSection;
@@ -35,16 +36,16 @@ public class ItemSetAction extends DefaultAction {
 	);
 
 	public ItemSetAction(ConfigurationSection section) throws LoadingException {
-		super(section);
+		super(section, false, false);
 		applier = new DefaultSetApplier(section);
 	}
 
 	@Override
-	public boolean act(InGamePlayer player, UsableItem item) {
+	public boolean act(Optional<InGamePlayer> source, InGamePlayer target, Optional<UsableItem> item) {
 		if (accepted.contains(applier.isSaving() ?
-				player.getKit().addStored(applier) :
-				player.getKit().addCurrent(applier))) {
-			player.updateKit();
+				target.getKit().addStored(applier) :
+				target.getKit().addCurrent(applier))) {
+			target.updateKit();
 			return true;
 		}
 		return false;

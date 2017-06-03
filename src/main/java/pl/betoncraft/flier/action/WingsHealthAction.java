@@ -6,6 +6,8 @@
  */
 package pl.betoncraft.flier.action;
 
+import java.util.Optional;
+
 import org.bukkit.configuration.ConfigurationSection;
 
 import pl.betoncraft.flier.api.content.Wings;
@@ -25,13 +27,13 @@ public class WingsHealthAction extends DefaultAction {
 	private double amount;
 
 	public WingsHealthAction(ConfigurationSection section) throws LoadingException {
-		super(section);
+		super(section, false, false);
 		amount = loader.loadDouble(AMOUNT);
 	}
 
 	@Override
-	public boolean act(InGamePlayer player, UsableItem item) {
-		Wings wings = player.getKit().getWings();
+	public boolean act(Optional<InGamePlayer> source, InGamePlayer target, Optional<UsableItem> item) {
+		Wings wings = target.getKit().getWings();
 		double amount = modMan.modifyNumber(AMOUNT, this.amount);
 		if (amount >= 0) {
 			return wings.addHealth(amount);

@@ -6,6 +6,8 @@
  */
 package pl.betoncraft.flier.action;
 
+import java.util.Optional;
+
 import org.bukkit.configuration.ConfigurationSection;
 
 import pl.betoncraft.flier.api.core.InGamePlayer;
@@ -21,13 +23,13 @@ import pl.betoncraft.flier.util.Position;
 public class SuicideAction extends DefaultAction {
 
 	public SuicideAction(ConfigurationSection section) {
-		super(section);
+		super(section, false, false);
 	}
 
 	@Override
-	public boolean act(InGamePlayer player, UsableItem item) {
-		if (Position.check(player.getPlayer(), Where.NO_FALL)) {
-			player.getPlayer().damage(player.getPlayer().getHealth() * 100);
+	public boolean act(Optional<InGamePlayer> source, InGamePlayer target, Optional<UsableItem> item) {
+		if (Position.check(target.getPlayer(), Where.NO_FALL)) {
+			target.getPlayer().damage(target.getPlayer().getHealth() * 100);
 			return true;
 		}
 		return false;

@@ -6,6 +6,8 @@
  */
 package pl.betoncraft.flier.action;
 
+import java.util.Optional;
+
 import org.bukkit.configuration.ConfigurationSection;
 
 import pl.betoncraft.flier.api.core.InGamePlayer;
@@ -24,23 +26,23 @@ public class HealthAction extends DefaultAction {
 	private double amount;
 
 	public HealthAction(ConfigurationSection section) throws LoadingException {
-		super(section);
+		super(section, false, false);
 		amount = loader.loadDouble(AMOUNT);
 	}
 
 	@Override
-	public boolean act(InGamePlayer player, UsableItem item) {
+	public boolean act(Optional<InGamePlayer> source, InGamePlayer target, Optional<UsableItem> item) {
 		if (amount < 0) {
-			player.getPlayer().damage(amount);
+			target.getPlayer().damage(amount);
 			return true;
 		}
 		if (amount > 0) {
-			double max = player.getPlayer().getMaxHealth();
-			double newHealth = player.getPlayer().getHealth() + amount;
+			double max = target.getPlayer().getMaxHealth();
+			double newHealth = target.getPlayer().getHealth() + amount;
 			if (newHealth > max) {
 				newHealth = max;
 			}
-			player.getPlayer().setHealth(newHealth);
+			target.getPlayer().setHealth(newHealth);
 			return true;
 		}
 		return false;

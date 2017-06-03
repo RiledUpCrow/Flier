@@ -37,7 +37,7 @@ public class SprintStartingAction extends DefaultAction {
 	private Optional<Location> lastLoc = Optional.empty();
 
 	public SprintStartingAction(ConfigurationSection section) throws LoadingException {
-		super(section);
+		super(section, false, false);
 		max = (float) loader.loadPositiveDouble("max", (double) WALK_SPEED * 4);
 		if (max > 1) {
 			throw new LoadingException("Value of 'max' speed must be lower than 1");
@@ -46,8 +46,8 @@ public class SprintStartingAction extends DefaultAction {
 	}
 
 	@Override
-	public boolean act(InGamePlayer data, UsableItem item) {
-		Player player = data.getPlayer();
+	public boolean act(Optional<InGamePlayer> source, InGamePlayer target, Optional<UsableItem> item) {
+		Player player = target.getPlayer();
 		if (player.isSprinting() && ((Entity) player).isOnGround()) {
 			Location loc = player.getLocation().clone();
 			Vector vec;

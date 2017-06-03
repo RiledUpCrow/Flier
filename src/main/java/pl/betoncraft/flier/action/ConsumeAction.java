@@ -6,6 +6,8 @@
  */
 package pl.betoncraft.flier.action;
 
+import java.util.Optional;
+
 import org.bukkit.configuration.ConfigurationSection;
 
 import pl.betoncraft.flier.api.Flier;
@@ -23,13 +25,13 @@ public class ConsumeAction extends DefaultAction {
 	private UsableItem item;
 
 	public ConsumeAction(ConfigurationSection section) throws LoadingException {
-		super(section);
+		super(section, false, false);
 		item = Flier.getInstance().getItem(loader.loadString("item"));
 	}
 
 	@Override
-	public boolean act(InGamePlayer player, UsableItem item) {
-		player.consumeItem(this.item);
+	public boolean act(Optional<InGamePlayer> source, InGamePlayer target, Optional<UsableItem> item) {
+		target.consumeItem(this.item);
 		return true;
 	}
 

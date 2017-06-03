@@ -6,14 +6,18 @@
  */
 package pl.betoncraft.flier.bonus;
 
+import java.util.Optional;
+
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.util.Vector;
 
 import pl.betoncraft.flier.api.content.Game;
 import pl.betoncraft.flier.api.core.Attacker;
+import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.LoadingException;
 import pl.betoncraft.flier.api.core.Target;
+import pl.betoncraft.flier.api.core.UsableItem;
 
 /**
  * An entity based Bonus type which also gets collected upon being hit with a
@@ -26,8 +30,9 @@ public class TargetBonus extends EntityBonus implements Target {
 	protected Attacker attacker;
 	protected int noDamageTicks = 0;
 
-	public TargetBonus(ConfigurationSection section, Game game) throws LoadingException {
-		super(section, game);
+	public TargetBonus(ConfigurationSection section, Game game, Optional<InGamePlayer> creator,
+			Optional<UsableItem> item) throws LoadingException {
+		super(section, game, creator, item);
 	}
 	
 	@Override

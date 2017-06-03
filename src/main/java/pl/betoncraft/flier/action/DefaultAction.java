@@ -23,11 +23,15 @@ public abstract class DefaultAction implements Action {
 	protected final String id;
 	protected final ValueLoader loader;
 	protected final ModificationManager modMan;
+	protected final boolean needsItem;
+	protected final boolean needsSource;
 	
-	public DefaultAction(ConfigurationSection section) {
+	public DefaultAction(ConfigurationSection section, boolean needsItem, boolean needsSource) {
 		id = section.getName();
 		loader = new ValueLoader(section);
 		modMan = new ModificationManager();
+		this.needsItem = needsItem;
+		this.needsSource = needsSource;
 	}
 	
 	@Override
@@ -43,6 +47,16 @@ public abstract class DefaultAction implements Action {
 	@Override
 	public void removeModification(Modification mod) {
 		modMan.removeModification(mod);
+	}
+
+	@Override
+	public boolean needsItem() {
+		return needsItem;
+	}
+
+	@Override
+	public boolean needsSource() {
+		return needsSource;
 	}
 
 }
