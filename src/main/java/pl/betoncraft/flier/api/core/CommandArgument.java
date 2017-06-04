@@ -182,7 +182,11 @@ public interface CommandArgument {
 		for (String g : available) {
 			builder.append(String.format("%s%s%s, ", ChatColor.YELLOW, g, ChatColor.GREEN));
 		}
-		LangManager.sendMessage(sender, "available_names", builder.toString().trim().substring(0, builder.lastIndexOf(",")));
+		int lastIndex = builder.lastIndexOf(",");
+		if (lastIndex < 0) {
+			lastIndex = 0;
+		}
+		LangManager.sendMessage(sender, "available_names", builder.toString().trim().substring(0, lastIndex));
 	}
 	
 	/**
