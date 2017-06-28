@@ -216,14 +216,11 @@ public class DefaultUsableItem extends DefaultItem implements UsableItem {
 	public void addModification(Modification mod) {
 		if (mod.getTarget() == ModificationTarget.USABLE_ITEM) {
 			modMan.addModification(mod);
-		} else if (mod.getTarget() == ModificationTarget.ACTION) {
+		} else {
 			usages.forEach(usage -> usage.getActions().stream()
-					.filter(action -> mod.getNames().contains(action.getID()))
 					.forEach(action -> action.addModification(mod))
 			);
-		} else if (mod.getTarget() == ModificationTarget.ACTIVATOR) {
 			usages.forEach(usage -> usage.getActivators().stream()
-					.filter(activator -> mod.getNames().contains(activator.getID()))
 					.forEach(activator -> activator.addModification(mod))
 			);
 		}
@@ -233,14 +230,11 @@ public class DefaultUsableItem extends DefaultItem implements UsableItem {
 	public void removeModification(Modification mod) {
 		if (mod.getTarget() == ModificationTarget.USABLE_ITEM) {
 			modMan.removeModification(mod);
-		} else if (mod.getTarget() == ModificationTarget.ACTION) {
+		} else {
 			usages.forEach(usage -> usage.getActions().stream()
-					.filter(action -> mod.getNames().contains(action.getID()))
 					.forEach(action -> action.removeModification(mod))
 			);
-		} else if (mod.getTarget() == ModificationTarget.ACTIVATOR) {
 			usages.forEach(usage -> usage.getActivators().stream()
-					.filter(activator -> mod.getNames().contains(activator.getID()))
 					.forEach(activator -> activator.removeModification(mod))
 			);
 		}

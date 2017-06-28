@@ -6,11 +6,13 @@
  */
 package pl.betoncraft.flier.api.content;
 
+import java.util.List;
 import java.util.Optional;
 
 import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.Modification;
 import pl.betoncraft.flier.api.core.UsableItem;
+import pl.betoncraft.flier.api.core.Usage;
 
 /**
  * Represents a one time action, as opposed to the repeating Effect.
@@ -36,6 +38,13 @@ public interface Action {
 	 * @return the ID of this Action, under which it is defined in actions.yml
 	 */
 	public String getID();
+	
+	/**
+	 * @return The list containing all further usages this Action invokes;
+	 *         not all actions have further usages, so this list may be empty.
+	 *         It's not guaranteed that returned list will be mutable.
+	 */
+	public List<Usage> getSubUsages();
 	
 	/**
 	 * Applies passed modification to this Action.

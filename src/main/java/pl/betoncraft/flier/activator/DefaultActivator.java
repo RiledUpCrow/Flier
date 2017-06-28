@@ -10,6 +10,7 @@ import org.bukkit.configuration.ConfigurationSection;
 
 import pl.betoncraft.flier.api.content.Activator;
 import pl.betoncraft.flier.api.core.Modification;
+import pl.betoncraft.flier.api.core.Modification.ModificationTarget;
 import pl.betoncraft.flier.util.ModificationManager;
 import pl.betoncraft.flier.util.ValueLoader;
 
@@ -37,7 +38,9 @@ public abstract class DefaultActivator implements Activator {
 	
 	@Override
 	public void addModification(Modification mod) {
-		modMan.addModification(mod);
+		if (mod.getTarget() == ModificationTarget.ACTIVATOR && mod.getNames().contains(id)) {
+			modMan.addModification(mod);
+		}
 	}
 	
 	@Override
