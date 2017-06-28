@@ -1009,7 +1009,7 @@ public abstract class DefaultGame implements Listener, Game {
 		}
 	}
 	
-	@EventHandler(priority=EventPriority.HIGH)
+	@EventHandler(priority=EventPriority.HIGHEST)
 	public void onDamage(EntityDamageEvent event) {
 		if (event.isCancelled()) {
 			return;
