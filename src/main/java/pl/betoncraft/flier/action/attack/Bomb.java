@@ -52,10 +52,12 @@ public class Bomb extends DefaultAttack {
 	}
 
 	@Override
-	public boolean act(Optional<InGamePlayer> source, InGamePlayer target, Optional<UsableItem> item) {
+	public boolean act(Optional<InGamePlayer> creator, Optional<InGamePlayer> source,
+			InGamePlayer target, Optional<UsableItem> item) {
 		TNTPrimed tnt = (TNTPrimed) target.getPlayer().getWorld().spawnEntity(
 				target.getPlayer().getLocation(), EntityType.PRIMED_TNT);
-		Attacker.saveAttacker(tnt, new DefaultAttacker(this, source.orElse(null), item.orElse(null)));
+		Attacker.saveAttacker(tnt, new DefaultAttacker(this, creator.orElse(null), target,
+				item.orElse(null)));
 		tnt.setIsIncendiary(false);
 		tnt.setVelocity(target.getPlayer().getVelocity());
 		tnt.setYield((float) modMan.modifyNumber(POWER, yield));
@@ -73,9 +75,9 @@ public class Bomb extends DefaultAttack {
 			Attacker attacker = Attacker.getAttacker(event.getDamager());
 			if (attacker != null && attacker.getDamager() instanceof Bomb) {
 				event.setCancelled(true);
-				Target target = attacker.getShooter().getGame().getTargets().get(event.getEntity().getUniqueId());
+				Target target = attacker.getCreator().getGame().getTargets().get(event.getEntity().getUniqueId());
 				if (target != null && target.isTargetable()) {
-					attacker.getShooter().getGame().handleHit(target, attacker);
+					attacker.getCreator().getGame().handleHit(target, attacker);
 				}
 			}
 		}

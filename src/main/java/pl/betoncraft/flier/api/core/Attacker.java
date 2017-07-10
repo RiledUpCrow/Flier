@@ -14,7 +14,6 @@ import org.bukkit.metadata.MetadataValue;
 
 import pl.betoncraft.flier.api.Flier;
 import pl.betoncraft.flier.core.DefaultAttacker;
-import pl.betoncraft.flier.util.DummyDamager;
 
 /**
  * Groups together the Damager used in the attack, the author of the attack and
@@ -23,6 +22,11 @@ import pl.betoncraft.flier.util.DummyDamager;
  * @author Jakub Sapalski
  */
 public interface Attacker {
+
+	public static final String DAMAGER = "flier-damager";
+	public static final String CREATOR = "flier-creator";
+	public static final String SOURCE = "flier-source";
+	public static final String WEAPON = "flier-weapon";
 
 	/**
 	 * @return the Damager used in the attack
@@ -33,7 +37,13 @@ public interface Attacker {
 	 * @return the author of the attack, may be null if it comes from the
 	 *         environment
 	 */
-	public InGamePlayer getShooter();
+	public InGamePlayer getCreator();
+	
+	/**
+	 * @return the direct source of the attack, may be null if it comes from
+	 *         the environment
+	 */
+	public InGamePlayer getSource();
 
 	/**
 	 * @return the weapon used in the attack, may be null if the Damager wasn't
@@ -49,21 +59,16 @@ public interface Attacker {
 	 *            projectile which was launched by Damager
 	 * @return Attacker or null
 	 */
-	static Attacker getAttacker(Entity entity) {
-		List<MetadataValue> listD = entity.getMetadata("flier-damager");
-		List<MetadataValue> listA = entity.getMetadata("flier-attacker");
-		List<MetadataValue> listW = entity.getMetadata("flier-weapon");
-		if (!listD.isEmpty() && !listA.isEmpty()) {
-			Object d = listD.get(0).value();
-			Object a = listA.get(0).value();
-			Object w = listW == null || listW.isEmpty() ? null : listW.get(0).value();
-			if (d instanceof Damager && a instanceof InGamePlayer && (w == null || w instanceof UsableItem)) {
-				return new DefaultAttacker((Damager) d, (InGamePlayer) a, w == null ? null : (UsableItem) w);
-			} else {
-				return new DefaultAttacker(DummyDamager.DUMMY, null, null);
-			}
-		}
-		return null;
+	public static Attacker getAttacker(Entity entity) {
+		List<MetadataValue> listD = entity.getMetadata(DAMAGER);
+		List<MetadataValue> listC = entity.getMetadata(CREATOR);
+		List<MetadataValue> listS = entity.getMetadata(SOURCE);
+		List<MetadataValue> listW = entity.getMetadata(WEAPON);
+		Damager      d = listD == null || listD.isEmpty() ? null : (Damager)      listD.get(0).value();
+		InGamePlayer c = listC == null || listC.isEmpty() ? null : (InGamePlayer) listC.get(0).value();
+		InGamePlayer s = listS == null || listS.isEmpty() ? null : (InGamePlayer) listS.get(0).value();
+		UsableItem   w = listW == null || listW.isEmpty() ? null : (UsableItem)   listW.get(0).value();
+		return new DefaultAttacker(d, c, s, w);
 	}
 
 	/**
@@ -75,10 +80,11 @@ public interface Attacker {
 	 * @param damager
 	 *            Damager which is the source of that projectile
 	 */
-	static void saveAttacker(Entity entity, Attacker attacker) {
-		entity.setMetadata("flier-damager", new FixedMetadataValue(Flier.getInstance(), attacker.getDamager()));
-		entity.setMetadata("flier-attacker", new FixedMetadataValue(Flier.getInstance(), attacker.getShooter()));
-		entity.setMetadata("flier-weapon", new FixedMetadataValue(Flier.getInstance(), attacker.getWeapon()));
+	public static void saveAttacker(Entity entity, Attacker attacker) {
+		entity.setMetadata(DAMAGER, new FixedMetadataValue(Flier.getInstance(), attacker.getDamager()));
+		entity.setMetadata(CREATOR, new FixedMetadataValue(Flier.getInstance(), attacker.getCreator()));
+		entity.setMetadata(SOURCE, new FixedMetadataValue(Flier.getInstance(), attacker.getSource()));
+		entity.setMetadata(WEAPON, new FixedMetadataValue(Flier.getInstance(), attacker.getWeapon()));
 	}
 
 }

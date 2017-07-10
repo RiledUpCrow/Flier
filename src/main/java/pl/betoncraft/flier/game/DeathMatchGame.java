@@ -165,7 +165,7 @@ public class DeathMatchGame extends DefaultGame {
 	public void handleKill(InGamePlayer killed, DamageCause cause) {
 		super.handleKill(killed, cause);
 		Attacker attacker = killed.getAttacker();
-		InGamePlayer killer = attacker == null ? null : attacker.getShooter();
+		InGamePlayer killer = attacker == null ? null : attacker.getCreator();
 		if (rounds) {
 			// kills in rounded games don't increase points
 			// we should check if there are any other players alive

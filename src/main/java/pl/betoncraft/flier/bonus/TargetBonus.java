@@ -62,7 +62,7 @@ public class TargetBonus extends EntityBonus implements Target {
 
 	@Override
 	public boolean handleHit(Attacker attacker) {
-		apply(attacker.getShooter());
+		apply(attacker.getCreator());
 		return true;
 	}
 

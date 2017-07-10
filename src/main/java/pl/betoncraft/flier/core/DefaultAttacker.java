@@ -19,12 +19,14 @@ import pl.betoncraft.flier.api.core.UsableItem;
 public class DefaultAttacker implements Attacker {
 
 	private Damager damager;
-	private InGamePlayer attacker;
+	private InGamePlayer creator;
+	private InGamePlayer source;
 	private UsableItem weapon;
 
-	public DefaultAttacker(Damager damager, InGamePlayer attacker, UsableItem weapon) {
+	public DefaultAttacker(Damager damager, InGamePlayer creator, InGamePlayer source, UsableItem weapon) {
 		this.damager = damager;
-		this.attacker = attacker;
+		this.creator = creator;
+		this.source = source;
 		this.weapon = weapon;
 	}
 
@@ -34,8 +36,13 @@ public class DefaultAttacker implements Attacker {
 	}
 
 	@Override
-	public InGamePlayer getShooter() {
-		return attacker;
+	public InGamePlayer getCreator() {
+		return creator;
+	}
+
+	@Override
+	public InGamePlayer getSource() {
+		return source;
 	}
 	
 	@Override

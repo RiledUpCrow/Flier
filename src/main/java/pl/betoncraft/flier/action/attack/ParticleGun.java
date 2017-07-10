@@ -86,7 +86,8 @@ public class ParticleGun extends DefaultAttack {
 	}
 	
 	@Override
-	public boolean act(Optional<InGamePlayer> source, InGamePlayer target, Optional<UsableItem> item) {
+	public boolean act(Optional<InGamePlayer> creator, Optional<InGamePlayer> source,
+			InGamePlayer target, Optional<UsableItem> item) {
 
 		new BukkitRunnable() {
 			
@@ -121,7 +122,8 @@ public class ParticleGun extends DefaultAttack {
 				
 				// launch projectiles
 				for (int i = 0; i < am; i++) {
-					new ParticleTracker(start.clone(), source.orElse(null), target, projectileSpeed, proximity, spread, range, item.orElse(null));
+					                                                         // target becomes the source
+					new ParticleTracker(start.clone(), creator.orElse(null), target, projectileSpeed, proximity, spread, range, item.orElse(null));
 				}
 			}
 			
@@ -132,7 +134,7 @@ public class ParticleGun extends DefaultAttack {
 	private class ParticleTracker extends BukkitRunnable {
 		
 		private Location start;
-		private InGamePlayer shooter;
+		private InGamePlayer creator;
 		private InGamePlayer source;
 		private double proximity;
 		private UsableItem weapon;
@@ -150,12 +152,12 @@ public class ParticleGun extends DefaultAttack {
 		private double squared;
 		private boolean early = false;
 		
-		public ParticleTracker(Location start, InGamePlayer source, InGamePlayer shooter, double projectileSpeed, double proximity,
+		public ParticleTracker(Location start, InGamePlayer creator, InGamePlayer source, double projectileSpeed, double proximity,
 				double spread, double range, UsableItem weapon) {
 			// get starting parameters
 			this.start = start;
+			this.creator = creator;
 			this.source = source;
-			this.shooter = shooter;
 			this.proximity = proximity;
 			this.weapon = weapon;
 			this.range = range;
@@ -213,9 +215,9 @@ public class ParticleGun extends DefaultAttack {
 			// we're looking only for the closest target
 			Target foundTarget = null;
 			double smallestDistance = squared;
-			for (Target target : shooter.getGame().getTargets().values()) {
+			for (Target target : creator.getGame().getTargets().values()) {
 				// don't hit the shooter
-				if (!target.isTargetable() || target.equals(shooter)) {
+				if (!target.isTargetable() || target.equals(creator)) {
 					continue;
 				}
 				Location loc = target.getLocation().clone();
@@ -233,7 +235,8 @@ public class ParticleGun extends DefaultAttack {
 			// hit closest player
 			if (foundTarget != null) {
 				earlyEnd(foundTarget.getLocation());
-				foundTarget.getGame().handleHit(foundTarget, new DefaultAttacker(ParticleGun.this, source, weapon));
+				foundTarget.getGame().handleHit(foundTarget,
+						new DefaultAttacker(ParticleGun.this, creator, source, weapon));
 			}
 			
 			// spawn particles 

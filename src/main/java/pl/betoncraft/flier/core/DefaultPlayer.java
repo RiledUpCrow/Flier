@@ -218,19 +218,20 @@ public class DefaultPlayer implements InGamePlayer {
 	
 	@Override
 	public boolean handleHit(Attacker attacker) {
-		InGamePlayer shooter = attacker.getShooter();
 		Damager damager = attacker.getDamager();
+		InGamePlayer source = attacker.getSource();
+		InGamePlayer creator = attacker.getCreator();
 		UsableItem weapon = attacker.getWeapon();
 		// if player can't be damaged yet, return
 		if (noDamageTicks > 0) {
 			return false;
 		}
 		// if player is friendly but damager deals no friendly fire, return
-		if (!damager.causesFriendlyFire() && getGame().getAttitude(this, shooter) == Attitude.FRIENDLY) {
+		if (!damager.causesFriendlyFire() && getGame().getAttitude(this, creator) == Attitude.FRIENDLY) {
 			return false;
 		}
 		// if shooter was this player but damager is not suicidal, return
-		if (!damager.isSuicidal() && this.equals(shooter)) {
+		if (!damager.isSuicidal() && this.equals(creator)) {
 			return false;
 		}
 		// fire an event
@@ -242,20 +243,21 @@ public class DefaultPlayer implements InGamePlayer {
 		}
 		lastHit = attacker;
 		noDamageTicks = damager.getNoDamageTicks();
-		// display a message about the hit and play the sound to the shooter if he exists and if he hits someone else
-		if (shooter != null && !shooter.equals(this)) {
+		// display a message about the hit and play the sound to the creator
+		// if he exists and if he hits someone else
+		if (creator != null && !creator.equals(this)) {
 			if (weapon == null) {
-				LangManager.sendMessage(shooter, "hit", Utils.formatPlayer(this, shooter));
+				LangManager.sendMessage(creator, "hit", Utils.formatPlayer(this, creator));
 			} else {
-				LangManager.sendMessage(shooter, "hit_weapon", Utils.formatPlayer(this, shooter),
-						Utils.formatItem(weapon, shooter));
+				LangManager.sendMessage(creator, "hit_weapon", Utils.formatPlayer(this, creator),
+						Utils.formatItem(weapon, creator));
 			}
 		}
-		if (!this.equals(shooter)) {
+		if (!this.equals(creator)) {
 			if (weapon == null) {
-				LangManager.sendMessage(this, "get_hit", Utils.formatPlayer(shooter, this));
+				LangManager.sendMessage(this, "get_hit", Utils.formatPlayer(creator, this));
 			} else {
-				LangManager.sendMessage(this, "get_hit_weapon", Utils.formatPlayer(shooter, this),
+				LangManager.sendMessage(this, "get_hit_weapon", Utils.formatPlayer(creator, this),
 						Utils.formatItem(weapon, this));
 			}
 		}
@@ -269,7 +271,10 @@ public class DefaultPlayer implements InGamePlayer {
 				}
 			}
 			for (Action action : usage.getActions()) {
-				action.act(Optional.ofNullable(shooter), this, Optional.ofNullable(weapon));
+				action.act(Optional.ofNullable(creator),
+						Optional.ofNullable(source),
+						this,
+						Optional.ofNullable(weapon));
 			}
 		}
 		return true;

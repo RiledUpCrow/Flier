@@ -723,7 +723,7 @@ public abstract class DefaultGame implements Listener, Game {
 	@Override
 	public void handleKill(InGamePlayer killed, DamageCause cause) {
 		Attacker attacker = killed.getAttacker();
-		InGamePlayer killer = attacker == null ? null : attacker.getShooter();
+		InGamePlayer killer = attacker == null ? null : attacker.getCreator();
 		boolean fall = cause == DamageCause.FALL;
 		if (killer != null && !killer.equals(killed)) {
 			if (fall) {
@@ -766,18 +766,18 @@ public abstract class DefaultGame implements Listener, Game {
 	
 	@Override
 	public void handleHit(Target attacked, Attacker attacker) {
-		InGamePlayer shooter = attacker.getShooter();
+		InGamePlayer creator = attacker.getCreator();
 		boolean hit = attacked.handleHit(attacker);
 		// handle a general hit
-		if (hit && shooter != null && attacked instanceof InGamePlayer) {
+		if (hit && creator != null && attacked instanceof InGamePlayer) {
 			// pay money for a hit
 			InGamePlayer attackedPlayer = (InGamePlayer) attacked;
-			Attitude a = getAttitude(shooter, attacked);
+			Attitude a = getAttitude(creator, attacked);
 			if (a == Attitude.FRIENDLY) {
-				pay(shooter, friendlyHitMoney);
+				pay(creator, friendlyHitMoney);
 				pay(attackedPlayer, byFriendlyHitMoney);
 			} else if (a == Attitude.HOSTILE) {
-				pay(shooter, enemyHitMoney);
+				pay(creator, enemyHitMoney);
 				pay(attackedPlayer, byEnemyHitMoney);
 			}
 		}

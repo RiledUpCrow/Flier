@@ -27,7 +27,8 @@ public class SuicideAction extends DefaultAction {
 	}
 
 	@Override
-	public boolean act(Optional<InGamePlayer> source, InGamePlayer target, Optional<UsableItem> item) {
+	public boolean act(Optional<InGamePlayer> creator, Optional<InGamePlayer> source,
+			InGamePlayer target, Optional<UsableItem> item) {
 		if (Position.check(target.getPlayer(), Where.NO_FALL)) {
 			target.getPlayer().damage(target.getPlayer().getHealth() * 100);
 			return true;

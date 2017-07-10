@@ -37,7 +37,8 @@ public class HealthAction extends DefaultAction {
 	}
 
 	@Override
-	public boolean act(Optional<InGamePlayer> source, InGamePlayer target, Optional<UsableItem> item) {
+	public boolean act(Optional<InGamePlayer> creator, Optional<InGamePlayer> source,
+			InGamePlayer target, Optional<UsableItem> item) {
 		double amount = modMan.modifyNumber(AMOUNT, this.amount);
 		double distanceScale = modMan.modifyNumber(DISTANCE_SCALE, this.distanceScale);
 		double minAmount = modMan.modifyNumber(MIN_AMOUNT, this.minAmount);

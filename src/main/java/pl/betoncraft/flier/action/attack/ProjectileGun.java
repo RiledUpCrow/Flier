@@ -67,7 +67,8 @@ public class ProjectileGun extends DefaultAttack {
 	}
 	
 	@Override
-	public boolean act(Optional<InGamePlayer> source, InGamePlayer target, Optional<UsableItem> item) {
+	public boolean act(Optional<InGamePlayer> creator, Optional<InGamePlayer> source,
+			InGamePlayer target, Optional<UsableItem> item) {
 		Player player = target.getPlayer();
 		int burstAmount = (int) modMan.modifyNumber(BURST_AMOUNT, this.burstAmount);
 		Map<Projectile, Vector> projectiles = new HashMap<>(burstAmount);
@@ -91,7 +92,8 @@ public class ProjectileGun extends DefaultAttack {
 					explosive.setIsIncendiary(false);
 					explosive.setYield(0);
 				}
-				Attacker.saveAttacker(projectile, new DefaultAttacker(ProjectileGun.this, source.orElse(null), item.orElse(null)));
+				Attacker.saveAttacker(projectile, new DefaultAttacker(ProjectileGun.this, creator.orElse(null),
+						target, item.orElse(null)));
 				projectiles.put(projectile, velocity);
 				counter --;
 				if (counter <= 0) {
@@ -127,9 +129,9 @@ public class ProjectileGun extends DefaultAttack {
 			if (attacker != null && attacker.getDamager() instanceof ProjectileGun) {
 				event.setCancelled(true);
 				event.getDamager().remove();
-				Target target = attacker.getShooter().getGame().getTargets().get(event.getEntity().getUniqueId());
+				Target target = attacker.getCreator().getGame().getTargets().get(event.getEntity().getUniqueId());
 				if (target != null && target.isTargetable()) {
-					attacker.getShooter().getGame().handleHit(target, attacker);
+					attacker.getCreator().getGame().handleHit(target, attacker);
 				}
 			}
 		}

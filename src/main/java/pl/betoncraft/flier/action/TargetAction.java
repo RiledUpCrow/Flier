@@ -32,7 +32,8 @@ public class TargetAction extends DefaultAction {
 	}
 
 	@Override
-	public boolean act(Optional<InGamePlayer> source, InGamePlayer player, Optional<UsableItem> item) {
+	public boolean act(Optional<InGamePlayer> creator, Optional<InGamePlayer> source,
+			InGamePlayer player, Optional<UsableItem> item) {
 		if (player.isPlaying()) {
 			InGamePlayer nearest = null;
 			double distance = 0;

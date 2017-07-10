@@ -42,7 +42,8 @@ public class EffectAction extends DefaultAction {
 	}
 
 	@Override
-	public boolean act(Optional<InGamePlayer> source, InGamePlayer target, Optional<UsableItem> item) {
+	public boolean act(Optional<InGamePlayer> creator, Optional<InGamePlayer> source,
+			InGamePlayer target, Optional<UsableItem> item) {
 		new BukkitRunnable() {
 			private int i = (int) modMan.modifyNumber(DURATION, EffectAction.this.duration);
 			@Override
@@ -51,7 +52,7 @@ public class EffectAction extends DefaultAction {
 					cancel();
 				}
 				for (Action action : actions) {
-					action.act(source, target, item);
+					action.act(creator, source, target, item);
 				}
 			}
 		}.runTaskTimer(Flier.getInstance(), 0, 1);

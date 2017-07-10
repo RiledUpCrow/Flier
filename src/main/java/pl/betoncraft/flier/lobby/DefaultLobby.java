@@ -242,7 +242,7 @@ public abstract class DefaultLobby implements Lobby, Listener {
 						game.getPlayers().values().stream()
 								.filter(
 										inGame -> inGame.getAttacker() != null &&
-										inGame.getAttacker().getShooter().equals(data)
+										data.equals(inGame.getAttacker().getCreator())
 								).forEach(inGame -> inGame.setAttacker(null));
 					}
 					break loop;

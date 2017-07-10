@@ -41,7 +41,8 @@ public class ItemSetAction extends DefaultAction {
 	}
 
 	@Override
-	public boolean act(Optional<InGamePlayer> source, InGamePlayer target, Optional<UsableItem> item) {
+	public boolean act(Optional<InGamePlayer> creator, Optional<InGamePlayer> source,
+			InGamePlayer target, Optional<UsableItem> item) {
 		if (accepted.contains(applier.isSaving() ?
 				target.getKit().addStored(applier) :
 				target.getKit().addCurrent(applier))) {

@@ -78,7 +78,8 @@ public class HomingMissile extends DefaultAttack {
 	}
 
 	@Override
-	public boolean act(Optional<InGamePlayer> source, InGamePlayer target, Optional<UsableItem> item) {
+	public boolean act(Optional<InGamePlayer> creator, Optional<InGamePlayer> source,
+			InGamePlayer target, Optional<UsableItem> item) {
 		Player player = target.getPlayer();
 		double speed = modMan.modifyNumber(SPEED, this.speed);
 		Vector velocity = player.getLocation().getDirection().clone().multiply(speed);
@@ -89,7 +90,8 @@ public class HomingMissile extends DefaultAttack {
 		missile.setShooter(player);
 		missile.setGravity(false);
 		missile.setGlowing(true);
-		Attacker.saveAttacker(missile, new DefaultAttacker(HomingMissile.this, source.orElse(null), item.orElse(null)));
+		Attacker.saveAttacker(missile, new DefaultAttacker(HomingMissile.this, creator.orElse(null),
+				target, item.orElse(null)));
 		new BukkitRunnable() {
 			int i = 0;
 			Location lastLoc;
@@ -211,9 +213,9 @@ public class HomingMissile extends DefaultAttack {
 			if (attacker != null && attacker.getDamager() instanceof HomingMissile) {
 				event.setCancelled(true);
 				event.getDamager().remove();
-				Target target = attacker.getShooter().getGame().getTargets().get(event.getEntity().getUniqueId());
+				Target target = attacker.getCreator().getGame().getTargets().get(event.getEntity().getUniqueId());
 				if (target != null && target.isTargetable()) {
-					attacker.getShooter().getGame().handleHit(target, attacker);
+					attacker.getCreator().getGame().handleHit(target, attacker);
 				}
 			}
 		}

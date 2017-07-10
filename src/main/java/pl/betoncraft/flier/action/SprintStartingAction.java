@@ -46,7 +46,8 @@ public class SprintStartingAction extends DefaultAction {
 	}
 
 	@Override
-	public boolean act(Optional<InGamePlayer> source, InGamePlayer target, Optional<UsableItem> item) {
+	public boolean act(Optional<InGamePlayer> creator, Optional<InGamePlayer> source,
+			InGamePlayer target, Optional<UsableItem> item) {
 		Player player = target.getPlayer();
 		if (player.isSprinting() && ((Entity) player).isOnGround()) {
 			Location loc = player.getLocation().clone();

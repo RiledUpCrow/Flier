@@ -187,7 +187,7 @@ public abstract class DefaultBonus implements Bonus {
 	private boolean use(InGamePlayer player) {
 		boolean used = false;
 		for (Action action : actions) {
-			if (action.act(creator, player, item)) {
+			if (action.act(creator, creator, player, item)) {
 				used = true;
 			}
 		}
