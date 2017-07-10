@@ -37,7 +37,6 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityExplodeEvent;
-import org.bukkit.event.entity.ExplosionPrimeEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
@@ -1036,20 +1035,6 @@ public abstract class DefaultGame implements Listener, Game {
 			if (attacker != null) {
 				event.setCancelled(true);
 			}
-		}
-	}
-	
-	@EventHandler
-	public void onExplode(ExplosionPrimeEvent event) {
-		if (event.isCancelled()) {
-			return;
-		}
-		Attacker weapon = Attacker.getAttacker(event.getEntity());
-		if (weapon == null) {
-			return;
-		}
-		if (!weapon.getDamager().isExploding()) {
-			event.setCancelled(true);
 		}
 	}
 	

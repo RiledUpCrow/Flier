@@ -6,11 +6,16 @@
  */
 package pl.betoncraft.flier.action.attack;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.bukkit.configuration.ConfigurationSection;
 
 import pl.betoncraft.flier.action.DefaultAction;
 import pl.betoncraft.flier.api.content.Attack;
 import pl.betoncraft.flier.api.core.LoadingException;
+import pl.betoncraft.flier.api.core.Usage;
+import pl.betoncraft.flier.core.DefaultUsage;
 
 /**
  * A default Weapon implementation.
@@ -19,74 +24,50 @@ import pl.betoncraft.flier.api.core.LoadingException;
  */
 public abstract class DefaultAttack extends DefaultAction implements Attack {
 
-	private static final String EXPLODING = "exploding";
+	private static final String NO_DAMAGE_TICKS = "no_damage_ticks";
 	private static final String FRIENDLY_FIRE = "friendly_fire";
 	private static final String SUICIDAL = "suicidal";
-	private static final String MIDAIR_PHYSICAL_DAMAGE = "midair_physical_damage";
-	private static final String WINGS_OFF = "wings_off";
-	private static final String PHYSICAL_DAMAGE = "physical_damage";
-	private static final String DAMAGE = "damage";
-	private static final String NO_DAMAGE_TICKS = "no_damage_ticks";
-
-	protected final double damage;
-	protected final double physicalDamage;
+	private static final String ATTACK_USAGES = "attack_usages";
+	
 	protected final int noDamageTicks;
-	protected final boolean wingsOff;
-	protected final boolean midAirPhysicalDamage;
-	protected final boolean suicidal;
 	protected final boolean friendlyFire;
-	protected final boolean isExploding;
+	protected final boolean suicidal;
+	protected List<Usage> subUsages = new ArrayList<>();
 	
 	public DefaultAttack(ConfigurationSection section) throws LoadingException {
 		super(section, true, false);
-		damage = loader.loadDouble(DAMAGE);
-		physicalDamage = loader.loadDouble(PHYSICAL_DAMAGE);
 		noDamageTicks = loader.loadPositiveInt(NO_DAMAGE_TICKS, 20);
-		wingsOff = loader.loadBoolean(WINGS_OFF, false);
-		midAirPhysicalDamage = loader.loadBoolean(MIDAIR_PHYSICAL_DAMAGE, false);
-		suicidal = loader.loadBoolean(SUICIDAL, false);
 		friendlyFire = loader.loadBoolean(FRIENDLY_FIRE, true);
-		isExploding = loader.loadBoolean(EXPLODING, false);
+		suicidal = loader.loadBoolean(SUICIDAL, false);
+		ConfigurationSection attackUsages = section.getConfigurationSection(ATTACK_USAGES);
+		if (attackUsages != null) for (String usageName : attackUsages.getKeys(false)) {
+			try {
+				subUsages.add(new DefaultUsage(attackUsages.getConfigurationSection(usageName)));
+			} catch (LoadingException e) {
+				throw (LoadingException) new LoadingException(
+						String.format("Error in '%s' attack usage.", usageName)).initCause(e);
+			}
+		}
 	}
 	
 	@Override
-	public double getDamage() {
-		return modMan.modifyNumber(DAMAGE, damage);
-	}
-
-	@Override
-	public double getPhysical() {
-		return modMan.modifyNumber(PHYSICAL_DAMAGE, physicalDamage);
+	public List<Usage> getSubUsages() {
+		return subUsages;
 	}
 	
 	@Override
 	public int getNoDamageTicks() {
-		return noDamageTicks;
+		return (int) modMan.modifyNumber(NO_DAMAGE_TICKS, noDamageTicks);
 	}
 	
 	@Override
-	public boolean wingsOff() {
-		return modMan.modifyBoolean(WINGS_OFF, wingsOff);
-	}
-	
-	@Override
-	public boolean midAirPhysicalDamage() {
-		return modMan.modifyBoolean(MIDAIR_PHYSICAL_DAMAGE, midAirPhysicalDamage);
-	}
-	
-	@Override
-	public boolean friendlyFire() {
+	public boolean causesFriendlyFire() {
 		return modMan.modifyBoolean(FRIENDLY_FIRE, friendlyFire);
 	}
-
-	@Override
-	public boolean suicidal() {
-		return modMan.modifyBoolean(SUICIDAL, suicidal);
-	}
 	
 	@Override
-	public boolean isExploding() {
-		return modMan.modifyBoolean(EXPLODING, isExploding);
+	public boolean isSuicidal() {
+		return modMan.modifyBoolean(SUICIDAL, suicidal);
 	}
 
 }

@@ -12,6 +12,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
@@ -31,9 +32,12 @@ import org.bukkit.util.Vector;
 import com.google.common.collect.Lists;
 
 import pl.betoncraft.flier.api.Flier;
+import pl.betoncraft.flier.api.content.Action;
+import pl.betoncraft.flier.api.content.Activator;
 import pl.betoncraft.flier.api.content.Engine;
 import pl.betoncraft.flier.api.content.Game;
 import pl.betoncraft.flier.api.content.Wings;
+import pl.betoncraft.flier.api.content.Game.Attitude;
 import pl.betoncraft.flier.api.core.Attacker;
 import pl.betoncraft.flier.api.core.Damager;
 import pl.betoncraft.flier.api.core.FancyStuffWrapper;
@@ -194,6 +198,11 @@ public class DefaultPlayer implements InGamePlayer {
 			}
 		}
 	}
+
+	@Override
+	public String getName() {
+		return player.getName();
+	}
 	
 	@Override
 	public void addTrigger(String name) {
@@ -212,74 +221,58 @@ public class DefaultPlayer implements InGamePlayer {
 		InGamePlayer shooter = attacker.getShooter();
 		Damager damager = attacker.getDamager();
 		UsableItem weapon = attacker.getWeapon();
-		// empty list means no damage was dealt
-		List<DamageResult> results = new ArrayList<>(3);
 		// if player can't be damaged yet, return
-		if (noDamageTicks <= 0) {
-			// player is not playing, nothing happens
-			// ignore if you can's commit suicide with this weapon
-			if (isPlaying() || !(shooter != null &&
-					shooter.equals(this) &&
-					!damager.suicidal())) {
-				if (Position.check(getPlayer(), Usage.Where.NO_FALL)) {
-					results.add(DamageResult.HIT);
-					if (Position.check(getPlayer(), Usage.Where.AIR)) {
-						if (damager.wingsOff()) {
-							results.add(DamageResult.WINGS_OFF);
-						}
-						if (damager.midAirPhysicalDamage()) {
-							results.add(DamageResult.REGULAR_DAMAGE);
-						}
-						results.add(DamageResult.WINGS_DAMAGE);
-					} else if (Position.check(getPlayer(), Usage.Where.GROUND)) {
-						results.add(DamageResult.REGULAR_DAMAGE);
-					}
+		if (noDamageTicks > 0) {
+			return false;
+		}
+		// if player is friendly but damager deals no friendly fire, return
+		if (!damager.causesFriendlyFire() && getGame().getAttitude(this, shooter) == Attitude.FRIENDLY) {
+			return false;
+		}
+		// if shooter was this player but damager is not suicidal, return
+		if (!damager.isSuicidal() && this.equals(shooter)) {
+			return false;
+		}
+		// fire an event
+		FlierPlayerHitEvent hitEvent = new FlierPlayerHitEvent(this, attacker);
+		Bukkit.getPluginManager().callEvent(hitEvent);
+		// stop if the event was canceled
+		if (hitEvent.isCancelled()) {
+			return false;
+		}
+		lastHit = attacker;
+		noDamageTicks = damager.getNoDamageTicks();
+		// display a message about the hit and play the sound to the shooter if he exists and if he hits someone else
+		if (shooter != null && !shooter.equals(this)) {
+			if (weapon == null) {
+				LangManager.sendMessage(shooter, "hit", Utils.formatPlayer(this, shooter));
+			} else {
+				LangManager.sendMessage(shooter, "hit_weapon", Utils.formatPlayer(this, shooter),
+						Utils.formatItem(weapon, shooter));
+			}
+		}
+		if (!this.equals(shooter)) {
+			if (weapon == null) {
+				LangManager.sendMessage(this, "get_hit", Utils.formatPlayer(shooter, this));
+			} else {
+				LangManager.sendMessage(this, "get_hit_weapon", Utils.formatPlayer(shooter, this),
+						Utils.formatItem(weapon, this));
+			}
+		}
+		loop: for (Usage usage : damager.getSubUsages()) {
+			if (!usage.canUse(this)) {
+				continue;
+			}
+			for (Activator activator : usage.getActivators()) {
+				if (!activator.isActive(this, weapon)) {
+					continue loop;
 				}
 			}
-			// fire an event
-			FlierPlayerHitEvent hitEvent = new FlierPlayerHitEvent(this, results, attacker);
-			Bukkit.getPluginManager().callEvent(hitEvent);
-			if (hitEvent.isCancelled()) {
-				results.clear();
+			for (Action action : usage.getActions()) {
+				action.act(Optional.ofNullable(shooter), this, Optional.ofNullable(weapon));
 			}
 		}
-		// handle a general hit
-		if (results.contains(DamageResult.HIT) && shooter != null) {
-			lastHit = attacker;
-			noDamageTicks = damager.getNoDamageTicks();
-			// display a message about the hit and play the sound to the shooter if he exists and if he hits someone else
-			if (shooter != null && !shooter.equals(this)) {
-				if (weapon == null) {
-					LangManager.sendMessage(shooter, "hit", Utils.formatPlayer(this, shooter));
-				} else {
-					LangManager.sendMessage(shooter, "hit_weapon", Utils.formatPlayer(this, shooter),
-							Utils.formatItem(weapon, shooter));
-				}
-			}
-			if (!this.equals(shooter)) {
-				if (weapon == null) {
-					LangManager.sendMessage(this, "get_hit", Utils.formatPlayer(shooter, this));
-				} else {
-					LangManager.sendMessage(this, "get_hit_weapon", Utils.formatPlayer(shooter, this),
-							Utils.formatItem(weapon, this));
-				}
-			}
-		}
-		// handle taking wings off
-		if (results.contains(DamageResult.WINGS_OFF)) {
-			takeWingsOff();
-		}
-		// handle wing damage
-		if (results.contains(DamageResult.WINGS_DAMAGE)) {
-			getKit().getWings().removeHealth(damager.getDamage());
-		}
-		// handle physical damage
-		// it's the last one because it triggers a respawn
-		if (results.contains(DamageResult.REGULAR_DAMAGE)) {
-			getPlayer().setNoDamageTicks(0);
-			getPlayer().damage(damager.getPhysical());
-		}
-		return results.contains(DamageResult.HIT);
+		return true;
 	}
 
 	@Override

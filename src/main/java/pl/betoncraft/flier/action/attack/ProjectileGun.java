@@ -91,7 +91,7 @@ public class ProjectileGun extends DefaultAttack {
 					explosive.setIsIncendiary(false);
 					explosive.setYield(0);
 				}
-				Attacker.saveAttacker(projectile, new DefaultAttacker(ProjectileGun.this, target, item.orElse(null)));
+				Attacker.saveAttacker(projectile, new DefaultAttacker(ProjectileGun.this, source.orElse(null), item.orElse(null)));
 				projectiles.put(projectile, velocity);
 				counter --;
 				if (counter <= 0) {

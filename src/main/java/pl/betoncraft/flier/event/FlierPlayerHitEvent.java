@@ -6,14 +6,10 @@
  */
 package pl.betoncraft.flier.event;
 
-import java.util.Arrays;
-import java.util.List;
-
 import org.bukkit.event.Cancellable;
 
 import pl.betoncraft.flier.api.core.Attacker;
 import pl.betoncraft.flier.api.core.InGamePlayer;
-import pl.betoncraft.flier.api.core.InGamePlayer.DamageResult;
 import pl.betoncraft.flier.core.MatchingTwoPlayersEvent;
 
 /**
@@ -22,10 +18,7 @@ import pl.betoncraft.flier.core.MatchingTwoPlayersEvent;
  * @author Jakub Sapalski
  */
 public class FlierPlayerHitEvent extends MatchingTwoPlayersEvent implements Cancellable {
-	
-	private static final List<DamageResult> all = Arrays.asList(DamageResult.values());
 
-	private List<DamageResult> result;
 	private Attacker attacker;
 	private boolean cancel = false;
 
@@ -34,16 +27,10 @@ public class FlierPlayerHitEvent extends MatchingTwoPlayersEvent implements Canc
 	 * 
 	 * @param player
 	 */
-	public FlierPlayerHitEvent(InGamePlayer target, List<DamageResult> results, Attacker attacker) {
+	public FlierPlayerHitEvent(InGamePlayer target, Attacker attacker) {
 		super(target, attacker.getShooter(), "shooter_", "target_");
-		this.result = results;
 		this.attacker = attacker;
 		setBool("self_hit", attacker.getShooter().equals(target));
-		for (DamageResult result : all) {
-			setBool(result.toString().toLowerCase(), results.contains(result));
-		}
-		setNumber("damage_to_wings", attacker.getDamager().getDamage());
-		setNumber("damage_to_health", attacker.getDamager().getPhysical());
 	}
 
 	/**
@@ -51,13 +38,6 @@ public class FlierPlayerHitEvent extends MatchingTwoPlayersEvent implements Canc
 	 */
 	public Attacker getAttacker() {
 		return attacker;
-	}
-	
-	/**
-	 * @return the list of results of the attack
-	 */
-	public List<DamageResult> getResult() {
-		return result;
 	}
 
 	@Override

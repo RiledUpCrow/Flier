@@ -6,7 +6,12 @@
  */
 package pl.betoncraft.flier.util;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import pl.betoncraft.flier.api.core.Damager;
+import pl.betoncraft.flier.api.core.Usage;
 
 /**
  * A dummy Damager.
@@ -16,18 +21,9 @@ import pl.betoncraft.flier.api.core.Damager;
 public class DummyDamager implements Damager {
 	
 	public static final DummyDamager DUMMY = new DummyDamager();
+	private static final List<Usage> emptyUsages = Collections.unmodifiableList(new ArrayList<>(0));
 	
 	private DummyDamager() {}
-
-	@Override
-	public double getDamage() {
-		return 0;
-	}
-
-	@Override
-	public double getPhysical() {
-		return 0;
-	}
 	
 	@Override
 	public int getNoDamageTicks() {
@@ -35,28 +31,18 @@ public class DummyDamager implements Damager {
 	}
 
 	@Override
-	public boolean wingsOff() {
-		return false;
+	public List<Usage> getSubUsages() {
+		return emptyUsages;
 	}
 
 	@Override
-	public boolean midAirPhysicalDamage() {
-		return false;
+	public boolean causesFriendlyFire() {
+		return true;
 	}
 
 	@Override
-	public boolean friendlyFire() {
-		return false;
-	}
-
-	@Override
-	public boolean suicidal() {
-		return false;
-	}
-	
-	@Override
-	public boolean isExploding() {
-		return false;
+	public boolean isSuicidal() {
+		return true;
 	}
 
 }

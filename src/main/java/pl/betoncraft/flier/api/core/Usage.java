@@ -23,7 +23,7 @@ public interface Usage {
 	 *
 	 * @author Jakub Sapalski
 	 */
-	enum Where {
+	public enum Where {
 		GROUND, AIR, FALL, NO_GROUND, NO_AIR, NO_FALL, EVERYWHERE
 	}
 	

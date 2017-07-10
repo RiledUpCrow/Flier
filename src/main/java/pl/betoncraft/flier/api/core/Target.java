@@ -72,4 +72,9 @@ public interface Target {
 	 */
 	public boolean isTargetable();
 
+	/**
+	 * @return the name of this Target
+	 */
+	public String getName();
+
 }

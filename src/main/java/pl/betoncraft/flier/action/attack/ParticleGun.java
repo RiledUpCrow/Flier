@@ -121,7 +121,7 @@ public class ParticleGun extends DefaultAttack {
 				
 				// launch projectiles
 				for (int i = 0; i < am; i++) {
-					new ParticleTracker(start.clone(), target, projectileSpeed, proximity, spread, range, item.orElse(null));
+					new ParticleTracker(start.clone(), source.orElse(null), target, projectileSpeed, proximity, spread, range, item.orElse(null));
 				}
 			}
 			
@@ -133,6 +133,7 @@ public class ParticleGun extends DefaultAttack {
 		
 		private Location start;
 		private InGamePlayer shooter;
+		private InGamePlayer source;
 		private double proximity;
 		private UsableItem weapon;
 		
@@ -149,10 +150,11 @@ public class ParticleGun extends DefaultAttack {
 		private double squared;
 		private boolean early = false;
 		
-		public ParticleTracker(Location start, InGamePlayer shooter, double projectileSpeed, double proximity,
+		public ParticleTracker(Location start, InGamePlayer source, InGamePlayer shooter, double projectileSpeed, double proximity,
 				double spread, double range, UsableItem weapon) {
 			// get starting parameters
 			this.start = start;
+			this.source = source;
 			this.shooter = shooter;
 			this.proximity = proximity;
 			this.weapon = weapon;
@@ -231,7 +233,7 @@ public class ParticleGun extends DefaultAttack {
 			// hit closest player
 			if (foundTarget != null) {
 				earlyEnd(foundTarget.getLocation());
-				foundTarget.getGame().handleHit(foundTarget, new DefaultAttacker(ParticleGun.this, shooter, weapon));
+				foundTarget.getGame().handleHit(foundTarget, new DefaultAttacker(ParticleGun.this, source, weapon));
 			}
 			
 			// spawn particles 

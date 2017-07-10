@@ -46,6 +46,8 @@ public class HomingMissile extends DefaultAttack {
 	private static final String SEARCH_RADIUS = "search_radius";
 	private static final String SEARCH_RANGE = "search_range";
 	private static final String ENTITY = "entity";
+	private static final String TARGET_FRIENDS = "target_friends";
+	private static final String TARGET_SELF = "target_self";
 	
 	private static MissileListener listener;
 
@@ -55,6 +57,8 @@ public class HomingMissile extends DefaultAttack {
 	private final double speed;
 	private final int lifetime;
 	private final double maneuverability;
+	private final boolean targetFriends;
+	private final boolean targetSelf;
 
 	public HomingMissile(ConfigurationSection section) throws LoadingException {
 		super(section);
@@ -64,6 +68,8 @@ public class HomingMissile extends DefaultAttack {
 		speed = loader.loadPositiveDouble(SPEED);
 		lifetime = loader.loadPositiveInt(LIFETIME);
 		maneuverability = loader.loadPositiveDouble(MANEUVERABILITY);
+		targetFriends = loader.loadBoolean(TARGET_FRIENDS, true);
+		targetSelf = loader.loadBoolean(TARGET_SELF, true);
 		// register a single listener for all homing missiles
 		if (listener == null) {
 			listener = new MissileListener();
@@ -83,7 +89,7 @@ public class HomingMissile extends DefaultAttack {
 		missile.setShooter(player);
 		missile.setGravity(false);
 		missile.setGlowing(true);
-		Attacker.saveAttacker(missile, new DefaultAttacker(HomingMissile.this, target, item.orElse(null)));
+		Attacker.saveAttacker(missile, new DefaultAttacker(HomingMissile.this, source.orElse(null), item.orElse(null)));
 		new BukkitRunnable() {
 			int i = 0;
 			Location lastLoc;
@@ -96,8 +102,8 @@ public class HomingMissile extends DefaultAttack {
 			double maneuverability = modMan.modifyNumber(MANEUVERABILITY, HomingMissile.this.maneuverability);
 			int radius = searchRange / 2;
 			int radiusSqr = radius * radius;
-			boolean friendlyFire = friendlyFire();
-			boolean suicidal = suicidal();
+			boolean friendlyFire = HomingMissile.this.targetFriends;
+			boolean suicidal = HomingMissile.this.targetSelf;
 			@Override
 			public void run() {
 				// stop if the missile does not exist

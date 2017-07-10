@@ -95,5 +95,10 @@ public class TargetBonus extends EntityBonus implements Target {
 	public boolean isTargetable() {
 		return isAvailable();
 	}
+	
+	@Override
+	public String getName() {
+		return id;
+	}
 
 }

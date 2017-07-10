@@ -10,27 +10,24 @@ some_action:
 
 ## Attack
 
-Actions which can damage another player share the same set of settings responsible for specifying how that damage is done. An example would be machine gun and homing missile: they both have options like `damage`.
+Actions which can apply other action to target players are called "attacks". An example would be machine gun and homing missile: when they hit another player, they will apply a defined set of actions (technically usages - actions with activators). This can be used to inflict damage, take the wings off, create explosion which will damage further players etc.
+
+Attacks also have other settings. `no_damage_ticks` is responsible for preventing next attacks from happening too quickly. `friendly_fire` controls whenever you can attack a friendly player with this weapon and `suicidal` controls whenever you can attack yourself with it.
 
 ```
 some_attack_action
   type: [attack action type]
-  damage: [non-negative decimal]
-  physical_damage: [non-negative decimal]
-  wings_off: [boolean]
-  midair_physical_damage: [boolean]
-  suicidal: [boolean]
-  friendly_fire: [boolean]
-  exploding: [boolean]
+  attack_usages:
+    [usages]
+  no_damage_ticks: [non-negative integer]
+  friendly_fire: [true/false]
+  suicidal: [true/false]
 ```
 
-* `damage` (**required**) is amount of damage dealt to Wings' health. It will only happen if the player is flying.
-* `physical_damage` (**required**) is amount of damage dealt to player's health. It will only happen on the ground or if `midair_physical_damage` is set to `true`.
-* `wings_off` (**default: false**) whenever Wings will be taken off on hit. It prevents further Wings damage but makes the player fall. They can quickly put them on to keep flying.
-* `midair_physical_damage` (**default: false**) whenever the physical damage will be dealt to flying targets too.
-* `suicidal` (**default: false**) whenever you can hit yourself with this weapon.
-* `friendly_fire` (**default: true**) whenever you can hit friendly players with this weapon.
-* `exploding` (**default: false**) in case the projectiles of this weapon are explosive (like ghast fireballs), it controls whenever they will explode.
+* `attack_usages` is a list of "usages". These are the same as described in _Item_ chapter. Settings like ammunition and cooldown don't apply here though.
+* `no_damage_ticks` (**default: 0**) is the amount of ticks before the player can be hit with an attack again.
+* `friendly_fire` (**default: true**) whenever you can attack a friendly player with this weapon.
+* `suicidal` (**default: false**) whenever you can attack yourself with this weapon.
 
 ## Action types
 
@@ -142,19 +139,34 @@ wings_health_action:
 
 * `amount` (**required**) is the amount of health added to the Wings. Negative values remove health.
 
+### Wings Off
+
+**`wingsOff`**
+
+This action will take the wings off of the target player.
+
+```
+take_wings_off:
+  type: wingsOff
+```
+
 ### Health
 
 **`health`**
 
-This action modifies the player's health. If the amount is negative it will damage the player (won't change cause of death though, so other players can still get points/money for the kill) and if it's positive, it will heal them.
+This action modifies the player's health. If the amount is negative it will damage the player (won't change cause of death though, so other players can still get points/money for the kill) and if it's positive, it will heal them. It can also scale the health amount according to the distance between the target of this action and the source.
 
 ```
 health_action:
   type: health
   amount: [decimal]
+  distance_scale: [non-negative decimal]
+  min_amount: [decimal]
 ```
 
 * `amount` (**required**) is the amount of health to modify. Negative values damage the player.
+* `distance_scale` (**default: 0**) when this number is different than 0, it will scale the damage accordingly to the distance from the source. When the distance is 0 (probably the player targets himself) it will use full amount. When the distance is equal to this setting, it will deal amount specified in `min_amount`. Anything in between is scaled proportionally.
+* `min_amount` (**default: 0**) the minimum amount of damage dealt when scaling it with distance. It must be between 0 and `amount`, otherwise the plugin will use 0 or `amount` instead.
 
 ### Suicide
 
@@ -213,6 +225,8 @@ rocket_action:
   speed: [positive decimal]
   lifetime: [positive integer]
   maneuverability: [positive decimal]
+  target_friends: [true/false]
+  target_self: [true/false]
 ```
 
 * `entity` (**required**) is the [entity](https://hub.spigotmc.org/javadocs/spigot/org/bukkit/entity/EntityType.html) (must be a projectile, can't use a sheep) used by the attack.
@@ -221,6 +235,8 @@ rocket_action:
 * `speed` is the speed of the missile.
 * `lifetime` is the amount of ticks the missile will live after launching. If it does not hit anything for this time, it will disappear.
 * `maneuverability` is the ability to turn when targeting someone. The greater this number is, the better the rocket is at following its target.
+* `target_friends` whenever this missile will target friendly players.
+* `target_self` whenever this missile will target the player who launched it.
 
 ### Projectile Gun
 

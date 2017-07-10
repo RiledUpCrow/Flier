@@ -6,16 +6,13 @@
  */
 package pl.betoncraft.flier.action;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import org.bukkit.configuration.ConfigurationSection;
 
 import pl.betoncraft.flier.api.content.Action;
+import pl.betoncraft.flier.api.content.Attack;
 import pl.betoncraft.flier.api.core.Modification;
-import pl.betoncraft.flier.api.core.Usage;
 import pl.betoncraft.flier.api.core.Modification.ModificationTarget;
+import pl.betoncraft.flier.api.core.Usage;
 import pl.betoncraft.flier.util.ModificationManager;
 import pl.betoncraft.flier.util.ValueLoader;
 
@@ -25,8 +22,6 @@ import pl.betoncraft.flier.util.ValueLoader;
  * @author Jakub Sapalski
  */
 public abstract class DefaultAction implements Action {
-	
-	private final static List<Usage> emptyUsages = Collections.unmodifiableList(new ArrayList<>(0));
 	
 	protected final String id;
 	protected final ValueLoader loader;
@@ -48,18 +43,16 @@ public abstract class DefaultAction implements Action {
 	}
 	
 	@Override
-	public List<Usage> getSubUsages() {
-		return emptyUsages;
-	}
-	
-	@Override
 	public void addModification(Modification mod) {
 		if (mod.getTarget() == ModificationTarget.ACTION && mod.getNames().contains(id)) {
 			modMan.addModification(mod);
 		}
-		for (Usage usage : getSubUsages()) {
-			usage.getActions().forEach(action -> action.addModification(mod));
-			usage.getActivators().forEach(activator -> activator.addModification(mod));
+		if (this instanceof Attack) {
+			Attack attack = (Attack) this;
+			for (Usage usage : attack.getSubUsages()) {
+				usage.getActions().forEach(action -> action.addModification(mod));
+				usage.getActivators().forEach(activator -> activator.addModification(mod));
+			}
 		}
 	}
 	
@@ -68,9 +61,12 @@ public abstract class DefaultAction implements Action {
 		if (mod.getTarget() == ModificationTarget.ACTION && mod.getNames().contains(id)) {
 			modMan.removeModification(mod);
 		}
-		for (Usage usage : getSubUsages()) {
-			usage.getActions().forEach(action -> action.removeModification(mod));
-			usage.getActivators().forEach(activator -> activator.removeModification(mod));
+		if (this instanceof Attack) {
+			Attack attack = (Attack) this;
+			for (Usage usage : attack.getSubUsages()) {
+				usage.getActions().forEach(action -> action.removeModification(mod));
+				usage.getActivators().forEach(activator -> activator.removeModification(mod));
+			}
 		}
 	}
 

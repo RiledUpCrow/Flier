@@ -1,14 +1,26 @@
 ###############
-# Flier 0.5.1 #
+# Flier 0.6.0 #
 ###############
 
 == Fixes ==
 * Items without slot are no longer placed on hotbar
 
+== Plugin ==
+* PlayerClass is renamed to Kit
+* Class name is no longer required in the Kit
+
+== Gameplay ==
+* Items can have cooldown before the first use
+* Weapons can now run actions on targets instead of damaging them directly
+
 == Content ==
+* Add "wingsOff" action
 * Add "sprintStarting" action
 * Add "blockStanding" activator
+* "health" action can scale amount with distance between source and target
 * "particleGun" attack has configurable range
+* "leftClick" and "rightClick" were changed to Triggers
+* "slowTick" was changed to more configurable "interval"
 
 ###############
 # Flier 0.5.0 #
