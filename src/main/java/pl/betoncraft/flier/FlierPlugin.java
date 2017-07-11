@@ -25,6 +25,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import pl.betoncraft.flier.action.ConsumeAction;
 import pl.betoncraft.flier.action.EffectAction;
@@ -274,7 +275,18 @@ public class FlierPlugin extends JavaPlugin implements Flier {
 						autoJoin = new Listener() {
 							@EventHandler
 							public void onJoin(PlayerJoinEvent event) {
-								lobby.addPlayer(event.getPlayer());
+								BukkitRunnable joiner = new BukkitRunnable() {
+									@Override
+									public void run() {
+										lobby.addPlayer(event.getPlayer());
+									}
+								};
+								int delay = getConfig().getInt("autojoin.delay", 0);
+								if (delay == 0) {
+									joiner.run();
+								} else {
+									joiner.runTaskLater(FlierPlugin.this, delay);
+								}
 							}
 						};
 						// add all online players in case of a reload

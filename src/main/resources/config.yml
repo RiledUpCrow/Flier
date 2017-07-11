@@ -17,6 +17,9 @@ autojoin:
   # the lobby where the players will be moved
   lobby: default
 
+  # delay in ticks between joining the server and moving to the lobby
+  delay: 0
+
 # database settings for storing statistics
 database:
 
