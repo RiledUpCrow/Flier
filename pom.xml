@@ -15,7 +15,6 @@
 				<filtering>true</filtering>
 				<includes>
 					<include>LICENSE</include>
-					<include>README.md</include>
 				</includes>
 			</resource>
 			<resource>
