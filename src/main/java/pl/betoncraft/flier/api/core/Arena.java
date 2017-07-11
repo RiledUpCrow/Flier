@@ -23,25 +23,12 @@
  */
 package pl.betoncraft.flier.api.core;
 
-import org.bukkit.entity.Player;
-
 /**
  * Contains Locations for Games.
  *
  * @author Jakub Sapalski
  */
-public interface Arena {
-
-	/**
-	 * @return the ID of the Arena
-	 */
-	public String getID();
-
-	/**
-	 * @param player the player for whom it should be translated
-	 * @return the display name of this Game
-	 */
-	public String getName(Player player);
+public interface Arena extends Named {
 	
 	/**
 	 * @param name name of the Location to get

@@ -33,12 +33,7 @@ import pl.betoncraft.flier.api.content.Wings;
  *
  * @author Jakub Sapalski
  */
-public interface ItemSet {
-	
-	/**
-	 * @return the ID of this ItemSet
-	 */
-	public String getID();
+public interface ItemSet extends Named {
 
 	/**
 	 * Category is used to group the ItemSets together and handle adding new
@@ -51,7 +46,7 @@ public interface ItemSet {
 	/**
 	 * @return the name of the class after applying this ItemSet
 	 */
-	public String getName();
+	public String getClassName();
 
 	/**
 	 * @return the Engine in this ItemSet

@@ -26,18 +26,14 @@ package pl.betoncraft.flier.api.content;
 import java.util.List;
 
 import pl.betoncraft.flier.api.core.InGamePlayer;
+import pl.betoncraft.flier.api.core.Named;
 
 /**
  * Represents a collectable Entity on the Game map.
  *
  * @author Jakub Sapalski
  */
-public interface Bonus {
-
-	/**
-	 * @return the ID of this Bonus
-	 */
-	public String getID();
+public interface Bonus extends Named {
 
 	/**
 	 * @return true if the Bonus should be removed after using

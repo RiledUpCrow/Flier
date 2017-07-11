@@ -28,12 +28,14 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 
 import pl.betoncraft.flier.api.content.Effect;
 import pl.betoncraft.flier.api.core.LoadingException;
 import pl.betoncraft.flier.api.core.Matcher;
 import pl.betoncraft.flier.core.DefaultMatcher;
+import pl.betoncraft.flier.util.LangManager;
 import pl.betoncraft.flier.util.ValueLoader;
 import pl.betoncraft.flier.util.EffectListener.EventType;
 
@@ -48,6 +50,7 @@ public abstract class DefaultEffect implements Effect {
 	private static final String MATCHERS = "matchers";
 	
 	protected final String id;
+	protected final String name;
 	protected final ValueLoader loader;
 	
 	protected final EventType type;
@@ -56,6 +59,7 @@ public abstract class DefaultEffect implements Effect {
 	public DefaultEffect(ConfigurationSection section) throws LoadingException {
 		id = section.getName();
 		loader = new ValueLoader(section);
+		name = loader.loadString("name", id);
 		type = loader.loadEnum(TYPE, EventType.class);
 		ConfigurationSection values = section.getConfigurationSection(MATCHERS);
 		if (values != null) {
@@ -109,6 +113,11 @@ public abstract class DefaultEffect implements Effect {
 	@Override
 	public String getID() {
 		return id;
+	}
+	
+	@Override
+	public String getName(CommandSender player) {
+		return name.startsWith("$") ? LangManager.getMessage(player, name.substring(1)) : name;
 	}
 
 	@Override

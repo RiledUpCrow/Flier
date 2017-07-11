@@ -27,6 +27,7 @@ import java.util.Optional;
 
 import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.Modification;
+import pl.betoncraft.flier.api.core.Named;
 import pl.betoncraft.flier.api.core.UsableItem;
 
 /**
@@ -34,7 +35,7 @@ import pl.betoncraft.flier.api.core.UsableItem;
  *
  * @author Jakub Sapalski
  */
-public interface Action {
+public interface Action extends Named {
 
 	/**
 	 * <p>Performs the action on specified player.</p>
@@ -63,11 +64,6 @@ public interface Action {
 			Optional<InGamePlayer> source,
 			InGamePlayer target,
 			Optional<UsableItem> item);
-
-	/**
-	 * @return the ID of this Action, under which it is defined in actions.yml
-	 */
-	public String getID();
 	
 	/**
 	 * Applies passed modification to this Action.

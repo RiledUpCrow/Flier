@@ -28,6 +28,7 @@ import java.util.stream.Collectors;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -49,6 +50,7 @@ public abstract class DefaultItem implements Item {
 	private static final String WEIGHT = "weight";
 
 	protected final String id;
+	protected final String name;
 	protected final ValueLoader loader;
 	protected final ModificationManager modMan;
 
@@ -62,6 +64,7 @@ public abstract class DefaultItem implements Item {
 		id = section.getName();
 		loader = new ValueLoader(section);
 		modMan = new ModificationManager();
+		name = loader.loadString("name", id);
 		material = loader.loadEnum("material", Material.class);
 		rawName = loader.loadString("name");
 		rawLore = section.getStringList("lore");
@@ -72,6 +75,11 @@ public abstract class DefaultItem implements Item {
 	@Override
 	public String getID() {
 		return id;
+	}
+	
+	@Override
+	public String getName(CommandSender player) {
+		return name.startsWith("$") ? LangManager.getMessage(player, name.substring(1)) : name;
 	}
 
 	@Override

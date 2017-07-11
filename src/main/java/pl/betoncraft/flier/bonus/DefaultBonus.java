@@ -31,6 +31,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
+import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -42,6 +43,7 @@ import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.LoadingException;
 import pl.betoncraft.flier.api.core.UsableItem;
 import pl.betoncraft.flier.event.FlierCollectBonusEvent;
+import pl.betoncraft.flier.util.LangManager;
 import pl.betoncraft.flier.util.ValueLoader;
 
 /**
@@ -53,6 +55,7 @@ public abstract class DefaultBonus implements Bonus {
 	
 	protected final ValueLoader loader;
 	protected final String id;
+	protected final String name;
 	protected final Optional<InGamePlayer> creator;
 	protected final Optional<UsableItem> item;
 	
@@ -75,6 +78,7 @@ public abstract class DefaultBonus implements Bonus {
 		this.creator = creator;
 		this.item = item;
 		loader = new ValueLoader(section);
+		name = loader.loadString("name", id);
 		consumable = loader.loadBoolean("consumable");
 		cooldown = loader.loadNonNegativeInt("cooldown");
 		respawn = loader.loadNonNegativeInt("respawn", 0);
@@ -96,6 +100,11 @@ public abstract class DefaultBonus implements Bonus {
 	@Override
 	public String getID() {
 		return id;
+	}
+	
+	@Override
+	public String getName(CommandSender player) {
+		return name.startsWith("$") ? LangManager.getMessage(player, name.substring(1)) : name;
 	}
 
 	@Override

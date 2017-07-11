@@ -23,6 +23,7 @@
  */
 package pl.betoncraft.flier.action;
 
+import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 
 import pl.betoncraft.flier.api.content.Action;
@@ -30,6 +31,7 @@ import pl.betoncraft.flier.api.content.Attack;
 import pl.betoncraft.flier.api.core.Modification;
 import pl.betoncraft.flier.api.core.Modification.ModificationTarget;
 import pl.betoncraft.flier.api.core.Usage;
+import pl.betoncraft.flier.util.LangManager;
 import pl.betoncraft.flier.util.ModificationManager;
 import pl.betoncraft.flier.util.ValueLoader;
 
@@ -41,6 +43,7 @@ import pl.betoncraft.flier.util.ValueLoader;
 public abstract class DefaultAction implements Action {
 	
 	protected final String id;
+	protected final String name;
 	protected final ValueLoader loader;
 	protected final ModificationManager modMan;
 	protected final boolean needsItem;
@@ -50,6 +53,7 @@ public abstract class DefaultAction implements Action {
 		id = section.getName();
 		loader = new ValueLoader(section);
 		modMan = new ModificationManager();
+		name = loader.loadString("name", id);
 		this.needsItem = needsItem;
 		this.needsSource = needsSource;
 	}
@@ -57,6 +61,11 @@ public abstract class DefaultAction implements Action {
 	@Override
 	public String getID() {
 		return id;
+	}
+	
+	@Override
+	public String getName(CommandSender player) {
+		return name.startsWith("$") ? LangManager.getMessage(player, name.substring(1)) : name;
 	}
 	
 	@Override

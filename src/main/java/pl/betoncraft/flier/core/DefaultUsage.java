@@ -26,6 +26,7 @@ package pl.betoncraft.flier.core;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 
 import pl.betoncraft.flier.api.Flier;
@@ -34,6 +35,7 @@ import pl.betoncraft.flier.api.content.Activator;
 import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.LoadingException;
 import pl.betoncraft.flier.api.core.Usage;
+import pl.betoncraft.flier.util.LangManager;
 import pl.betoncraft.flier.util.Position;
 import pl.betoncraft.flier.util.ValueLoader;
 
@@ -44,8 +46,9 @@ import pl.betoncraft.flier.util.ValueLoader;
  */
 public class DefaultUsage implements Usage {
 	
-	protected String id;
-	protected ValueLoader loader;
+	protected final String id;
+	protected final String name;
+	protected final ValueLoader loader;
 	
 	protected int cooldown;
 	protected int ammoUse;
@@ -56,6 +59,7 @@ public class DefaultUsage implements Usage {
 	public DefaultUsage(ConfigurationSection section) throws LoadingException {
 		id = section.getName();
 		loader = new ValueLoader(section);
+		name = loader.loadString("name", id);
 		cooldown = loader.loadNonNegativeInt("cooldown", 0);
 		ammoUse = loader.loadInt("ammo_use", 0);
 		where = loader.loadEnum("where", Usage.Where.EVERYWHERE, Usage.Where.class);
@@ -71,6 +75,11 @@ public class DefaultUsage implements Usage {
 	@Override
 	public String getID() {
 		return id;
+	}
+	
+	@Override
+	public String getName(CommandSender player) {
+		return name.startsWith("$") ? LangManager.getMessage(player, name.substring(1)) : name;
 	}
 
 	@Override

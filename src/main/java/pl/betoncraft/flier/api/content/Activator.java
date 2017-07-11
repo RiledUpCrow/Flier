@@ -25,6 +25,7 @@ package pl.betoncraft.flier.api.content;
 
 import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.Modification;
+import pl.betoncraft.flier.api.core.Named;
 import pl.betoncraft.flier.api.core.UsableItem;
 
 /**
@@ -32,17 +33,12 @@ import pl.betoncraft.flier.api.core.UsableItem;
  *
  * @author Jakub Sapalski
  */
-public interface Activator {
+public interface Activator extends Named {
 
 	/**
 	 * @return whenever the Activator is active for this player
 	 */
 	public boolean isActive(InGamePlayer player, UsableItem item);
-
-	/**
-	 * @return the ID of this Activator, under which it is defined in activators.yml
-	 */
-	public String getID();
 	
 	/**
 	 * Applies passed modification to this Activator.

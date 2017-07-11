@@ -30,12 +30,7 @@ import org.bukkit.inventory.ItemStack;
  *
  * @author Jakub Sapalski
  */
-public interface Item {
-
-	/**
-	 * @return the ID of this Item, which is the section defining it in the file
-	 */
-	public String getID();
+public interface Item extends Named {
 
 	/**
 	 * @return the ItemStack equal to this item, with strings translated for specified player

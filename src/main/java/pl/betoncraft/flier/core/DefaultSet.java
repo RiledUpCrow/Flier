@@ -26,6 +26,7 @@ package pl.betoncraft.flier.core;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 
 import pl.betoncraft.flier.api.Flier;
@@ -35,6 +36,7 @@ import pl.betoncraft.flier.api.core.ItemSet;
 import pl.betoncraft.flier.api.core.LoadingException;
 import pl.betoncraft.flier.api.core.Modification;
 import pl.betoncraft.flier.api.core.UsableItem;
+import pl.betoncraft.flier.util.LangManager;
 import pl.betoncraft.flier.util.ValueLoader;
 
 /**
@@ -47,8 +49,9 @@ public class DefaultSet implements ItemSet {
 	protected ValueLoader loader;
 
 	protected String id;
-	protected String category;
 	protected String name;
+	protected String category;
+	protected String className;
 	protected Engine engine;
 	protected Wings wings;
 	protected List<UsableItem> items = new ArrayList<>();
@@ -58,8 +61,9 @@ public class DefaultSet implements ItemSet {
 		Flier flier = Flier.getInstance();
 		id = section.getName();
 		loader = new ValueLoader(section);
+		name = loader.loadString("name", id);
 		category = loader.loadString("category");
-		name = section.getString("name");
+		className = section.getString("class_name", null);
 		String engineName = section.getString("engine");
 		if (engineName == null) {
 			engine = null;
@@ -85,15 +89,20 @@ public class DefaultSet implements ItemSet {
 	public String getID() {
 		return id;
 	}
+	
+	@Override
+	public String getName(CommandSender player) {
+		return name.startsWith("$") ? LangManager.getMessage(player, name.substring(1)) : name;
+	}
 
 	@Override
 	public String getCategory() {
 		return category;
 	}
-
+	
 	@Override
-	public String getName() {
-		return name;
+	public String getClassName() {
+		return className;
 	}
 
 	@Override

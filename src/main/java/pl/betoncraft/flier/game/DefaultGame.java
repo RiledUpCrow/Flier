@@ -43,6 +43,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
+import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -588,7 +589,7 @@ public abstract class DefaultGame implements Listener, Game {
 	}
 
 	@Override
-	public String getName(Player player) {
+	public String getName(CommandSender player) {
 		return name.startsWith("$") ? LangManager.getMessage(player, name.substring(1)) : name;
 	}
 	

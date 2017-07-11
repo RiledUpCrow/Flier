@@ -37,6 +37,7 @@ import org.bukkit.permissions.Permission;
 import pl.betoncraft.flier.api.core.Arena;
 import pl.betoncraft.flier.api.core.Attacker;
 import pl.betoncraft.flier.api.core.InGamePlayer;
+import pl.betoncraft.flier.api.core.Named;
 import pl.betoncraft.flier.api.core.SetApplier;
 import pl.betoncraft.flier.api.core.Target;
 import pl.betoncraft.flier.event.FlierGameEndEvent.GameEndCause;
@@ -46,7 +47,7 @@ import pl.betoncraft.flier.event.FlierGameEndEvent.GameEndCause;
  *
  * @author Jakub Sapalski
  */
-public interface Game {
+public interface Game extends Named {
 
 	/**
 	 * The Button in a Lobby, which has costs and can be locked.
@@ -108,17 +109,6 @@ public interface Game {
 		 */
 		public SetApplier getOnUnlock();
 	}
-
-	/**
-	 * @return the ID of this Game
-	 */
-	public String getID();
-
-	/**
-	 * @param player the player for whom it should be translated
-	 * @return the display name of this Game
-	 */
-	public String getName(Player player);
 
 	/**
 	 * @return the unique number generated for this game, used to distinguish different matches

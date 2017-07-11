@@ -32,6 +32,7 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 import pl.betoncraft.flier.api.core.Arena;
+import pl.betoncraft.flier.api.core.Named;
 import pl.betoncraft.flier.event.FlierGameEndEvent.GameEndCause;
 
 /**
@@ -39,16 +40,11 @@ import pl.betoncraft.flier.event.FlierGameEndEvent.GameEndCause;
  *
  * @author Jakub Sapalski
  */
-public interface Lobby {
+public interface Lobby extends Named {
 	
 	public enum JoinResult {
 		GAME_CREATED, GAME_JOINED, GAMES_FULL, NO_SUCH_GAME, ALREADY_IN_GAME, BLOCKED
 	}
-
-	/**
-	 * @return the ID of this lobby
-	 */
-	public String getID();
 	
 	/**
 	 * @return whenever the Lobby is open for players or not

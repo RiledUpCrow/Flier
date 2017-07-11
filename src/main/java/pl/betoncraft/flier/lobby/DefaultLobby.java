@@ -37,6 +37,7 @@ import java.util.stream.IntStream;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -79,6 +80,7 @@ public abstract class DefaultLobby implements Lobby, Listener {
 	
 	protected ValueLoader loader;
 	protected String id;
+	protected final String name;
 	protected boolean open = false;
 
 	protected Map<String, List<Game>> gameLists = new HashMap<>();
@@ -93,6 +95,7 @@ public abstract class DefaultLobby implements Lobby, Listener {
 	public DefaultLobby(ConfigurationSection section) throws LoadingException {
 		id = section.getName();
 		loader = new ValueLoader(section);
+		name = loader.loadString("name", id);
 		spawn = loader.loadLocation("spawn");
 		maxGames = loader.loadNonNegativeInt("max_games", 0);
 		List<String> gameNames = section.getStringList("games");
@@ -128,6 +131,11 @@ public abstract class DefaultLobby implements Lobby, Listener {
 	@Override
 	public String getID() {
 		return id;
+	}
+	
+	@Override
+	public String getName(CommandSender player) {
+		return name.startsWith("$") ? LangManager.getMessage(player, name.substring(1)) : name;
 	}
 	
 	@Override

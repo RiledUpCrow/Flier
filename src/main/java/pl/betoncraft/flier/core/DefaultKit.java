@@ -83,8 +83,8 @@ public class DefaultKit implements Kit {
 
 		private Compiled(Collection<ItemSet> sets) {
 			for (ItemSet set : sets) {
-				if (set.getName() != null) {
-					name = set.getName();
+				if (set.getClassName() != null) {
+					name = set.getClassName();
 				}
 				// don't override existing stuff with nulls!
 				engine = set.getEngine() == null ? engine : set.getEngine();

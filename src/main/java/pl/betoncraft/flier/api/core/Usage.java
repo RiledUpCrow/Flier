@@ -33,7 +33,7 @@ import pl.betoncraft.flier.api.content.Activator;
  *
  * @author Jakub Sapalski
  */
-public interface Usage {
+public interface Usage extends Named {
 
 	/**
 	 * Represents a location where the player can be.
@@ -43,11 +43,6 @@ public interface Usage {
 	public enum Where {
 		GROUND, AIR, FALL, NO_GROUND, NO_AIR, NO_FALL, EVERYWHERE
 	}
-	
-	/**
-	 * @return the ID of this Usage
-	 */
-	public String getID();
 
 	/**
 	 * @return the list of Activators in this Usage

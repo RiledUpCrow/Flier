@@ -6,7 +6,7 @@
 # for other items.
 
 fast:                  # ID of the item set (used in the `buttons` section)
-  name: '$custom.fast'                 # name of the player's class
+  class_name: '$custom.fast'                 # name of the player's class
   category: main             # name of this set's category
   engine: fastEngine         # engine added in this item set
   wings: lightWings          # wings added in this item set
@@ -16,7 +16,7 @@ fast:                  # ID of the item set (used in the `buttons` section)
   - ammo
   - radar
 balanced:
-  name: '$custom.balanced'
+  class_name: '$custom.balanced'
   category: main             # the category here is the same as in Fast
   engine: balancedEngine
   wings: balancedWings
@@ -26,7 +26,7 @@ balanced:
   - ammo
   - radar
 strong:
-  name: '$custom.strong'
+  class_name: '$custom.strong'
   category: main
   engine: strongEngine
   wings: heavyWings

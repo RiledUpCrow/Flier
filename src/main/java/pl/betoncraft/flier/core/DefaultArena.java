@@ -26,8 +26,8 @@ package pl.betoncraft.flier.core;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.entity.Player;
 
 import pl.betoncraft.flier.api.core.Arena;
 import pl.betoncraft.flier.api.core.LoadingException;
@@ -77,7 +77,7 @@ public class DefaultArena implements Arena {
 	}
 
 	@Override
-	public String getName(Player player) {
+	public String getName(CommandSender player) {
 		return name.startsWith("$") ? LangManager.getMessage(player, name.substring(1)) : name;
 	}
 

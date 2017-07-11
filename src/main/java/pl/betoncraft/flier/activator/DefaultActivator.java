@@ -23,11 +23,13 @@
  */
 package pl.betoncraft.flier.activator;
 
+import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 
 import pl.betoncraft.flier.api.content.Activator;
 import pl.betoncraft.flier.api.core.Modification;
 import pl.betoncraft.flier.api.core.Modification.ModificationTarget;
+import pl.betoncraft.flier.util.LangManager;
 import pl.betoncraft.flier.util.ModificationManager;
 import pl.betoncraft.flier.util.ValueLoader;
 
@@ -39,6 +41,7 @@ import pl.betoncraft.flier.util.ValueLoader;
 public abstract class DefaultActivator implements Activator {
 	
 	protected final String id;
+	protected final String name;
 	protected final ValueLoader loader;
 	protected final ModificationManager modMan;
 	
@@ -46,11 +49,17 @@ public abstract class DefaultActivator implements Activator {
 		id = section.getName();
 		loader = new ValueLoader(section);
 		modMan = new ModificationManager();
+		name = loader.loadString("name", id);
 	}
 	
 	@Override
 	public String getID() {
 		return id;
+	}
+	
+	@Override
+	public String getName(CommandSender player) {
+		return name.startsWith("$") ? LangManager.getMessage(player, name.substring(1)) : name;
 	}
 	
 	@Override
