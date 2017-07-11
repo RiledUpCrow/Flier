@@ -159,7 +159,7 @@ public abstract class DefaultGame implements Listener, Game {
 		}
 		
 		// calculate borders
-		center = arena.getLocation(loader.loadString("center"));
+		center = arena.getLocationSet(loader.loadString("center")).getSingle();
 		int radius = loader.loadPositiveInt("radius");
 		minX = center.getBlockX() - radius;
 		maxX = center.getBlockX() + radius;
@@ -167,8 +167,8 @@ public abstract class DefaultGame implements Listener, Game {
 		maxZ = center.getBlockZ() + radius;
 		
 		// load "leave" blocks
-		for (String name : section.getStringList("leave_blocks")) {
-			leaveBlocks.add(arena.getLocation(name).getBlock());
+		for (Location loc : arena.getLocationSet(loader.loadString("leave_blocks")).getMultiple()) {
+			leaveBlocks.add(loc.getBlock());
 		}
 		
 		fancyStuff = flier.getFancyStuff();
@@ -266,7 +266,7 @@ public abstract class DefaultGame implements Listener, Game {
 	public class DefaultButton implements Button {
 		
 		protected final String id;
-		protected List<Location> locations = new ArrayList<>();
+		protected List<Location> locations;
 		protected final Set<String> requirements;
 		protected final Set<Permission> permissions;
 		protected final int buyCost;
@@ -279,9 +279,7 @@ public abstract class DefaultGame implements Listener, Game {
 		public DefaultButton(ConfigurationSection section) throws LoadingException {
 			id = section.getName();
 			ValueLoader loader = new ValueLoader(section);
-			for (String locationName : section.getStringList("blocks")) {
-				locations.add(arena.getLocation(locationName));
-			}
+			locations = Arrays.asList(arena.getLocationSet(section.getString("blocks")).getMultiple());
 			if (locations.isEmpty()) {
 				throw new LoadingException("Blocks must be specified.");
 			}
@@ -415,7 +413,7 @@ public abstract class DefaultGame implements Listener, Game {
 			respawnDelay = loader.loadNonNegativeInt("respawn_delay", 0);
 			startDelay = loader.loadNonNegativeInt("start_delay", 0);
 			locking = loader.loadBoolean("locking", false);
-			location = arena.getLocation(loader.loadString("waiting_room"));
+			location = arena.getLocationSet(loader.loadString("waiting_room")).getSingle();
 			ticker = new BukkitRunnable() {
 				public void run() {
 					tick();

@@ -6,8 +6,6 @@
  */
 package pl.betoncraft.flier.api.core;
 
-import org.bukkit.Location;
-
 /**
  * Contains Locations for Games.
  *
@@ -26,7 +24,7 @@ public interface Arena {
 	 * @return the Location, never null
 	 * @throws when it can't load this Location
 	 */
-	public Location getLocation(String name) throws LoadingException;
+	public LocationSet getLocationSet(String name) throws LoadingException;
 	
 	/**
 	 * @return whenever this Arena is currently used

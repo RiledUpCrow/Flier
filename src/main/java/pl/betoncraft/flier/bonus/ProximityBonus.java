@@ -33,7 +33,7 @@ public class ProximityBonus extends DefaultBonus {
 			Optional<UsableItem> item) throws LoadingException {
 		super(section, game, creator, item);
 		distance = Math.pow(loader.loadNonNegativeDouble("distance"), 2);
-		location = game.getArena().getLocation(loader.loadString("location"));
+		location = game.getArena().getLocationSet(loader.loadString("location")).getSingle();
 	}
 	
 	public void check() {

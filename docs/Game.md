@@ -20,9 +20,10 @@ game_name:
   respawn_delay: [non-negative integer]
   start_delay: [non-negative integer]
   locking: [true/false]
-  waiting_room: [location]
-  center: [location]
+  waiting_room: [arena location (single)]
+  center: [arena location (single)]
   radius: [integer]
+  leave_blocks: [arena locations (multiple)]
   viable_arenas:
   - [arena name]
   respawn_action: [action]
@@ -54,6 +55,7 @@ game_name:
       unlock_cost: [integer]
       on_unlock:
         [the same as in on_buy]
+      blocks: [arena locations (multiple)]
   [type specific settings]
 ```
 
@@ -76,6 +78,7 @@ These settings apply to every game. Some of them have default values, so if you 
 * `waiting_room` (**required**) the location of the waiting room, as defined in _arenas.yml_ file.
 * `center` (**required**) the center location of the game arena, as defined in _arenas.yml_ file.
 * `radius` (**required**) the radius around the center location players are allowed to fly.
+* `leave_blocks` (**optional**) name of locations from the arena (can have multiple locations under the same name)
 * `viable_arenas` list of arenas on which this game can be played. New games will be created in the first free arena from this list.
 
 ***
@@ -112,7 +115,9 @@ These settings apply to every game. Some of them have default values, so if you 
 
 ***
 
-* `buttons` is a list of clickable, item set giving controls (for example a button in `physicalLobby` is a block in the room). Each button support two types of the click, called "buy" and "sell" (you don't have to actually sell anything with "sell" type, it's just a name). Additionally, a button can be locked before using it, so the player has to unlock it with money. You can specify the cost of each action in `buy_cost`, `sell_cost` and `unlock_cost` options. Negative values will give the money to the player, so you can use that for selling items.
+* `buttons` is a list of clickable blocks on the map. By clicking on those blocks the player can modify his items. Each button supports two types of the click, called "buy" and "sell" (you don't have to actually sell anything with "sell" type, it's just a name). Additionally a button can be locked, so the player has to unlock it with money before using it. You can specify the cost of each action in `buy_cost`, `sell_cost` and `unlock_cost` options. Negative values will give the money to the player, so you can use that for selling items.
+
+    Each button specified a location from the arena in the `blocks` setting. It can have multiple locations if you want to have more of these buttons.
 
     Each of the `on_buy`, `on_sell` and `on_unlock` categories holds so called _applier_, which is a set of rules on how to apply an item set. The `item_set` option is the name of the item set, as defined in _sets.yml_ file. The `add_type` specifies how exactly that item set will be added. Possible values are:
 

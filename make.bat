@@ -41,6 +41,7 @@ pandoc^
  docs\Commands.md^
  docs\Integrations.md^
  docs\Lobby.md^
+ docs\Arena.md^
  docs\Game.md^
  docs\ItemSet.md^
  docs\Item.md^

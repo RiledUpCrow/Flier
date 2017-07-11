@@ -9,12 +9,11 @@ package pl.betoncraft.flier.core;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 
 import pl.betoncraft.flier.api.core.Arena;
 import pl.betoncraft.flier.api.core.LoadingException;
-import pl.betoncraft.flier.util.ValueLoader;
+import pl.betoncraft.flier.api.core.LocationSet;
 
 /**
  * Default implementation of an Arena.
@@ -24,14 +23,24 @@ import pl.betoncraft.flier.util.ValueLoader;
 public class DefaultArena implements Arena {
 	
 	private String id;
-	private Map<String, Location> locations = new HashMap<>();
+	private Map<String, LocationSet> locationSets = new HashMap<>();
 	private boolean used = false;
 	
 	public DefaultArena(ConfigurationSection section) throws LoadingException {
 		id = section.getName();
-		ValueLoader loader = new ValueLoader(section);
 		for (String key : section.getKeys(false)) {
-			locations.put(key, loader.loadLocation(key));
+			LocationSet set;
+			try {
+				if (section.isList(key)) {
+					set = new DefaultLocationSet(section.getStringList(key));
+				} else {
+					set = new DefaultLocationSet(section.getString(key));
+				}
+			} catch (LoadingException e) {
+				throw (LoadingException) new LoadingException(
+						String.format("Error loading '%s' location.", key)).initCause(e);
+			}
+			locationSets.put(key, set);
 		}
 	}
 	
@@ -41,8 +50,8 @@ public class DefaultArena implements Arena {
 	}
 
 	@Override
-	public Location getLocation(String name) throws LoadingException {
-		Location loc = locations.get(name);
+	public LocationSet getLocationSet(String name) throws LoadingException {
+		LocationSet loc = locationSets.get(name);
 		if (loc == null) {
 			throw new LoadingException(String.format("Arena '%s' is missing '%s' location.", id, name));
 		}

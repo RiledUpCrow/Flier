@@ -43,7 +43,7 @@ public class DeathMatchGame extends DefaultGame {
 	protected final Map<UUID, Integer> scores = new HashMap<>();
 	protected final Map<String, ChatColor> colors = new HashMap<>();
 	
-	protected final List<Location> locations = new ArrayList<>();
+	protected final List<Location> locations;
 	protected int spawnCounter = 0;
 	
 	protected final List<ChatColor> usedColors;
@@ -71,9 +71,7 @@ public class DeathMatchGame extends DefaultGame {
 		} else {
 			usedColors = Arrays.asList(ChatColor.values());
 		}
-		for (String name : section.getStringList("spawns")) {
-			locations.add(arena.getLocation(name));
-		}
+		locations = Arrays.asList(arena.getLocationSet(section.getString("spawns")).getMultiple());
 		if (locations.isEmpty()) {
 			throw new LoadingException("Spawn list cannot be empty");
 		}

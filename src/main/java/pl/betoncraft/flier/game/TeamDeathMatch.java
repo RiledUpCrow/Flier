@@ -7,6 +7,7 @@
 package pl.betoncraft.flier.game;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -82,9 +83,7 @@ public class TeamDeathMatch extends DefaultGame {
 			ValueLoader loader = new ValueLoader(section);
 			color = loader.loadEnum("color", ChatColor.class);
 			name = ChatColor.translateAlternateColorCodes('&', loader.loadString("name"));
-			for (String name : section.getStringList("spawns")) {
-				spawns.add(arena.getLocation(name));
-			}
+			spawns = Arrays.asList(arena.getLocationSet(section.getString("spawns")).getMultiple());
 			if (spawns.isEmpty()) {
 				throw new LoadingException(String.format("Spawn list for team %s is empty.", name));
 			}
