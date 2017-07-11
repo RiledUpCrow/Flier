@@ -180,6 +180,16 @@ public class TeamDeathMatch extends DefaultGame {
 		players.remove(player.getUniqueId());
 		updateColors();
 	}
+	
+	@Override
+	public boolean modifyPoints(UUID player, int amount) {
+		SimpleTeam team = players.get(player);
+		if (team != null) {
+			score(team, amount);
+			return true;
+		}
+		return false;
+	}
 
 	@Override
 	public void handleKill(InGamePlayer killed, DamageCause cause) {

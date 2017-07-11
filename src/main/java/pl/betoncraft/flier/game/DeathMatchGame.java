@@ -160,6 +160,16 @@ public class DeathMatchGame extends DefaultGame {
 	}
 
 	@Override
+	public boolean modifyPoints(UUID player, int amount) {
+		InGamePlayer data = dataMap.get(player);
+		if (data != null) {
+			score(data, amount);
+			return true;
+		}
+		return false;
+	}
+
+	@Override
 	public void handleKill(InGamePlayer killed, DamageCause cause) {
 		super.handleKill(killed, cause);
 		Attacker attacker = killed.getAttacker();

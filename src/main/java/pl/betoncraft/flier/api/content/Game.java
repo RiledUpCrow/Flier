@@ -151,6 +151,18 @@ public interface Game {
 	 * @return a set containing all targets in this Game
 	 */
 	public Map<UUID, Target> getTargets();
+	
+	/**
+	 * Modifies the amount of points of the player specified by the UUID. This
+	 * method will return false if the player is not in the Game.
+	 * 
+	 * @param player
+	 *            the UUID of the player
+	 * @param amount
+	 *            the amount of points to modify (can be negative)
+	 * @return whenever the points were correctly modified
+	 */
+	public boolean modifyPoints(UUID player, int amount);
 
 	/**
 	 * This method will be called by the Lobby when the game needs to be started.
