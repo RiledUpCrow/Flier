@@ -40,6 +40,7 @@ import pl.betoncraft.flier.integration.betonquest.JoinGameObjective;
 import pl.betoncraft.flier.integration.betonquest.JoinLobbyObjective;
 import pl.betoncraft.flier.integration.betonquest.LobbyCondition;
 import pl.betoncraft.flier.integration.betonquest.UsableItemObjective;
+import pl.betoncraft.flier.integration.placeholderapi.FlierPlaceholder;
 
 /**
  * Loads all possible integrations.
@@ -49,6 +50,7 @@ import pl.betoncraft.flier.integration.betonquest.UsableItemObjective;
 public class Integrations {
 	
 	public Integrations() {
+		Flier flier = Flier.getInstance();
 		if (Bukkit.getPluginManager().isPluginEnabled("BetonQuest")) {
 			BetonQuest bq = BetonQuest.getInstance();
 			bq.registerConditions("ingame", GameCondition.class);
@@ -64,7 +66,11 @@ public class Integrations {
 			bq.registerObjectives("flierdeath", FlierDeathObjective.class);
 			bq.registerObjectives("fliergethit", FlierGetHitObjective.class);
 			bq.registerObjectives("flierbutton", ButtonObjective.class);
-			Flier.getInstance().getLogger().info("Hooked into BetonQuest!");
+			flier.getLogger().info("Hooked into BetonQuest!");
+		}
+		if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
+			new FlierPlaceholder(flier, "flier").hook();
+			flier.getLogger().info("Hooked into PlaceholderAPI!");
 		}
 	}
 

@@ -27,10 +27,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.entity.Player;
 
 import pl.betoncraft.flier.api.core.Arena;
 import pl.betoncraft.flier.api.core.LoadingException;
 import pl.betoncraft.flier.api.core.LocationSet;
+import pl.betoncraft.flier.util.LangManager;
+import pl.betoncraft.flier.util.ValueLoader;
 
 /**
  * Default implementation of an Arena.
@@ -40,18 +43,25 @@ import pl.betoncraft.flier.api.core.LocationSet;
 public class DefaultArena implements Arena {
 	
 	private String id;
+	private String name;
 	private Map<String, LocationSet> locationSets = new HashMap<>();
 	private boolean used = false;
 	
 	public DefaultArena(ConfigurationSection section) throws LoadingException {
 		id = section.getName();
-		for (String key : section.getKeys(false)) {
+		ValueLoader loader = new ValueLoader(section);
+		name = loader.loadString("name", id);
+		ConfigurationSection locations = section.getConfigurationSection("locations");
+		if (locations == null || locations.getKeys(false).isEmpty()) {
+			throw new LoadingException("Locations must be specified.");
+		}
+		for (String key : locations.getKeys(false)) {
 			LocationSet set;
 			try {
-				if (section.isList(key)) {
-					set = new DefaultLocationSet(section.getStringList(key));
+				if (locations.isList(key)) {
+					set = new DefaultLocationSet(locations.getStringList(key));
 				} else {
-					set = new DefaultLocationSet(section.getString(key));
+					set = new DefaultLocationSet(locations.getString(key));
 				}
 			} catch (LoadingException e) {
 				throw (LoadingException) new LoadingException(
@@ -64,6 +74,11 @@ public class DefaultArena implements Arena {
 	@Override
 	public String getID() {
 		return id;
+	}
+
+	@Override
+	public String getName(Player player) {
+		return name.startsWith("$") ? LangManager.getMessage(player, name.substring(1)) : name;
 	}
 
 	@Override

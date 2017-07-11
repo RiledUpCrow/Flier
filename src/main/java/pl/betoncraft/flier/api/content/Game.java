@@ -115,6 +115,12 @@ public interface Game {
 	public String getID();
 
 	/**
+	 * @param player the player for whom it should be translated
+	 * @return the display name of this Game
+	 */
+	public String getName(Player player);
+
+	/**
 	 * @return the unique number generated for this game, used to distinguish different matches
 	 */
 	public int getUniqueNumber();

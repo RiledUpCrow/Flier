@@ -23,6 +23,7 @@
  */
 package pl.betoncraft.flier.api.content;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -126,7 +127,7 @@ public interface Lobby {
 	/**
 	 * @return the map of games and their names
 	 */
-	public Map<String, Set<Game>> getGames();
+	public Map<String, List<Game>> getGames();
 
 	/**
 	 * @return the map of Arenas and their names

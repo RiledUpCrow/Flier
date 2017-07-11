@@ -113,6 +113,7 @@ public abstract class DefaultGame implements Listener, Game {
 	});
 
 	protected final String id;
+	protected final String name;
 	protected final int uniqueNumber = new Random().nextInt(Integer.MAX_VALUE);
 	protected final ValueLoader loader;
 	protected GameHeartBeat heartBeat;
@@ -158,6 +159,7 @@ public abstract class DefaultGame implements Listener, Game {
 		this.lobby = lobby;
 		id = section.getName();
 		loader = new ValueLoader(section);
+		name = loader.loadString("name", id);
 		
 		// select an arena
 		List<String> viableArenas = section.getStringList("viable_arenas");
@@ -583,6 +585,11 @@ public abstract class DefaultGame implements Listener, Game {
 	@Override
 	public String getID() {
 		return id;
+	}
+
+	@Override
+	public String getName(Player player) {
+		return name.startsWith("$") ? LangManager.getMessage(player, name.substring(1)) : name;
 	}
 	
 	@Override

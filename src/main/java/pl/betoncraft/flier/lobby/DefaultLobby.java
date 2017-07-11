@@ -23,6 +23,7 @@
  */
 package pl.betoncraft.flier.lobby;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -80,7 +81,7 @@ public abstract class DefaultLobby implements Lobby, Listener {
 	protected String id;
 	protected boolean open = false;
 
-	protected Map<String, Set<Game>> gameSets = new HashMap<>();
+	protected Map<String, List<Game>> gameSets = new HashMap<>();
 	protected Map<String, Arena> arenas = new HashMap<>();
 	protected Location spawn;
 	protected Set<UUID> players = new HashSet<>();
@@ -107,7 +108,7 @@ public abstract class DefaultLobby implements Lobby, Listener {
 				throw new LoadingException(String.format(
 						"Game '%s' does not have any viable arena to be played on.", gameName));
 			}
-			gameSets.put(gameName, new HashSet<>());
+			gameSets.put(gameName, new ArrayList<>());
 		}
 		if (gameSets.isEmpty()) {
 			throw new LoadingException("Game list is empty.");
@@ -189,7 +190,7 @@ public abstract class DefaultLobby implements Lobby, Listener {
 		}
 		
 		// find the correct set of games
-		Set<Game> games = gameSets.get(gameName);
+		List<Game> games = gameSets.get(gameName);
 		if (games == null) {
 			return JoinResult.NO_SUCH_GAME;
 		}
@@ -247,7 +248,7 @@ public abstract class DefaultLobby implements Lobby, Listener {
 	
 	@Override
 	public void leaveGame(Player player) {
-		loop: for (Set<Game> set : gameSets.values()) {
+		loop: for (List<Game> set : gameSets.values()) {
 			for (Iterator<Game> it = set.iterator(); it.hasNext();) {
 				Game game = it.next();
 				InGamePlayer data = game.getPlayers().get(player.getUniqueId());
@@ -304,7 +305,7 @@ public abstract class DefaultLobby implements Lobby, Listener {
 	}
 	
 	@Override
-	public Map<String, Set<Game>> getGames() {
+	public Map<String, List<Game>> getGames() {
 		return Collections.unmodifiableMap(gameSets);
 	}
 	
