@@ -36,8 +36,8 @@ import pl.betoncraft.flier.api.content.Action;
 import pl.betoncraft.flier.api.content.Activator;
 import pl.betoncraft.flier.api.content.Engine;
 import pl.betoncraft.flier.api.content.Game;
-import pl.betoncraft.flier.api.content.Wings;
 import pl.betoncraft.flier.api.content.Game.Attitude;
+import pl.betoncraft.flier.api.content.Wings;
 import pl.betoncraft.flier.api.core.Attacker;
 import pl.betoncraft.flier.api.core.Damager;
 import pl.betoncraft.flier.api.core.FancyStuffWrapper;
@@ -230,7 +230,7 @@ public class DefaultPlayer implements InGamePlayer {
 		if (!damager.causesFriendlyFire() && getGame().getAttitude(this, creator) == Attitude.FRIENDLY) {
 			return false;
 		}
-		// if shooter was this player but damager is not suicidal, return
+		// if creator was this player but damager is not suicidal, return
 		if (!damager.isSuicidal() && this.equals(creator)) {
 			return false;
 		}
@@ -241,24 +241,27 @@ public class DefaultPlayer implements InGamePlayer {
 		if (hitEvent.isCancelled()) {
 			return false;
 		}
-		lastHit = attacker;
-		noDamageTicks = damager.getNoDamageTicks();
-		// display a message about the hit and play the sound to the creator
-		// if he exists and if he hits someone else
-		if (creator != null && !creator.equals(this)) {
-			if (weapon == null) {
-				LangManager.sendMessage(creator, "hit", Utils.formatPlayer(this, creator));
-			} else {
-				LangManager.sendMessage(creator, "hit_weapon", Utils.formatPlayer(this, creator),
-						Utils.formatItem(weapon, creator));
+		// if this is an intermediate hit then skip handling this hit
+		if (damager.isFinalHit()) {
+			lastHit = attacker;
+			noDamageTicks = damager.getNoDamageTicks();
+			// display a message about the hit and play the sound to the creator
+			// if he exists and if he hits someone else
+			if (creator != null && !creator.equals(this)) {
+				if (weapon == null) {
+					LangManager.sendMessage(creator, "hit", Utils.formatPlayer(this, creator));
+				} else {
+					LangManager.sendMessage(creator, "hit_weapon", Utils.formatPlayer(this, creator),
+							Utils.formatItem(weapon, creator));
+				}
 			}
-		}
-		if (!this.equals(creator)) {
-			if (weapon == null) {
-				LangManager.sendMessage(this, "get_hit", Utils.formatPlayer(creator, this));
-			} else {
-				LangManager.sendMessage(this, "get_hit_weapon", Utils.formatPlayer(creator, this),
-						Utils.formatItem(weapon, this));
+			if (!this.equals(creator)) {
+				if (weapon == null) {
+					LangManager.sendMessage(this, "get_hit", Utils.formatPlayer(creator, this));
+				} else {
+					LangManager.sendMessage(this, "get_hit_weapon", Utils.formatPlayer(creator, this),
+							Utils.formatItem(weapon, this));
+				}
 			}
 		}
 		loop: for (Usage usage : damager.getSubUsages()) {

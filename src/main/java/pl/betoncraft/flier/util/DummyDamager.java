@@ -44,5 +44,10 @@ public class DummyDamager implements Damager {
 	public boolean isSuicidal() {
 		return true;
 	}
+	
+	@Override
+	public boolean isFinalHit() {
+		return false;
+	}
 
 }

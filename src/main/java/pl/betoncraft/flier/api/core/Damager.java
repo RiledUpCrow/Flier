@@ -36,5 +36,12 @@ public interface Damager {
 	 * @return whenever this Damager can damage the player who created it
 	 */
 	public boolean isSuicidal();
+	
+	/**
+	 * @return whenever this Damager should be considered a final hit; there may
+	 *         be more Damagers caused by this one, in which case this method
+	 *         should return false
+	 */
+	public boolean isFinalHit();
 
 }

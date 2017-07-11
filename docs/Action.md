@@ -14,6 +14,10 @@ Actions which can apply other action to target players are called "attacks". An 
 
 Attacks also have other settings. `no_damage_ticks` is responsible for preventing next attacks from happening too quickly. `friendly_fire` controls whenever you can attack a friendly player with this weapon and `suicidal` controls whenever you can attack yourself with it.
 
+There's one special feature: `final`. This tells Flier whenever the attack should be handled as a hit. This is important because there's one situation when you don't want a particular attack to be a hit - chained attacks. If one of your attacks (like a rocket) triggers another attack (like an explosion), you'll want to skip displaying message about rocket hitting and only display messages about players caught in that explosion attack. It will catch the rocket-hit player too, so you don't want to see the message twice. The first attack will be marked as `final: false`, because the explosion is the actual hit.
+
+_**Note**: if your `no_damage_ticks` setting is greater than 0, all final hits will prevent any further attacks from happening. In that case the chained attacks must have `final` setting disabled to even work._
+
 ```
 some_attack_action
   type: [attack action type]
@@ -22,12 +26,14 @@ some_attack_action
   no_damage_ticks: [non-negative integer]
   friendly_fire: [true/false]
   suicidal: [true/false]
+  final: [true/false]
 ```
 
 * `attack_usages` is a list of "usages". These are the same as described in _Item_ chapter. Settings like ammunition and cooldown don't apply here though.
 * `no_damage_ticks` (**default: 0**) is the amount of ticks before the player can be hit with an attack again.
 * `friendly_fire` (**default: true**) whenever you can attack a friendly player with this weapon.
 * `suicidal` (**default: false**) whenever you can attack yourself with this weapon.
+* `final` (**default: true**) whenever this attack should count as a hit.
 
 ## Action types
 

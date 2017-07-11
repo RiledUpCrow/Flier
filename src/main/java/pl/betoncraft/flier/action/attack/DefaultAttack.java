@@ -27,11 +27,13 @@ public abstract class DefaultAttack extends DefaultAction implements Attack {
 	private static final String NO_DAMAGE_TICKS = "no_damage_ticks";
 	private static final String FRIENDLY_FIRE = "friendly_fire";
 	private static final String SUICIDAL = "suicidal";
+	private static final String FINAL_HIT = "final";
 	private static final String ATTACK_USAGES = "attack_usages";
 	
 	protected final int noDamageTicks;
 	protected final boolean friendlyFire;
 	protected final boolean suicidal;
+	protected final boolean finalHit;
 	protected List<Usage> subUsages = new ArrayList<>();
 	
 	public DefaultAttack(ConfigurationSection section) throws LoadingException {
@@ -39,6 +41,7 @@ public abstract class DefaultAttack extends DefaultAction implements Attack {
 		noDamageTicks = loader.loadPositiveInt(NO_DAMAGE_TICKS, 20);
 		friendlyFire = loader.loadBoolean(FRIENDLY_FIRE, true);
 		suicidal = loader.loadBoolean(SUICIDAL, false);
+		finalHit = loader.loadBoolean(FINAL_HIT, true);
 		ConfigurationSection attackUsages = section.getConfigurationSection(ATTACK_USAGES);
 		if (attackUsages != null) for (String usageName : attackUsages.getKeys(false)) {
 			try {
@@ -68,6 +71,11 @@ public abstract class DefaultAttack extends DefaultAction implements Attack {
 	@Override
 	public boolean isSuicidal() {
 		return modMan.modifyBoolean(SUICIDAL, suicidal);
+	}
+	
+	@Override
+	public boolean isFinalHit() {
+		return modMan.modifyBoolean(FINAL_HIT, finalHit);
 	}
 
 }

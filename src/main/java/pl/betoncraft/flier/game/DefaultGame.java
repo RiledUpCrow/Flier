@@ -754,14 +754,16 @@ public abstract class DefaultGame implements Listener, Game {
 	}
 	
 	protected void moveToWaitingRoom(InGamePlayer player) {
-		Utils.clearPlayer(player.getPlayer());
-		player.setPlaying(false);
-		Kit kit = player.getKit();
-		kit.onRespawn();
-		player.updateKit();
-		WaitReason reason = waitingRoom.addPlayer(player);
-		Bukkit.getScheduler().scheduleSyncDelayedTask(Flier.getInstance(), () ->
-				waitMessage(player.getPlayer(), reason));
+		Bukkit.getScheduler().scheduleSyncDelayedTask(Flier.getInstance(), () -> {
+			Utils.clearPlayer(player.getPlayer());
+			player.setAttacker(null);
+			player.setPlaying(false);
+			Kit kit = player.getKit();
+			kit.onRespawn();
+			player.updateKit();
+			WaitReason reason = waitingRoom.addPlayer(player);
+			waitMessage(player.getPlayer(), reason);
+		});
 	}
 	
 	@Override
@@ -769,7 +771,7 @@ public abstract class DefaultGame implements Listener, Game {
 		InGamePlayer creator = attacker.getCreator();
 		boolean hit = attacked.handleHit(attacker);
 		// handle a general hit
-		if (hit && creator != null && attacked instanceof InGamePlayer) {
+		if (hit && attacker.getDamager().isFinalHit() && creator != null && attacked instanceof InGamePlayer) {
 			// pay money for a hit
 			InGamePlayer attackedPlayer = (InGamePlayer) attacked;
 			Attitude a = getAttitude(creator, attacked);
