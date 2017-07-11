@@ -46,11 +46,9 @@ import pl.betoncraft.flier.api.core.Kit;
 import pl.betoncraft.flier.api.core.SidebarLine;
 import pl.betoncraft.flier.api.core.UsableItem;
 import pl.betoncraft.flier.api.core.Usage;
-import pl.betoncraft.flier.api.core.Usage.Where;
 import pl.betoncraft.flier.event.FlierEngineUseEvent;
 import pl.betoncraft.flier.event.FlierPlayerHitEvent;
 import pl.betoncraft.flier.util.LangManager;
-import pl.betoncraft.flier.util.Position;
 import pl.betoncraft.flier.util.Utils;
 
 /**
@@ -76,7 +74,6 @@ public class DefaultPlayer implements InGamePlayer {
 	private List<SidebarLine> lines = new LinkedList<>();
 	private Attacker lastHit = null;
 	private ChatColor color = ChatColor.WHITE;
-	private long glowTimer;
 	private int money;
 	
 	public DefaultPlayer(Player player, Game game, Kit kit) {
@@ -137,10 +134,6 @@ public class DefaultPlayer implements InGamePlayer {
 			if (!isAccelerating()) { // is not accelerating
 				regenerateFuel();
 			}
-			// if on ground glow for half a second every second
-			if (tickCounter % 20 == 0 && Position.check(player, Where.GROUND)) {
-				startGlowing(10);
-			}
 			
 			// manage UsableItems
 			use();
@@ -151,7 +144,6 @@ public class DefaultPlayer implements InGamePlayer {
 	}
 
 	public void slowTick() {
-		stopGlowing();
 		updateStats();
 		updateActionBar();
 		if (!sb.equals(player.getScoreboard())) {
@@ -511,17 +503,6 @@ public class DefaultPlayer implements InGamePlayer {
 		player.setScoreboard(oldSb);
 	}
 	
-	private void startGlowing(int ticks) {
-		player.setGlowing(true);
-		glowTimer = System.currentTimeMillis() + 50*ticks;
-	}
-	
-	private void stopGlowing() {
-		if (System.currentTimeMillis() >= glowTimer) {
-			player.setGlowing(false);
-		}
-	}
-	
 	private void speedUp() {
 		Engine engine = kit.getEngine();
 		if (engine == null) {
@@ -536,7 +517,7 @@ public class DefaultPlayer implements InGamePlayer {
 			return;
 		}
 		getPlayer().setVelocity(engine.launch(getPlayer().getVelocity(), getPlayer().getLocation().getDirection()));
-		startGlowing(engine.getGlowTime());
+//		startGlowing(engine.getGlowTime());
 	}
 	
 	private void regenerateFuel() {

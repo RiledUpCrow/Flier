@@ -20,7 +20,6 @@ import pl.betoncraft.flier.core.DefaultItem;
  */
 public abstract class DefaultEngine extends DefaultItem implements Engine {
 
-	private static final String GLOW_TIME = "glow_time";
 	private static final String REGENERATION = "regeneration";
 	private static final String CONSUMPTION = "consumption";
 	private static final String MAX_FUEL = "max_fuel";
@@ -28,7 +27,6 @@ public abstract class DefaultEngine extends DefaultItem implements Engine {
 	protected final double maxFuel;
 	protected final double consumption;
 	protected final double regeneration;
-	protected final int glowTime;
 	
 	protected double fuel;
 
@@ -37,7 +35,6 @@ public abstract class DefaultEngine extends DefaultItem implements Engine {
 		maxFuel = loader.loadPositiveDouble(MAX_FUEL);
 		consumption = loader.loadNonNegativeDouble(CONSUMPTION);
 		regeneration = loader.loadNonNegativeDouble(REGENERATION);
-		glowTime = loader.loadNonNegativeInt(GLOW_TIME);
 		fuel = maxFuel;
 	}
 
@@ -54,11 +51,6 @@ public abstract class DefaultEngine extends DefaultItem implements Engine {
 	@Override
 	public double getRegeneration() {
 		return modMan.modifyNumber(REGENERATION, regeneration);
-	}
-	
-	@Override
-	public int getGlowTime() {
-		return (int) modMan.modifyNumber(GLOW_TIME, glowTime);
 	}
 
 	@Override

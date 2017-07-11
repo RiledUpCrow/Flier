@@ -81,17 +81,3 @@ on_a_block:
 ```
 
 * `block` is the [type of a block](https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html).
-
-### Position
-
-**`position`**
-
-This activator is activated when the player is in a correct position.
-
-```
-somewhere:
-  type: position
-  position: [where]
-```
-
-* `position` is the name of the position. Available values are: `ground`, `air`, `fall`, `no ground`, `no air`, `no fall`, `everywhere`.

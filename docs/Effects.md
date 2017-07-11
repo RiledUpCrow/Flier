@@ -103,6 +103,21 @@ effect_name:
   manual_offset: [non-negative decimal]
 ```
 
+### Glow effect
+
+**`glow`**
+
+This effect makes the player glow for a specified time.
+
+```
+shiny:
+  type: glow
+  [event settings]
+  time: [positive integer]
+```
+
+* `time` (**required**) is the glowing time in ticks.
+
 ## Event types
 
 Every player event has available these matchers:

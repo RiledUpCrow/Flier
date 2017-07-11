@@ -9,7 +9,6 @@ engine_name:
   max_fuel: [positive decimal]
   consumption: [non-negative decimal]
   regeneration: [non-negative decimal]
-  glow_time: [non-negative integer]
   [type specific settings]
 ```
 
@@ -18,7 +17,6 @@ engine_name:
 * `max_fuel` (**required**) is the amount of fuel the engine has.
 * `consumption` (**required**) is the amount of fuel consumed every tick while accelerating (20 times per second). Set it to 0 if you want your fuel to be unlimited.
 * `regeneration` (**required**) is the amount of fuel regenerated every tick while _not_ accelerating. Set it to 0 if you want to restore fuel some other way than via regeneration.
-* `glow_time` (**required**) is the time the player glows after using their engine. If you don't want to glow, set it to 0.
 
 ## Engine types
 

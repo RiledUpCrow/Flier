@@ -80,6 +80,7 @@ import pl.betoncraft.flier.core.DefaultModification;
 import pl.betoncraft.flier.core.DefaultSet;
 import pl.betoncraft.flier.core.DefaultUsableItem;
 import pl.betoncraft.flier.effect.GameSoundEffect;
+import pl.betoncraft.flier.effect.GlowingEffect;
 import pl.betoncraft.flier.effect.ParticleEffect;
 import pl.betoncraft.flier.effect.PrivateSoundEffect;
 import pl.betoncraft.flier.effect.PublicSoundEffect;
@@ -163,6 +164,7 @@ public class FlierPlugin extends JavaPlugin implements Flier {
 		registerEffect("privateSound", s -> new PrivateSoundEffect(s));
 		registerEffect("gameSound", s -> new GameSoundEffect(s));
 		registerEffect("particle", s -> new ParticleEffect(s));
+		registerEffect("glow", s -> new GlowingEffect(s));
 		
 		// add projectile cleanup listener
 		Bukkit.getPluginManager().registerEvents(new Listener() {

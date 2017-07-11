@@ -45,11 +45,6 @@ public interface Engine extends Item {
 	public double getRegeneration();
 
 	/**
-	 * @return the amount of tick to glow after speed up
-	 */
-	public int getGlowTime();
-
-	/**
 	 * @return the amount of fuel currently in the Engine
 	 */
 	public double getFuel();
