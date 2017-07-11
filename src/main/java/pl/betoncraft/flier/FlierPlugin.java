@@ -40,6 +40,7 @@ import pl.betoncraft.flier.action.TargetAction;
 import pl.betoncraft.flier.action.WingsHealthAction;
 import pl.betoncraft.flier.action.WingsOffAction;
 import pl.betoncraft.flier.action.attack.Bomb;
+import pl.betoncraft.flier.action.attack.Explosion;
 import pl.betoncraft.flier.action.attack.HomingMissile;
 import pl.betoncraft.flier.action.attack.ParticleGun;
 import pl.betoncraft.flier.action.attack.ProjectileGun;
@@ -138,6 +139,7 @@ public class FlierPlugin extends JavaPlugin implements Flier {
 		registerAction("particleGun", s -> new ParticleGun(s));
 		registerAction("homingMissile", s -> new HomingMissile(s));
 		registerAction("bomb", s -> new Bomb(s));
+		registerAction("explosion", s -> new Explosion(s));
 		registerAction("suicide", s -> new SuicideAction(s));
 		registerAction("launcher", s -> new LaunchAction(s));
 		registerAction("effect", s -> new EffectAction(s));

@@ -297,6 +297,8 @@ gun_action:
 
 ### Bomb
 
+**`bomb`**
+
 This action is an attack which creates an exploding TNT. The `exploding` option should be set to `true` or it won't work.
 
 ```
@@ -309,3 +311,18 @@ bomb_action:
 
 * `power` (**required**) is the power of the explosion. It doesn't control damage, only the radius of the explosion.
 * `fuse` (**default: 80**) is the amount of ticks before the explosion.
+
+### Explosion
+
+**`bomb`**
+
+This attack will affect all players in a specified radius around the source of the explosion. It's not a visual explosion, although you can add those visuals with effect mechanism.
+
+```
+explode:
+  type: explosion
+  [attack specific settings]
+  radius: [positive decimal]
+```
+
+* `radius` is the radius around the source of the explosion
