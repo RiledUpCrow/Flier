@@ -117,6 +117,10 @@ gun:
   slot: 2
   ammo: 10
   usages:
+    ground_glow:
+      where: ground
+      activators:
+      - every_second
     click:
       where: no air
       activators:

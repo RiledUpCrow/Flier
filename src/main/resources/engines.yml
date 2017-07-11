@@ -18,7 +18,6 @@ balancedEngine:
   max_fuel: 750                              # maximum fuel amount
   consumption: 2                             # fuel consumption per tick
   regeneration: 1                            # fuel regeneration per tick
-  glow_time: 100                             # glow time after accelerating (in ticks)
 fastEngine:
   type: multiplyingEngine
   material: feather
@@ -33,7 +32,6 @@ fastEngine:
   max_fuel: 500
   consumption: 2.5
   regeneration: 1.5
-  glow_time: 50
 strongEngine:
   type: multiplyingEngine
   material: wheat
@@ -48,4 +46,3 @@ strongEngine:
   max_fuel: 1500
   consumption: 2
   regeneration: 1
-  glow_time: 200

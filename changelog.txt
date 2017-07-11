@@ -17,6 +17,7 @@
 * Add "wingsOff" action
 * Add "sprintStarting" action
 * Add "explosion" action
+* Add "score" action
 * Add "blockStanding" activator
 * "health" action can scale amount with distance between source and target
 * "particleGun" attack has configurable range

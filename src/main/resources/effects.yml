@@ -95,3 +95,13 @@ engine_smoke:
   amount: 20
   offset: 0.2
   speed: 0.1
+engine_glow:
+  type: glow
+  event_type: engine
+  time: 100
+ground_glow:
+  type: glow
+  event_type: use
+  matchers:
+    usage: ground_glow
+  time: 10

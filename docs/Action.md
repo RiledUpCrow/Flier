@@ -215,6 +215,20 @@ consume_item:
 
 * `item` is the name of the item, as in _items.yml_ file.
 
+### Score
+
+**`score`**
+
+This action will add or remove points from the player running it. The game decides how to handle adding/removing points, for example team game would modify points of the player's team.
+
+```
+remove_points:
+  type: score
+  amount: -10
+```
+
+* `amount` (**required**) the amount of points to add/remove
+
 ### Homing missile
 
 **`homingMissile`**

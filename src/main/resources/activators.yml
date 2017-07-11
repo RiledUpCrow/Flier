@@ -29,3 +29,6 @@ emptyClip:
 notFullClip:
   type: ammo
   amount: "<100%"
+every_second:
+  type: interval
+  interval: 20
