@@ -9,10 +9,7 @@ click:
   pitch: 1.5                                        # pitch of the sound
 shoot:
   type: publicSound
-  event_type: use
-  matchers:
-    usage: shoot
-    ammo: '>(0)'                                    # (ammunition must not be empty)
+  event_type: projectile
   sound: entity blaze shoot
   volume: 0.25
 hit:

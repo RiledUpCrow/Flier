@@ -32,6 +32,7 @@ import pl.betoncraft.flier.api.core.LoadingException;
 import pl.betoncraft.flier.api.core.Target;
 import pl.betoncraft.flier.api.core.UsableItem;
 import pl.betoncraft.flier.core.DefaultAttacker;
+import pl.betoncraft.flier.event.FlierProjectileLaunchEvent;
 
 /**
  * Burst shooting weapon with unguided projectile-based bullets.
@@ -99,6 +100,8 @@ public class ProjectileGun extends DefaultAttack {
 				if (counter <= 0) {
 					cancel();
 				}
+				// call event for each projectile launched
+				Bukkit.getPluginManager().callEvent(new FlierProjectileLaunchEvent(target, ProjectileGun.this));
 			}
 		}.runTaskTimer(Flier.getInstance(), 0, (int) modMan.modifyNumber(BURST_TICKS, burstTicks));
 		new BukkitRunnable() {

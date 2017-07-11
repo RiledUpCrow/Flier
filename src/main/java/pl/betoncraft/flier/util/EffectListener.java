@@ -34,6 +34,7 @@ import pl.betoncraft.flier.event.FlierGameStartEvent;
 import pl.betoncraft.flier.event.FlierPlayerHitEvent;
 import pl.betoncraft.flier.event.FlierPlayerKillEvent;
 import pl.betoncraft.flier.event.FlierPlayerSpawnEvent;
+import pl.betoncraft.flier.event.FlierProjectileLaunchEvent;
 import pl.betoncraft.flier.event.FlierUseEvent;
 
 /**
@@ -56,6 +57,7 @@ public class EffectListener implements Listener {
 		SPAWN(true),
 		BONUS(true),
 		BUTTON(true),
+		PROJECTILE(true),
 		GAME_CREATE(false),
 		GAME_START(false),
 		GAME_END(false);
@@ -146,6 +148,11 @@ public class EffectListener implements Listener {
 	@EventHandler(priority=EventPriority.MONITOR)
 	public void onButton(FlierClickButtonEvent event) {
 		fireEffects(EventType.BUTTON, event);
+	}
+	
+	@EventHandler(priority=EventPriority.MONITOR)
+	public void onShoot(FlierProjectileLaunchEvent event) {
+		fireEffects(EventType.PROJECTILE, event);
 	}
 	
 	@EventHandler

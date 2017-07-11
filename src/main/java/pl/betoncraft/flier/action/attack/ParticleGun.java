@@ -9,6 +9,7 @@ package pl.betoncraft.flier.action.attack;
 import java.util.Optional;
 import java.util.Random;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.World;
@@ -24,6 +25,7 @@ import pl.betoncraft.flier.api.core.LoadingException;
 import pl.betoncraft.flier.api.core.Target;
 import pl.betoncraft.flier.api.core.UsableItem;
 import pl.betoncraft.flier.core.DefaultAttacker;
+import pl.betoncraft.flier.event.FlierProjectileLaunchEvent;
 
 /**
  * Burst shooting weapon with unguided particle-based bullets.
@@ -122,8 +124,11 @@ public class ParticleGun extends DefaultAttack {
 				
 				// launch projectiles
 				for (int i = 0; i < am; i++) {
-					                                                         // target becomes the source
-					new ParticleTracker(start.clone(), creator.orElse(null), target, projectileSpeed, proximity, spread, range, item.orElse(null));
+					new ParticleTracker(start.clone(), creator.orElse(null),
+					        target, projectileSpeed, proximity, spread, range, item.orElse(null));
+                         // target becomes the source
+					// call event for each projectile launched
+					Bukkit.getPluginManager().callEvent(new FlierProjectileLaunchEvent(target, ParticleGun.this));
 				}
 			}
 			

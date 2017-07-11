@@ -207,3 +207,19 @@ This event fires when the player spawns in the game. It has no special matchers.
 This event fires when the player collects a bonus.
 
 * `bonus` _(text)_ the ID of the bonus, as defined in _bonuses.yml_ file.
+
+### Button click event
+
+**`button`** (player event)
+
+This event fires when the player clicks on the button in the game.
+
+* `button` _(text)_ the ID of the button, as defined in _games.yml_ file.
+
+### Projectile launch event
+
+**`projectile`** (player event)
+
+This event fires every time a projectile is launched by the player. This includes particle guns and projectile guns, since other attacks launch a single projectile (you can use `use` event for them.)
+
+* `attack` _(text)_ the ID of the attack action which launched the projectile, as defined in _actions.yml_ file.

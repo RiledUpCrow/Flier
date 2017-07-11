@@ -8,6 +8,7 @@
 == Plugin ==
 * PlayerClass is renamed to Kit
 * Class name is no longer required in the Kit
+* Autojoin feature now has a configurable delay
 
 == Gameplay ==
 * Items can have cooldown before the first use
@@ -19,6 +20,7 @@
 * Add "explosion" action
 * Add "score" action
 * Add "blockStanding" activator
+* Add "projectile" event
 * "health" action can scale amount with distance between source and target
 * "particleGun" attack has configurable range
 * "leftClick" and "rightClick" were changed to Triggers
