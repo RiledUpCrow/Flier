@@ -27,7 +27,6 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
@@ -64,7 +63,7 @@ public class MoneyArgument implements CommandArgument {
 			UUID uuid = player.getUniqueId();
 			InGamePlayer data = null;
 			loop: for (Lobby lobby : Flier.getInstance().getLobbies().values()) {
-				for (Set<Game> games : lobby.getGames().values()) {
+				for (List<Game> games : lobby.getGames().values()) {
 					for (Game game : games) {
 						data = game.getPlayers().get(uuid);
 						if (data != null) {

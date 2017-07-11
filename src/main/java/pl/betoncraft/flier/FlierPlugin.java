@@ -25,9 +25,9 @@ package pl.betoncraft.flier;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 
 import org.bstats.Metrics;
@@ -220,7 +220,7 @@ public class FlierPlugin extends JavaPlugin implements Flier {
 			@Override
 			public HashMap<String, Integer> getValues(HashMap<String, Integer> map) {
 				for (Lobby lobby : lobbies.values()) {
-					for (Set<Game> set : lobby.getGames().values()) {
+					for (List<Game> set : lobby.getGames().values()) {
 						for (Game game : set) {
 							String name;
 							if (game instanceof DeathMatchGame) {

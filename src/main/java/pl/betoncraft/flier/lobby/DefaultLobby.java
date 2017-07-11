@@ -81,7 +81,7 @@ public abstract class DefaultLobby implements Lobby, Listener {
 	protected String id;
 	protected boolean open = false;
 
-	protected Map<String, List<Game>> gameSets = new HashMap<>();
+	protected Map<String, List<Game>> gameLists = new HashMap<>();
 	protected Map<String, Arena> arenas = new HashMap<>();
 	protected Location spawn;
 	protected Set<UUID> players = new HashSet<>();
@@ -108,14 +108,14 @@ public abstract class DefaultLobby implements Lobby, Listener {
 				throw new LoadingException(String.format(
 						"Game '%s' does not have any viable arena to be played on.", gameName));
 			}
-			gameSets.put(gameName, new ArrayList<>());
+			gameLists.put(gameName, new ArrayList<>());
 		}
-		if (gameSets.isEmpty()) {
+		if (gameLists.isEmpty()) {
 			throw new LoadingException("Game list is empty.");
 		}
 		if (section.contains("autojoin", true)) {
 			autoJoinGame = loader.loadString("autojoin");
-			if (!gameSets.containsKey(autoJoinGame)) {
+			if (!gameLists.containsKey(autoJoinGame)) {
 				throw new LoadingException(
 						String.format("Automatic joining impossible because game '%s' is not on the list.",
 								autoJoinGame));
@@ -181,7 +181,7 @@ public abstract class DefaultLobby implements Lobby, Listener {
 	public JoinResult joinGame(Player player, String gameName) {
 		
 		// check if the player is already in some game
-		if (gameSets.values().stream().anyMatch(
+		if (gameLists.values().stream().anyMatch(
 				set -> set.stream().anyMatch(
 						game -> game.getPlayers().containsKey(player.getUniqueId())
 				)
@@ -190,7 +190,7 @@ public abstract class DefaultLobby implements Lobby, Listener {
 		}
 		
 		// find the correct set of games
-		List<Game> games = gameSets.get(gameName);
+		List<Game> games = gameLists.get(gameName);
 		if (games == null) {
 			return JoinResult.NO_SUCH_GAME;
 		}
@@ -215,7 +215,7 @@ public abstract class DefaultLobby implements Lobby, Listener {
 		} else {
 			// create a new game if there's room for it
 			try {
-				int amount = gameSets.values().stream().flatMapToInt(set -> IntStream.of(set.size())).sum();
+				int amount = gameLists.values().stream().flatMapToInt(set -> IntStream.of(set.size())).sum();
 				if (amount < maxGames || maxGames == 0) {
 					try {
 						game = Flier.getInstance().getGame(gameName, this);
@@ -248,7 +248,7 @@ public abstract class DefaultLobby implements Lobby, Listener {
 	
 	@Override
 	public void leaveGame(Player player) {
-		loop: for (List<Game> set : gameSets.values()) {
+		loop: for (List<Game> set : gameLists.values()) {
 			for (Iterator<Game> it = set.iterator(); it.hasNext();) {
 				Game game = it.next();
 				InGamePlayer data = game.getPlayers().get(player.getUniqueId());
@@ -273,7 +273,7 @@ public abstract class DefaultLobby implements Lobby, Listener {
 	public void endGame(Game game, GameEndCause cause) {
 		game.stop(cause);
 		game.getArena().setUsed(false);
-		gameSets.get(game.getID()).remove(game);
+		gameLists.get(game.getID()).remove(game);
 	}
 	
 	public static void joinMessage(Player player, JoinResult result) {
@@ -306,7 +306,7 @@ public abstract class DefaultLobby implements Lobby, Listener {
 	
 	@Override
 	public Map<String, List<Game>> getGames() {
-		return Collections.unmodifiableMap(gameSets);
+		return Collections.unmodifiableMap(gameLists);
 	}
 	
 	@Override
@@ -322,7 +322,10 @@ public abstract class DefaultLobby implements Lobby, Listener {
 	@Override
 	public void stop() {
 		// abort all games
-		gameSets.values().forEach(set -> set.forEach(game -> endGame(game, GameEndCause.ABORTED)));
+		gameLists.values().forEach(list -> {
+			List<Game> temp = new ArrayList<>(list);
+			temp.forEach(game -> endGame(game, GameEndCause.ABORTED));
+		});
 		// move players out of the lobby
 		for (Player player : players.stream().map(uuid -> Bukkit.getPlayer(uuid)).collect(Collectors.toList())) {
 			removePlayer(player);
@@ -346,7 +349,7 @@ public abstract class DefaultLobby implements Lobby, Listener {
 		}
 		for (UUID u : uuid) {
 			if (u != null && players.contains(u) &&
-					!gameSets.values().stream().anyMatch(
+					!gameLists.values().stream().anyMatch(
 							set -> set.stream().anyMatch(
 									game -> game.getPlayers().containsKey(u)
 							)

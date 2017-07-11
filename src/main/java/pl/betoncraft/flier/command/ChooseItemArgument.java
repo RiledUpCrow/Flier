@@ -26,7 +26,6 @@ package pl.betoncraft.flier.command;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
@@ -101,7 +100,7 @@ public class ChooseItemArgument implements CommandArgument {
 		UUID uuid = player.getUniqueId();
 		InGamePlayer data = null;
 		loop: for (Lobby lobby : flier.getLobbies().values()) {
-			for (Set<Game> games : lobby.getGames().values()) {
+			for (List<Game> games : lobby.getGames().values()) {
 				for (Game game : games) {
 					data = game.getPlayers().get(uuid);
 					if (data != null) {

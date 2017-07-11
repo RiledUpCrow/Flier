@@ -69,7 +69,7 @@ public class PhysicalLobby extends DefaultLobby {
 		if (startSection != null) {
 			ValueLoader startLoader = new ValueLoader(startSection);
 			for (String key : startSection.getKeys(false)) {
-				if (!gameSets.containsKey(key)) {
+				if (!gameLists.containsKey(key)) {
 					throw new LoadingException(String.format("Start location points to non-existing game '%s'.", key));
 				}
 				start.put(key, startLoader.loadLocation(key));
