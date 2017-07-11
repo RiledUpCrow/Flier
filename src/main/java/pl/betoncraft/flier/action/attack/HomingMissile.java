@@ -139,14 +139,14 @@ public class HomingMissile extends DefaultAttack {
 				double distance = radiusSqr;
 				for (Target t : target.getGame().getTargets().values()) {
 					// skip the player if he shouldn't be targeted
-					Attitude attitude = missileTarget.getGame().getAttitude(t, missileTarget);
+					Attitude attitude = t.getGame().getAttitude(t, creator.get());
 					if (attitude == Attitude.NEUTRAL) {
 						continue;
 					}
 					if (!friendlyFire && attitude == Attitude.FRIENDLY) {
 						continue;
 					}
-					if (!suicidal && missileTarget.equals(t)) {
+					if (!suicidal && creator.get().equals(t)) {
 						continue;
 					}
 					// get the nearest player
