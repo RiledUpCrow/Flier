@@ -11,11 +11,11 @@ multiple:
 - 700;800;900;world
 ```
 
-When the plugin will try to get a single location and encounters a list, it will take the first location. In case the plugin can use multiple locations and finds only one, it will use only one. For example if you specify multiple locations for the center of the map, only the first one will be used, but if you give only one location for the player spawns, all players will spawn in the same place. So don't worry, both forms are valid in every situation.
+When the plugin tries to get a single location and encounters a list, it will take the first location. In case the plugin can use multiple locations and finds only one, it will use only one. For example if you specify multiple locations for the center of the map, only the first one will be used, but if you give only one location for the player spawns, all players will spawn in the same place. So don't worry, both forms are valid in every situation, lists just give you more control sometimes.
 
 ***
 
-The arena system is designed in such way that you can build a single map on which many types of games can be run. Imagine that you have a map with 10 spawns - you can run a deathmatch game on this map, but you can also split the spawns into two teams and run a team game. Arena system will ensure that only one of these games is running on this map at the same time, but players will be able to choose which game to play before it starts.
+The arena system is designed in such a way that you can build a single map on which many types of games can be run. Imagine that you have a map with 10 spawns - you can run a deathmatch game on this map, but you can also split the spawns into two teams and run a team game. Arena system will ensure that only one of these games is running on this map at the same time, but players will be able to choose which game to play before it starts.
 
 Let's dive into workings of this system now. Each arena is a set of named locations - places for spawns, bonuses, buttons etc. You can define locations with whatever names you like, and then make your games use locations with those names. The example above could look like this (we're using location lists because game spawns can use more than one location):
 
@@ -34,4 +34,4 @@ team_or_deathmatch_arena:
   - 4;4;4;world
 ```
 
-Both games (team and deathmatch) can use this arena. Team game will specify `red_team_spawns` location for the red spawn and `blue_team_spawns` for blue spawn, and deathmatch game will use `all_spawns` as a list of spawns for all players. Note that locations are repeated here - this is correct, since we will use either [`red_team_spawns` and `blue_team_spawns`] or [`all_spawns`]. Never both at the same time, because two games cannot run simultaneously on the same arena.
+Both games (team and deathmatch) can use this arena. Team game will specify `red_team_spawns` location for the red spawn and `blue_team_spawns` for blue spawn, and deathmatch game will use `all_spawns` as a list of spawns for all players. Note that the locations are repeated here - this is correct, since we will use either `red_team_spawns` and `blue_team_spawns`, or `all_spawns`. Never both at the same time, because two games cannot run simultaneously on the same arena.

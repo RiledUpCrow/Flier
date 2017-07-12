@@ -1,6 +1,6 @@
 # Action
 
-Action is something that happens in a game. It can be simple like restoring fuel in the Engine or more complex like shooting a homing missile. Actions are defined in _actions.yml_ file. Each one has a `type` which specifies what it does and additional options which specify how it does that. All available types are listed below.
+Action is something involving players that happens in the game. It can be simple like restoring fuel in the Engine or more complex like shooting a homing missile. Actions are defined in _actions.yml_ file. Each one has a `type` which specifies what it does and additional options which specify how it does that. All available types are listed below.
 
 ```
 some_action:
@@ -8,9 +8,11 @@ some_action:
   [type specific settings]
 ```
 
+Generally actions don't share any settings, everything depends on the type of the action.
+
 ## Attack
 
-Actions which can apply other action to target players are called "attacks". An example would be machine gun and homing missile: when they hit another player, they will apply a defined set of actions (technically usages - actions with activators). This can be used to inflict damage, take the wings off, create explosion which will damage further players etc.
+Actions which can apply other action to target players are called "attacks". An example would be a machine gun and homing missile: when they hit another player, they will apply a defined set of actions (technically usages - actions with activators, described in _Items_ chapter). This can be used to inflict damage, take the wings off, create explosions which will damage further players etc.
 
 Attacks also have other settings. `no_damage_ticks` is responsible for preventing next attacks from happening too quickly. `friendly_fire` controls whenever you can attack a friendly player with this weapon and `suicidal` controls whenever you can attack yourself with it.
 
@@ -41,13 +43,13 @@ some_attack_action
 
 **`effect`**
 
-This action runs other Actions 20 times a second for a `duration` measured in ticks. For example if you want to increase Wings regeneration by 1 for a minute, you would run `wingsHealth` action with `1` amount for `duration` 1200 (20 ticks/second times 60 seconds).
+This action runs other actions 20 times a second for a `duration` measured in ticks. For example if you want to increase wings regeneration by 1 for a minute, you would run `wingsHealth` action with `1` amount for `duration` 1200 (20 ticks/second times 60 seconds).
 
 ```
 effect_action:
   type: effect
   actions:
-  - some_action
+  - [action names]
   duration: [positive integer]
 ```
 
@@ -58,7 +60,7 @@ effect_action:
 
 **`fuel`**
 
-This action modifies fuel amount of the player's Engine.
+This action modifies fuel amount of the player's engine.
 
 ```
 fuel_action:
@@ -72,7 +74,7 @@ fuel_action:
 
 **`launch`**
 
-This action launches you in the direction you're looking. If you're standing on the ground, it will first throw you a few meters up and enable flying.
+This action launches you in the direction you're looking. If you're standing on the ground, it will additionally throw you a few meters up and then enable flying.
 
 ```
 launch_action:
@@ -86,7 +88,7 @@ launch_action:
 
 **`sprintStarting`**
 
-This action allows the player to take-off when sprinting on a runway. It needs to be constantly used/activated in order to work (for example when having no activators in an usage). The player needs to be sprinting in a straight line on a flat surface.
+This action allows the player to take-off when sprinting on a runway. It needs to be constantly used/activated in order to work (for example when having no activators in a usage). The player needs to be sprinting in a straight line on a flat surface.
 
 The player's sprinting speed will increase during `time` seconds up to the `max` speed, at which the player will be slightly thrown into the air. Gliding will be enabled and the engine will be turned on (as if the player was sneaking). To turn the engine off you need to press sneaking key once.
 
@@ -118,7 +120,7 @@ money_action:
 
 **`targetCompass`**
 
-This action points player's compass at the closest target of specified type. It's best to run this Action repeatedly, since targets (players) are moving.
+This action points player's compass at the closest target of specified type. It's best to run this action repeatedly, since targets (players) are moving.
 
 ```
 target_action:
@@ -135,7 +137,7 @@ target_action:
 
 **`wingsHealth`**
 
-This action modifies the health of Wings. It will break the Wings if their health drops to 0 and restore them if their health goes above 0.
+This action modifies the health of wings. It will break the wings if their health drops to 0 and restore them if their health goes above 0.
 
 ```
 wings_health_action:
@@ -143,7 +145,7 @@ wings_health_action:
   amount: [decimal]
 ```
 
-* `amount` (**required**) is the amount of health added to the Wings. Negative values remove health.
+* `amount` (**required**) is the amount of health added to the wings. Negative values remove health.
 
 ### Wings Off
 
@@ -178,7 +180,7 @@ health_action:
 
 **`suicide`**
 
-This action simply kills the player. It works only when the player is not falling due to game mechanics.
+This action simply kills the player. It will not change the previous attacker, so the kill may go to another player.
 
 ```
 self_destruction:
@@ -189,7 +191,7 @@ self_destruction:
 
 **`itemSet`**
 
-This action will apply an item set according to the specified rules. The settings available here are exactly the same as in a lobby button. Refer to the _Lobby_ chapter for more details.
+This action will apply an item set according to the specified rules. The settings available here are exactly the same as in a game button. Refer to the _Game_ chapter for more details.
 
 ```
 apply_set:
@@ -205,7 +207,7 @@ apply_set:
 
 **`consume`**
 
-This action will consume a single item from player's inventory, just like using a consumable item does. It will not update all class items, as opposed to `itemSet` with a single item decreasing.
+This action will consume a single item from player's inventory, just like using a consumable item does. It will not update kit items, as opposed to `itemSet` action set to decrease a single item.
 
 ```
 consume_item:
@@ -250,13 +252,13 @@ rocket_action:
 ```
 
 * `entity` (**required**) is the [entity](https://hub.spigotmc.org/javadocs/spigot/org/bukkit/entity/EntityType.html) (must be a projectile, can't use a sheep) used by the attack.
-* `search_range` is the range in which the missile looks for targets (technically it's a diameter of a sphere directly before the missile).
-* `search_radius` is the maneuverability when searching for a target (after loosing one). The greater this number is, the smaller circles the rocket will do.
-* `speed` is the speed of the missile.
-* `lifetime` is the amount of ticks the missile will live after launching. If it does not hit anything for this time, it will disappear.
-* `maneuverability` is the ability to turn when targeting someone. The greater this number is, the better the rocket is at following its target.
-* `target_friends` whenever this missile will target friendly players.
-* `target_self` whenever this missile will target the player who launched it.
+* `search_range` (**required**) is the range in which the missile looks for targets (technically it's a diameter of a sphere directly before the missile).
+* `search_radius` (**required**) is the maneuverability when searching for a target (after loosing one). The greater this number is, the smaller circles the rocket will do.
+* `speed` (**required**) is the speed of the missile.
+* `lifetime` (**required**) is the amount of ticks the missile will live after launching. If it does not hit anything for this time, it will disappear.
+* `maneuverability` (**required**) is the ability to turn when targeting someone. The greater this number is, the better the rocket is at following its target.
+* `target_friends` (**default: true**) whenever this missile will target friendly players.
+* `target_self`` (**default: true**) whenever this missile will target the player who launched it.
 
 ### Projectile Gun
 
@@ -300,6 +302,7 @@ gun_action:
   burst_ticks: [positive integer]
   spread: [non-negative integer]
   projectile_speed: [positive decimal]
+  proximity: [positive decimal]
   range: [positive decimal]
 ```
 
@@ -313,13 +316,14 @@ gun_action:
 * `burst_ticks` (**required**) is the total time of the burst.
 * `spread` (**default: 0**) is the precision of the bullets, where 0 means perfect.
 * `projectile_speed` (**required**) is the speed of the bullets.
+* `proximity` (**default: 1**) the minimum distance from the player in which the bullet has to pass in order to score a hit.
 * `range` (**default: 256**) the range of bullets - they will disappear after traveling that distance in blocks.
 
 ### Bomb
 
 **`bomb`**
 
-This action is an attack which creates an exploding TNT. The `exploding` option should be set to `true` or it won't work.
+This action is an attack which creates an exploding TNT.
 
 ```
 bomb_action:
@@ -345,4 +349,4 @@ explode:
   radius: [positive decimal]
 ```
 
-* `radius` is the radius around the source of the explosion
+* `radius` (**required**) is the radius around the source of the explosion

@@ -7,12 +7,11 @@ Note that if the bonus is collected by being in its radius, `cooldown` is 0 and 
 ```
 some_bonus:
   type: [bonus type]
-  consumable: [boolean]
+  consumable: [true/false]
   cooldown: [non-negative integer]
   respawn: [non-negative integer]
   actions:
-  - some_action
-  - other_action
+  - [action names]
   [type specific settings]
 ```
 
@@ -38,8 +37,8 @@ invisible_bonus:
   distance: [positive decimal]
 ```
 
-* `location` (**required**) is the location at which the Bonus is.
-* `distance` (**required**) is the minimum distance from the Bonus where the player will collect it.
+* `location` (**required**) is the location at which the bonus is (from the _arenas.yml_.)
+* `distance` (**required**) is the minimum distance from the bonus where the player will collect it.
 
 ### Entity
 
@@ -57,5 +56,5 @@ entity_bonus:
 ```
 
 * `entity` (**required**) is the [type of the Entity](https://hub.spigotmc.org/javadocs/spigot/org/bukkit/entity/EntityType.html).
-* `location` (**required**) is the location at which the Bonus is.
-* `distance` (**required**) is the minimum distance from the Bonus where the player will collect it.
+* `location` (**required**) is the location at which the bonus is.
+* `distance` (**required**) is the minimum distance from the bonus where the player will collect it.

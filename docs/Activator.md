@@ -1,8 +1,8 @@
 # Activator
 
-Activators simply check conditions. They are used in Usages, in Items. When all Activators in a Usage are active, the Usage will be used (an will run its Actions). The `type` of the activator specifies what it needs to be active and additional settings specify when exactly it activates.
+Activators simply check conditions. They are used in usages. When all activators in a usage are active, the usage will be used (an will run its actions). The `type` of the activator specifies what it needs to be active and additional settings specify when exactly it activates.
 
-Technically speaking, Activators in Usages are checked every tick (20 times per second). If there are no Activators in some Usage, it will run 20 times a second, all the time. Be careful with this. There are special `leftClick` and `rightClick` Activators which activate only after the player clicked with the appropriate mouse button. There's also a `slowTick` activator, which is active only once in four ticks. Use this to run the Usage 5 times per second. Note that clicking and `slowTick` activators are not compatible - you have only 25% chances that the click will happen on a slow tick.
+Technically speaking, activators in usages are checked every tick (20 times per second). If there are no activators in a usage, it will run 20 times a second, all the time. Be careful with this. There is a special `trigger` activator which can be configured to activate only after the player has clicked with the appropriate mouse button. There's also an `interval` activator, which is active only once in _n_ ticks. Use this to run the usage less often. Note that `trigger` and `interval` activators (in this order) together will make only _n_th trigger work (in the opposite order you will have _1/n_ chance of the trigger working.)
 
 ## Activator types
 
@@ -12,26 +12,25 @@ Technically speaking, Activators in Usages are checked every tick (20 times per 
 
 This activator is activated when a specified trigger occurs. Currently there are these triggers:
 
-* left_click
-* right_click
+* `left_click`
+* `right_click`
 
 ```
 leftClick:
   type: trigger
-  trigger: left_click
-```
+  trigger: [trigger type]
 ```
 
 ### Interval
 
 **`interval`**
 
-This activator is activated once in _n_ checks. Since activators are checked every tick in the order they were defined and the check fails as soon as some activator fails, placing `interval` correctly is essential. For example when it's _after_ the `trigger` activator, it will pass every _n_ times that trigger happens. However, placing it _before_ makes the behavior undefined because you never know if the `trigger` will happen at the nth tick.
+This activator is activated once in _n_ checks. Since activators are checked every tick in the order they were defined and the check fails as soon as some activator fails, placing `interval` correctly is essential. For example when it's _after_ the `trigger` activator, it will pass every _n_ times that trigger happens. However, placing it _before_ makes the behavior undefined because you never know if the `trigger` will happen at the _n_th tick.
 
 ```
 slow:
   type: interval
-  interval: 4
+  interval: [positive integer]
 ```
 
 ### Wings health
@@ -49,8 +48,8 @@ wing_health:
 ```
 
 * `min` (**required**) is the lower bound of acceptable health level.
-* `max` (**default: the same as `min` value**) is the upper bound of acceptable health level.
-* `number_type` (**default: absolute**) is the type of the number. Available values are:
+* `max` (**default: `min` value**) is the upper bound of acceptable health level.
+* `number_type` (**default: `absolute`**) is the type of the number. Available values are:
     * `absolute`
     * `percentage`
 

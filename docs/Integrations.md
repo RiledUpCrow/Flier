@@ -6,6 +6,21 @@ Flier is fully standalone and doesn't need any additional plugins to work. You c
 
 Installing this plugin will remove command messages from the console when displaying titles and will also display ammunition on the action bar instead of the sidebar.
 
+## [PlaceholderAPI](https://www.spigotmc.org/resources/placeholderapi.6245/)
+
+If you have PlaceholderAPI on your server Flier will add a `flier_` placeholder. It consists of arguments separated by dots, for example `%flier_first.second.third%`.
+
+### Game argument: `game`
+
+This argument will display various information about the game. Second argument is the name of the lobby, third is the name of the game, fourth is the index number of the game (there may be more than one game of the same type running). Fifth argument is the type of information you want to display:
+
+* `name` is the name of the game
+* `arena` is the name of the arena which is currently hosting the game
+* `players` is the amount of players in the game
+* `locked` displays whenever the game is Open or Closed for new players
+
+**Example**: `%flier_game.main_lobby.the_deathmatch.0.players%` - displays the amount of players in the first `the_deathmatch` game in the `main_lobby` lobby.
+
 ## [BetonQuest](https://www.spigotmc.org/resources/betonquest.2117/)
 
 Flier adds a few conditions and objectives to the BetonQuest plugin so you can create better games. An example use of this is to create a tutorial for player playing Flier for the first time.

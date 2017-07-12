@@ -1,8 +1,8 @@
 # Effects
 
-Effects are non-game-changing actions which can happen during the game. Non-game-changing means they don't actually alter you as a player - effects don't restore wings, don't drain fuel and don't attack other players. Instead they can play a sound, display a title or launch a firework. Effects are assigned to specific events - this way you can control when they fire. There are multiple types of both events and effects and you can combine them with only one rule: non-player event can't fire a player effect (example of non-player event is when the game starts and example of player effect is sending a title to a single player).
+Effects are non-game-changing actions which can happen during the game. Non-game-changing means they don't actually alter you as a player - effects don't restore wings, don't drain fuel and don't attack other players. Instead they can play a sound, display a title or launch a firework. Effects are assigned to specific events - this way you can control when they fire. There are multiple types of both events and effects and you can combine them with only one rule: non-player events can't fire player effects (example of non-player event is when the game starts and example of player effect is sending a title to a single player - these two are incompatible because starting of a game isn't tied to any player and we need a player to send him a title.)
 
-Effects are defined in _effects.yml_ file and you attach them to games in the `games` section of _games.yml_ file. Each effect has an effect type (available types are described below) and an event type (also below). You can also add so called "matchers", which can further narrow down which event exactly should fire an effect (for example you want to play a sound only if player shoots a weapon - matcher would match `use` events for "weapon" `usage`).
+Effects are defined in _effects.yml_ file and you attach them to games in the `games` section of _games.yml_ file. Each effect has an effect type (available types are described below) and an event type (also below). You can also add so called "matchers", which can further narrow down which event exactly should fire an effect (for example you want to play a sound only if player shoots a weapon - matcher would match `use` events for `weapon` _usage_).
 
 ```
 effect_name:
@@ -10,7 +10,6 @@ effect_name:
   event_type: [event type]
   matchers:
     name: [value]
-    other_name: [value]
   [effect specific settings]
 ```
 
@@ -35,19 +34,19 @@ matchers:
   boolean: false
 ```
 
-All are self-explanatory except for range. It has a special syntax (`>(10)`), where the first character is "less than" or "greater than" and next is a number in parentheses. It will match all numbers smaller or greater than specified number. You can combine these two types with a coma, just like in the example, or specify a single bound.
+All are self-explanatory except for range. It has a special syntax (`<(10)`), where the first character is "less than" or "greater than" and next is a number in parentheses. It will match all numbers smaller or greater than specified number. You can combine these two types with a coma, just like in the example, or specify a single bound.
 
 ## Effect settings
 
 * `type` (**required**) is the type of the effect
 * `event_type` (**required**) is the type of the event which will fire this effect
-* `matchers` is a list of matchers which the event must match in order to fire the effect
+* `matchers` (**optional**) is a list of matchers which the event must match in order to fire the effect
 
 ## Effect types
 
 ### Sound effect
 
-All sound effects play a sound, but to a different targets. These settings are available in all of them:
+All sound effects play a sound, but to different targets. These settings are available in all of them:
 
 * `sound` (**required**) is the type of [the sound](https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Sound.html).
 * `volume` (**default: 1**) is the volume of the sound.
@@ -58,7 +57,7 @@ effect_name
   type: [type]
   [event settings]
   sound: [sound type]
-  volume: [positive decimal ]
+  volume: [positive decimal]
   pitch: [positive decimal]
 ```
 
@@ -83,11 +82,11 @@ This effect will play a sound to every player in the Game at their locations.
 This effect spawns a particle at player's location. Particles in Minecraft are generally weird to handle.
 
 * `particle` (**required**) is the type of [the particle](https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Particle.html).
-* `amount` (**default: 0**) is the amount of particles. Set it to 0 to enable alternative particle mode. High values won't make the server lag (the client on the other side is a different story).
+* `amount` (**default: 0**) is the amount of particles. Set it to 0 to enable alternative particle mode. High values won't make the server lag (the client is a different story though.)
 * `offset` (**default: 0**) is distance from the player in which the particles will spawn randomly. If it's 0 the particles will appear exactly at the player's location. It may have a different meaning in alternative mode.
 * `offset_x`, `offset_y` and `offset_z` (**default: 0**) is the override for particular axis offset, useful in the alternative mode, for example for setting colors.
 * `speed` (**default: 0**) is the speed of particles. This may have a different meaning in alternative mode.
-* `count` (**default: 1**) controls how many times the server will spawn the particle. This differs from `amount` because multiple particles are spawned server-side, which means very high values (like a few hundreds) spawned every tick can lag the server. Use this if you need the alternative `amount` mode but still want to spawn multiple particles.
+* `count` (**default: 1**) controls how many times the server will spawn the particle. This differs from `amount` because with this setting multiple particles are spawned server-side, which means very high values (like a few hundreds) spawned every tick can lag the server. Use this if you need the alternative `amount` mode but still want to spawn multiple particles.
 * `manual_offset` (**default: 0**) the same as offset, but used in server-side spawning described above.
 * `manual_offset_x`, `manual_offset_y` and `manual_offset_z` (**default: 0**) is the override for particular axis offset in server-side spawning, this time with no special meaning.
 

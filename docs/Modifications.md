@@ -4,15 +4,11 @@ Modifications change various properties of player's items - they can increase we
 
 ```
 stronger_weapon:
-  target: usable item
+  target: [target type]
   names:
-  - fastWeapon
-  - strongWeapon
-  - balancedWeapon
+  - [object names]
   modifiers:
-    damage: "*(0.35)"
-    physical_damage: "+(5)"
-    wings_off: true
+  - [modifiers]
 ```
 
 In the example above, when applied to a player who has `balancedWeapon`, it will increase wing damage by 35% and add 5 to physical damage of that weapon.
@@ -32,6 +28,15 @@ In the example above, when applied to a player who has `balancedWeapon`, it will
     * text - it will replace the property with this text (i.e. `arrow`)
 
 ## Advanced numeric modifiers
+
+Let's consider these modifiers (as part of a modification):
+
+```
+modifiers:
+  damage: "*(0.35)"
+  physical_damage: "+(5)"
+  wings_off: true
+```
 
 In the example above you can see some strange syntax: `*(0.35)` and `+(5)` (they are wrapped in quotation marks because YAML doesn't accept strings starting with an asterisk.) These are the multiplier and the bonus respectively. The multiplier will take the current value of the property, multiply it by the number you specified and add it to that property. For example `0.35` increases the property by 35%, while `-0.5` decreases it by 50%. If you have multiple modifiers with these multipliers, they will be summed before applying. For example `*(0.35)` and then `*(-0.1)` will increase your property by 25%.
 

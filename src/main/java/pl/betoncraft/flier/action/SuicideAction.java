@@ -30,8 +30,6 @@ import org.bukkit.configuration.ConfigurationSection;
 import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.LoadingException;
 import pl.betoncraft.flier.api.core.Owner;
-import pl.betoncraft.flier.api.core.Usage.Where;
-import pl.betoncraft.flier.util.Position;
 
 /**
  * Kills the player. Due to DefaultGame mechanics this only works when the player is not falling.
@@ -46,11 +44,8 @@ public class SuicideAction extends DefaultAction {
 
 	@Override
 	public boolean act(InGamePlayer target, InGamePlayer source) {
-		if (Position.check(target.getPlayer(), Where.NO_FALL)) {
-			target.getPlayer().damage(target.getPlayer().getHealth() * 100);
-			return true;
-		}
-		return false;
+		target.getPlayer().damage(target.getPlayer().getHealth() * 100);
+		return true;
 	}
 
 }

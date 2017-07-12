@@ -109,6 +109,30 @@ import pl.betoncraft.flier.util.ValueLoader;
  */
 public abstract class DefaultGame implements Listener, Game {
 	
+	private static final String MONEY_SUICIDE = "money.suicide";
+	private static final String MONEY_BY_FRIENDLY_HIT = "money.by_friendly_hit";
+	private static final String MONEY_BY_FRIENDLY_DEATH = "money.by_friendly_death";
+	private static final String MONEY_BY_ENEMY_HIT = "money.by_enemy_hit";
+	private static final String MONEY_BY_ENEMY_DEATH = "money.by_enemy_death";
+	private static final String MONEY_FRIENDLY_HIT = "money.friendly_hit";
+	private static final String MONEY_FRIENDLY_KILL = "money.friendly_kill";
+	private static final String MONEY_ENEMY_HIT = "money.enemy_hit";
+	private static final String MONEY_ENEMY_KILL = "money.enemy_kill";
+	private static final String MONEY_ENABLED = "money.enabled";
+	private static final String DEFAULT_KIT = "default_kit";
+	private static final String BUTTONS = "buttons";
+	private static final String BONUSES = "bonuses";
+	private static final String RESPAWN_ACTION = "respawn_action";
+	private static final String MAX_TIME = "max_time";
+	private static final String MAX_PLAYERS = "max_players";
+	private static final String ROUNDS = "rounds";
+	private static final String EFFECTS = "effects";
+	private static final String LEAVE_BLOCKS = "leave_blocks";
+	private static final String RADIUS = "radius";
+	private static final String CENTER = "center";
+	private static final String VIABLE_ARENAS = "viable_arenas";
+	private static final String NAME = "name";
+
 	protected static final List<DamageCause> allowedDamage = new ArrayList<>(Arrays.asList(new DamageCause[]{
 			DamageCause.CONTACT, DamageCause.CUSTOM, DamageCause.FALL, DamageCause.FLY_INTO_WALL,
 			DamageCause.DROWNING, DamageCause.FALLING_BLOCK, DamageCause.FIRE,
@@ -167,10 +191,10 @@ public abstract class DefaultGame implements Listener, Game {
 		this.lobby = lobby;
 		id = section.getName();
 		loader = new ValueLoader(section);
-		name = loader.loadString("name", id);
+		name = loader.loadString(NAME, id);
 		
 		// select an arena
-		List<String> viableArenas = section.getStringList("viable_arenas");
+		List<String> viableArenas = section.getStringList(VIABLE_ARENAS);
 		if (viableArenas.isEmpty()) {
 			throw new LoadingException("No viable arenas are specified.");
 		}
@@ -186,30 +210,35 @@ public abstract class DefaultGame implements Listener, Game {
 		}
 		
 		// calculate borders
-		center = arena.getLocationSet(loader.loadString("center")).getSingle();
-		int radius = loader.loadPositiveInt("radius");
+		center = arena.getLocationSet(loader.loadString(CENTER)).getSingle();
+		int radius = loader.loadPositiveInt(RADIUS);
 		minX = center.getBlockX() - radius;
 		maxX = center.getBlockX() + radius;
 		minZ = center.getBlockZ() - radius;
 		maxZ = center.getBlockZ() + radius;
 		
 		// load "leave" blocks
-		for (Location loc : arena.getLocationSet(loader.loadString("leave_blocks")).getMultiple()) {
+		for (Location loc : arena.getLocationSet(loader.loadString(LEAVE_BLOCKS)).getMultiple()) {
 			leaveBlocks.add(loc.getBlock());
 		}
 		
+		// load other stuffs
 		fancyStuff = flier.getFancyStuff();
-		listener = new EffectListener(section.getStringList("effects"), this);
-		rounds = loader.loadBoolean("rounds");
-		maxPlayers = loader.loadNonNegativeInt("max_players", 0);
-		maxTime = loader.loadNonNegativeInt("max_time", 0) * 20;
+		listener = new EffectListener(section.getStringList(EFFECTS), this);
+		rounds = loader.loadBoolean(ROUNDS);
+		maxPlayers = loader.loadNonNegativeInt(MAX_PLAYERS, 0);
+		maxTime = loader.loadNonNegativeInt(MAX_TIME, 0) * 20;
 		timeLeft = maxTime;
-		respawnAction = loader.loadEnum("respawn_action", RespawnAction.class);
+		respawnAction = loader.loadEnum(RESPAWN_ACTION, RespawnAction.class);
 		waitingRoom = new WaitingRoom(this);
-		for (String bonusName : section.getStringList("bonuses")) {
+		
+		// bonuses
+		for (String bonusName : section.getStringList(BONUSES)) {
 			bonuses.add(flier.getBonus(bonusName, this, Optional.empty()));
 		}
-		ConfigurationSection buttonsSection = section.getConfigurationSection("buttons");
+		
+		// buttons
+		ConfigurationSection buttonsSection = section.getConfigurationSection(BUTTONS);
 		if (buttonsSection != null) for (String button : buttonsSection.getKeys(false)) {
 			ConfigurationSection buttonSection = buttonsSection.getConfigurationSection(button);
 			if (buttonSection == null) {
@@ -218,27 +247,34 @@ public abstract class DefaultGame implements Listener, Game {
 			try {
 				buttons.put(button, new DefaultButton(buttonSection));
 			} catch (LoadingException e) {
-				throw (LoadingException) new LoadingException(String.format("Error in '%s' button.", button)).initCause(e);
+				throw (LoadingException) new LoadingException(
+						String.format("Error in '%s' button.", button)).initCause(e);
 			}
 		}
+		
+		// default kit
 		try {
-			defKit = new DefaultKit(section.getStringList("default_kit"), respawnAction, new DummyPlayer());
+			defKit = new DefaultKit(section.getStringList(DEFAULT_KIT), respawnAction, new DummyPlayer());
 		} catch (LoadingException e) {
 			throw (LoadingException) new LoadingException("Error in default kit.").initCause(e);
 		}
-		useMoney = loader.loadBoolean("money.enabled", false);
-		enemyKillMoney = loader.loadInt("money.enemy_kill", 0);
-		enemyHitMoney = loader.loadInt("money.enemy_hit", 0);
-		friendlyKillMoney = loader.loadInt("money.friendly_kill", 0);
-		friendlyHitMoney = loader.loadInt("money.friendly_hit", 0);
-		byEnemyDeathMoney = loader.loadInt("money.by_enemy_death", 0);
-		byEnemyHitMoney = loader.loadInt("money.by_enemy_hit", 0);
-		byFriendlyDeathMoney = loader.loadInt("money.by_friendly_death", 0);
-		byFriendlyHitMoney = loader.loadInt("money.by_friendly_hit", 0);
-		suicideMoney = loader.loadInt("money.suicide", 0);
+		
+		// money
+		useMoney = loader.loadBoolean(MONEY_ENABLED, false);
+		enemyKillMoney = loader.loadInt(MONEY_ENEMY_KILL, 0);
+		enemyHitMoney = loader.loadInt(MONEY_ENEMY_HIT, 0);
+		friendlyKillMoney = loader.loadInt(MONEY_FRIENDLY_KILL, 0);
+		friendlyHitMoney = loader.loadInt(MONEY_FRIENDLY_HIT, 0);
+		byEnemyDeathMoney = loader.loadInt(MONEY_BY_ENEMY_DEATH, 0);
+		byEnemyHitMoney = loader.loadInt(MONEY_BY_ENEMY_HIT, 0);
+		byFriendlyDeathMoney = loader.loadInt(MONEY_BY_FRIENDLY_DEATH, 0);
+		byFriendlyHitMoney = loader.loadInt(MONEY_BY_FRIENDLY_HIT, 0);
+		suicideMoney = loader.loadInt(MONEY_SUICIDE, 0);
+		
+		// registering an event listener
 		Bukkit.getPluginManager().registerEvents(this, Flier.getInstance());
 		
-		// game created, fire an event
+		// game created, firing an event
 		if (lobby.isOpen()) {
 			FlierGameCreateEvent event = new FlierGameCreateEvent(this);
 			Bukkit.getPluginManager().callEvent(event);
@@ -298,7 +334,7 @@ public abstract class DefaultGame implements Listener, Game {
 		public DefaultButton(ConfigurationSection section) throws LoadingException {
 			id = section.getName();
 			ValueLoader loader = new ValueLoader(section);
-			name = loader.loadString("name", id);
+			name = loader.loadString(NAME, id);
 			locations = Arrays.asList(arena.getLocationSet(section.getString("blocks")).getMultiple());
 			if (locations.isEmpty()) {
 				throw new LoadingException("Blocks must be specified.");
@@ -415,6 +451,31 @@ public abstract class DefaultGame implements Listener, Game {
 	 */
 	protected class WaitingRoom {
 		
+		/**
+		 * 
+		 */
+		private static final String WAITING_ROOM = "waiting_room";
+
+		/**
+		 * 
+		 */
+		private static final String LOCKING = "locking";
+
+		/**
+		 * 
+		 */
+		private static final String START_DELAY = "start_delay";
+
+		/**
+		 * 
+		 */
+		private static final String RESPAWN_DELAY = "respawn_delay";
+
+		/**
+		 * 
+		 */
+		private static final String MIN_PLAYERS = "min_players";
+
 		protected final List<Integer> displayTimes = Arrays.asList(
 				1, 2, 3, 4, 5, 10, 15, 30, 60, 90, 120, 180, 240, 300, 600).stream()
 				.map(i -> i * 20).collect(Collectors.toList());
@@ -434,11 +495,11 @@ public abstract class DefaultGame implements Listener, Game {
 		
 		public WaitingRoom(Game game) throws LoadingException {
 			this.game = game;
-			minPlayers = loader.loadPositiveInt("min_players", 1);
-			respawnDelay = loader.loadNonNegativeInt("respawn_delay", 0);
-			startDelay = loader.loadNonNegativeInt("start_delay", 0);
-			locking = loader.loadBoolean("locking", false);
-			location = arena.getLocationSet(loader.loadString("waiting_room")).getSingle();
+			minPlayers = loader.loadPositiveInt(MIN_PLAYERS, 1);
+			respawnDelay = loader.loadNonNegativeInt(RESPAWN_DELAY, 0);
+			startDelay = loader.loadNonNegativeInt(START_DELAY, 0);
+			locking = loader.loadBoolean(LOCKING, false);
+			location = arena.getLocationSet(loader.loadString(WAITING_ROOM)).getSingle();
 			ticker = new BukkitRunnable() {
 				public void run() {
 					tick();

@@ -1,6 +1,6 @@
 # Engine
 
-Engines allow players to speed up while flying. Each engine is an item held in the offhand, thus many item specific settings like `material` are needed to define it. Each engine is defined in _engines.yml_ file. Every engine has a `type` that defines how it behaves and what additional settings are available. The types are listed below.
+Engines are items which allow players to speed up while flying. Each engine is an item held in the offhand, thus many item specific settings like `material` are needed to define it. Each engine is defined in _engines.yml_ file. Every engine has a `type` that defines how it behaves and what additional settings are available. The types are listed below.
 
 ```
 engine_name:
@@ -26,9 +26,9 @@ Each engine type has a different acceleration model.
 
 **`multiplyingEngine`**
 
-This engine multiplies your current speed by `acceleration`. This means that the faster you fly the faster you will accelerate, until you reach `max_speed`. If you fly slower than `min_speed` you'll accelerate as if you were flying at that speed. With these three settings you can create powerful engines with low speed or weak engines capable of getting really fast after a long accelerating, whatever you need.
+This engine multiplies your current speed by `acceleration`. This means that the faster you fly the faster you will accelerate, until you reach `max_speed`. If you fly slower than `min_speed` you'll accelerate as if you were flying at that speed. With these three settings you can create powerful engines with low speed or weak engines capable of getting really fast after a long accelerating, and anything in between.
 
-The speed displayed on the sidebar is multiplied by 10, so the players are not confused with small numbers (speed of 3 is actually very fast). Acceleration is applied 20 times per second, so it needs to be a very small value (like 0.025) unless you want instant max speed.
+The speed displayed on the sidebar is multiplied by 10, so the players are not confused with small numbers (speed of 3 is actually very fast, so it's displayed as 30). Acceleration is applied 20 times per second, so it needs to be a very small value (like 0.025) unless you want instant max speed.
 
 ```
 engine_name:
