@@ -28,7 +28,8 @@ import java.util.Optional;
 import org.bukkit.configuration.ConfigurationSection;
 
 import pl.betoncraft.flier.api.core.InGamePlayer;
-import pl.betoncraft.flier.api.core.UsableItem;
+import pl.betoncraft.flier.api.core.LoadingException;
+import pl.betoncraft.flier.api.core.Owner;
 import pl.betoncraft.flier.api.core.Usage.Where;
 import pl.betoncraft.flier.util.Position;
 
@@ -39,13 +40,12 @@ import pl.betoncraft.flier.util.Position;
  */
 public class SuicideAction extends DefaultAction {
 
-	public SuicideAction(ConfigurationSection section) {
-		super(section, false, false);
+	public SuicideAction(ConfigurationSection section, Optional<Owner> owner) throws LoadingException {
+		super(section, owner);
 	}
 
 	@Override
-	public boolean act(Optional<InGamePlayer> creator, Optional<InGamePlayer> source,
-			InGamePlayer target, Optional<UsableItem> item) {
+	public boolean act(InGamePlayer target, InGamePlayer source) {
 		if (Position.check(target.getPlayer(), Where.NO_FALL)) {
 			target.getPlayer().damage(target.getPlayer().getHealth() * 100);
 			return true;

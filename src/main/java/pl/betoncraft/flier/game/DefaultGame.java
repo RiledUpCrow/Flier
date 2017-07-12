@@ -99,6 +99,7 @@ import pl.betoncraft.flier.util.EffectListener;
 import pl.betoncraft.flier.util.LangManager;
 import pl.betoncraft.flier.util.Utils;
 import pl.betoncraft.flier.util.ValueLoader;
+import pl.betoncraft.flier.utils.DummyPlayer;
 
 /**
  * Basic rules of a game.
@@ -200,7 +201,7 @@ public abstract class DefaultGame implements Listener, Game {
 		respawnAction = loader.loadEnum("respawn_action", RespawnAction.class);
 		waitingRoom = new WaitingRoom(this);
 		for (String bonusName : section.getStringList("bonuses")) {
-			bonuses.add(flier.getBonus(bonusName, this, Optional.empty(), Optional.empty()));
+			bonuses.add(flier.getBonus(bonusName, this, Optional.empty()));
 		}
 		ConfigurationSection buttonsSection = section.getConfigurationSection("buttons");
 		if (buttonsSection != null) for (String button : buttonsSection.getKeys(false)) {
@@ -215,7 +216,7 @@ public abstract class DefaultGame implements Listener, Game {
 			}
 		}
 		try {
-			defKit = new DefaultKit(section.getStringList("default_kit"), respawnAction);
+			defKit = new DefaultKit(section.getStringList("default_kit"), respawnAction, new DummyPlayer());
 		} catch (LoadingException e) {
 			throw (LoadingException) new LoadingException("Error in default kit.").initCause(e);
 		}
@@ -609,7 +610,7 @@ public abstract class DefaultGame implements Listener, Game {
 		if (dataMap.containsKey(uuid)) {
 			throw new IllegalStateException("Player is already in game.");
 		}
-		InGamePlayer data =  new DefaultPlayer(player, this, defKit.replicate());
+		InGamePlayer data =  new DefaultPlayer(player, this, defKit);
 		dataMap.put(uuid, data);
 		targets.put(uuid, data);
 		Flier.getInstance().getPlayers().put(player.getUniqueId(), data);

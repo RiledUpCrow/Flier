@@ -30,7 +30,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import pl.betoncraft.flier.api.content.Game.Attitude;
 import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.LoadingException;
-import pl.betoncraft.flier.api.core.UsableItem;
+import pl.betoncraft.flier.api.core.Owner;
 
 /**
  * Targets other players with a compass.
@@ -43,14 +43,13 @@ public class TargetAction extends DefaultAction {
 
 	private final Attitude target;
 	
-	public TargetAction(ConfigurationSection section) throws LoadingException {
-		super(section, false, false);
+	public TargetAction(ConfigurationSection section, Optional<Owner> owner) throws LoadingException {
+		super(section, owner);
 		this.target = loader.loadEnum(TARGET, Attitude.HOSTILE, Attitude.class);
 	}
 
 	@Override
-	public boolean act(Optional<InGamePlayer> creator, Optional<InGamePlayer> source,
-			InGamePlayer player, Optional<UsableItem> item) {
+	public boolean act(InGamePlayer player, InGamePlayer source) {
 		if (player.isPlaying()) {
 			InGamePlayer nearest = null;
 			double distance = 0;

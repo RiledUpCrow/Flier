@@ -45,8 +45,8 @@ import pl.betoncraft.flier.api.content.Game.Attitude;
 import pl.betoncraft.flier.api.core.Attacker;
 import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.LoadingException;
+import pl.betoncraft.flier.api.core.Owner;
 import pl.betoncraft.flier.api.core.Target;
-import pl.betoncraft.flier.api.core.UsableItem;
 import pl.betoncraft.flier.core.DefaultAttacker;
 import pl.betoncraft.flier.util.ImmutableVector;
 
@@ -77,8 +77,8 @@ public class HomingMissile extends DefaultAttack {
 	private final boolean targetFriends;
 	private final boolean targetSelf;
 
-	public HomingMissile(ConfigurationSection section) throws LoadingException {
-		super(section);
+	public HomingMissile(ConfigurationSection section, Optional<Owner> owner) throws LoadingException {
+		super(section, owner);
 		entity = loader.loadEnum(ENTITY, EntityType.class);
 		searchRange = loader.loadPositiveInt(SEARCH_RANGE);
 		searchRadius = loader.loadPositiveDouble(SEARCH_RADIUS);
@@ -95,8 +95,7 @@ public class HomingMissile extends DefaultAttack {
 	}
 
 	@Override
-	public boolean act(Optional<InGamePlayer> creator, Optional<InGamePlayer> source,
-			InGamePlayer target, Optional<UsableItem> item) {
+	public boolean act(InGamePlayer target, InGamePlayer source) {
 		Player player = target.getPlayer();
 		double speed = modMan.modifyNumber(SPEED, this.speed);
 		Vector velocity = player.getLocation().getDirection().clone().multiply(speed);
@@ -107,8 +106,8 @@ public class HomingMissile extends DefaultAttack {
 		missile.setShooter(player);
 		missile.setGravity(false);
 		missile.setGlowing(true);
-		Attacker.saveAttacker(missile, new DefaultAttacker(HomingMissile.this, creator.orElse(null),
-				target, item.orElse(null)));
+		Attacker.saveAttacker(missile, new DefaultAttacker(HomingMissile.this, owner.get().getPlayer(),
+				target, owner.get().getItem()));
 		new BukkitRunnable() {
 			int i = 0;
 			Location lastLoc;
@@ -156,14 +155,14 @@ public class HomingMissile extends DefaultAttack {
 				double distance = radiusSqr;
 				for (Target t : target.getGame().getTargets().values()) {
 					// skip the player if he shouldn't be targeted
-					Attitude attitude = t.getGame().getAttitude(t, creator.get());
+					Attitude attitude = t.getGame().getAttitude(t, owner.get().getPlayer());
 					if (attitude == Attitude.NEUTRAL) {
 						continue;
 					}
 					if (!friendlyFire && attitude == Attitude.FRIENDLY) {
 						continue;
 					}
-					if (!suicidal && creator.get().equals(t)) {
+					if (!suicidal && owner.get().getPlayer().equals(t)) {
 						continue;
 					}
 					// get the nearest player

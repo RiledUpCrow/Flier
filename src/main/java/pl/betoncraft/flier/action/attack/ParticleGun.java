@@ -39,6 +39,7 @@ import org.bukkit.util.Vector;
 import pl.betoncraft.flier.api.Flier;
 import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.LoadingException;
+import pl.betoncraft.flier.api.core.Owner;
 import pl.betoncraft.flier.api.core.Target;
 import pl.betoncraft.flier.api.core.UsableItem;
 import pl.betoncraft.flier.core.DefaultAttacker;
@@ -83,8 +84,8 @@ public class ParticleGun extends DefaultAttack {
 	private final double extra;
 	private final double density;
 	
-	public ParticleGun(ConfigurationSection section) throws LoadingException {
-		super(section);
+	public ParticleGun(ConfigurationSection section, Optional<Owner> owner) throws LoadingException {
+		super(section, owner);
 		flier = Flier.getInstance();
 		random = new Random();
 		burstAmount = loader.loadPositiveInt(BURST_AMOUNT);
@@ -105,8 +106,7 @@ public class ParticleGun extends DefaultAttack {
 	}
 	
 	@Override
-	public boolean act(Optional<InGamePlayer> creator, Optional<InGamePlayer> source,
-			InGamePlayer target, Optional<UsableItem> item) {
+	public boolean act(InGamePlayer target, InGamePlayer source) {
 
 		new BukkitRunnable() {
 			
@@ -141,8 +141,8 @@ public class ParticleGun extends DefaultAttack {
 				
 				// launch projectiles
 				for (int i = 0; i < am; i++) {
-					new ParticleTracker(start.clone(), creator.orElse(null),
-					        target, projectileSpeed, proximity, spread, range, item.orElse(null));
+					new ParticleTracker(start.clone(), owner.get().getPlayer(),
+					        target, projectileSpeed, proximity, spread, range, owner.get().getItem());
                          // target becomes the source
 					// call event for each projectile launched
 					Bukkit.getPluginManager().callEvent(new FlierProjectileLaunchEvent(target, ParticleGun.this));

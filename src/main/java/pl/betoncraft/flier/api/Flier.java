@@ -48,6 +48,7 @@ import pl.betoncraft.flier.api.core.ItemSet;
 import pl.betoncraft.flier.api.core.LoadingException;
 import pl.betoncraft.flier.api.core.Modification;
 import pl.betoncraft.flier.api.core.NoArenaException;
+import pl.betoncraft.flier.api.core.Owner;
 import pl.betoncraft.flier.api.core.UsableItem;
 
 /**
@@ -114,7 +115,7 @@ public interface Flier extends Plugin {
 	 * @throws LoadingException
 	 *             when the Item cannot be created due to an error
 	 */
-	public UsableItem getItem(String id) throws LoadingException;
+	public UsableItem getItem(String id, InGamePlayer owner) throws LoadingException;
 
 	/**
 	 * @param id ID of the Wings
@@ -140,7 +141,7 @@ public interface Flier extends Plugin {
 	 * @throws LoadingException
 	 *             when the Action cannot be created due to an error
 	 */
-	public Action getAction(String id) throws LoadingException;
+	public Action getAction(String id, Optional<Owner> owner) throws LoadingException;
 
 	/**
 	 * @param id ID of the Activator
@@ -148,7 +149,7 @@ public interface Flier extends Plugin {
 	 * @throws LoadingException
 	 *             when the Activator cannot be created due to an error
 	 */
-	public Activator getActivator(String id) throws LoadingException;
+	public Activator getActivator(String id, Optional<Owner> owner) throws LoadingException;
 
 	/**
 	 * @param id
@@ -164,8 +165,7 @@ public interface Flier extends Plugin {
 	 *             when the Bonus cannot be created due to an error, type is not
 	 *             defined or Bonus is not defined
 	 */
-	public Bonus getBonus(String id, Game game, Optional<InGamePlayer> creator, Optional<UsableItem> item)
-			throws LoadingException;
+	public Bonus getBonus(String id, Game game, Optional<Owner> owner) throws LoadingException;
 	
 	/**
 	 * @param id ID of the Modification
@@ -181,7 +181,7 @@ public interface Flier extends Plugin {
 	 * @throws LoadingException
 	 *             when the ItemSet cannot be created due to an error or ItemSet is not defined
 	 */
-	public ItemSet getItemSet(String id) throws LoadingException;
+	public ItemSet getItemSet(String id, InGamePlayer owner) throws LoadingException;
 
 	/**
 	 * @param id ID of the Effect
@@ -368,16 +368,15 @@ public interface Flier extends Plugin {
 	}
 	
 	public interface BonusFactory {
-		public Bonus get(ConfigurationSection settings, Game game, Optional<InGamePlayer> creator, Optional<UsableItem> item)
-				throws LoadingException;
+		public Bonus get(ConfigurationSection settings, Game game, Optional<Owner> owner) throws LoadingException;
 	}
 	
 	public interface ActionFactory {
-		public Action get(ConfigurationSection settings) throws LoadingException;
+		public Action get(ConfigurationSection settings, Optional<Owner> owner) throws LoadingException;
 	}
 	
 	public interface ActivatorFactory {
-		public Activator get(ConfigurationSection settings) throws LoadingException;
+		public Activator get(ConfigurationSection settings, Optional<Owner> owner) throws LoadingException;
 	}
 	
 	public interface EffectFactory {

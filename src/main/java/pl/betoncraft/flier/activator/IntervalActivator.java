@@ -23,11 +23,13 @@
  */
 package pl.betoncraft.flier.activator;
 
+import java.util.Optional;
+
 import org.bukkit.configuration.ConfigurationSection;
 
 import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.LoadingException;
-import pl.betoncraft.flier.api.core.UsableItem;
+import pl.betoncraft.flier.api.core.Owner;
 
 /**
  * Activates once in "interval" times.
@@ -39,14 +41,14 @@ public class IntervalActivator extends DefaultActivator {
 	private int counter = 0;
 	private final int interval;
 
-	public IntervalActivator(ConfigurationSection section) throws LoadingException {
-		super(section);
+	public IntervalActivator(ConfigurationSection section, Optional<Owner> owner) throws LoadingException {
+		super(section, owner);
 		interval = loader.loadPositiveInt("interval");
 		counter += loader.loadNonNegativeInt("offset", 0);
 	}
 
 	@Override
-	public boolean isActive(InGamePlayer player, UsableItem item) {
+	public boolean isActive(InGamePlayer player, InGamePlayer source) {
 		return counter++ % interval == 0;
 	}
 

@@ -23,11 +23,14 @@
  */
 package pl.betoncraft.flier.activator;
 
+import java.util.Optional;
+
 import org.bukkit.configuration.ConfigurationSection;
 
 import pl.betoncraft.flier.api.Flier;
 import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.LoadingException;
+import pl.betoncraft.flier.api.core.Owner;
 import pl.betoncraft.flier.api.core.UsableItem;
 
 /**
@@ -39,13 +42,16 @@ public class ItemActivator extends DefaultActivator {
 	
 	private UsableItem item;
 
-	public ItemActivator(ConfigurationSection section) throws LoadingException {
-		super(section);
-		item = Flier.getInstance().getItem(loader.loadString("item"));
+	public ItemActivator(ConfigurationSection section, Optional<Owner> owner) throws LoadingException {
+		super(section, owner);
+		if (!owner.isPresent()) {
+			throw new LoadingException("Cannot use item activator without a player.");
+		}
+		item = Flier.getInstance().getItem(loader.loadString("item"), owner.get().getPlayer());
 	}
 
 	@Override
-	public boolean isActive(InGamePlayer player, UsableItem item) {
+	public boolean isActive(InGamePlayer player, InGamePlayer source) {
 		UsableItem found = player.getKit().getItems().stream()
 				.filter(i -> i.isSimilar(this.item))
 				.findFirst()

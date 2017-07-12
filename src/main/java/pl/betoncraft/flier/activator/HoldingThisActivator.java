@@ -23,10 +23,13 @@
  */
 package pl.betoncraft.flier.activator;
 
+import java.util.Optional;
+
 import org.bukkit.configuration.ConfigurationSection;
 
 import pl.betoncraft.flier.api.core.InGamePlayer;
-import pl.betoncraft.flier.api.core.UsableItem;
+import pl.betoncraft.flier.api.core.LoadingException;
+import pl.betoncraft.flier.api.core.Owner;
 
 /**
  * Activates when the player is holding the item on which this activator is
@@ -36,13 +39,16 @@ import pl.betoncraft.flier.api.core.UsableItem;
  */
 public class HoldingThisActivator extends DefaultActivator {
 
-	public HoldingThisActivator(ConfigurationSection section) {
-		super(section);
+	public HoldingThisActivator(ConfigurationSection section, Optional<Owner> owner) throws LoadingException {
+		super(section, owner);
+		if (!owner.isPresent()) {
+			throw new LoadingException("Cannot use holding activator without a player.");
+		}
 	}
 
 	@Override
-	public boolean isActive(InGamePlayer player, UsableItem item) {
-		return item != null && player.isHolding(item);
+	public boolean isActive(InGamePlayer player, InGamePlayer source) {
+		return player.isHolding(owner.get().getItem());
 	}
 
 }

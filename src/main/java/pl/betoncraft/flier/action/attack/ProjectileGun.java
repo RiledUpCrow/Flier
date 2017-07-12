@@ -25,8 +25,8 @@ package pl.betoncraft.flier.action.attack;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Map.Entry;
+import java.util.Optional;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -46,8 +46,8 @@ import pl.betoncraft.flier.api.Flier;
 import pl.betoncraft.flier.api.core.Attacker;
 import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.LoadingException;
+import pl.betoncraft.flier.api.core.Owner;
 import pl.betoncraft.flier.api.core.Target;
-import pl.betoncraft.flier.api.core.UsableItem;
 import pl.betoncraft.flier.core.DefaultAttacker;
 import pl.betoncraft.flier.event.FlierProjectileLaunchEvent;
 
@@ -71,8 +71,8 @@ public class ProjectileGun extends DefaultAttack {
 	private final double projectileSpeed;
 	private final int range = 10 * 20;
 	
-	public ProjectileGun(ConfigurationSection section) throws LoadingException {
-		super(section);
+	public ProjectileGun(ConfigurationSection section, Optional<Owner> owner) throws LoadingException {
+		super(section, owner);
 		entity = loader.loadEnum(ENTITY, EntityType.class);
 		burstAmount = loader.loadPositiveInt(BURST_AMOUNT);
 		burstTicks = loader.loadPositiveInt(BURST_TICKS);
@@ -85,8 +85,7 @@ public class ProjectileGun extends DefaultAttack {
 	}
 	
 	@Override
-	public boolean act(Optional<InGamePlayer> creator, Optional<InGamePlayer> source,
-			InGamePlayer target, Optional<UsableItem> item) {
+	public boolean act(InGamePlayer target, InGamePlayer source) {
 		Player player = target.getPlayer();
 		int burstAmount = (int) modMan.modifyNumber(BURST_AMOUNT, this.burstAmount);
 		Map<Projectile, Vector> projectiles = new HashMap<>(burstAmount);
@@ -110,8 +109,8 @@ public class ProjectileGun extends DefaultAttack {
 					explosive.setIsIncendiary(false);
 					explosive.setYield(0);
 				}
-				Attacker.saveAttacker(projectile, new DefaultAttacker(ProjectileGun.this, creator.orElse(null),
-						target, item.orElse(null)));
+				Attacker.saveAttacker(projectile, new DefaultAttacker(ProjectileGun.this, owner.get().getPlayer(),
+						target, owner.get().getItem()));
 				projectiles.put(projectile, velocity);
 				counter --;
 				if (counter <= 0) {

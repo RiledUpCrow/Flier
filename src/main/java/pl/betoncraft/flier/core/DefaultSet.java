@@ -32,6 +32,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import pl.betoncraft.flier.api.Flier;
 import pl.betoncraft.flier.api.content.Engine;
 import pl.betoncraft.flier.api.content.Wings;
+import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.ItemSet;
 import pl.betoncraft.flier.api.core.LoadingException;
 import pl.betoncraft.flier.api.core.Modification;
@@ -57,7 +58,7 @@ public class DefaultSet implements ItemSet {
 	protected List<UsableItem> items = new ArrayList<>();
 	protected List<Modification> mods = new ArrayList<>();
 
-	public DefaultSet(ConfigurationSection section) throws LoadingException {
+	public DefaultSet(ConfigurationSection section, InGamePlayer owner) throws LoadingException {
 		Flier flier = Flier.getInstance();
 		id = section.getName();
 		loader = new ValueLoader(section);
@@ -78,7 +79,7 @@ public class DefaultSet implements ItemSet {
 		}
 		List<String> itemNames = section.getStringList("items");
 		for (String itemName : itemNames) {
-			items.add(flier.getItem(itemName));
+			items.add(flier.getItem(itemName, owner));
 		}
 		for (String modName : section.getStringList("modifications")) {
 			mods.add(flier.getModification(modName));

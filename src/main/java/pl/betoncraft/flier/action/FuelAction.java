@@ -30,7 +30,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import pl.betoncraft.flier.api.content.Engine;
 import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.LoadingException;
-import pl.betoncraft.flier.api.core.UsableItem;
+import pl.betoncraft.flier.api.core.Owner;
 
 /**
  * Adds fuel to the player's engine.
@@ -43,14 +43,13 @@ public class FuelAction extends DefaultAction {
 
 	private double amount;
 
-	public FuelAction(ConfigurationSection section) throws LoadingException {
-		super(section, false, false);
+	public FuelAction(ConfigurationSection section, Optional<Owner> owner) throws LoadingException {
+		super(section, owner);
 		amount = loader.loadDouble(AMOUNT);
 	}
 
 	@Override
-	public boolean act(Optional<InGamePlayer> creator, Optional<InGamePlayer> source,
-			InGamePlayer target, Optional<UsableItem> item) {
+	public boolean act(InGamePlayer target, InGamePlayer source) {
 		Engine engine = target.getKit().getEngine();
 		double amount = modMan.modifyNumber(AMOUNT, this.amount);
 		if (amount >= 0) {

@@ -23,6 +23,8 @@
  */
 package pl.betoncraft.flier.action;
 
+import java.util.Optional;
+
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 
@@ -30,6 +32,7 @@ import pl.betoncraft.flier.api.content.Action;
 import pl.betoncraft.flier.api.content.Attack;
 import pl.betoncraft.flier.api.core.Modification;
 import pl.betoncraft.flier.api.core.Modification.ModificationTarget;
+import pl.betoncraft.flier.api.core.Owner;
 import pl.betoncraft.flier.api.core.Usage;
 import pl.betoncraft.flier.util.LangManager;
 import pl.betoncraft.flier.util.ModificationManager;
@@ -46,16 +49,14 @@ public abstract class DefaultAction implements Action {
 	protected final String name;
 	protected final ValueLoader loader;
 	protected final ModificationManager modMan;
-	protected final boolean needsItem;
-	protected final boolean needsSource;
+	protected final Optional<Owner> owner;
 	
-	public DefaultAction(ConfigurationSection section, boolean needsItem, boolean needsSource) {
+	public DefaultAction(ConfigurationSection section, Optional<Owner> owner) {
 		id = section.getName();
 		loader = new ValueLoader(section);
 		modMan = new ModificationManager();
 		name = loader.loadString("name", id);
-		this.needsItem = needsItem;
-		this.needsSource = needsSource;
+		this.owner = owner;
 	}
 	
 	@Override
@@ -97,13 +98,8 @@ public abstract class DefaultAction implements Action {
 	}
 
 	@Override
-	public boolean needsItem() {
-		return needsItem;
-	}
-
-	@Override
-	public boolean needsSource() {
-		return needsSource;
+	public Optional<Owner> getOwner() {
+		return owner;
 	}
 
 }

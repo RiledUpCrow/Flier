@@ -34,9 +34,10 @@ import java.util.stream.Collectors;
 
 import pl.betoncraft.flier.api.content.Engine;
 import pl.betoncraft.flier.api.content.Wings;
+import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.ItemSet;
-import pl.betoncraft.flier.api.core.LoadingException;
 import pl.betoncraft.flier.api.core.Kit;
+import pl.betoncraft.flier.api.core.LoadingException;
 import pl.betoncraft.flier.api.core.SetApplier;
 import pl.betoncraft.flier.api.core.UsableItem;
 
@@ -48,6 +49,7 @@ import pl.betoncraft.flier.api.core.UsableItem;
 public class DefaultKit implements Kit {
 	
 	private final RespawnAction respawnAction;
+	private final InGamePlayer owner;
 	
 	private Compiled compiled;
 
@@ -55,8 +57,9 @@ public class DefaultKit implements Kit {
 	private final Map<String, List<SetApplier>> stored = new HashMap<>();
 	private final Map<String, List<SetApplier>> def;
 	
-	public DefaultKit(List<String> sets, RespawnAction respAct) throws LoadingException {
+	public DefaultKit(List<String> sets, RespawnAction respAct, InGamePlayer owner) throws LoadingException {
 		respawnAction = respAct;
+		this.owner = owner;
 		Map<String, List<SetApplier>> map = new HashMap<>(sets.size());
 		for (String set : sets) {
 			SetApplier applier = new DefaultSetApplier(set);
@@ -67,8 +70,9 @@ public class DefaultKit implements Kit {
 		load();
 	}
 	
-	private DefaultKit(Map<String, List<SetApplier>> map, RespawnAction respawnAction) {
+	private DefaultKit(Map<String, List<SetApplier>> map, RespawnAction respawnAction, InGamePlayer newOwner) {
 		this.respawnAction = respawnAction;
+		owner = newOwner;
 		def = Collections.unmodifiableMap(map);
 		reset();
 		load();
@@ -295,7 +299,7 @@ public class DefaultKit implements Kit {
 			case INCREASE:
 			case FILL:
 				// in this case these both add in the same way
-				ItemSet set = applier.getItemSet();
+				ItemSet set = applier.getItemSet(owner);
 				set.increase(amount - 1);
 				current.put(category, set);
 				result = AddResult.ADDED;
@@ -327,7 +331,7 @@ public class DefaultKit implements Kit {
 			} else {
 				switch (applier.getConflictAction()) {
 				case REPLACE:
-					ItemSet set = applier.getItemSet();
+					ItemSet set = applier.getItemSet(owner);
 					set.increase(amount - 1);
 					current.put(category, set);
 					result = AddResult.REPLACED;
@@ -387,8 +391,8 @@ public class DefaultKit implements Kit {
 	}
 
 	@Override
-	public Kit replicate() {
-		return new DefaultKit(getDefault(), respawnAction);
+	public Kit replicate(InGamePlayer newOwner) {
+		return new DefaultKit(getDefault(), respawnAction, newOwner);
 	}
 
 }

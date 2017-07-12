@@ -33,7 +33,7 @@ import pl.betoncraft.flier.api.Flier;
 import pl.betoncraft.flier.api.content.Game;
 import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.LoadingException;
-import pl.betoncraft.flier.api.core.UsableItem;
+import pl.betoncraft.flier.api.core.Owner;
 
 /**
  * A Bonus without physical manifestation, activated by proximity.
@@ -46,9 +46,8 @@ public class ProximityBonus extends DefaultBonus {
 	protected final double distance;
 	protected BukkitRunnable checker;
 
-	public ProximityBonus(ConfigurationSection section, Game game, Optional<InGamePlayer> creator,
-			Optional<UsableItem> item) throws LoadingException {
-		super(section, game, creator, item);
+	public ProximityBonus(ConfigurationSection section, Game game, Optional<Owner> owner) throws LoadingException {
+		super(section, game, owner);
 		distance = Math.pow(loader.loadNonNegativeDouble("distance"), 2);
 		location = game.getArena().getLocationSet(loader.loadString("location")).getSingle();
 	}

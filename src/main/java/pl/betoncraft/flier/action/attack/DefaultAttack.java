@@ -25,12 +25,14 @@ package pl.betoncraft.flier.action.attack;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.bukkit.configuration.ConfigurationSection;
 
 import pl.betoncraft.flier.action.DefaultAction;
 import pl.betoncraft.flier.api.content.Attack;
 import pl.betoncraft.flier.api.core.LoadingException;
+import pl.betoncraft.flier.api.core.Owner;
 import pl.betoncraft.flier.api.core.Usage;
 import pl.betoncraft.flier.core.DefaultUsage;
 
@@ -53,8 +55,11 @@ public abstract class DefaultAttack extends DefaultAction implements Attack {
 	protected final boolean finalHit;
 	protected List<Usage> subUsages = new ArrayList<>();
 	
-	public DefaultAttack(ConfigurationSection section) throws LoadingException {
-		super(section, true, false);
+	public DefaultAttack(ConfigurationSection section, Optional<Owner> owner) throws LoadingException {
+		super(section, owner);
+		if (!owner.isPresent()) {
+			throw new LoadingException("Attacks cannot be used without a player.");
+		}
 		noDamageTicks = loader.loadPositiveInt(NO_DAMAGE_TICKS, 20);
 		friendlyFire = loader.loadBoolean(FRIENDLY_FIRE, true);
 		suicidal = loader.loadBoolean(SUICIDAL, false);
@@ -62,7 +67,7 @@ public abstract class DefaultAttack extends DefaultAction implements Attack {
 		ConfigurationSection attackUsages = section.getConfigurationSection(ATTACK_USAGES);
 		if (attackUsages != null) for (String usageName : attackUsages.getKeys(false)) {
 			try {
-				subUsages.add(new DefaultUsage(attackUsages.getConfigurationSection(usageName)));
+				subUsages.add(new DefaultUsage(attackUsages.getConfigurationSection(usageName), owner));
 			} catch (LoadingException e) {
 				throw (LoadingException) new LoadingException(
 						String.format("Error in '%s' attack usage.", usageName)).initCause(e);

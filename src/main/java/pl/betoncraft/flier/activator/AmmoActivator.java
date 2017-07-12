@@ -23,10 +23,13 @@
  */
 package pl.betoncraft.flier.activator;
 
+import java.util.Optional;
+
 import org.bukkit.configuration.ConfigurationSection;
 
 import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.LoadingException;
+import pl.betoncraft.flier.api.core.Owner;
 import pl.betoncraft.flier.api.core.UsableItem;
 
 /**
@@ -44,8 +47,11 @@ public class AmmoActivator extends DefaultActivator {
 		LESS, EQUAL, MORE
 	}
 
-	public AmmoActivator(ConfigurationSection section) throws LoadingException {
-		super(section);
+	public AmmoActivator(ConfigurationSection section, Optional<Owner> owner) throws LoadingException {
+		super(section, owner);
+		if (!owner.isPresent()) {
+			throw new LoadingException("Cannot use ammo activator without a player");
+		}
 		String string = loader.loadString("amount");
 		if (string.startsWith("<")) {
 			type = Type.LESS;
@@ -71,8 +77,9 @@ public class AmmoActivator extends DefaultActivator {
 	}
 
 	@Override
-	public boolean isActive(InGamePlayer player, UsableItem item) {
-		if (item == null || item.getMaxAmmo() == 0) {
+	public boolean isActive(InGamePlayer player, InGamePlayer source) {
+		UsableItem item = owner.get().getItem();
+		if (item.getMaxAmmo() == 0) {
 			return false;
 		}
 		int a = percentage ? (int) ((double) item.getAmmo() / (double) item.getMaxAmmo() * 100.0) : item.getAmmo();

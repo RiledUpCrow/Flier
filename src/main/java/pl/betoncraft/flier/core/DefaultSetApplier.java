@@ -26,10 +26,12 @@ package pl.betoncraft.flier.core;
 import org.bukkit.configuration.ConfigurationSection;
 
 import pl.betoncraft.flier.api.Flier;
+import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.ItemSet;
 import pl.betoncraft.flier.api.core.LoadingException;
 import pl.betoncraft.flier.api.core.SetApplier;
 import pl.betoncraft.flier.util.ValueLoader;
+import pl.betoncraft.flier.utils.DummyPlayer;
 
 /**
  * Default implementation of the SetApplier.
@@ -55,7 +57,7 @@ public class DefaultSetApplier implements SetApplier {
 		amount = loader.loadPositiveInt("amount", 1);
 		id = loader.loadString("item_set");
 		// check if everything's fine
-		ItemSet set = Flier.getInstance().getItemSet(id);
+		ItemSet set = Flier.getInstance().getItemSet(id, new DummyPlayer());
 		category = set.getCategory();
 	}
 	
@@ -66,15 +68,15 @@ public class DefaultSetApplier implements SetApplier {
 		amount = 1;
 		id = name;
 		// check if everything's fine
-		ItemSet set = Flier.getInstance().getItemSet(id);
+		ItemSet set = Flier.getInstance().getItemSet(id, new DummyPlayer());
 		category = set.getCategory();
 		
 	}
 
 	@Override
-	public ItemSet getItemSet() {
+	public ItemSet getItemSet(InGamePlayer owner) {
 		try {
-			return Flier.getInstance().getItemSet(id);
+			return Flier.getInstance().getItemSet(id, owner);
 		} catch (LoadingException e) {
 			e.printStackTrace();
 			return null; // won't happen, it's already checked

@@ -25,6 +25,7 @@ package pl.betoncraft.flier.core;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
@@ -34,6 +35,7 @@ import pl.betoncraft.flier.api.content.Action;
 import pl.betoncraft.flier.api.content.Activator;
 import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.LoadingException;
+import pl.betoncraft.flier.api.core.Owner;
 import pl.betoncraft.flier.api.core.Usage;
 import pl.betoncraft.flier.util.LangManager;
 import pl.betoncraft.flier.util.Position;
@@ -56,7 +58,7 @@ public class DefaultUsage implements Usage {
 	protected List<Activator> activators = new ArrayList<>();
 	protected List<Action> actions = new ArrayList<>();
 	
-	public DefaultUsage(ConfigurationSection section) throws LoadingException {
+	public DefaultUsage(ConfigurationSection section, Optional<Owner> owner) throws LoadingException {
 		id = section.getName();
 		loader = new ValueLoader(section);
 		name = loader.loadString("name", id);
@@ -65,10 +67,10 @@ public class DefaultUsage implements Usage {
 		where = loader.loadEnum("where", Usage.Where.EVERYWHERE, Usage.Where.class);
 		Flier flier = Flier.getInstance();
 		for (String activator : section.getStringList("activators")) {
-			activators.add(flier.getActivator(activator));
+			activators.add(flier.getActivator(activator, owner));
 		}
 		for (String action : section.getStringList("actions")) {
-			actions.add(flier.getAction(action));
+			actions.add(flier.getAction(action, owner));
 		}
 	}
 

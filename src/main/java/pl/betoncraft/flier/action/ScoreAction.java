@@ -29,7 +29,7 @@ import org.bukkit.configuration.ConfigurationSection;
 
 import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.LoadingException;
-import pl.betoncraft.flier.api.core.UsableItem;
+import pl.betoncraft.flier.api.core.Owner;
 
 /**
  * Modifies score of the player.
@@ -42,14 +42,13 @@ public class ScoreAction extends DefaultAction {
 	
 	private final int amount;
 
-	public ScoreAction(ConfigurationSection section) throws LoadingException {
-		super(section, false, false);
+	public ScoreAction(ConfigurationSection section, Optional<Owner> owner) throws LoadingException {
+		super(section, owner);
 		amount = loader.loadInt(AMOUNT);
 	}
 
 	@Override
-	public boolean act(Optional<InGamePlayer> creator, Optional<InGamePlayer> source, InGamePlayer target,
-			Optional<UsableItem> item) {
+	public boolean act(InGamePlayer target, InGamePlayer source) {
 		return target.getGame().modifyPoints(target.getPlayer().getUniqueId(), amount);
 	}
 

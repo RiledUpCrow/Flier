@@ -162,6 +162,6 @@ public interface Kit {
 	 * 
 	 * @return the copy of this Kit
 	 */
-	public Kit replicate();
+	public Kit replicate(InGamePlayer newOwner);
 
 }

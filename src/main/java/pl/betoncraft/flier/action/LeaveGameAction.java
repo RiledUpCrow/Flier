@@ -30,7 +30,8 @@ import org.bukkit.configuration.ConfigurationSection;
 
 import pl.betoncraft.flier.api.Flier;
 import pl.betoncraft.flier.api.core.InGamePlayer;
-import pl.betoncraft.flier.api.core.UsableItem;
+import pl.betoncraft.flier.api.core.LoadingException;
+import pl.betoncraft.flier.api.core.Owner;
 
 /**
  * Removes the player from his current Game.
@@ -39,13 +40,12 @@ import pl.betoncraft.flier.api.core.UsableItem;
  */
 public class LeaveGameAction extends DefaultAction {
 
-	public LeaveGameAction(ConfigurationSection section) {
-		super(section, false, false);
+	public LeaveGameAction(ConfigurationSection section, Optional<Owner> owner) throws LoadingException {
+		super(section, owner);
 	}
 
 	@Override
-	public boolean act(Optional<InGamePlayer> creator, Optional<InGamePlayer> source,
-			InGamePlayer target, Optional<UsableItem> item) {
+	public boolean act(InGamePlayer target, InGamePlayer source) {
 		Bukkit.getScheduler().scheduleSyncDelayedTask(Flier.getInstance(),
 				() -> target.getGame().getLobby().leaveGame(target.getPlayer()));
 		return true;

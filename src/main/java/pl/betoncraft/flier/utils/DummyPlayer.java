@@ -21,99 +21,172 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  * 
  */
-package pl.betoncraft.flier.bonus;
+package pl.betoncraft.flier.utils;
 
-import java.util.Optional;
+import java.util.List;
+import java.util.Map;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
-import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
 import pl.betoncraft.flier.api.content.Game;
 import pl.betoncraft.flier.api.core.Attacker;
-import pl.betoncraft.flier.api.core.LoadingException;
-import pl.betoncraft.flier.api.core.Owner;
-import pl.betoncraft.flier.api.core.Target;
+import pl.betoncraft.flier.api.core.InGamePlayer;
+import pl.betoncraft.flier.api.core.Kit;
+import pl.betoncraft.flier.api.core.SidebarLine;
+import pl.betoncraft.flier.api.core.UsableItem;
 
 /**
- * An entity based Bonus type which also gets collected upon being hit with a
- * weapon.
+ * Dummy player for testing games.
  *
  * @author Jakub Sapalski
  */
-public class TargetBonus extends EntityBonus implements Target {
-	
-	protected Attacker attacker;
-	protected int noDamageTicks = 0;
-
-	public TargetBonus(ConfigurationSection section, Game game, Optional<Owner> owner) throws LoadingException {
-		super(section, game, owner);
-	}
-	
-	@Override
-	public void release() {
-		super.release();
-		entity.setInvulnerable(false);
-		game.getTargets().put(entity.getUniqueId(), this);
-	}
-	
-	@Override
-	public void block() {
-		super.block();
-		if (entity != null) {
-			game.getTargets().remove(entity.getUniqueId());
-		}
-	}
+public class DummyPlayer implements InGamePlayer {
 
 	@Override
 	public Attacker getAttacker() {
-		return attacker;
+		return null;
 	}
 
 	@Override
 	public void setAttacker(Attacker attacker) {
-		this.attacker = attacker;
 	}
 
 	@Override
 	public boolean handleHit(Attacker attacker) {
-		apply(attacker.getCreator());
-		return true;
+		return false;
 	}
 
 	@Override
 	public Location getLocation() {
-		return location;
+		return null;
 	}
 
 	@Override
 	public Vector getVelocity() {
-		return new Vector();
+		return null;
 	}
 
 	@Override
 	public Game getGame() {
-		return game;
+		return null;
 	}
 
 	@Override
 	public void setNoDamageTicks(int noDamageTicks) {
-		this.noDamageTicks = noDamageTicks;
 	}
 
 	@Override
 	public int getNoDamageTicks() {
-		return noDamageTicks;
+		return 0;
 	}
 
 	@Override
 	public boolean isTargetable() {
-		return isAvailable();
+		return false;
 	}
-	
+
 	@Override
 	public String getName() {
-		return id;
+		return null;
+	}
+
+	@Override
+	public void addTrigger(String name) {
+	}
+
+	@Override
+	public List<String> getTriggers() {
+		return null;
+	}
+
+	@Override
+	public UsableItem getHeldItem() {
+		return null;
+	}
+
+	@Override
+	public boolean isHolding(UsableItem item) {
+		return false;
+	}
+
+	@Override
+	public boolean isAccelerating() {
+		return false;
+	}
+
+	@Override
+	public void takeWingsOff() {
+	}
+
+	@Override
+	public void consumeItem(UsableItem item) {
+	}
+
+	@Override
+	public Player getPlayer() {
+		return null;
+	}
+
+	@Override
+	public double getWeight() {
+		return 0;
+	}
+
+	@Override
+	public String getLanguage() {
+		return null;
+	}
+
+	@Override
+	public boolean isPlaying() {
+		return false;
+	}
+
+	@Override
+	public void setPlaying(boolean isPlaying) {
+	}
+
+	@Override
+	public Kit getKit() {
+		return null;
+	}
+
+	@Override
+	public void updateKit() {
+	}
+
+	@Override
+	public int getMoney() {
+		return 0;
+	}
+
+	@Override
+	public void setMoney(int amount) {
+	}
+
+	@Override
+	public ChatColor getColor() {
+		return null;
+	}
+
+	@Override
+	public void setColor(ChatColor color) {
+	}
+
+	@Override
+	public void updateColors(Map<String, ChatColor> map) {
+	}
+
+	@Override
+	public List<SidebarLine> getLines() {
+		return null;
+	}
+
+	@Override
+	public void exitGame() {
 	}
 
 }

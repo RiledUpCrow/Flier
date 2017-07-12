@@ -23,12 +23,15 @@
  */
 package pl.betoncraft.flier.activator;
 
+import java.util.Optional;
+
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 
 import pl.betoncraft.flier.api.content.Activator;
 import pl.betoncraft.flier.api.core.Modification;
 import pl.betoncraft.flier.api.core.Modification.ModificationTarget;
+import pl.betoncraft.flier.api.core.Owner;
 import pl.betoncraft.flier.util.LangManager;
 import pl.betoncraft.flier.util.ModificationManager;
 import pl.betoncraft.flier.util.ValueLoader;
@@ -44,12 +47,14 @@ public abstract class DefaultActivator implements Activator {
 	protected final String name;
 	protected final ValueLoader loader;
 	protected final ModificationManager modMan;
+	protected final Optional<Owner> owner;
 	
-	public DefaultActivator(ConfigurationSection section) {
+	public DefaultActivator(ConfigurationSection section, Optional<Owner> owner) {
 		id = section.getName();
 		loader = new ValueLoader(section);
 		modMan = new ModificationManager();
 		name = loader.loadString("name", id);
+		this.owner = owner;
 	}
 	
 	@Override
@@ -72,6 +77,11 @@ public abstract class DefaultActivator implements Activator {
 	@Override
 	public void removeModification(Modification mod) {
 		modMan.removeModification(mod);
+	}
+	
+	@Override
+	public Optional<Owner> getOwner() {
+		return owner;
 	}
 
 }

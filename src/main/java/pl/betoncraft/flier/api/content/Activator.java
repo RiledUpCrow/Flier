@@ -26,19 +26,19 @@ package pl.betoncraft.flier.api.content;
 import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.Modification;
 import pl.betoncraft.flier.api.core.Named;
-import pl.betoncraft.flier.api.core.UsableItem;
+import pl.betoncraft.flier.api.core.Owned;
 
 /**
  * Represents a condition, under which a Usage can be activated.
  *
  * @author Jakub Sapalski
  */
-public interface Activator extends Named {
+public interface Activator extends Named, Owned {
 
 	/**
 	 * @return whenever the Activator is active for this player
 	 */
-	public boolean isActive(InGamePlayer player, UsableItem item);
+	public boolean isActive(InGamePlayer player, InGamePlayer source);
 	
 	/**
 	 * Applies passed modification to this Activator.

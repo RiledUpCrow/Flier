@@ -294,10 +294,11 @@ public class TeamDeathMatch extends DefaultGame {
 	}
 	
 	private  SimpleTeam getTeam(Target target) {
+		SimpleTeam team = null;
 		if (target instanceof InGamePlayer) {
-			return players.get(((InGamePlayer) target).getPlayer().getUniqueId());
+			team = players.get(((InGamePlayer) target).getPlayer().getUniqueId());
 		}
-		return new SimpleTeam();
+		return team == null ? new SimpleTeam() : team;
 	}
 	
 	private void setTeam(InGamePlayer data, SimpleTeam team) {

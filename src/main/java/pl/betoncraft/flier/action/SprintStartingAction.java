@@ -36,7 +36,7 @@ import org.bukkit.util.Vector;
 import pl.betoncraft.flier.api.Flier;
 import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.LoadingException;
-import pl.betoncraft.flier.api.core.UsableItem;
+import pl.betoncraft.flier.api.core.Owner;
 
 /**
  * Takes off the player after he sprints up to a required speed.
@@ -53,8 +53,8 @@ public class SprintStartingAction extends DefaultAction {
 	private Optional<Float> direction = Optional.empty();
 	private Optional<Location> lastLoc = Optional.empty();
 
-	public SprintStartingAction(ConfigurationSection section) throws LoadingException {
-		super(section, false, false);
+	public SprintStartingAction(ConfigurationSection section, Optional<Owner> owner) throws LoadingException {
+		super(section, owner);
 		max = (float) loader.loadPositiveDouble("max", (double) WALK_SPEED * 4);
 		if (max > 1) {
 			throw new LoadingException("Value of 'max' speed must be lower than 1");
@@ -63,8 +63,7 @@ public class SprintStartingAction extends DefaultAction {
 	}
 
 	@Override
-	public boolean act(Optional<InGamePlayer> creator, Optional<InGamePlayer> source,
-			InGamePlayer target, Optional<UsableItem> item) {
+	public boolean act(InGamePlayer target, InGamePlayer source) {
 		Player player = target.getPlayer();
 		if (player.isSprinting() && ((Entity) player).isOnGround()) {
 			Location loc = player.getLocation().clone();

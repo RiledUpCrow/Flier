@@ -29,7 +29,7 @@ import org.bukkit.configuration.ConfigurationSection;
 
 import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.LoadingException;
-import pl.betoncraft.flier.api.core.UsableItem;
+import pl.betoncraft.flier.api.core.Owner;
 import pl.betoncraft.flier.core.DefaultAttacker;
 
 /**
@@ -43,19 +43,18 @@ public class Explosion extends DefaultAttack {
 	
 	private final double radius;
 
-	public Explosion(ConfigurationSection section) throws LoadingException {
-		super(section);
+	public Explosion(ConfigurationSection section, Optional<Owner> owner) throws LoadingException {
+		super(section, owner);
 		radius = loader.loadPositiveDouble(RADIUS);
 	}
 
 	@Override
-	public boolean act(Optional<InGamePlayer> creator, Optional<InGamePlayer> source, InGamePlayer target,
-			Optional<UsableItem> item) {
+	public boolean act(InGamePlayer target, InGamePlayer source) {
 		System.out.println("Exploding at " + target.getName() + " location");
 		double radius = modMan.modifyNumber(RADIUS, this.radius);
 		target.getGame().getTargets().values().stream()
 				.filter(t -> t.getLocation().distanceSquared(target.getLocation()) <= radius*radius)
-				.forEach(t -> t.handleHit(new DefaultAttacker(this, creator.orElse(null), target, item.orElse(null))));
+				.forEach(t -> t.handleHit(new DefaultAttacker(this, owner.get().getPlayer(), target, owner.get().getItem())));
 		return true;
 	}
 

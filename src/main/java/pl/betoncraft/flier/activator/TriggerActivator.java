@@ -23,11 +23,13 @@
  */
 package pl.betoncraft.flier.activator;
 
+import java.util.Optional;
+
 import org.bukkit.configuration.ConfigurationSection;
 
 import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.LoadingException;
-import pl.betoncraft.flier.api.core.UsableItem;
+import pl.betoncraft.flier.api.core.Owner;
 
 /**
  * Activates when the player has specified trigger on this tick.
@@ -38,13 +40,13 @@ public class TriggerActivator extends DefaultActivator {
 	
 	private String trigger;
 
-	public TriggerActivator(ConfigurationSection section) throws LoadingException {
-		super(section);
+	public TriggerActivator(ConfigurationSection section, Optional<Owner> owner) throws LoadingException {
+		super(section, owner);
 		trigger = loader.loadString("trigger");
 	}
 
 	@Override
-	public boolean isActive(InGamePlayer player, UsableItem item) {
+	public boolean isActive(InGamePlayer player, InGamePlayer source) {
 		return player.getTriggers().contains(trigger);
 	}
 

@@ -38,8 +38,8 @@ import pl.betoncraft.flier.api.Flier;
 import pl.betoncraft.flier.api.core.Attacker;
 import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.LoadingException;
+import pl.betoncraft.flier.api.core.Owner;
 import pl.betoncraft.flier.api.core.Target;
-import pl.betoncraft.flier.api.core.UsableItem;
 import pl.betoncraft.flier.core.DefaultAttacker;
 
 /**
@@ -57,8 +57,8 @@ public class Bomb extends DefaultAttack {
 	private final float yield;
 	private final int fuse;
 
-	public Bomb(ConfigurationSection section) throws LoadingException {
-		super(section);
+	public Bomb(ConfigurationSection section, Optional<Owner> owner) throws LoadingException {
+		super(section, owner);
 		yield = (float) loader.loadPositiveDouble(POWER);
 		fuse = loader.loadNonNegativeInt(FUSE, 80);
 		// register a single listener for all bombs
@@ -69,12 +69,10 @@ public class Bomb extends DefaultAttack {
 	}
 
 	@Override
-	public boolean act(Optional<InGamePlayer> creator, Optional<InGamePlayer> source,
-			InGamePlayer target, Optional<UsableItem> item) {
+	public boolean act(InGamePlayer target, InGamePlayer source) {
 		TNTPrimed tnt = (TNTPrimed) target.getPlayer().getWorld().spawnEntity(
 				target.getPlayer().getLocation(), EntityType.PRIMED_TNT);
-		Attacker.saveAttacker(tnt, new DefaultAttacker(this, creator.orElse(null), target,
-				item.orElse(null)));
+		Attacker.saveAttacker(tnt, new DefaultAttacker(this, owner.get().getPlayer(), target, owner.get().getItem()));
 		tnt.setIsIncendiary(false);
 		tnt.setVelocity(target.getPlayer().getVelocity());
 		tnt.setYield((float) modMan.modifyNumber(POWER, yield));

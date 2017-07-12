@@ -26,11 +26,6 @@ package pl.betoncraft.flier.util;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 
-import pl.betoncraft.flier.api.Flier;
-import pl.betoncraft.flier.api.content.Action;
-import pl.betoncraft.flier.api.content.Activator;
-import pl.betoncraft.flier.api.content.Engine;
-import pl.betoncraft.flier.api.content.Wings;
 import pl.betoncraft.flier.api.core.LoadingException;
 
 /**
@@ -199,22 +194,6 @@ public class ValueLoader {
 	
 	public <T extends Enum<T>> T loadEnum(String address, Class<T> enumClass) throws LoadingException {
 		return loadEnum(address, null, enumClass);
-	}
-	
-	public Action loadAction(String address) throws LoadingException {
-		return Flier.getInstance().getAction(loadString(address));
-	}
-	
-	public Activator loadActivator(String address) throws LoadingException {
-		return Flier.getInstance().getActivator(loadString(address));
-	}
-	
-	public Engine loadEngine(String address) throws LoadingException {
-		return Flier.getInstance().getEngine(loadString(address));
-	}
-	
-	public Wings loadWings(String address) throws LoadingException {
-		return Flier.getInstance().getWing(loadString(address));
 	}
 
 }

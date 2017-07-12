@@ -31,10 +31,10 @@ import org.bukkit.configuration.ConfigurationSection;
 import com.google.common.collect.Sets;
 
 import pl.betoncraft.flier.api.core.InGamePlayer;
-import pl.betoncraft.flier.api.core.LoadingException;
 import pl.betoncraft.flier.api.core.Kit.AddResult;
+import pl.betoncraft.flier.api.core.LoadingException;
+import pl.betoncraft.flier.api.core.Owner;
 import pl.betoncraft.flier.api.core.SetApplier;
-import pl.betoncraft.flier.api.core.UsableItem;
 import pl.betoncraft.flier.core.DefaultSetApplier;
 
 /**
@@ -52,14 +52,13 @@ public class ItemSetAction extends DefaultAction {
 			AddResult.REPLACED
 	);
 
-	public ItemSetAction(ConfigurationSection section) throws LoadingException {
-		super(section, false, false);
+	public ItemSetAction(ConfigurationSection section, Optional<Owner> owner) throws LoadingException {
+		super(section, owner);
 		applier = new DefaultSetApplier(section);
 	}
 
 	@Override
-	public boolean act(Optional<InGamePlayer> creator, Optional<InGamePlayer> source,
-			InGamePlayer target, Optional<UsableItem> item) {
+	public boolean act(InGamePlayer target, InGamePlayer source) {
 		if (accepted.contains(applier.isSaving() ?
 				target.getKit().addStored(applier) :
 				target.getKit().addCurrent(applier))) {

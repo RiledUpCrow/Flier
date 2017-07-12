@@ -21,31 +21,35 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  * 
  */
-package pl.betoncraft.flier.action;
-
-import java.util.Optional;
-
-import org.bukkit.configuration.ConfigurationSection;
+package pl.betoncraft.flier.core;
 
 import pl.betoncraft.flier.api.core.InGamePlayer;
-import pl.betoncraft.flier.api.core.LoadingException;
 import pl.betoncraft.flier.api.core.Owner;
+import pl.betoncraft.flier.api.core.UsableItem;
 
 /**
- * Takes wings off the player.
+ * Default implementation of the Owner.
  *
  * @author Jakub Sapalski
  */
-public class WingsOffAction extends DefaultAction {
-
-	public WingsOffAction(ConfigurationSection section, Optional<Owner> owner) throws LoadingException {
-		super(section, owner);
+public class DefaultOwner implements Owner {
+	
+	private final InGamePlayer player;
+	private final UsableItem item;
+	
+	public DefaultOwner(InGamePlayer player, UsableItem item) {
+		this.player = player;
+		this.item = item;
 	}
 
 	@Override
-	public boolean act(InGamePlayer target, InGamePlayer source) {
-		target.takeWingsOff();
-		return true;
+	public InGamePlayer getPlayer() {
+		return player;
+	}
+
+	@Override
+	public UsableItem getItem() {
+		return item;
 	}
 
 }

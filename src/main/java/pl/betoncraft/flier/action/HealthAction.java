@@ -29,7 +29,7 @@ import org.bukkit.configuration.ConfigurationSection;
 
 import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.LoadingException;
-import pl.betoncraft.flier.api.core.UsableItem;
+import pl.betoncraft.flier.api.core.Owner;
 
 /**
  * Modifies player's health.
@@ -46,16 +46,15 @@ public class HealthAction extends DefaultAction {
 	private double distanceScale;
 	private double minAmount;
 
-	public HealthAction(ConfigurationSection section) throws LoadingException {
-		super(section, false, false);
+	public HealthAction(ConfigurationSection section, Optional<Owner> owner) throws LoadingException {
+		super(section, owner);
 		amount = loader.loadDouble(AMOUNT);
 		distanceScale = loader.loadNonNegativeDouble(DISTANCE_SCALE, 0d);
 		minAmount = loader.loadNonNegativeDouble(MIN_AMOUNT, 0d);
 	}
 
 	@Override
-	public boolean act(Optional<InGamePlayer> creator, Optional<InGamePlayer> source,
-			InGamePlayer target, Optional<UsableItem> item) {
+	public boolean act(InGamePlayer target, InGamePlayer source) {
 		double amount = modMan.modifyNumber(AMOUNT, this.amount);
 		double distanceScale = modMan.modifyNumber(DISTANCE_SCALE, this.distanceScale);
 		double minAmount = modMan.modifyNumber(MIN_AMOUNT, this.minAmount);
@@ -69,8 +68,8 @@ public class HealthAction extends DefaultAction {
 			minAmount = 0;
 		}
 		// calculate optional distance scaling
-		if (distanceScale > 0 && source.isPresent()) {
-			double currentDist = source.get().getLocation().distance(target.getLocation());
+		if (distanceScale > 0) {
+			double currentDist = source.getLocation().distance(target.getLocation());
 			amount -= (currentDist * (amount - minAmount) / distanceScale);
 		}
 		// use different methods, based on whenever we're damaging or healing the player

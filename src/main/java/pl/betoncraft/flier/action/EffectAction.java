@@ -35,7 +35,7 @@ import pl.betoncraft.flier.api.content.Action;
 import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.LoadingException;
 import pl.betoncraft.flier.api.core.Modification;
-import pl.betoncraft.flier.api.core.UsableItem;
+import pl.betoncraft.flier.api.core.Owner;
 
 /**
  * An action type which adds a specified effect.
@@ -49,18 +49,17 @@ public class EffectAction extends DefaultAction {
 	private final List<Action> actions = new ArrayList<>();
 	private final int duration;
 
-	public EffectAction(ConfigurationSection section) throws LoadingException {
-		super(section, false, false);
+	public EffectAction(ConfigurationSection section, Optional<Owner> owner) throws LoadingException {
+		super(section, owner);
 		Flier flier = Flier.getInstance();
 		for (String actionName : section.getStringList("actions")) {
-			actions.add(flier.getAction(actionName));
+			actions.add(flier.getAction(actionName, owner));
 		}
 		duration = loader.loadPositiveInt(DURATION);
 	}
 
 	@Override
-	public boolean act(Optional<InGamePlayer> creator, Optional<InGamePlayer> source,
-			InGamePlayer target, Optional<UsableItem> item) {
+	public boolean act(InGamePlayer target, InGamePlayer source) {
 		new BukkitRunnable() {
 			private int i = (int) modMan.modifyNumber(DURATION, EffectAction.this.duration);
 			@Override
@@ -69,7 +68,7 @@ public class EffectAction extends DefaultAction {
 					cancel();
 				}
 				for (Action action : actions) {
-					action.act(creator, source, target, item);
+					action.act(target, source);
 				}
 			}
 		}.runTaskTimer(Flier.getInstance(), 0, 1);

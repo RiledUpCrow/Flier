@@ -30,6 +30,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import pl.betoncraft.flier.api.Flier;
 import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.LoadingException;
+import pl.betoncraft.flier.api.core.Owner;
 import pl.betoncraft.flier.api.core.UsableItem;
 
 /**
@@ -41,14 +42,16 @@ public class ConsumeAction extends DefaultAction {
 	
 	private UsableItem item;
 
-	public ConsumeAction(ConfigurationSection section) throws LoadingException {
-		super(section, false, false);
-		item = Flier.getInstance().getItem(loader.loadString("item"));
+	public ConsumeAction(ConfigurationSection section, Optional<Owner> owner) throws LoadingException {
+		super(section, owner);
+		if (!owner.isPresent()) {
+			throw new LoadingException("Cannot use consume action without the player.");
+		}
+		item = Flier.getInstance().getItem(loader.loadString("item"), owner.get().getPlayer());
 	}
 
 	@Override
-	public boolean act(Optional<InGamePlayer> creator, Optional<InGamePlayer> source,
-			InGamePlayer target, Optional<UsableItem> item) {
+	public boolean act(InGamePlayer target, InGamePlayer source) {
 		target.consumeItem(this.item);
 		return true;
 	}

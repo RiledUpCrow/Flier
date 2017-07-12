@@ -23,12 +23,14 @@
  */
 package pl.betoncraft.flier.activator;
 
+import java.util.Optional;
+
 import org.bukkit.configuration.ConfigurationSection;
 
 import pl.betoncraft.flier.api.content.Wings;
 import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.LoadingException;
-import pl.betoncraft.flier.api.core.UsableItem;
+import pl.betoncraft.flier.api.core.Owner;
 
 /**
  * Activates if wings health is in range.
@@ -49,15 +51,15 @@ public class WingsHealthActivator extends DefaultActivator {
 		ABSOLUTE, PERCENTAGE
 	}
 	
-	public WingsHealthActivator(ConfigurationSection section) throws LoadingException {
-		super(section);
+	public WingsHealthActivator(ConfigurationSection section, Optional<Owner> owner) throws LoadingException {
+		super(section, owner);
 		min = loader.loadNonNegativeDouble(MIN);
 		max = loader.loadNonNegativeDouble(MAX, min);
 		type = loader.loadEnum(NUMBER_TYPE, Type.ABSOLUTE, Type.class);
 	}
 
 	@Override
-	public boolean isActive(InGamePlayer player, UsableItem item) {
+	public boolean isActive(InGamePlayer player, InGamePlayer source) {
 		Wings wings = player.getKit().getWings();
 		double health = wings.getHealth();
 		double maxHealth = wings.getMaxHealth();

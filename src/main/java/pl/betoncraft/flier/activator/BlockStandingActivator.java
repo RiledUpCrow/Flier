@@ -23,12 +23,14 @@
  */
 package pl.betoncraft.flier.activator;
 
+import java.util.Optional;
+
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 
 import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.LoadingException;
-import pl.betoncraft.flier.api.core.UsableItem;
+import pl.betoncraft.flier.api.core.Owner;
 
 /**
  * Activates when the player is standing on a correct block.
@@ -39,8 +41,8 @@ public class BlockStandingActivator extends DefaultActivator {
 	
 	private Material block;
 
-	public BlockStandingActivator(ConfigurationSection section) throws LoadingException {
-		super(section);
+	public BlockStandingActivator(ConfigurationSection section, Optional<Owner> owner) throws LoadingException {
+		super(section, owner);
 		block = loader.loadEnum("block", Material.class);
 		if (!block.isBlock() || !block.isSolid()) {
 			throw new LoadingException(String.format("Material '%s' is not a solid block.", block));
@@ -48,7 +50,7 @@ public class BlockStandingActivator extends DefaultActivator {
 	}
 
 	@Override
-	public boolean isActive(InGamePlayer player, UsableItem item) {
+	public boolean isActive(InGamePlayer player, InGamePlayer source) {
 		return player.getLocation().add(0, -1, 0).getBlock().getType() == block;
 	}
 

@@ -48,7 +48,7 @@ public interface SetApplier {
 	/**
 	 * @return the ItemSet which is applied by this applier
 	 */
-	public ItemSet getItemSet();
+	public ItemSet getItemSet(InGamePlayer owner);
 
 	/**
 	 * Category is used to group the ItemSets together and handle adding new

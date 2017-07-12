@@ -29,7 +29,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
@@ -97,7 +96,7 @@ public class DefaultPlayer implements InGamePlayer {
 		Flier flier = Flier.getInstance();
 		this.player = player;
 		this.game = game;
-		this.kit = kit;
+		this.kit = kit.replicate(this);
 		lang = LangManager.getLanguage(player);
 		oldSb = player.getScoreboard();
 		sb = Bukkit.getScoreboardManager().getNewScoreboard();
@@ -278,15 +277,12 @@ public class DefaultPlayer implements InGamePlayer {
 				continue;
 			}
 			for (Activator activator : usage.getActivators()) {
-				if (!activator.isActive(this, weapon)) {
+				if (!activator.isActive(this, source == null ? this : source)) {
 					continue loop;
 				}
 			}
 			for (Action action : usage.getActions()) {
-				action.act(Optional.ofNullable(creator),
-						Optional.ofNullable(source),
-						this,
-						Optional.ofNullable(weapon));
+				action.act(this, source == null ? this : source);
 			}
 		}
 		return true;

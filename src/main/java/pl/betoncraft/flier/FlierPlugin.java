@@ -89,6 +89,7 @@ import pl.betoncraft.flier.api.core.ItemSet;
 import pl.betoncraft.flier.api.core.LoadingException;
 import pl.betoncraft.flier.api.core.Modification;
 import pl.betoncraft.flier.api.core.NoArenaException;
+import pl.betoncraft.flier.api.core.Owner;
 import pl.betoncraft.flier.api.core.UsableItem;
 import pl.betoncraft.flier.bonus.EntityBonus;
 import pl.betoncraft.flier.bonus.ProximityBonus;
@@ -151,35 +152,35 @@ public class FlierPlugin extends JavaPlugin implements Flier {
 		registerLobby("physicalLobby", s -> new PhysicalLobby(s));
 		registerGame("teamDeathMatch", (s, l) -> new TeamDeathMatch(s, l));
 		registerGame("deathMatch", (s, l) -> new DeathMatchGame(s, l));
-		registerBonus("entity", (s, g, c, i) -> new EntityBonus(s, g, c, i));
-		registerBonus("invisible", (s, g, c, i) -> new ProximityBonus(s, g, c, i));
-		registerBonus("target", (s, g, c, i) -> new TargetBonus(s, g, c, i));
-		registerAction("leave", s -> new LeaveGameAction(s));
-		registerAction("projectileGun", s -> new ProjectileGun(s));
-		registerAction("particleGun", s -> new ParticleGun(s));
-		registerAction("homingMissile", s -> new HomingMissile(s));
-		registerAction("bomb", s -> new Bomb(s));
-		registerAction("explosion", s -> new Explosion(s));
-		registerAction("suicide", s -> new SuicideAction(s));
-		registerAction("launcher", s -> new LaunchAction(s));
-		registerAction("effect", s -> new EffectAction(s));
-		registerAction("money", s -> new MoneyAction(s));
-		registerAction("wingsHealth", s -> new WingsHealthAction(s));
-		registerAction("fuel", s -> new FuelAction(s));
-		registerAction("targetCompass", s -> new TargetAction(s));
-		registerAction("itemSet", s -> new ItemSetAction(s));
-		registerAction("consume", s -> new ConsumeAction(s));
-		registerAction("health", s -> new HealthAction(s));
-		registerAction("sprintStarting", s -> new SprintStartingAction(s));
-		registerAction("wingsOff", s -> new WingsOffAction(s));
-		registerAction("score", s -> new ScoreAction(s));
-		registerActivator("trigger", s -> new TriggerActivator(s));
-		registerActivator("holdingThis", s -> new HoldingThisActivator(s));
-		registerActivator("interval", s -> new IntervalActivator(s));
-		registerActivator("wingsHealth", s -> new WingsHealthActivator(s));
-		registerActivator("item", s -> new ItemActivator(s));
-		registerActivator("ammo", s -> new AmmoActivator(s));
-		registerActivator("blockStanding", s -> new BlockStandingActivator(s));
+		registerBonus("entity", (s, g, o) -> new EntityBonus(s, g, o));
+		registerBonus("invisible", (s, g, o) -> new ProximityBonus(s, g, o));
+		registerBonus("target", (s, g, o) -> new TargetBonus(s, g, o));
+		registerAction("leave", (s, o) -> new LeaveGameAction(s, o));
+		registerAction("projectileGun", (s, o) -> new ProjectileGun(s, o));
+		registerAction("particleGun", (s, o) -> new ParticleGun(s, o));
+		registerAction("homingMissile", (s, o) -> new HomingMissile(s, o));
+		registerAction("bomb", (s, o) -> new Bomb(s, o));
+		registerAction("explosion", (s, o) -> new Explosion(s, o));
+		registerAction("suicide", (s, o) -> new SuicideAction(s, o));
+		registerAction("launcher", (s, o) -> new LaunchAction(s, o));
+		registerAction("effect", (s, o) -> new EffectAction(s, o));
+		registerAction("money", (s, o) -> new MoneyAction(s, o));
+		registerAction("wingsHealth", (s, o) -> new WingsHealthAction(s, o));
+		registerAction("fuel", (s, o) -> new FuelAction(s, o));
+		registerAction("targetCompass", (s, o) -> new TargetAction(s, o));
+		registerAction("itemSet", (s, o) -> new ItemSetAction(s, o));
+		registerAction("consume", (s, o) -> new ConsumeAction(s, o));
+		registerAction("health", (s, o) -> new HealthAction(s, o));
+		registerAction("sprintStarting", (s, o) -> new SprintStartingAction(s, o));
+		registerAction("wingsOff", (s, o) -> new WingsOffAction(s, o));
+		registerAction("score", (s, o) -> new ScoreAction(s, o));
+		registerActivator("trigger", (s, o) -> new TriggerActivator(s, o));
+		registerActivator("holdingThis", (s, o) -> new HoldingThisActivator(s, o));
+		registerActivator("interval", (s, o) -> new IntervalActivator(s, o));
+		registerActivator("wingsHealth", (s, o) -> new WingsHealthActivator(s, o));
+		registerActivator("item", (s, o) -> new ItemActivator(s, o));
+		registerActivator("ammo", (s, o) -> new AmmoActivator(s, o));
+		registerActivator("blockStanding", (s, o) -> new BlockStandingActivator(s, o));
 		registerEffect("publicSound", s -> new PublicSoundEffect(s));
 		registerEffect("privateSound", s -> new PrivateSoundEffect(s));
 		registerEffect("gameSound", s -> new GameSoundEffect(s));
@@ -371,11 +372,11 @@ public class FlierPlugin extends JavaPlugin implements Flier {
 	}
 
 	@Override
-	public UsableItem getItem(String id) throws LoadingException {
+	public UsableItem getItem(String id, InGamePlayer player) throws LoadingException {
 		String name = "item";
 		ConfigurationSection section = getSection(configManager.getItems(), id, name);
 		try {
-			return new DefaultUsableItem(section);
+			return new DefaultUsableItem(section, player);
 		} catch (LoadingException e) {
 			throw loadingError(e, id, name);
 		}
@@ -410,43 +411,42 @@ public class FlierPlugin extends JavaPlugin implements Flier {
 	}
 	
 	@Override
-	public Action getAction(String id) throws LoadingException {
+	public Action getAction(String id, Optional<Owner> owner) throws LoadingException {
 		String name = "action";
 		ConfigurationSection section = getSection(configManager.getActions(), id, name);
 		String type = getType(section);
 		ActionFactory factory = getActionFactory(type);
 		checkFactory(factory, name, type);
 		try {
-			return factory.get(section);
+			return factory.get(section, owner);
 		} catch (LoadingException e) {
 			throw loadingError(e, id, name);
 		}
 	}
 	
 	@Override
-	public Activator getActivator(String id) throws LoadingException {
+	public Activator getActivator(String id, Optional<Owner> owner) throws LoadingException {
 		String name = "activator";
 		ConfigurationSection section = getSection(configManager.getActivators(), id, name);
 		String type = getType(section);
 		ActivatorFactory factory = getActivatorFactory(type);
 		checkFactory(factory, name, type);
 		try {
-			return factory.get(section);
+			return factory.get(section, owner);
 		} catch (LoadingException e) {
 			throw loadingError(e, id, name);
 		}
 	}
 	
 	@Override
-	public Bonus getBonus(String id, Game game, Optional<InGamePlayer> creator, Optional<UsableItem> item)
-			throws LoadingException {
+	public Bonus getBonus(String id, Game game, Optional<Owner> owner) throws LoadingException {
 		String name = "bonus";
 		ConfigurationSection section = getSection(configManager.getBonuses(), id, name);
 		String type = getType(section);
 		BonusFactory factory = getBonusFactory(type);
 		checkFactory(factory, name, type);
 		try {
-			return factory.get(section, game, creator, item);
+			return factory.get(section, game, owner);
 		} catch (LoadingException e) {
 			throw loadingError(e, id, name);
 		}
@@ -464,11 +464,11 @@ public class FlierPlugin extends JavaPlugin implements Flier {
 	}
 	
 	@Override
-	public ItemSet getItemSet(String id) throws LoadingException {
+	public ItemSet getItemSet(String id, InGamePlayer owner) throws LoadingException {
 		String name = "item set";
 		ConfigurationSection section = getSection(configManager.getItemSets(), id, name);
 		try {
-			return new DefaultSet(section);
+			return new DefaultSet(section, owner);
 		} catch (LoadingException e) {
 			throw loadingError(e, id, name);
 		}

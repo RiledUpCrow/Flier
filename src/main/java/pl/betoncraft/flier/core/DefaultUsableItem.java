@@ -64,7 +64,7 @@ public class DefaultUsableItem extends DefaultItem implements UsableItem {
 	protected int whole;
 	protected int ammo;
 
-	public DefaultUsableItem(ConfigurationSection section) throws LoadingException {
+	public DefaultUsableItem(ConfigurationSection section, InGamePlayer owner) throws LoadingException {
 		super(section);
 		whole = time = startingCooldown = loader.loadNonNegativeInt("starting_cooldown", 0);
 		consumable = loader.loadBoolean(CONSUMABLE, false);
@@ -78,7 +78,7 @@ public class DefaultUsableItem extends DefaultItem implements UsableItem {
 		if (usagesSection != null) for (String id : usagesSection.getKeys(false)) {
 			ConfigurationSection usageSection = usagesSection.getConfigurationSection(id);
 			if (usageSection != null) try {
-				usages.add(new DefaultUsage(usageSection));
+				usages.add(new DefaultUsage(usageSection, Optional.of(new DefaultOwner(owner, this))));
 			} catch (LoadingException e) {
 				throw (LoadingException) new LoadingException(String.format("Error in '%s' usage.", id)).initCause(e);
 			}
@@ -187,7 +187,7 @@ public class DefaultUsableItem extends DefaultItem implements UsableItem {
 					continue;
 				}
 				for (Activator activator : usage.getActivators()) {
-					if (!activator.isActive(player, this)) {
+					if (!activator.isActive(player, player)) {
 						continue usages;
 					}
 				}
@@ -204,7 +204,7 @@ public class DefaultUsableItem extends DefaultItem implements UsableItem {
 				}
 				setAmmo(ammo - usage.getAmmoUse());
 				for (Action action : usage.getActions()) {
-					action.act(Optional.of(player), Optional.of(player), player, Optional.of(this));
+					action.act(player, player);
 				}
 			}
 		}

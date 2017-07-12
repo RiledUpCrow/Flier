@@ -29,7 +29,7 @@ import org.bukkit.configuration.ConfigurationSection;
 
 import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.LoadingException;
-import pl.betoncraft.flier.api.core.UsableItem;
+import pl.betoncraft.flier.api.core.Owner;
 
 /**
  * Adds or removes money from player.
@@ -42,14 +42,13 @@ public class MoneyAction extends DefaultAction {
 
 	private final int money;
 
-	public MoneyAction(ConfigurationSection section) throws LoadingException {
-		super(section, false, false);
+	public MoneyAction(ConfigurationSection section, Optional<Owner> owner) throws LoadingException {
+		super(section, owner);
 		money = loader.loadInt(MONEY);
 	}
 
 	@Override
-	public boolean act(Optional<InGamePlayer> creator, Optional<InGamePlayer> source,
-			InGamePlayer target, Optional<UsableItem> item) {
+	public boolean act(InGamePlayer target, InGamePlayer source) {
 		target.setMoney(target.getMoney() + (int) modMan.modifyNumber(MONEY, money));
 		return true;
 	}

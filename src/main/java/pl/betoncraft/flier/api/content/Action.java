@@ -23,19 +23,17 @@
  */
 package pl.betoncraft.flier.api.content;
 
-import java.util.Optional;
-
 import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.Modification;
 import pl.betoncraft.flier.api.core.Named;
-import pl.betoncraft.flier.api.core.UsableItem;
+import pl.betoncraft.flier.api.core.Owned;
 
 /**
  * Represents a one time action, as opposed to the repeating Effect.
  *
  * @author Jakub Sapalski
  */
-public interface Action extends Named {
+public interface Action extends Named, Owned {
 
 	/**
 	 * <p>Performs the action on specified player.</p>
@@ -50,20 +48,13 @@ public interface Action extends Named {
 	 * 
 	 * <p>Usually creator, source and target are the same players though.</p>
 	 * 
-	 * @param creator
-	 *            the optional player who initiated the Action
 	 * @param source
 	 *            the optional player who is the direct source of the Action
 	 * @param target
 	 *            the player on which the Action is performed
-	 * @param item
-	 *            the optional UsableItem which generated this Action
 	 * @return whenever the action was performed or not
 	 */
-	public boolean act(Optional<InGamePlayer> creator,
-			Optional<InGamePlayer> source,
-			InGamePlayer target,
-			Optional<UsableItem> item);
+	public boolean act(InGamePlayer target, InGamePlayer source);
 	
 	/**
 	 * Applies passed modification to this Action.
@@ -78,15 +69,5 @@ public interface Action extends Named {
 	 * @param mod
 	 */
 	public void removeModification(Modification mod);
-
-	/**
-	 * @return whenever this Action needs to be launched from an item to work correctly.
-	 */
-	public boolean needsItem();
-
-	/**
-	 * @return whenever this Action needs to have a source player to work correctly.
-	 */
-	public boolean needsSource();
 
 }
