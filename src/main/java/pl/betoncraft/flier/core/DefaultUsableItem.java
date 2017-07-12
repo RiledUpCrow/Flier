@@ -51,6 +51,7 @@ public class DefaultUsableItem extends DefaultItem implements UsableItem {
 	private static final String AMMO = "ammo";
 	private static final String CONSUMABLE = "consumable";
 
+	protected final InGamePlayer owner;
 	protected final int startingCooldown;
 	protected final boolean consumable;
 	protected final int maxAmmo;
@@ -66,6 +67,7 @@ public class DefaultUsableItem extends DefaultItem implements UsableItem {
 
 	public DefaultUsableItem(ConfigurationSection section, InGamePlayer owner) throws LoadingException {
 		super(section);
+		this.owner = owner;
 		whole = time = startingCooldown = loader.loadNonNegativeInt("starting_cooldown", 0);
 		consumable = loader.loadBoolean(CONSUMABLE, false);
 		maxAmmo = loader.loadNonNegativeInt(AMMO, 0);
@@ -172,7 +174,7 @@ public class DefaultUsableItem extends DefaultItem implements UsableItem {
 	}
 
 	@Override
-	public boolean use(InGamePlayer player) {
+	public boolean use() {
 		if (time > 0) {
 			time--;
 		}
@@ -180,18 +182,18 @@ public class DefaultUsableItem extends DefaultItem implements UsableItem {
 		if (isReady()) {
 			usages:
 			for (Usage usage : usages) {
-				if (!usage.canUse(player)) {
+				if (!usage.canUse(owner)) {
 					continue;
 				}
 				if (getMaxAmmo() > 0 && ammo - usage.getAmmoUse() < 0) {
 					continue;
 				}
 				for (Activator activator : usage.getActivators()) {
-					if (!activator.isActive(player, player)) {
+					if (!activator.isActive(owner, owner)) {
 						continue usages;
 					}
 				}
-				FlierUseEvent event = new FlierUseEvent(player, this, usage);
+				FlierUseEvent event = new FlierUseEvent(owner, this, usage);
 				Bukkit.getPluginManager().callEvent(event);
 				if (event.isCancelled()) {
 					continue;
@@ -204,7 +206,7 @@ public class DefaultUsableItem extends DefaultItem implements UsableItem {
 				}
 				setAmmo(ammo - usage.getAmmoUse());
 				for (Action action : usage.getActions()) {
-					action.act(player, player);
+					action.act(owner, owner);
 				}
 			}
 		}

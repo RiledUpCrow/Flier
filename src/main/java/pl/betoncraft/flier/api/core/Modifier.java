@@ -29,12 +29,12 @@ package pl.betoncraft.flier.api.core;
  * @author Jakub Sapalski
  */
 public interface Modifier {
-	
+
 	/**
 	 * @return the name of the property to modify
 	 */
 	public String getProperty();
-	
+
 	/**
 	 * @return the base value which will be used
 	 */

@@ -131,12 +131,12 @@ public interface ConfigManager {
 	 * Saves the activators.yml file.
 	 */
 	public void saveActivators();
-	
+
 	/**
 	 * Saves the modifications.yml file.
 	 */
 	public void saveModifications();
-	
+
 	/**
 	 * Saves the effects.yml file.
 	 */
@@ -146,7 +146,7 @@ public interface ConfigManager {
 	 * Saves the sets.yml file.
 	 */
 	public void saveItemSets();
-	
+
 	/**
 	 * Saves the arenas.yml file.
 	 */

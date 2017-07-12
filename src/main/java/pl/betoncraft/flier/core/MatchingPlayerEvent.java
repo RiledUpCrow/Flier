@@ -60,7 +60,7 @@ public class MatchingPlayerEvent extends MatchingEvent {
 	}
 	
 	protected void parsePlayer(InGamePlayer player, String prefix) {
-		String className = player.getKit().getClassName();
+		String className = player.getKit().getClassName().orElse(null);
 		setString(prefix + CLASS, className == null ? "" : className);
 		setString(prefix + COLOR, player.getColor().name());
 		setNumber(prefix + MONEY, (double) player.getMoney());

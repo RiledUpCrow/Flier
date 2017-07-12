@@ -29,21 +29,24 @@ package pl.betoncraft.flier.api.core;
  * @author Jakub Sapalski
  */
 public interface Arena extends Named {
-	
+
 	/**
-	 * @param name name of the Location to get
-	 * @return the Location, never null
-	 * @throws when it can't load this Location
+	 * @param name
+	 *            name of the LocationSet to get
+	 * @return the LocationSet, never null
+	 * @throws LoadingException
+	 *             when it can't load this Location
 	 */
 	public LocationSet getLocationSet(String name) throws LoadingException;
-	
+
 	/**
 	 * @return whenever this Arena is currently used
 	 */
 	public boolean isUsed();
-	
+
 	/**
-	 * @param used whenever this Arena is currently used
+	 * @param used
+	 *            whenever this Arena is currently used
 	 */
 	public void setUsed(boolean used);
 }

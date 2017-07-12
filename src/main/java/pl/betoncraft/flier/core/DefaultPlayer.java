@@ -361,6 +361,15 @@ public class DefaultPlayer implements InGamePlayer {
 		}
 		kit.removeItem(item);
 	}
+	
+	@Override
+	public void takeWingsOff() {
+		ItemStack elytra = player.getInventory().getChestplate();
+		if (elytra != null) {
+			player.getInventory().setChestplate(null);
+			player.getInventory().setItem(1, elytra);
+		}
+	}
 
 	@Override
 	public Game getGame() {
@@ -510,7 +519,7 @@ public class DefaultPlayer implements InGamePlayer {
 	}
 	
 	@Override
-	public void exitGame() {
+	public void clearPlayer() {
 		ticker.cancel();
 		Utils.clearPlayer(player);
 		player.setScoreboard(oldSb);
@@ -547,15 +556,6 @@ public class DefaultPlayer implements InGamePlayer {
 			return;
 		}
 		wings.addHealth(wings.getRegeneration());
-	}
-	
-	@Override
-	public void takeWingsOff() {
-		ItemStack elytra = player.getInventory().getChestplate();
-		if (elytra != null) {
-			player.getInventory().setChestplate(null);
-			player.getInventory().setItem(1, elytra);
-		}
 	}
 	
 	private void destroyWings() {
@@ -657,7 +657,7 @@ public class DefaultPlayer implements InGamePlayer {
 		// iterate over copied list to avoid concurrent modifications
 		List<UsableItem> copy = new ArrayList<>(kit.getItems());
 		for (UsableItem item : copy) {
-			if (item.use(this) && item.getAmmo() == 0 && item.isConsumable()) {
+			if (item.use() && item.getAmmo() == 0 && item.isConsumable()) {
 				consumeItem(item);
 			}
 		}

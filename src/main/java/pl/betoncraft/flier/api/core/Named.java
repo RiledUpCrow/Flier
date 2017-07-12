@@ -33,12 +33,14 @@ import org.bukkit.command.CommandSender;
 public interface Named {
 
 	/**
-	 * @return the ID of this Named object, under which it is defined in its file
+	 * @return the ID of this Named object, under which it is defined in its
+	 *         file
 	 */
 	public String getID();
 
 	/**
-	 * @param player the player for whom it should be translated
+	 * @param player
+	 *            the player for whom it should be translated
 	 * @return the display name of this named Object
 	 */
 	public String getName(CommandSender player);

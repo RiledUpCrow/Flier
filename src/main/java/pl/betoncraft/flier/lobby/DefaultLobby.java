@@ -229,7 +229,7 @@ public abstract class DefaultLobby implements Lobby, Listener {
 						game = Flier.getInstance().getGame(gameName, this);
 						if (!event(player, game)) {
 							games.add(game);
-							Flier.getInstance().getPlayers().put(player.getUniqueId(), game.addPlayer(player));
+							Flier.getInstance().playerJoinsGame(game.addPlayer(player));
 							return JoinResult.GAME_CREATED;
 						} else {
 							game.stop(GameEndCause.ABORTED);

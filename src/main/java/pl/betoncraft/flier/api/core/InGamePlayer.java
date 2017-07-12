@@ -37,44 +37,14 @@ import org.bukkit.entity.Player;
 public interface InGamePlayer extends Target {
 
 	/**
-	 * Represents a result of player being hit by Damager. There can be multiple
-	 * results.
-	 *
-	 * @author Jakub Sapalski
-	 */
-	public enum DamageResult {
-
-		/**
-		 * When the player is gliding and Damager has "wings off" option
-		 */
-		WINGS_OFF,
-
-		/**
-		 * When the player is gliding and his wings can receive damage.
-		 */
-		WINGS_DAMAGE,
-
-		/**
-		 * When the player is on ground and was not instantly killed.
-		 */
-		REGULAR_DAMAGE,
-
-		/**
-		 * When a hit is accepted at all.
-		 */
-		HIT,
-
-	}
-
-	/**
-	 * Adds a trigger to the list. Triggers are events that happen on
-	 * this particular tick, like left or right clicks.
+	 * Adds a trigger to the list. Triggers are events that happen on this
+	 * particular tick, for example left or right clicks.
 	 *
 	 * @param name
 	 *            name of the trigger
 	 */
 	public void addTrigger(String name);
-	
+
 	/**
 	 * @return the list of triggers which happened during this tick
 	 */
@@ -96,19 +66,21 @@ public interface InGamePlayer extends Target {
 	public boolean isAccelerating();
 
 	/**
-	 * Takes wings off the player.
+	 * Takes the wings off from the player.
 	 */
 	public void takeWingsOff();
 
 	/**
-	 * Consumes the UsableItem, removing it both from the kit and from the player's inventory.
+	 * Consumes the UsableItem, removing it both from the kit and from the
+	 * player's inventory.
 	 * 
 	 * @param item
+	 *            UsableItem to consume
 	 */
 	public void consumeItem(UsableItem item);
 
 	/**
-	 * @return the Player object of this player
+	 * @return the Bukkit Player object of this player
 	 */
 	public Player getPlayer();
 
@@ -116,9 +88,10 @@ public interface InGamePlayer extends Target {
 	 * @return total weight of all items carried by the player
 	 */
 	public double getWeight();
-	
+
 	/**
-	 * @return the language chosen by this player
+	 * @return the language chosen by this player (won't change in the middle of
+	 *         the Game, even if the player changes his language)
 	 */
 	public String getLanguage();
 
@@ -182,8 +155,8 @@ public interface InGamePlayer extends Target {
 	public List<SidebarLine> getLines();
 
 	/**
-	 * Makes the player leave the game back to the lobby.
+	 * Clears all stuff in the player. Called by the Game when removing this player.
 	 */
-	public void exitGame();
+	public void clearPlayer();
 
 }

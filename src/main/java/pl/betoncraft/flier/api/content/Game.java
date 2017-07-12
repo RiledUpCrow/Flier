@@ -25,20 +25,17 @@ package pl.betoncraft.flier.api.content;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
-import org.bukkit.permissions.Permission;
 
 import pl.betoncraft.flier.api.core.Arena;
 import pl.betoncraft.flier.api.core.Attacker;
 import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.Named;
-import pl.betoncraft.flier.api.core.SetApplier;
 import pl.betoncraft.flier.api.core.Target;
 import pl.betoncraft.flier.event.FlierGameEndEvent.GameEndCause;
 
@@ -50,68 +47,8 @@ import pl.betoncraft.flier.event.FlierGameEndEvent.GameEndCause;
 public interface Game extends Named {
 
 	/**
-	 * The Button in a Lobby, which has costs and can be locked.
-	 */
-	public interface Button {
-
-		/**
-		 * @return the ID of the Button
-		 */
-		public String getID();
-		
-		/**
-		 * @return the Location of this Button
-		 */
-		public List<Location> getLocations();
-		
-		/**
-		 * @param location the Location of this Bonus
-		 */
-		public void setLocations(List<Location> location);
-
-		/**
-		 * @return the set of Button names required for unlocking this Button
-		 */
-		public Set<String> getRequirements();
-		
-		/**
-		 * @return the set of permissions required to use this Button
-		 */
-		public Set<Permission> getPermissions();
-
-		/**
-		 * @return the cost to buy an ItemSet
-		 */
-		public int getBuyCost();
-
-		/**
-		 * @return the cost to sell an ItemSet
-		 */
-		public int getSellCost();
-
-		/**
-		 * @return the cost to unlock this Button
-		 */
-		public int getUnlockCost();
-
-		/**
-		 * @return the SetApplier for buying
-		 */
-		public SetApplier getOnBuy();
-
-		/**
-		 * @return the SetApplier for selling
-		 */
-		public SetApplier getOnSell();
-
-		/**
-		 * @return the SetApplier for unlocking
-		 */
-		public SetApplier getOnUnlock();
-	}
-
-	/**
-	 * @return the unique number generated for this game, used to distinguish different matches
+	 * @return the unique number generated for this game, used to distinguish
+	 *         different matches
 	 */
 	public int getUniqueNumber();
 
@@ -128,7 +65,8 @@ public interface Game extends Named {
 	 * @param button
 	 *            the button to apply
 	 * @param buy
-	 *            whenever the player wants to buy (true) or sell (false)
+	 *            whenever the player wants to buy (true) or sell (false);
+	 *            unlocking gets triggered by both
 	 * @param message
 	 *            whenever to display a message
 	 */
@@ -136,17 +74,20 @@ public interface Game extends Named {
 
 	/**
 	 * Adds the player to the game. It will throw IllegalStateException if the
-	 * player is already in the game or the game is locked. If you want to add
+	 * player is already in the Game or the Game is locked. If you want to add
 	 * the player easily, use {@link Lobby#joinGame(Player, String) joinGame}
 	 * method instead. This method is only called by the Lobby.
 	 * 
 	 * @param player
 	 *            player to add
+	 * @throws IllegalStateException
+	 *             when the player is already in the Game or the Game is locked
 	 */
-	public InGamePlayer addPlayer(Player player);
+	public InGamePlayer addPlayer(Player player) throws IllegalStateException;
 
 	/**
-	 * Removes the player from the game. This method is only called by the Lobby.
+	 * Removes the player from the game. This method is only called by the
+	 * Lobby.
 	 * 
 	 * @param player
 	 *            player to remove
@@ -154,17 +95,15 @@ public interface Game extends Named {
 	public void removePlayer(Player player);
 
 	/**
-	 * Returns the map containing players by their UUID.
-	 * 
-	 * @return the map of players
+	 * @return the map containing players in this Game by their UUID
 	 */
 	public Map<UUID, InGamePlayer> getPlayers();
-	
+
 	/**
-	 * @return a set containing all targets in this Game
+	 * @return a map containing all targets in this Game by their UUID
 	 */
 	public Map<UUID, Target> getTargets();
-	
+
 	/**
 	 * Modifies the amount of points of the player specified by the UUID. This
 	 * method will return false if the player is not in the Game.
@@ -178,13 +117,13 @@ public interface Game extends Named {
 	public boolean modifyPoints(UUID player, int amount);
 
 	/**
-	 * This method will be called by the Lobby when the game needs to be started.
+	 * This method will be called by the Lobby when the game needs to be
+	 * started.
 	 */
 	public void start();
 
 	/**
 	 * This method will be called by the Lobby once the game is forced to end.
-	 * It should clean up all its data so it can be freshly started again.
 	 *
 	 * @param cause
 	 *            cause of the game ending
@@ -192,7 +131,7 @@ public interface Game extends Named {
 	public void stop(GameEndCause cause);
 
 	/**
-	 * @return the Lobby this Game is in
+	 * @return the Lobby which started this Game
 	 */
 	public Lobby getLobby();
 
@@ -212,8 +151,8 @@ public interface Game extends Named {
 
 	/**
 	 * Returns a map where the key is player's name and the value is his color.
-	 * Each game should manage its player's colors, so they can be displayed
-	 * when using engine.
+	 * Each game should manage its player's colors, so they can be displayed for
+	 * players correctly.
 	 * 
 	 * @return the map with colors assigned to player names
 	 */
@@ -225,29 +164,12 @@ public interface Game extends Named {
 	public List<Bonus> getBonuses();
 
 	/**
-	 * @return the height limit in this game; 0 and less means no limit
-	 */
-	public int getHeightLimit();
-
-	/**
 	 * Attitude of one player to another.
 	 *
 	 * @author Jakub Sapalski
 	 */
 	public enum Attitude {
-		FRIENDLY(0),
-		HOSTILE(1),
-		NEUTRAL(2);
-		private int type;
-		private Attitude(int type) {
-			this.type = type;
-		}
-		/**
-		 * @return the magic number for database storage
-		 */
-		public int get() {
-			return type;
-		}
+		FRIENDLY, HOSTILE, NEUTRAL;
 	}
 
 	/**
@@ -273,9 +195,8 @@ public interface Game extends Named {
 	public void handleKill(InGamePlayer killed, DamageCause cause);
 
 	/**
-	 * This method is called for the respawned player. Use it if you want to do
-	 * something special after respawning the player, or just pass him to
-	 * lobby.respawnPlayer().
+	 * This method is called for the respawned player. Use it to correctly
+	 * respawn that player.
 	 * 
 	 * @param player
 	 *            the player who has just respawned
@@ -286,17 +207,18 @@ public interface Game extends Named {
 	 * @return the location of the Game's center
 	 */
 	public Location getCenter();
-	
+
 	/**
 	 * @return the Arena currently used by this Game
 	 */
 	public Arena getArena();
-	
+
 	/**
-	 * @return the maximum amount of players this Game can have or 0 if there is no limit
+	 * @return the maximum amount of players this Game can have or 0 if there is
+	 *         no limit
 	 */
 	public int getMaxPlayers();
-	
+
 	/**
 	 * @return whenever the Game is currently running
 	 */
@@ -308,7 +230,7 @@ public interface Game extends Named {
 	public boolean isLocked();
 
 	/**
-	 * @return the amount of ticks before this game ends.
+	 * @return the amount of ticks before this game ends
 	 */
 	public int getTimeLeft();
 

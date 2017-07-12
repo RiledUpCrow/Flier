@@ -21,7 +21,7 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  * 
  */
-package pl.betoncraft.flier.utils;
+package pl.betoncraft.flier.util;
 
 import java.util.List;
 import java.util.Map;
@@ -186,7 +186,7 @@ public class DummyPlayer implements InGamePlayer {
 	}
 
 	@Override
-	public void exitGame() {
+	public void clearPlayer() {
 	}
 
 }

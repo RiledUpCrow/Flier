@@ -39,9 +39,10 @@ public interface Target {
 	 * @return the player who last attacked this target
 	 */
 	public Attacker getAttacker();
-	
+
 	/**
-	 * @param attacker the Attacker which last attacked this target
+	 * @param attacker
+	 *            the Attacker which last attacked this target
 	 */
 	public void setAttacker(Attacker attacker);
 
@@ -58,7 +59,7 @@ public interface Target {
 	 * @return the Target's location
 	 */
 	public Location getLocation();
-	
+
 	/**
 	 * @return the current velocity of the Target
 	 */

@@ -55,10 +55,10 @@ public interface Attacker {
 	 *         environment
 	 */
 	public InGamePlayer getCreator();
-	
+
 	/**
-	 * @return the direct source of the attack, may be null if it comes from
-	 *         the environment
+	 * @return the direct source of the attack, may be null if it comes from the
+	 *         environment
 	 */
 	public InGamePlayer getSource();
 
@@ -81,10 +81,10 @@ public interface Attacker {
 		List<MetadataValue> listC = entity.getMetadata(CREATOR);
 		List<MetadataValue> listS = entity.getMetadata(SOURCE);
 		List<MetadataValue> listW = entity.getMetadata(WEAPON);
-		Damager      d = listD == null || listD.isEmpty() ? null : (Damager)      listD.get(0).value();
+		Damager d = listD == null || listD.isEmpty() ? null : (Damager) listD.get(0).value();
 		InGamePlayer c = listC == null || listC.isEmpty() ? null : (InGamePlayer) listC.get(0).value();
 		InGamePlayer s = listS == null || listS.isEmpty() ? null : (InGamePlayer) listS.get(0).value();
-		UsableItem   w = listW == null || listW.isEmpty() ? null : (UsableItem)   listW.get(0).value();
+		UsableItem w = listW == null || listW.isEmpty() ? null : (UsableItem) listW.get(0).value();
 		return new DefaultAttacker(d, c, s, w);
 	}
 

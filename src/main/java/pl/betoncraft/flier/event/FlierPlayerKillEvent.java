@@ -34,16 +34,8 @@ import pl.betoncraft.flier.core.MatchingTwoPlayersEvent;
 public class FlierPlayerKillEvent extends MatchingTwoPlayersEvent {
 
 	public enum KillType {
-		SHOT_DOWN(0),
-		KILLED(1);
-		// the number is meant for the database
-		private final int type;
-		private KillType(int type) {
-			this.type = type;
-		}
-		public int get() {
-			return type;
-		}
+		SHOT_DOWN,
+		KILLED;
 	}
 	
 	private KillType type;

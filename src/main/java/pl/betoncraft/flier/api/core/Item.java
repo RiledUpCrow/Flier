@@ -33,7 +33,8 @@ import org.bukkit.inventory.ItemStack;
 public interface Item extends Named {
 
 	/**
-	 * @return the ItemStack equal to this item, with strings translated for specified player
+	 * @return the ItemStack equal to this item, with strings translated for
+	 *         specified player
 	 */
 	public ItemStack getItem(InGamePlayer player);
 
@@ -48,7 +49,7 @@ public interface Item extends Named {
 	public int slot();
 
 	/**
-	 * Compares two items by the default values (ignores mutable values). This
+	 * Compares two items by their default values (ignores mutable values). This
 	 * returns true for replicated items.
 	 * 
 	 * @param key
@@ -56,21 +57,21 @@ public interface Item extends Named {
 	 * @return true if the item was replicated from this one, false if not
 	 */
 	public boolean isSimilar(Item key);
-	
+
 	/**
-	 * Applies passed modification to this Item.
+	 * Applies modification to this Item.
 	 * 
 	 * @param mod
 	 */
 	public void addModification(Modification mod);
-	
+
 	/**
-	 * Removes passed modification from this Item.
+	 * Removes modification from this Item.
 	 * 
 	 * @param mod
 	 */
 	public void removeModification(Modification mod);
-	
+
 	/**
 	 * Removes all modifications from this item.
 	 */

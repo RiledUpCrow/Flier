@@ -36,6 +36,11 @@ import pl.betoncraft.flier.api.core.Owned;
 public interface Activator extends Named, Owned {
 
 	/**
+	 * @param player
+	 *            the player to check
+	 * @param item
+	 *            the item, from which this Activator originates
+	 * 
 	 * @return whenever the Activator is active for this player
 	 */
 	public boolean isActive(InGamePlayer player, InGamePlayer source);
@@ -46,7 +51,7 @@ public interface Activator extends Named, Owned {
 	 * @param mod
 	 */
 	public void addModification(Modification mod);
-	
+
 	/**
 	 * Removes passed modification from this Activator.
 	 * 

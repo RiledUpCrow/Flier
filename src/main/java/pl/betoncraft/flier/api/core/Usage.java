@@ -36,7 +36,7 @@ import pl.betoncraft.flier.api.content.Activator;
 public interface Usage extends Named {
 
 	/**
-	 * Represents a location where the player can be.
+	 * Represents a position where the player can be.
 	 *
 	 * @author Jakub Sapalski
 	 */

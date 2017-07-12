@@ -139,12 +139,12 @@ public class DefaultDatabaseManager implements DatabaseManager {
 		db.update("add_kill", new Object[]{
 				game.getUniqueNumber(), 
 				killed.getPlayer().getUniqueId().toString(),
-				killed.getKit().getClassName(),
+				killed.getKit().getClassName().orElse(null),
 				killer == null ? null : killer.getPlayer().getUniqueId().toString(),
-				killer == null ? null : killer.getKit().getClassName(),
+				killer == null ? null : killer.getKit().getClassName().orElse(null),
 				weapon == null ? null : weapon.getID(),
-				type.get(),
-				game.getAttitude(killed, killer).get(),
+				type.toString(),
+				game.getAttitude(killed, killer).toString(),
 				new Date()
 		});
 	}

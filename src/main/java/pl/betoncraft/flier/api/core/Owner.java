@@ -29,12 +29,12 @@ package pl.betoncraft.flier.api.core;
  * @author Jakub Sapalski
  */
 public interface Owner {
-	
+
 	/**
 	 * @return the player who owns the Action or Activator
 	 */
 	public InGamePlayer getPlayer();
-	
+
 	/**
 	 * @return the item which has the owned Usage
 	 */

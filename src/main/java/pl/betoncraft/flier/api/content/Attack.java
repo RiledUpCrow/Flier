@@ -26,7 +26,7 @@ package pl.betoncraft.flier.api.content;
 import pl.betoncraft.flier.api.core.Damager;
 
 /**
- * Represents an action which attacks another player with a Damager.
+ * Represents an Action which attacks another player with a Damager.
  *
  * @author Jakub Sapalski
  */

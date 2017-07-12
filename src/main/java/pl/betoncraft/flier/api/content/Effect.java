@@ -24,6 +24,7 @@
 package pl.betoncraft.flier.api.content;
 
 import java.util.List;
+import java.util.Optional;
 
 import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.Matcher;
@@ -31,7 +32,7 @@ import pl.betoncraft.flier.api.core.Named;
 import pl.betoncraft.flier.util.EffectListener.EventType;
 
 /**
- * Effect represents some non-game-changing action which is called when a
+ * Effect represents some non-game-changing action which is used when a
  * specified Bukkit event fires.
  *
  * @author Jakub Sapalski
@@ -47,11 +48,11 @@ public interface Effect extends Named {
 	 * Fire an effect with optional player.
 	 * 
 	 * @param player
-	 *            the player for whom the effect will fire or null if it should
-	 *            just fire for no particular player
+	 *            the optional player for whom the Effect will fire; some
+	 *            Effects can't run without any player
 	 */
-	public void fire(InGamePlayer player);
-	
+	public void fire(Optional<InGamePlayer> player);
+
 	/**
 	 * @return the list of Matchers to match against a MatchingEvent
 	 */

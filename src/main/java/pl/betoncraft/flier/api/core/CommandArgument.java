@@ -69,8 +69,6 @@ public interface CommandArgument {
 	
 	/**
 	 * The user of an Argument.
-	 *
-	 * @author Jakub Sapalski
 	 */
 	public enum User {
 		CONSOLE, PLAYER, ANYONE
@@ -89,10 +87,10 @@ public interface CommandArgument {
 	 *            the sender of the command
 	 * @param currentCommand
 	 *            the command string parsed so far
-	 * @param it
+	 * @param iterator
 	 *            iterator over next arguments
 	 */
-	public void parse(CommandSender sender, String currentCommand, Iterator<String> it);
+	public void parse(CommandSender sender, String currentCommand, Iterator<String> iterator);
 
 	/**
 	 * Parses the next argument. Call it if you're finished with the current
@@ -102,7 +100,7 @@ public interface CommandArgument {
 	 *            the sender of the command
 	 * @param currentCommand
 	 *            the command string parsed so far
-	 * @param it
+	 * @param iterator
 	 *            iterator over next arguments (it should be already incremented
 	 *            to the next argument, see {@code name} argument)
 	 * @param name
@@ -111,7 +109,7 @@ public interface CommandArgument {
 	 * @param arguments
 	 *            the list of CommandArguments which are valid in this context
 	 */
-	public static void nextArgument(CommandSender sender, String currentCommand, Iterator<String> it, String name,
+	public static void nextArgument(CommandSender sender, String currentCommand, Iterator<String> iterator, String name,
 			List<CommandArgument> arguments) {
 		for (CommandArgument a : arguments) {
 			if (!a.getAliases().contains(name)) {
@@ -121,7 +119,7 @@ public interface CommandArgument {
 			} else if (!sender.hasPermission(a.getPermission())) {
 				noPermission(sender);
 			} else {
-				a.parse(sender, currentCommand + " " + name, it);
+				a.parse(sender, currentCommand + " " + name, iterator);
 			}
 			return;
 		}

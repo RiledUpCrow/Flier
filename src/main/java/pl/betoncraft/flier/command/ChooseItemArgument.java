@@ -36,8 +36,8 @@ import org.bukkit.permissions.Permission;
 import com.google.common.collect.Sets;
 
 import pl.betoncraft.flier.api.Flier;
+import pl.betoncraft.flier.api.content.Button;
 import pl.betoncraft.flier.api.content.Game;
-import pl.betoncraft.flier.api.content.Game.Button;
 import pl.betoncraft.flier.api.content.Lobby;
 import pl.betoncraft.flier.api.core.CommandArgument;
 import pl.betoncraft.flier.api.core.InGamePlayer;

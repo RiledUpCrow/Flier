@@ -24,6 +24,7 @@
 package pl.betoncraft.flier.api.core;
 
 import java.util.List;
+import java.util.Optional;
 
 import pl.betoncraft.flier.api.content.Engine;
 import pl.betoncraft.flier.api.content.Wings;
@@ -44,9 +45,9 @@ public interface ItemSet extends Named {
 	public String getCategory();
 
 	/**
-	 * @return the name of the class after applying this ItemSet
+	 * @return the optional name of the class after applying this ItemSet
 	 */
-	public String getClassName();
+	public Optional<String> getClassName();
 
 	/**
 	 * @return the Engine in this ItemSet

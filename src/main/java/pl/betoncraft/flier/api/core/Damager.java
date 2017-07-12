@@ -43,17 +43,17 @@ public interface Damager {
 	 *         hit
 	 */
 	public int getNoDamageTicks();
-	
+
 	/**
 	 * @return whenever this Damager can cause friendly fire
 	 */
 	public boolean causesFriendlyFire();
-	
+
 	/**
 	 * @return whenever this Damager can damage the player who created it
 	 */
 	public boolean isSuicidal();
-	
+
 	/**
 	 * @return whenever this Damager should be considered a final hit; there may
 	 *         be more Damagers caused by this one, in which case this method

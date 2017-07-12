@@ -23,6 +23,7 @@
  */
 package pl.betoncraft.flier.effect;
 
+import java.util.Optional;
 import java.util.Random;
 
 import org.bukkit.Location;
@@ -67,6 +68,9 @@ public class ParticleEffect extends DefaultEffect {
 
 	public ParticleEffect(ConfigurationSection section) throws LoadingException {
 		super(section);
+		if (!type.isPlayerInvolved()) {
+			throw new LoadingException("Game sound effect cannot be run on a non-player event.");
+		}
 		random = new Random();
 		playerOnly();
 		particle = loader.loadEnum(PARTICLE, Particle.class);
@@ -85,13 +89,13 @@ public class ParticleEffect extends DefaultEffect {
 	}
 
 	@Override
-	public void fire(InGamePlayer player) {
+	public void fire(Optional<InGamePlayer> player) {
 		for (int i = 0; i < count; i++) {
-			Location loc = player.getPlayer().getLocation();
+			Location loc = player.get().getLocation();
 			loc.add(manualOffsetX * random.nextGaussian(),
 					manualOffsetY * random.nextGaussian(),
 					manualOffsetZ * random.nextGaussian());
-			player.getPlayer().getWorld().spawnParticle(particle, loc, amount, offsetX, offsetY, offsetZ, speed);
+			player.get().getPlayer().getWorld().spawnParticle(particle, loc, amount, offsetX, offsetY, offsetZ, speed);
 		}
 	}
 

@@ -23,6 +23,8 @@
  */
 package pl.betoncraft.flier.effect;
 
+import java.util.Optional;
+
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -46,27 +48,30 @@ public class GlowingEffect extends DefaultEffect {
 
 	public GlowingEffect(ConfigurationSection section) throws LoadingException {
 		super(section);
+		if (!type.isPlayerInvolved()) {
+			throw new LoadingException("Game sound effect cannot be run on a non-player event.");
+		}
 		plugin = Flier.getInstance();
 		time = loader.loadPositiveInt(TIME);
 	}
 
 	@Override
-	public void fire(InGamePlayer player) {
+	public void fire(Optional<InGamePlayer> player) {
 		if (canceler != null) {
 			canceler.cancel();
 		}
 		canceler = new BukkitRunnable() {
 			@Override
 			public void run() {
-				if (player.getPlayer().isGlowing()) {
-					player.getPlayer().setGlowing(false);
+				if (player.get().getPlayer().isGlowing()) {
+					player.get().getPlayer().setGlowing(false);
 				}
 				canceler = null;
 			}
 		};
 		canceler.runTaskLater(plugin, time);
-		if (!player.getPlayer().isGlowing()) {
-			player.getPlayer().setGlowing(true);
+		if (!player.get().getPlayer().isGlowing()) {
+			player.get().getPlayer().setGlowing(true);
 		}
 	}
 

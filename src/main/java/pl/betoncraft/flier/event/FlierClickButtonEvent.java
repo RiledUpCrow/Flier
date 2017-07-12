@@ -25,7 +25,7 @@ package pl.betoncraft.flier.event;
 
 import org.bukkit.event.Cancellable;
 
-import pl.betoncraft.flier.api.content.Game.Button;
+import pl.betoncraft.flier.api.content.Button;
 import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.core.MatchingPlayerEvent;
 

@@ -24,57 +24,71 @@
 package pl.betoncraft.flier.api.content;
 
 import java.util.List;
+import java.util.Set;
 
-import pl.betoncraft.flier.api.core.InGamePlayer;
+import org.bukkit.Location;
+import org.bukkit.permissions.Permission;
+
 import pl.betoncraft.flier.api.core.Named;
+import pl.betoncraft.flier.api.core.SetApplier;
 
 /**
- * Represents a collectable on the Game map.
- *
- * @author Jakub Sapalski
+ * The Button in a Game. It can be locked, and when it's unlocked it supports
+ * two operations: buy and sell. All these three actions can have cost and
+ * SetAppliers.
  */
-public interface Bonus extends Named {
+public interface Button extends Named {
 
 	/**
-	 * @return true if the Bonus should be removed after using
+	 * @return the Locations of this Button
 	 */
-	public boolean isConsumable();
+	public List<Location> getLocations();
 
 	/**
-	 * @return true if the bonus is available for use
+	 * Sets the Locations at which this Button can be clicked. 
+	 * 
+	 * @param location
+	 *            the Location of this Bonus
 	 */
-	public boolean isAvailable();
+	public void setLocations(List<Location> location);
 
 	/**
-	 * @return the cooldown time
+	 * @return the set of Button names required for unlocking this Button
 	 */
-	public int getCooldown();
+	public Set<String> getRequirements();
 
 	/**
-	 * @return in how many ticks should this Bonus be respawned; it will return
-	 *         -1 if it shouldn't respawn at all
+	 * @return the set of permissions required to use this Button
 	 */
-	public int getRespawn();
+	public Set<Permission> getPermissions();
 
 	/**
-	 * Starts the bonus, for example spawning the entity.
+	 * @return the cost to buy an ItemSet
 	 */
-	public void start();
+	public int getBuyCost();
 
 	/**
-	 * Cleans up the bonus, for example removing the entity.
+	 * @return the cost to sell an ItemSet
 	 */
-	public void stop();
+	public int getSellCost();
 
 	/**
-	 * @return the list of all actions in this Bonus
+	 * @return the cost to unlock this Button
 	 */
-	public List<Action> getActions();
+	public int getUnlockCost();
 
 	/**
-	 * @param player
-	 *            applies the Bonus to the player
+	 * @return the SetApplier for buying
 	 */
-	public void apply(InGamePlayer player);
+	public SetApplier getOnBuy();
 
+	/**
+	 * @return the SetApplier for selling
+	 */
+	public SetApplier getOnSell();
+
+	/**
+	 * @return the SetApplier for unlocking
+	 */
+	public SetApplier getOnUnlock();
 }

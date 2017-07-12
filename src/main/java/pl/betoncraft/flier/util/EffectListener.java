@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.bukkit.Bukkit;
 import org.bukkit.event.Cancellable;
@@ -203,9 +204,9 @@ public class EffectListener implements Listener {
 		for (Effect effect : effects) {
 			if (checkEffect(effect, event)) {
 				if (effect.getType().isPlayerInvolved() && event instanceof MatchingPlayerEvent) {
-					effect.fire(((MatchingPlayerEvent) event).getPlayer());
+					effect.fire(Optional.of(((MatchingPlayerEvent) event).getPlayer()));
 				} else {
-					effect.fire(null);
+					effect.fire(Optional.empty());
 				}
 			}
 		}

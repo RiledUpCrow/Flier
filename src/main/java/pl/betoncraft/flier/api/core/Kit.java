@@ -25,6 +25,7 @@ package pl.betoncraft.flier.api.core;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import pl.betoncraft.flier.api.content.Engine;
 import pl.betoncraft.flier.api.content.Wings;
@@ -45,6 +46,9 @@ public interface Kit {
 		CLEAR, COMBINE, NOTHING,
 	}
 
+	/**
+	 * What happened after the items were added to the Kit.
+	 */
 	public enum AddResult {
 		ADDED, REMOVED, ALREADY_MAXED, ALREADY_EMPTIED, FILLED, REPLACED, SKIPPED
 	}
@@ -55,7 +59,7 @@ public interface Kit {
 	 * 
 	 * @return the name of the class
 	 */
-	public String getClassName();
+	public Optional<String> getClassName();
 
 	/**
 	 * Returns the Engine of the player.
@@ -160,6 +164,8 @@ public interface Kit {
 	/**
 	 * Replicates the current state of this Kit.
 	 * 
+	 * @param newOwner
+	 *            Owner of the new Kit
 	 * @return the copy of this Kit
 	 */
 	public Kit replicate(InGamePlayer newOwner);

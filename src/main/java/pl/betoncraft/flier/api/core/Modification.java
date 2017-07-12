@@ -44,14 +44,14 @@ public interface Modification {
 	 * @return the list of modifiers
 	 */
 	public List<Modifier> getModifiers();
-	
+
 	/**
 	 * @return the target of the modification
 	 */
 	public ModificationTarget getTarget();
-	
+
 	/**
-	 * @return the names of applicable objects
+	 * @return the IDs of applicable objects
 	 */
 	public List<String> getNames();
 

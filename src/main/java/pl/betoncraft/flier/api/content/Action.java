@@ -29,24 +29,35 @@ import pl.betoncraft.flier.api.core.Named;
 import pl.betoncraft.flier.api.core.Owned;
 
 /**
- * Represents a one time action, as opposed to the repeating Effect.
+ * Represents an action which can happen for an InGamePlayer.
  *
  * @author Jakub Sapalski
  */
 public interface Action extends Named, Owned {
 
 	/**
-	 * <p>Performs the action on specified player.</p>
+	 * <p>
+	 * Performs the action on specified player.
+	 * </p>
 	 * 
-	 * <p>To understand the arguments here, let's imagine a UsableItem, which has a rocket-shooting action.
-	 * The rocket will create an explosion upon impact, and that explosion will damage everyone around, with
-	 * damage scaled with the distance from the center.</p>
+	 * <p>
+	 * To understand the arguments here, let's imagine a UsableItem, which has a
+	 * rocket-shooting action. The rocket will create an explosion upon impact,
+	 * and that explosion will damage everyone around, with damage scaled with
+	 * the distance from the center.
+	 * </p>
 	 * 
-	 * <p>Now player A launches the rocket and hits player B, and player C gets caught in the blast radius.
-	 * Running the last damage action will have player A as the creator (1st argument), player B as the source
-	 * (2nd argument) and player C as the target (3rd argument).</p>
+	 * <p>
+	 * (This is done by a rocket action which fires an explosion action which
+	 * fires a damage action.)
+	 * </p>
 	 * 
-	 * <p>Usually creator, source and target are the same players though.</p>
+	 * <p>
+	 * Now player A launches the rocket and hits player B, and player C gets
+	 * caught in the blast radius. Running that last damage action will have
+	 * player A as the owner ({@link #getOwner()}), player B as the source (2nd
+	 * argument) and player C as the target (1st argument).
+	 * </p>
 	 * 
 	 * @param source
 	 *            the optional player who is the direct source of the Action
@@ -57,16 +68,20 @@ public interface Action extends Named, Owned {
 	public boolean act(InGamePlayer target, InGamePlayer source);
 	
 	/**
-	 * Applies passed modification to this Action.
+	 * Applies modifications to this Action. If the Action is an Attack, it will
+	 * apply modifications recursively on all subActions.
 	 * 
 	 * @param mod
+	 *            Modification to apply
 	 */
 	public void addModification(Modification mod);
-	
+
 	/**
-	 * Removes passed modification from this Action.
+	 * Removes modifications from this Action. If the Action is an Attack, it
+	 * will remove modifications recursively on all subActions.
 	 * 
 	 * @param mod
+	 *            Modification to remove
 	 */
 	public void removeModification(Modification mod);
 

@@ -35,11 +35,9 @@ public interface UsableItem extends Item {
 	/**
 	 * Uses this item once.
 	 * 
-	 * @param player
-	 *            the player for which the item will be used
 	 * @return if the item was used or not
 	 */
-	public boolean use(InGamePlayer player);
+	public boolean use();
 
 	/**
 	 * @return the list of all usages of this item
@@ -105,8 +103,8 @@ public interface UsableItem extends Item {
 	public int getMaxAmount();
 
 	/**
-	 * @return the minimum amount of these Items (in case you want to sell
-	 *         too much)
+	 * @return the minimum amount of these Items (in case you want to sell too
+	 *         much)
 	 */
 	public int getMinAmount();
 

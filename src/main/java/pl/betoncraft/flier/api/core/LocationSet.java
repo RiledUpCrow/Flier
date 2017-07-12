@@ -31,12 +31,12 @@ import org.bukkit.Location;
  * @author Jakub Sapalski
  */
 public interface LocationSet {
-	
+
 	/**
 	 * @return a single (first) Location from this LocationSet
 	 */
 	public Location getSingle();
-	
+
 	/**
 	 * @return an array containing all Locations in this LocationSet
 	 */

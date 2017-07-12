@@ -25,6 +25,7 @@ package pl.betoncraft.flier.core;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
@@ -52,7 +53,7 @@ public class DefaultSet implements ItemSet {
 	protected String id;
 	protected String name;
 	protected String category;
-	protected String className;
+	protected Optional<String> className;
 	protected Engine engine;
 	protected Wings wings;
 	protected List<UsableItem> items = new ArrayList<>();
@@ -64,7 +65,7 @@ public class DefaultSet implements ItemSet {
 		loader = new ValueLoader(section);
 		name = loader.loadString("name", id);
 		category = loader.loadString("category");
-		className = section.getString("class_name", null);
+		className = Optional.ofNullable(section.getString("class_name", null));
 		String engineName = section.getString("engine");
 		if (engineName == null) {
 			engine = null;
@@ -102,7 +103,7 @@ public class DefaultSet implements ItemSet {
 	}
 	
 	@Override
-	public String getClassName() {
+	public Optional<String> getClassName() {
 		return className;
 	}
 

@@ -23,6 +23,8 @@
  */
 package pl.betoncraft.flier.effect;
 
+import java.util.Optional;
+
 import org.bukkit.configuration.ConfigurationSection;
 
 import pl.betoncraft.flier.api.core.InGamePlayer;
@@ -37,11 +39,14 @@ public class GameSoundEffect extends SoundEffect {
 
 	public GameSoundEffect(ConfigurationSection section) throws LoadingException {
 		super(section);
+		if (!type.isPlayerInvolved()) {
+			throw new LoadingException("Game sound effect cannot be run on a non-player event.");
+		}
 	}
 
 	@Override
-	public void fire(InGamePlayer player) {
-		player.getGame().getPlayers().values().forEach(
+	public void fire(Optional<InGamePlayer> player) {
+		player.get().getGame().getPlayers().values().forEach(
 				p -> p.getPlayer().getWorld().playSound(p.getPlayer().getLocation(), sound, volume, pitch));
 	}
 

@@ -348,8 +348,18 @@ public class FlierPlugin extends JavaPlugin implements Flier {
 	}
 	
 	@Override
+	public void playerJoinsGame(InGamePlayer player) {
+		players.put(player.getPlayer().getUniqueId(), player);
+	}
+	
+	@Override
+	public void playerLeavesGame(InGamePlayer player) {
+		players.remove(player.getPlayer().getUniqueId());
+	}
+	
+	@Override
 	public Map<UUID, InGamePlayer> getPlayers() {
-		return players;
+		return Collections.unmodifiableMap(players);
 	}
 
 	@Override

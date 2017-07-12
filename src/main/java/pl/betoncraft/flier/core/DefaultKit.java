@@ -30,6 +30,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import pl.betoncraft.flier.api.content.Engine;
@@ -80,14 +81,14 @@ public class DefaultKit implements Kit {
 	
 	private class Compiled {
 
-		private String name;
+		private Optional<String> name = Optional.empty();
 		private Engine engine;
 		private Wings wings;
 		private List<UsableItem> items = new ArrayList<>();
 
 		private Compiled(Collection<ItemSet> sets) {
 			for (ItemSet set : sets) {
-				if (set.getClassName() != null) {
+				if (set.getClassName().isPresent()) {
 					name = set.getClassName();
 				}
 				// don't override existing stuff with nulls!
@@ -167,7 +168,7 @@ public class DefaultKit implements Kit {
 	}
 
 	@Override
-	public String getClassName() {
+	public Optional<String> getClassName() {
 		return compiled.name;
 	}
 	

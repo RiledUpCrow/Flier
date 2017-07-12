@@ -63,6 +63,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import pl.betoncraft.flier.api.Flier;
 import pl.betoncraft.flier.api.content.Bonus;
+import pl.betoncraft.flier.api.content.Button;
 import pl.betoncraft.flier.api.content.Game;
 import pl.betoncraft.flier.api.content.Lobby;
 import pl.betoncraft.flier.api.content.Wings;
@@ -95,11 +96,11 @@ import pl.betoncraft.flier.sidebar.Money;
 import pl.betoncraft.flier.sidebar.Speed;
 import pl.betoncraft.flier.sidebar.Time;
 import pl.betoncraft.flier.util.DoubleClickBlocker;
+import pl.betoncraft.flier.util.DummyPlayer;
 import pl.betoncraft.flier.util.EffectListener;
 import pl.betoncraft.flier.util.LangManager;
 import pl.betoncraft.flier.util.Utils;
 import pl.betoncraft.flier.util.ValueLoader;
-import pl.betoncraft.flier.utils.DummyPlayer;
 
 /**
  * Basic rules of a game.
@@ -133,8 +134,6 @@ public abstract class DefaultGame implements Listener, Game {
 	protected final int maxPlayers;
 	protected final int maxTime;
 	protected final Kit defKit;
-	protected final int heightLimit;
-	protected final double heightDamage;
 	protected final boolean useMoney;
 	protected final int enemyKillMoney;
 	protected final int enemyHitMoney;
@@ -220,8 +219,6 @@ public abstract class DefaultGame implements Listener, Game {
 		} catch (LoadingException e) {
 			throw (LoadingException) new LoadingException("Error in default kit.").initCause(e);
 		}
-		heightLimit = loader.loadInt("height_limit", 512);
-		heightDamage = loader.loadNonNegativeDouble("height_damage", 0.5);
 		useMoney = loader.loadBoolean("money.enabled", false);
 		enemyKillMoney = loader.loadInt("money.enemy_kill", 0);
 		enemyHitMoney = loader.loadInt("money.enemy_hit", 0);
@@ -269,13 +266,6 @@ public abstract class DefaultGame implements Listener, Game {
 						data.getPlayer().damage(data.getPlayer().getHealth() + 1);
 					}
 				}
-				if (heightLimit > 0 && tickCounter % 20 == 0) {
-					for (InGamePlayer data : getPlayers().values()) {
-						if (data.getPlayer().getLocation().getY() > heightLimit) {
-							data.getPlayer().damage(heightDamage);
-						}
-					}
-				}
 				tickCounter++;
 				if (tickCounter > 1000) {
 					tickCounter = 0;
@@ -285,8 +275,9 @@ public abstract class DefaultGame implements Listener, Game {
 	}
 	
 	public class DefaultButton implements Button {
-		
+
 		protected final String id;
+		protected final String name;
 		protected List<Location> locations;
 		protected final Set<String> requirements;
 		protected final Set<Permission> permissions;
@@ -300,6 +291,7 @@ public abstract class DefaultGame implements Listener, Game {
 		public DefaultButton(ConfigurationSection section) throws LoadingException {
 			id = section.getName();
 			ValueLoader loader = new ValueLoader(section);
+			name = loader.loadString("name", id);
 			locations = Arrays.asList(arena.getLocationSet(section.getString("blocks")).getMultiple());
 			if (locations.isEmpty()) {
 				throw new LoadingException("Blocks must be specified.");
@@ -336,6 +328,11 @@ public abstract class DefaultGame implements Listener, Game {
 		@Override
 		public String getID() {
 			return id;
+		}
+		
+		@Override
+		public String getName(CommandSender player) {
+			return name.startsWith("$") ? LangManager.getMessage(player, name.substring(1)) : name;
 		}
 		
 		@Override
@@ -613,7 +610,7 @@ public abstract class DefaultGame implements Listener, Game {
 		InGamePlayer data =  new DefaultPlayer(player, this, defKit);
 		dataMap.put(uuid, data);
 		targets.put(uuid, data);
-		Flier.getInstance().getPlayers().put(player.getUniqueId(), data);
+		Flier.getInstance().playerJoinsGame(data);
 		// creating default stuff
 		data.getLines().add(new Fuel(data));
 		data.getLines().add(new Health(data));
@@ -673,8 +670,8 @@ public abstract class DefaultGame implements Listener, Game {
 		targets.remove(player.getUniqueId());
 		unlocked.remove(data);
 		waitingRoom.removePlayer(data);
-		Flier.getInstance().getPlayers().remove(player.getUniqueId());
-		data.exitGame();
+		Flier.getInstance().playerLeavesGame(data);
+		data.clearPlayer();
 		data.getPlayer().teleport(lobby.getSpawn());
 	}
 	
@@ -946,11 +943,6 @@ public abstract class DefaultGame implements Listener, Game {
 	@Override
 	public List<Bonus> getBonuses() {
 		return bonuses;
-	}
-	
-	@Override
-	public int getHeightLimit() {
-		return heightLimit;
 	}
 	
 	@Override

@@ -36,31 +36,32 @@ import pl.betoncraft.flier.api.core.Named;
 import pl.betoncraft.flier.event.FlierGameEndEvent.GameEndCause;
 
 /**
- * Represents a lobby.
+ * Represents a lobby, which can create Games on Arenas and assign players to
+ * those Games.
  *
  * @author Jakub Sapalski
  */
 public interface Lobby extends Named {
-	
+
 	public enum JoinResult {
 		GAME_CREATED, GAME_JOINED, GAMES_FULL, NO_SUCH_GAME, ALREADY_IN_GAME, BLOCKED
 	}
-	
+
 	/**
 	 * @return whenever the Lobby is open for players or not
 	 */
 	public boolean isOpen();
-	
+
 	/**
 	 * Opens or closes the Lobby.
 	 *
-	 * @param open whenever the Lobby should be open or closed
+	 * @param open
+	 *            whenever the Lobby should be open or closed
 	 */
 	public void setOpen(boolean open);
 
 	/**
-	 * Adds player to the lobby. Creates an InGamePlayer instance and adds the
-	 * player to the current Game.
+	 * Adds player to the lobby.
 	 * 
 	 * @param player
 	 *            the player to add to this lobby
@@ -77,10 +78,9 @@ public interface Lobby extends Named {
 	public void removePlayer(Player player);
 
 	/**
-	 * Tries to move this player to the Game with specified name. If it fails
-	 * for some reason (Games are full and no available Arenas to create new
-	 * Game), it will display a message and return false. This method will
-	 * create a new Game if it needs to.
+	 * Tries to move this player to the Game with specified name. It doesn't
+	 * guarantee success, the result will be returned. This method will create a
+	 * new Game if it needs (and is able) to.
 	 * 
 	 * @param player
 	 *            Player to add to the Game
@@ -116,12 +116,13 @@ public interface Lobby extends Named {
 	public Set<UUID> getPlayers();
 
 	/**
-	 * Called when the game ends.
+	 * Stops all Games and removes all players from this Lobby.
 	 */
 	public void stop();
 
 	/**
-	 * @return the map of games and their names
+	 * @return the map of Game lists by their names; each Game can run in
+	 *         multiple instances at once, that's why there are lists
 	 */
 	public Map<String, List<Game>> getGames();
 

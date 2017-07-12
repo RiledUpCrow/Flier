@@ -30,8 +30,8 @@ import pl.betoncraft.flier.api.core.InGamePlayer;
 import pl.betoncraft.flier.api.core.ItemSet;
 import pl.betoncraft.flier.api.core.LoadingException;
 import pl.betoncraft.flier.api.core.SetApplier;
+import pl.betoncraft.flier.util.DummyPlayer;
 import pl.betoncraft.flier.util.ValueLoader;
-import pl.betoncraft.flier.utils.DummyPlayer;
 
 /**
  * Default implementation of the SetApplier.

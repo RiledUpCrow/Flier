@@ -31,51 +31,55 @@ import java.util.List;
  * @author Jakub Sapalski
  */
 public interface Matcher {
-	
+
+	/**
+	 * Type of the Matcher.
+	 */
 	public enum Type {
 		STRING, NUMBER_EXACT, NUMBER_SECTION, BOOLEAN
 	}
-	
+
 	/**
 	 * @return the name of this Matcher
 	 */
 	public String getName();
-	
+
 	/**
-	 * Specifies the type of this Matcher. Don't use methods for other types than specified here or there will be errors.
+	 * Specifies the type of this Matcher. Don't use methods for other types
+	 * than specified here or there will be errors.
 	 * 
 	 * @return the type of objects this matcher matches against
 	 */
 	public Type getType();
-	
+
 	/**
 	 * This works for the type {@link Type#STRING}.
 	 * 
 	 * @return the list of Strings to match against
 	 */
 	public List<String> getStrings();
-	
+
 	/**
 	 * This works for the type {@link Type#NUMBER_EXACT}.
 	 * 
 	 * @return the exact number to match against
 	 */
 	public double exactNumber();
-	
+
 	/**
 	 * This works for the type {@link Type#NUMBER_SECTION}.
 	 * 
 	 * @return the minimum number to match
 	 */
 	public double minNumber();
-	
+
 	/**
 	 * This works for the type {@link Type#NUMBER_SECTION}.
 	 * 
 	 * @return the maximum number to match
 	 */
 	public double maxNumber();
-	
+
 	/**
 	 * This works for the type {@link Type#BOOLEAN}.
 	 * 

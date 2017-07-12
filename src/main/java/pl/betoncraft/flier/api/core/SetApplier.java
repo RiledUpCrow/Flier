@@ -38,7 +38,7 @@ public interface SetApplier {
 	}
 
 	/**
-	 * What to do when the conflict between item types in the same category
+	 * What to do when the conflict between ItemSets in the same category
 	 * arises.
 	 */
 	public enum ConflicAction {
@@ -46,6 +46,8 @@ public interface SetApplier {
 	}
 
 	/**
+	 * @param owner
+	 *            the Owner of the returned ItemSet
 	 * @return the ItemSet which is applied by this applier
 	 */
 	public ItemSet getItemSet(InGamePlayer owner);
@@ -57,7 +59,7 @@ public interface SetApplier {
 	 * @return the category name of this ItemSet
 	 */
 	public String getCategory();
-	
+
 	/**
 	 * @return the ID of the ItemSet applied by this SetApplier
 	 */

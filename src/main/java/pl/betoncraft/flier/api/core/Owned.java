@@ -31,7 +31,7 @@ import java.util.Optional;
  * @author Jakub Sapalski
  */
 public interface Owned {
-	
+
 	/**
 	 * @return the optional Owner of this object
 	 */

@@ -31,15 +31,9 @@ package pl.betoncraft.flier.api.core;
 public class LoadingException extends Exception {
 
 	private static final long serialVersionUID = 78313283731892504L;
-	private final String message;
 	
 	public LoadingException(String message) {
-		this.message = message;
-	}
-	
-	@Override
-	public String getMessage() {
-		return message;
+		super(message);
 	}
 
 }

@@ -97,11 +97,11 @@ public class Utils {
 	 */
 	public static String formatPlayer(InGamePlayer player, InGamePlayer receiver) {
 		Kit kit = player.getKit();
-		String className = kit.getClassName();
+		String className = kit.getClassName().orElse(null);
 		if (className != null) {
 			className = className.startsWith("$") ?
-					LangManager.getMessage(receiver, kit.getClassName().substring(1)) :
-					kit.getClassName();
+					LangManager.getMessage(receiver, className.substring(1)) :
+					className;
 		}
 		String name = player.getPlayer().getName();
 		return player.getColor() + name + (className == null ? "" :
