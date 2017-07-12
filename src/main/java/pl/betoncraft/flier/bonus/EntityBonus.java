@@ -96,9 +96,13 @@ public class EntityBonus extends ProximityBonus implements Listener {
 		};
 		rotator.runTaskTimer(Flier.getInstance(), 1, 1);
 		entity = location.getWorld().spawnEntity(location, type);
-		entity.setGravity(false);
+		try{
+			entity.setGravity(false);
+		} catch (NoSuchMethodError e) {}
 		entity.setInvulnerable(true);
-		entity.setSilent(true);
+		try{
+			entity.setSilent(true);
+		} catch (NoSuchMethodError e) {}
 		entity.setGlowing(true);
 		Bukkit.getPluginManager().registerEvents(this, Flier.getInstance());
 	}

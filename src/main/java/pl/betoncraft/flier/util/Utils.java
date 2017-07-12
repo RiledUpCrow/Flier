@@ -31,6 +31,7 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
@@ -175,11 +176,21 @@ public class Utils {
 	 * 
 	 * @param player
 	 */
+	@SuppressWarnings("deprecation")
 	public static void clearPlayer(Player player) {
 		player.getInventory().clear();
 		player.setGameMode(GameMode.SURVIVAL);
-		player.resetMaxHealth();
-		player.setHealth(player.getMaxHealth());
+		try {
+			player.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(
+					player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getDefaultValue());
+		} catch (NoSuchMethodError e) {
+			player.resetMaxHealth();
+		}
+		try {
+			player.setHealth(player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
+		} catch (NoSuchMethodError e) {
+			player.setHealth(player.getMaxHealth());
+		}
 		player.setExp(0);
 		player.setLevel(0);
 		player.setExhaustion(0);
@@ -194,7 +205,9 @@ public class Utils {
 		player.setVelocity(new Vector());
 		player.setFoodLevel(20);
 		player.setGlowing(false);
-		player.setGravity(true);
+		try {
+			player.setGravity(true);
+		} catch (NoSuchMethodError e) {}
 		player.setInvulnerable(false);
 		player.setSaturation(20);
 		for (PotionEffectType type : player.getActivePotionEffects().stream()

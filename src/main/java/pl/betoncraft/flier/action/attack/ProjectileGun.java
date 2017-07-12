@@ -102,7 +102,9 @@ public class ProjectileGun extends DefaultAttack {
 				Projectile projectile = (Projectile) launch.getWorld().spawnEntity(launch, entity);
 				projectile.setVelocity(velocity);
 				projectile.setShooter(player);
-				projectile.setGravity(false);
+				try{
+					projectile.setGravity(false);
+				} catch (NoSuchMethodError e) {}
 				projectile.setBounce(false);
 				if (projectile instanceof Explosive) {
 					Explosive explosive = (Explosive) projectile;

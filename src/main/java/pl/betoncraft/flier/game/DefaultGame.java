@@ -109,11 +109,18 @@ import pl.betoncraft.flier.util.ValueLoader;
  */
 public abstract class DefaultGame implements Listener, Game {
 	
-	protected static final List<DamageCause> allowedDamage = Arrays.asList(new DamageCause[]{
+	protected static final List<DamageCause> allowedDamage = new ArrayList<>(Arrays.asList(new DamageCause[]{
 			DamageCause.CONTACT, DamageCause.CUSTOM, DamageCause.FALL, DamageCause.FLY_INTO_WALL,
-			DamageCause.HOT_FLOOR, DamageCause.DROWNING, DamageCause.FALLING_BLOCK, DamageCause.FIRE,
+			DamageCause.DROWNING, DamageCause.FALLING_BLOCK, DamageCause.FIRE,
 			DamageCause.FIRE_TICK, DamageCause.LAVA, DamageCause.LIGHTNING, DamageCause.SUFFOCATION
-	});
+	}));
+	
+	static {
+		try {
+			// this is a fix for 1.9 version, which lacks HOT_FLOOR enum
+			allowedDamage.add(DamageCause.valueOf("HOT_FLOOR"));
+		} catch (IllegalArgumentException e) {}
+	}
 
 	protected final String id;
 	protected final String name;

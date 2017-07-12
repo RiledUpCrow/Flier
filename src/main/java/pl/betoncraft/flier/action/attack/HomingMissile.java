@@ -104,7 +104,9 @@ public class HomingMissile extends DefaultAttack {
 		Projectile missile = (Projectile) launch.getWorld().spawnEntity(launch, modMan.modifyEnum(ENTITY, entity));
 		missile.setVelocity(velocity);
 		missile.setShooter(player);
-		missile.setGravity(false);
+		try {
+			missile.setGravity(false);
+		} catch (NoSuchMethodError e) {}
 		missile.setGlowing(true);
 		Attacker.saveAttacker(missile, new DefaultAttacker(HomingMissile.this, owner.get().getPlayer(),
 				target, owner.get().getItem()));

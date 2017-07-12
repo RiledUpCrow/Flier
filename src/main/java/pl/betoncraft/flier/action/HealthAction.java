@@ -25,6 +25,7 @@ package pl.betoncraft.flier.action;
 
 import java.util.Optional;
 
+import org.bukkit.attribute.Attribute;
 import org.bukkit.configuration.ConfigurationSection;
 
 import pl.betoncraft.flier.api.core.InGamePlayer;
@@ -54,6 +55,7 @@ public class HealthAction extends DefaultAction {
 	}
 
 	@Override
+	@SuppressWarnings("deprecation")
 	public boolean act(InGamePlayer target, InGamePlayer source) {
 		double amount = modMan.modifyNumber(AMOUNT, this.amount);
 		double distanceScale = modMan.modifyNumber(DISTANCE_SCALE, this.distanceScale);
@@ -78,7 +80,12 @@ public class HealthAction extends DefaultAction {
 			return true;
 		}
 		if (amount > 0) {
-			double max = target.getPlayer().getMaxHealth();
+			double max;
+			try {
+				max = target.getPlayer().getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
+			} catch (NoSuchMethodError e) {
+				 max = target.getPlayer().getMaxHealth();
+			}
 			double newHealth = target.getPlayer().getHealth() + amount;
 			if (newHealth > max) {
 				newHealth = max;

@@ -116,7 +116,7 @@ public abstract class DefaultLobby implements Lobby, Listener {
 		if (gameLists.isEmpty()) {
 			throw new LoadingException("Game list is empty.");
 		}
-		if (section.contains("autojoin", true)) {
+		if (section.contains("autojoin")) {
 			autoJoinGame = loader.loadString("autojoin");
 			if (!gameLists.containsKey(autoJoinGame)) {
 				throw new LoadingException(
