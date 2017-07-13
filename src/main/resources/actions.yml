@@ -13,8 +13,8 @@ balancedShot:
   speed: 0.01               #
   burst_amount: 10          # amount of bullets in a burst
   burst_ticks: 20           # length of the burst
-  spread: 0.01              # precision of bullets (0 means straight shots)
-  projectile_speed: 5       # speed of bullets
+  spread: 0.005             # precision of bullets (0 means straight shots)
+  projectile_speed: 7.5     # speed of bullets
   range: 192                # range of bullets in blocks
   friendly_fire: true       # whenever it can damage friendly players
   suicidal: false           # whenever it can damage the shooter
@@ -24,16 +24,16 @@ balancedShot:
       actions:
       - balancedWing        # wing damage
       - wingsOff            # and taking wings off
-    on_the_ground:          # what happens if his is on the ground
+    on_the_ground:          # what happens if hit is on the ground
       where: ground
       actions:
-      - balancedPhysical    # physical damage
+      - lowPhysical         # physical damage
 balancedWing:
   type: wingsHealth
   amount: -1000             # damage to wings
-balancedPhysical:
+lowPhysical:
   type: health
-  amount: -7.5              # damage to player's health
+  amount: -6                # damage to player's health
 wingsOff:
   type: wingsOff            # wings are taken off
 strongShot:
@@ -42,10 +42,10 @@ strongShot:
   amount: 10
   offset: 0.1
   speed: 0.01
-  burst_amount: 10
+  burst_amount: 15
   burst_ticks: 1
-  spread: 0.05
-  projectile_speed: 5
+  spread: 0.033
+  projectile_speed: 7.5
   range: 128
   friendly_fire: true
   suicidal: false
@@ -58,21 +58,18 @@ strongShot:
     on_the_ground:
       where: ground
       actions:
-      - strongPhysical
+      - lowPhysical
 strongWing:
   type: wingsHealth
-  amount: -2800
-strongPhysical:
-  type: health
-  amount: -20
+  amount: -900
 fastShot:
   type: particleGun
   particle: crit magic
   amount: 10
   offset: 0.1
   speed: 0.01
-  burst_amount: 5
-  burst_ticks: 5
+  burst_amount: 1
+  burst_ticks: 1
   projectile_speed: 15
   range: 256
   friendly_fire: true
@@ -85,13 +82,13 @@ fastShot:
     on_the_ground:
       where: ground
       actions:
-      - fastPhysical
+      - highPhysical
 fastWing:
   type: wingsHealth
-  amount: -700
-fastPhysical:
+  amount: -2800
+highPhysical:
   type: health
-  amount: -5
+  amount: -18
 gunShot:
   type: projectileGun
   entity: snowball
@@ -108,13 +105,10 @@ gunShot:
     on_the_ground:
       where: ground
       actions:
-      - gunPhysical
+      - lowPhysical
 gunWing:
   type: wingsHealth
   amount: -1000
-gunPhysical:
-  type: health
-  amount: -5
 selfdestruct:
   type: suicide
 missile:
@@ -132,11 +126,11 @@ missile:
       where: air
       actions:
       - wingsOff
-      - strongPhysical
+      - highPhysical
     on_the_ground:
       where: ground
       actions:
-      - strongPhysical
+      - highPhysical
 launch:
   type: launcher
   speed: 2
@@ -152,13 +146,13 @@ bomb:
       where: air
       actions:
       - wingsOff
-      - strongPhysical
+      - highPhysical
     on_the_ground:
       where: ground
       actions:
-      - strongPhysical
+      - highPhysical
 giveMoney:
-  money: 5
+  money: 10
   type: money
 repair:
   type: wingsHealth
@@ -168,10 +162,10 @@ target:
   target: hostile
 fixAll:
   type: wingsHealth
-  amount: 4000
+  amount: 5000
 refuel:
   type: fuel
-  amount: 2000
+  amount: 5000
 refill_fast:
   type: itemSet
   item_set: fast

@@ -15,6 +15,7 @@ item_name:
   weight: [decimal]
   slot: [integer]
   amount: [positive integer]
+  starting_cooldown: [non-negative integer]
   max_amount: [non-negative integer]
   min_amount: [non-negative integer]
   consumable: [true/false]
@@ -44,6 +45,7 @@ The settings described to the first horizontal line apply to all items - engines
 
 * `consumable` (**default: false**) specifies whenever the item will be consumed after use (or after the ammo runs out).
 * `amount` (**default: 1**) is the amount of these items given to the player.
+* `starting_cooldown` (**default: 0**) is the amount of cooldown ticks before the first use after respawn.
 * `max_amount` (**default: 0**) is the maximum amount of these items that the player can have. `0` means unlimited.
 * `min_amount` (**default: 0**) is the amount of these items that the player won't be able to sell if selling is possible.
 * `ammo` (**default: 0**) is the maximum amount of ammunition in this item.

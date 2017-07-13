@@ -7,8 +7,13 @@
 
 default:
   type: teamDeathMatch                 # type of the game
-  points_to_win: 25                    # points required to win the game
+  points_to_win: 5                     # points required to win the game
   rounds: true                         # whenever the game is continuous or uses rounds
+  start_delay: 600                     # how long to wait before starting the game
+  respawn_delay: 300                   # how long to wait before respawning players
+  max_players: 6                       # maximum amount of players allowed in the game
+  min_players: 2                       # minimum amount of players before the game starts
+  locking: true                        # players can't join an already running game
   teams:                               # list of teams
     blue:
       name: '$custom.blue'             # name of the team
@@ -20,14 +25,15 @@ default:
       color: red
   money:                               # money settings for the Game
     enabled: true                      # whenever the money system is enabled at all
-    enemy_hit: 1                       # amount of money players get of different actions
+    enemy_hit: 1                       # amount of money players get for different actions
     enemy_kill: 5                      #
     friendly_kill: -2                  #
     by_friendly_death: 2               #
-    suicide: -1                        #
-  height_limit: 512                    # maximum height of the map
-  height_damage: 0.5                   # damage taken when flying above the height limit
+    suicide: -3                        #
   waiting_room: room                   # location of the waiting room as in arenas.yml
+  leave_blocks: leave                  # locations of leave blocks as in arenas.yml
+  center: center                       # center of the map
+  radius: 1000                         # the radius defining map borders
   viable_arenas:                       # list of arenas this game can use
   - default
   bonuses:                             # list of Bonuses in this Game
@@ -47,8 +53,11 @@ default:
   - chicken_sound
   - sheep_sound
   - engine_smoke
+  - engine_glow
+  - ground_glow
   default_kit:                         # list of item sets for default kit
   - balanced
+  respawn_action: combine              # what happens with items after respawn (see docs)
   buttons:                             # list of buttons with item sets
     rocket_button:
       buy_cost: 15                     # cost of buying this item set
@@ -171,6 +180,3 @@ default:
         conflict_action: replace
         saving: true
       blocks: upgrade_damage
-  respawn_action: combine              # what happens with items after respawn (see docs)
-  center: center                       # center of the map
-  radius: 1000                         # the radius defining map borders

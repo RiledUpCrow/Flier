@@ -45,7 +45,7 @@ en:
   time: "T: {color}{min}:{s}"
   your_score: "&2Score: &e{score}"
   best_score: "&2Best: &c{score}"
-  actionbar_ammo: "&f[&a{full}&0{empty}&f]"
+  actionbar_ammo: "&f[{1}&f]"
   ammo_char: "■"
   game_open: "Open"
   game_closed: "Closed"
@@ -84,6 +84,8 @@ en:
   start_game_desc_2: "Start a game or force specified player to start game."
   start_game_desc_3: "Start a game."
   custom:
+    defArena: Main Map
+    defGame: Team Game
     blue: Blue
     red: Red
     fast: Fast
@@ -222,6 +224,8 @@ pl:
   start_game_desc_2: "Rozpoczyna grę albo zmusza podanego gracza do rozpoczęcia gry."
   start_game_desc_3: "Rozpoczyna grę."
   custom:
+    defArena: Mapa Główna
+    defGame: Gra Drużynowa
     blue: Niebiescy
     red: Czerwoni
     fast: Szybki

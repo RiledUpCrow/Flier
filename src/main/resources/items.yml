@@ -15,7 +15,7 @@ balancedWeapon:
   slot: 0                                           # slot in which the item is placed
   ammo: 10                                          # ammunition in this item
   usages:                                           # list  of usages
-    click:                                          # empty activator for "click" effect (see effects.yml)
+    click:                                          # empty usage for "click" effect (see effects.yml)
       where: air
       activators:
       - left
@@ -32,7 +32,7 @@ balancedWeapon:
     reload:                                         # another usage
       where: no fall
       cooldown: 150
-      ammo_use: -10
+      ammo_use: -100
       activators:
       - right
       - hasAmmo
@@ -66,7 +66,7 @@ strongWeapon:
     reload:
       where: no fall
       cooldown: 100
-      ammo_use: -30
+      ammo_use: -100
       activators:
       - right
       - holding
@@ -100,7 +100,7 @@ fastWeapon:
     reload:
       where: no fall
       cooldown: 200
-      ammo_use: -10
+      ammo_use: -100
       activators:
       - right
       - holding
@@ -138,7 +138,7 @@ gun:
     reload:
       where: no fall
       cooldown: 60
-      ammo_use: -10
+      ammo_use: -100
       activators:
       - right
       - holding
@@ -153,6 +153,7 @@ rocket:
   - '$custom.rocketDesc'
   - '$custom.rocketUse'
   slot: 3
+  starting_cooldown: 600
   consumable: true
   max_amount: 3
   usages:
@@ -180,7 +181,7 @@ radar:
     kill:
       where: ground
       activators:
-      - left
+      - right
       - holding
       actions:
       - selfdestruct
