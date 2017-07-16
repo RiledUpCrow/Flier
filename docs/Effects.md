@@ -154,12 +154,7 @@ This event fires whenever some player uses an item with a usage.
 
 This event fires when one player hits another one with a weapon. Effects will be fired for the shooter. Matchers for the player who got hit are prefixed with `target_`, for example `target_class`.
 
-* `hit` _(true/false)_ whenever the hit actually happened (hits when falling don't happen)
-* `wings_off` _(true/false)_ whenever the hit causes the wings to fall of
-* `wings_damage` _(true/false)_ whenever the hit causes any wings damage
-* `regular_damage` _(true/false)_ whenever the hit causes any physical damage
-* `damage_to_wings` _(number)_ the amount of damage the weapon deals to the wings (not necessarily dealt)
-* `damage_to_health` _(number)_ the amount of damage the weapon deals to the player (not necessarily dealt)
+* `self_hit` _(true/false)_ whenever the player hit himself
 
 ### Get hit event
 
@@ -167,7 +162,7 @@ This event fires when one player hits another one with a weapon. Effects will be
 
 This event fires when one player gets hit by another one with a weapon. Effects will be fired for the victim. Matchers for the player who fired the weapon are prefixed with `shooter_`, for example `shooter_money`.
 
-All other matchers like `wings_off` and `damage_to_health` are exactly the same as in `hit` event described above.
+The `self_hit` matcher works as in **hit** event.
 
 ### Kill event
 

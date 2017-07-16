@@ -16,14 +16,12 @@ hit:
   type: privateSound
   event_type: hit
   matchers:
-    hit: true
     self_hit: false
   sound: block dispenser dispense
 get_hit:
   type: publicSound
   event_type: get hit
   matchers:
-    hit: true
     self_hit: false
   sound: entity villager hurt
 explode_particle:
