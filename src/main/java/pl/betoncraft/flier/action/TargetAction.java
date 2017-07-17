@@ -52,12 +52,15 @@ public class TargetAction extends DefaultAction {
 	public boolean act(InGamePlayer player, InGamePlayer source) {
 		if (player.isPlaying()) {
 			InGamePlayer nearest = null;
-			double distance = 0;
+			double distance = Double.MAX_VALUE;
 			Attitude target = modMan.modifyEnum(TARGET, this.target);
 			for (InGamePlayer data : player.getGame().getPlayers().values()) {
+				if (data.equals(player)) {
+					continue;
+				}
 				if (player.getGame().getAttitude(data, player) == target) {
-					double dist = player.getPlayer().getLocation().distanceSquared(data.getPlayer().getLocation());
-					if (distance == 0 || dist < distance) {
+					double dist = player.getLocation().distanceSquared(data.getLocation());
+					if (dist < distance) {
 						distance = dist;
 						nearest = data;
 					}
