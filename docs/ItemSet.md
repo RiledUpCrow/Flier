@@ -6,6 +6,8 @@ An item set can optionally have `class_name` value, which will be used as class 
 
 Each specified item can have `max` value which limits the maximum amount of this item a player can have and `min` value which is the minimum limit below which selling is not possible.
 
+The `refills` setting controls whenever all player's items will be refilled when applying this item set. Generally you don't want that - buying a rocket shouldn't fix your wings, right? This can be useful however if you have buttons in your waiting room. With this setting you can give filled items even if players have additional modifications which increase some items' properties.
+
 ```
 items:
   item_set_name:
@@ -16,6 +18,7 @@ items:
     - [item name]
     modifications:
     - [modification name]
+    refills: [true/false]
 ```
 
 ## Item set settings
@@ -25,3 +28,4 @@ items:
 * `wings` (**optional**) is the name of the Wings, as defined in _wings.yml_.
 * `items` (**optional**) is the list of items in this set, as defined in _items.yml_.
 * `modifications` (**optional**) is the list of Modifications, as defined in _modifications.yml_.
+* `refils` (**default: false**) whenever applying this set will refill all items

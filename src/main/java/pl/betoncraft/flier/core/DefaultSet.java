@@ -54,10 +54,12 @@ public class DefaultSet implements ItemSet {
 	protected String name;
 	protected String category;
 	protected Optional<String> className;
+	protected boolean refills;
 	protected Engine engine;
 	protected Wings wings;
 	protected List<UsableItem> items = new ArrayList<>();
 	protected List<Modification> mods = new ArrayList<>();
+	protected boolean modsRemoved = false;
 
 	public DefaultSet(ConfigurationSection section, InGamePlayer owner) throws LoadingException {
 		Flier flier = Flier.getInstance();
@@ -85,6 +87,7 @@ public class DefaultSet implements ItemSet {
 		for (String modName : section.getStringList("modifications")) {
 			mods.add(flier.getModification(modName));
 		}
+		refills = loader.loadBoolean("refills", false);
 	}
 
 	@Override
@@ -134,22 +137,31 @@ public class DefaultSet implements ItemSet {
 	
 	@Override
 	public List<Modification> getModifications() {
-		return mods;
+		return modsRemoved ? new ArrayList<>(0) : mods;
 	}
 	
 	@Override
 	public boolean isEmpty() {
-		return engine == null && wings == null && items.stream().allMatch(item -> item.getAmount() == 0) && mods.isEmpty();
+		return engine == null && wings == null && items.stream().allMatch(item -> item.getAmount() == 0) && (mods.isEmpty() || modsRemoved);
 	}
 
 	@Override
 	public boolean increase(int amount) {
+		// check if it's possible first
 		for (UsableItem item : items) {
 			int newAmount = item.getAmount() + (item.getDefAmount() * amount);
 			if (newAmount < 0 || newAmount < item.getMinAmount() || newAmount > item.getMaxAmount()) {
 				return false;
 			}
 		}
+		// remove mods if the set is zeroed
+		int currentAmount = getAmount();
+		if (currentAmount > 0 && currentAmount + amount == 0) {
+			modsRemoved = true;
+		} else {
+			modsRemoved = false;
+		}
+		// increase items only if it's possible
 		for (UsableItem item : items) {
 			item.setAmount(item.getAmount() + (item.getDefAmount() * amount));
 		}
@@ -167,6 +179,7 @@ public class DefaultSet implements ItemSet {
 				}
 			}
 		}
+		modsRemoved = false;
 	}
 
 	@Override
@@ -184,6 +197,11 @@ public class DefaultSet implements ItemSet {
 				}
 			}
 		}
-		return amount;
+		return amount == -1 ? 1 : amount;
+	}
+	
+	@Override
+	public boolean refills() {
+		return refills;
 	}
 }

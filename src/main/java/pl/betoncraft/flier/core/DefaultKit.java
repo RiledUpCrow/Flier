@@ -86,7 +86,7 @@ public class DefaultKit implements Kit {
 		private Wings wings;
 		private List<UsableItem> items = new ArrayList<>();
 
-		private Compiled(Collection<ItemSet> sets) {
+		private Compiled(Collection<ItemSet> sets, boolean refill) {
 			for (ItemSet set : sets) {
 				if (set.getClassName().isPresent()) {
 					name = set.getClassName();
@@ -137,6 +137,18 @@ public class DefaultKit implements Kit {
 					break;
 				}
 			}));
+			// optionally refill all items
+			if (refill) {
+				for (UsableItem item : items) {
+					item.refill();
+				}
+				if (engine != null) {
+					engine.refill();
+				}
+				if (wings != null) {
+					wings.refill();
+				}
+			}
 		}
 		
 		public Engine getEngine() {
@@ -158,8 +170,8 @@ public class DefaultKit implements Kit {
 		stored.values().forEach(list -> list.forEach(applier -> addCurrent(applier)));
 	}
 	
-	private void compile() {
-		compiled = new Compiled(current.values());
+	private void compile(boolean refill) {
+		compiled = new Compiled(current.values(), refill);
 	}
 	
 	@Override
@@ -291,6 +303,7 @@ public class DefaultKit implements Kit {
 	
 	@Override
 	public AddResult addCurrent(SetApplier applier) {
+		ItemSet set = applier.getItemSet(owner);
 		int amount = applier.getAmount();
 		String category = applier.getCategory();
 		AddResult result = null;
@@ -300,7 +313,6 @@ public class DefaultKit implements Kit {
 			case INCREASE:
 			case FILL:
 				// in this case these both add in the same way
-				ItemSet set = applier.getItemSet(owner);
 				set.increase(amount - 1);
 				current.put(category, set);
 				result = AddResult.ADDED;
@@ -332,7 +344,6 @@ public class DefaultKit implements Kit {
 			} else {
 				switch (applier.getConflictAction()) {
 				case REPLACE:
-					ItemSet set = applier.getItemSet(owner);
 					set.increase(amount - 1);
 					current.put(category, set);
 					result = AddResult.REPLACED;
@@ -344,7 +355,7 @@ public class DefaultKit implements Kit {
 			}
 		}
 		if (result != AddResult.ALREADY_MAXED && result != AddResult.ALREADY_EMPTIED && result != AddResult.SKIPPED) {
-			compile();
+			compile(set.refills());
 		}
 		return result;
 	}

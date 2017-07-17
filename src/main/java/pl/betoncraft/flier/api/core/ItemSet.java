@@ -115,4 +115,9 @@ public interface ItemSet extends Named {
 	 */
 	public void fill(int amount);
 
+	/**
+	 * @return whenever applying this ItemSet should refill all player's items.
+	 */
+	public boolean refills();
+
 }
