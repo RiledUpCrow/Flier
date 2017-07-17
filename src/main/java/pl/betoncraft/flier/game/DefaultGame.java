@@ -523,6 +523,9 @@ public abstract class DefaultGame implements Listener, Game {
 		 * @return the type of waiting the player experiences
 		 */
 		public WaitReason addPlayer(InGamePlayer player) {
+			if (waitingPlayers.contains(player)) {
+				throw new IllegalStateException("Cannot add player to the waiting room twice!");
+			}
 			waitingPlayers.add(player);
 			// if the game has ended just move the player
 			if (reason == WaitReason.GAME_ENDS) {
