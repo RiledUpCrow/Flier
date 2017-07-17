@@ -63,7 +63,7 @@ if %ERRORLEVEL% NEQ 0 (
 )
 
 echo Zipping source code...
-git archive -o target\SourceCode.zip HEAD src pom.xml >nul 2>nul
+git archive -o target\SourceCode.zip HEAD src pom.xml LICENSE >nul 2>nul
 if %ERRORLEVEL% NEQ 0 (
   echo Error: could not zip the source code
   pause >nul
