@@ -744,6 +744,7 @@ public abstract class DefaultGame implements Listener, Game {
 		Flier.getInstance().playerLeavesGame(data);
 		data.clearPlayer();
 		data.getPlayer().teleport(lobby.getSpawn());
+		LangManager.sendMessage(player, "game_left", getName(player));
 	}
 	
 	@Override

@@ -6,6 +6,7 @@
 #
 
 default:
+  name: '$custom.defGame'
   type: teamDeathMatch                 # type of the game
   points_to_win: 5                     # points required to win the game
   rounds: true                         # whenever the game is continuous or uses rounds

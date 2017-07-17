@@ -32,8 +32,11 @@ en:
   player_win: "&a** {1} wins! **"
   game_ends: "&b=== &eThe game ends! &a==="
   no_such_game: "&cThere is no such game."
-  game_joined: "&aGame joined!"
-  game_created: "&aGame created!"
+  game_joined: "&aGame {1} joined!"
+  game_created: "&aGame {1} created!"
+  game_left: "&aGame {1} left!"
+  lobby_joined: "&aYou joined {1} lobby!"
+  lobby_left: "&aYou left {1} lobby!"
   games_full: "&cAll games are currently full."
   altitude: "A: {color}{altitude}m"
   ammo: "M: {color}{current}/{max}"
@@ -85,7 +88,8 @@ en:
   start_game_desc_3: "Start a game."
   custom:
     defArena: Main Map
-    defGame: Team Game
+    defGame: Team DeathMatch
+    defLobby: Main
     blue: Blue
     red: Red
     fast: Fast
@@ -172,8 +176,11 @@ pl:
   player_win: "&a** {1} wygrywa! **"
   game_ends: "&b=== &eKoniec gry! &a==="
   no_such_game: "&cNie ma takiej gry."
-  game_joined: "&aDołączono do gry."
-  game_created: "&aGra utworzona."
+  game_joined: "&aDołączono do gry {1}."
+  game_created: "&aGra {1} utworzona."
+  game_left: "&aOpuszczono grę {1}!"
+  lobby_joined: "&aDołączono do lobby {1}!"
+  lobby_left: "&aOpuszczono lobby {1}!"
   games_full: "&cWszystkie gry są obecnie pełne."
   altitude: "W: {color}{altitude}m"
   ammo: "A: {color}{current}/{max}"
@@ -225,7 +232,8 @@ pl:
   start_game_desc_3: "Rozpoczyna grę."
   custom:
     defArena: Mapa Główna
-    defGame: Gra Drużynowa
+    defGame: Drużynowa
+    defLobby: Główne
     blue: Niebiescy
     red: Czerwoni
     fast: Szybki

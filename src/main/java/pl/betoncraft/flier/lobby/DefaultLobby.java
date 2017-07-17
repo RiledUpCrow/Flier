@@ -174,6 +174,7 @@ public abstract class DefaultLobby implements Lobby, Listener {
 			}
 		}
 		player.teleport(spawn);
+		LangManager.sendMessage(player, "lobby_joined", getName(player));
 	}
 
 	@Override
@@ -181,6 +182,7 @@ public abstract class DefaultLobby implements Lobby, Listener {
 		UUID uuid = player.getUniqueId();
 		if (players.remove(uuid)) {
 			leaveGame(player);
+			LangManager.sendMessage(player, "lobby_left", getName(player));
 			backups.remove(uuid).load();
 		}
 	}
@@ -290,10 +292,12 @@ public abstract class DefaultLobby implements Lobby, Listener {
 			LangManager.sendMessage(player, "already_in_game");
 			break;
 		case GAME_CREATED:
-			LangManager.sendMessage(player, "game_created");
+			LangManager.sendMessage(player, "game_created", Flier.getInstance().getPlayers().get(player.getUniqueId())
+					.getGame().getName(player));
 			break;
 		case GAME_JOINED:
-			LangManager.sendMessage(player, "game_joined");
+			LangManager.sendMessage(player, "game_joined", Flier.getInstance().getPlayers().get(player.getUniqueId())
+					.getGame().getName(player));
 			break;
 		case GAMES_FULL:
 			LangManager.sendMessage(player, "games_full");
