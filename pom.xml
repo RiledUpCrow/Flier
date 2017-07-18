@@ -22,6 +22,7 @@
 				<filtering>true</filtering>
 				<includes>
 					<include>*.yml</include>
+					<include>version.txt</include>
 				</includes>
 			</resource>
 		</resources>

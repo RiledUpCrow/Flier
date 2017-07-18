@@ -27,11 +27,18 @@ if %ERRORLEVEL% NEQ 0 (
 )
 
 echo Compiling plugin...
+echo Flier-${project.version}.zip > src\main\resources\version.txt
 call mvn clean package >nul 2>nul
 if %ERRORLEVEL% NEQ 0 (
+  del src\main\resources\version.txt
   echo Error: could not compile the plugin
   pause >nul
   goto :eof
+)
+7z d target\Flier.jar version.txt README.md >nul 2>nul
+del src\main\resources\version.txt
+for /F "tokens=* USEBACKQ" %%F in (`type target\classes\version.txt`) do (
+  set flier=%%F
 )
 
 echo Generating documentation...
@@ -74,7 +81,7 @@ echo Bundling files...
 type changelog.txt > target\ChangeLog.txt
 type LICENSE > target\License.txt
 cd target
-7z a Flier.zip Flier.jar Documentation.pdf SourceCode.zip ChangeLog.txt License.txt >nul 2>nul
+7z a %flier% Flier.jar Documentation.pdf SourceCode.zip ChangeLog.txt License.txt >nul 2>nul
 if %ERRORLEVEL% NEQ 0 (
   echo Error: could not bundle all items together
   pause >nul
