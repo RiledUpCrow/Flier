@@ -29,6 +29,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -209,7 +210,7 @@ public class DeathMatchGame extends DefaultGame {
 			}
 			// this is for test games where only one player is playing
 			if (alivePlayers.size() <= 1) {
-				roundFinished = true;
+				waitingRoom.finishRound();
 			}
 		} else {
 			// kills in continuous games increase points
@@ -260,6 +261,11 @@ public class DeathMatchGame extends DefaultGame {
 	@Override
 	public Map<String, ChatColor> getColors() {
 		return colors;
+	}
+	
+	@Override
+	protected Set<InGamePlayer> getPlayersForRespawn(Set<InGamePlayer> players) {
+		return players;
 	}
 
 }

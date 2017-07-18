@@ -26,9 +26,12 @@ package pl.betoncraft.flier.game;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -67,9 +70,12 @@ public class TeamDeathMatch extends DefaultGame {
 	protected final int enemyKillScore;
 	
 	protected final int pointsToWin;
+	protected final boolean equalTeams;
+	protected final LinkedList<InGamePlayer> queue = new LinkedList<>();
 	
 	public TeamDeathMatch(ConfigurationSection section, Lobby lobby) throws LoadingException, NoArenaException {
 		super(section, lobby);
+		equalTeams = loader.loadBoolean("equal_teams", false);
 		suicideScore = loader.loadInt("suicide_score", 0);
 		friendlyKillScore = loader.loadInt("friendly_kill_score", 0);
 		enemyKillScore = loader.loadInt("enemy_kill_score", 1);
@@ -192,7 +198,15 @@ public class TeamDeathMatch extends DefaultGame {
 	}
 	
 	@Override
+	public InGamePlayer addPlayer(Player player) {
+		InGamePlayer data = super.addPlayer(player);
+		queue.addFirst(data);
+		return data;
+	}
+	
+	@Override
 	public void removePlayer(Player player) {
+		queue.remove(dataMap.get(player.getUniqueId()));
 		super.removePlayer(player);
 		players.remove(player.getUniqueId());
 		updateColors();
@@ -236,7 +250,7 @@ public class TeamDeathMatch extends DefaultGame {
 			}
 			// this is for test games where only one player is playing
 			if (aliveTeams.size() <= 1) {
-				roundFinished = true;
+				waitingRoom.finishRound();
 			}
 		} else {
 			// kills in continuous games increase points
@@ -258,14 +272,6 @@ public class TeamDeathMatch extends DefaultGame {
 	public void handleRespawn(InGamePlayer player) {
 		super.handleRespawn(player);
 		SimpleTeam team = players.get(player.getPlayer().getUniqueId());
-		if (team == null) {
-			team = chooseTeam();
-			setTeam(player, team);
-			player.getLines().addAll(teams.values().stream()
-					.map(t -> new TeamLine(player, t))
-					.collect(Collectors.toList())
-			);
-		}
 		player.getPlayer().teleport(team.spawns.get(team.spawnCounter++ % team.spawns.size()));
 		FlierPlayerSpawnEvent event = new FlierPlayerSpawnEvent(player);
 		Bukkit.getPluginManager().callEvent(event);
@@ -291,6 +297,70 @@ public class TeamDeathMatch extends DefaultGame {
 			}
 		}
 		return map;
+	}
+	
+	@Override
+	protected Set<InGamePlayer> getPlayersForRespawn(Set<InGamePlayer> respawningPlayers) {
+		
+		// compute teams for all players without them
+		Map<SimpleTeam, Set<InGamePlayer>> teamPlayers = new HashMap<>(teams.size());
+		for (InGamePlayer player : dataMap.values()) {
+			SimpleTeam team = players.get(player.getPlayer().getUniqueId());
+			if (team == null) {
+				team = chooseTeam();
+				setTeam(player, team);
+				player.getLines().addAll(teams.values().stream()
+						.map(t -> new TeamLine(player, t))
+						.collect(Collectors.toList())
+				);
+			}
+			teamPlayers.computeIfAbsent(team, k -> new HashSet<>()).add(player);
+		}
+
+		// return unchanged if unequal teams are allowed
+		if (!equalTeams) {
+			return respawningPlayers;
+		}
+		
+		// calculate the team with least amount of players
+		int leastPlayers = Integer.MAX_VALUE;
+		for (Set<InGamePlayer> set : teamPlayers.values()) {
+			if (set.size() < leastPlayers) {
+				leastPlayers = set.size();
+			}
+		}
+		
+		// calculate how much more players have other teams
+		Map<SimpleTeam, Integer> overLimits = new HashMap<>();
+		for (Entry<SimpleTeam, Set<InGamePlayer>> entry : teamPlayers.entrySet()) {
+			overLimits.put(entry.getKey(), entry.getValue().size() - leastPlayers);
+		}
+		
+		// disallow players who are over the limit
+		Set<InGamePlayer> allowedPlayers = new HashSet<>();
+		// first players in the queue will be chosen to wait
+		for (InGamePlayer player : new ArrayList<>(queue)) {
+			// iterating in the queue order on the respawning set
+			if (!respawningPlayers.contains(player)) {
+				continue;
+			}
+			SimpleTeam team = players.get(player.getPlayer().getUniqueId());
+			int overLimit = overLimits.get(team);
+			if (overLimit == 0) {
+				// if the team is not over the limit respawn the player
+				allowedPlayers.add(player);
+			} else {
+				// otherwise decrease the limit,
+				overLimit--;
+				overLimits.put(team, overLimit);
+				// move the player to the end of the queue, so next time he doesn't wait
+				queue.remove(player);
+				queue.addLast(player);
+				// and display an apology
+				LangManager.sendMessage(player, "unequal_teams");
+			}
+		}
+		return allowedPlayers;
 	}
 	
 	private  SimpleTeam getTeam(Target target) {

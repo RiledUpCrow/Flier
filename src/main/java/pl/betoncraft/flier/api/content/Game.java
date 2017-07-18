@@ -234,4 +234,9 @@ public interface Game extends Named {
 	 */
 	public int getTimeLeft();
 
+	/**
+	 * @return whenever this game has rounds or not
+	 */
+	public boolean hasRounds();
+
 }

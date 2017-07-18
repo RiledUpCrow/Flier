@@ -1,4 +1,11 @@
 ###############
+# Flier 0.7.0 #
+###############
+
+ == Content ==
+* Add 'equal_teams' option to Team DeathMatch game.
+
+###############
 # Flier 0.6.1 #
 ###############
 

@@ -162,6 +162,7 @@ game_name:
   friendly_kill_score: [integer]
   enemy_kill_score: [integer]
   points_to_win: [positive integer]
+  equal_teams: [true/false]
   teams:
     team_id:
       name: [translatable text]
@@ -175,6 +176,7 @@ game_name:
 * `friendly_kill_score` (**default: 0**) points given to a team if one of its members kills an ally.
 * `enemy_kill_score` (**default: 1**) points given to a team if one of its members kills an enemy. These three settings matter only in continuous games.
 * `points_to_win` (**default: 0**) points required for the team to win the game. 0 means infinite game.
+* `equal_teams` (**default: false**) if this setting is set to true, the game will respawn players in such way that the team sizes in-game are always equal. The players who exceed the equality check will have to wait until the next respawn batch. When choosing, the game will prioritize the players who have already waited.
 * `teams` list of teams in the game.
   * `name` (**required**) the name of the team.
   * `color` (**required**) the color of the team (from [this list](https://hub.spigotmc.org/javadocs/spigot/org/bukkit/ChatColor.html)).

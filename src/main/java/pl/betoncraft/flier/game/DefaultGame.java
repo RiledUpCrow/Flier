@@ -28,7 +28,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -37,7 +36,6 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -58,7 +56,6 @@ import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.permissions.Permission;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import pl.betoncraft.flier.api.Flier;
@@ -80,7 +77,6 @@ import pl.betoncraft.flier.api.core.SetApplier;
 import pl.betoncraft.flier.api.core.Target;
 import pl.betoncraft.flier.core.DefaultKit;
 import pl.betoncraft.flier.core.DefaultPlayer;
-import pl.betoncraft.flier.core.DefaultSetApplier;
 import pl.betoncraft.flier.event.FlierClickButtonEvent;
 import pl.betoncraft.flier.event.FlierGameCreateEvent;
 import pl.betoncraft.flier.event.FlierGameEndEvent;
@@ -88,6 +84,7 @@ import pl.betoncraft.flier.event.FlierGameEndEvent.GameEndCause;
 import pl.betoncraft.flier.event.FlierGameStartEvent;
 import pl.betoncraft.flier.event.FlierPlayerKillEvent;
 import pl.betoncraft.flier.event.FlierPlayerKillEvent.KillType;
+import pl.betoncraft.flier.game.WaitingRoom.WaitReason;
 import pl.betoncraft.flier.sidebar.Altitude;
 import pl.betoncraft.flier.sidebar.Ammo;
 import pl.betoncraft.flier.sidebar.Fuel;
@@ -183,7 +180,6 @@ public abstract class DefaultGame implements Listener, Game {
 	protected List<Block> leaveBlocks = new ArrayList<>();
 	protected Location center;
 	protected int minX, minZ, maxX, maxZ;
-	protected boolean roundFinished = false;
 	
 	public DefaultGame(ConfigurationSection section, Lobby lobby) throws LoadingException, NoArenaException {
 		
@@ -230,7 +226,7 @@ public abstract class DefaultGame implements Listener, Game {
 		maxTime = loader.loadNonNegativeInt(MAX_TIME, 0) * 20;
 		timeLeft = maxTime;
 		respawnAction = loader.loadEnum(RESPAWN_ACTION, RespawnAction.class);
-		waitingRoom = new WaitingRoom(this);
+		waitingRoom = new WaitingRoom(this, loader);
 		
 		// bonuses
 		for (String bonusName : section.getStringList(BONUSES)) {
@@ -245,7 +241,7 @@ public abstract class DefaultGame implements Listener, Game {
 				throw new LoadingException(String.format("'%s' is not a button.", button));
 			}
 			try {
-				buttons.put(button, new DefaultButton(buttonSection));
+				buttons.put(button, new DefaultButton(this, buttonSection));
 			} catch (LoadingException e) {
 				throw (LoadingException) new LoadingException(
 						String.format("Error in '%s' button.", button)).initCause(e);
@@ -315,323 +311,6 @@ public abstract class DefaultGame implements Listener, Game {
 				}
 			}
 		}
-	}
-	
-	public class DefaultButton implements Button {
-
-		protected final String id;
-		protected final String name;
-		protected List<Location> locations;
-		protected final Set<String> requirements;
-		protected final Set<Permission> permissions;
-		protected final int buyCost;
-		protected final int sellCost;
-		protected final int unlockCost;
-		protected final SetApplier onBuy;
-		protected final SetApplier onSell;
-		protected final SetApplier onUnlock;
-
-		public DefaultButton(ConfigurationSection section) throws LoadingException {
-			id = section.getName();
-			ValueLoader loader = new ValueLoader(section);
-			name = loader.loadString(NAME, id);
-			locations = Arrays.asList(arena.getLocationSet(section.getString("blocks")).getMultiple());
-			if (locations.isEmpty()) {
-				throw new LoadingException("Blocks must be specified.");
-			}
-			requirements = new HashSet<>(section.getStringList("required"));
-			permissions = new HashSet<>(
-					section.getStringList("permissions").stream()
-							.map(str -> new Permission(str))
-							.collect(Collectors.toList())
-			);
-			buyCost = loader.loadInt("buy_cost", 0);
-			sellCost = loader.loadInt("sell_cost", 0);
-			unlockCost = loader.loadNonNegativeInt("unlock_cost", 0);
-			try {
-				ConfigurationSection buySection = section.getConfigurationSection("on_buy");
-				onBuy = buySection == null ? null : new DefaultSetApplier(buySection);
-			} catch (LoadingException e) {
-				throw (LoadingException) new LoadingException("Error in 'on_buy' section.").initCause(e);
-			}
-			try {
-				ConfigurationSection sellSection = section.getConfigurationSection("on_sell");
-				onSell = sellSection == null ? null : new DefaultSetApplier(sellSection);
-			} catch (LoadingException e) {
-				throw (LoadingException) new LoadingException("Error in 'on_sell' section.").initCause(e);
-			}
-			try {
-				ConfigurationSection unlockSection = section.getConfigurationSection("on_unlock");
-				onUnlock = unlockSection == null ? null : new DefaultSetApplier(unlockSection);
-			} catch (LoadingException e) {
-				throw (LoadingException) new LoadingException("Error in 'on_unlock' section.").initCause(e);
-			}
-		}
-		
-		@Override
-		public String getID() {
-			return id;
-		}
-		
-		@Override
-		public String getName(CommandSender player) {
-			return name.startsWith("$") ? LangManager.getMessage(player, name.substring(1)) : name;
-		}
-		
-		@Override
-		public List<Location> getLocations() {
-			return locations;
-		}
-		
-		@Override
-		public void setLocations(List<Location> locs) {
-			locations = new ArrayList<>(locs.size());
-			locs.forEach(location ->
-					locations.add(new Location(
-							location.getWorld(),
-							location.getBlockX(),
-							location.getBlockY(),
-							location.getBlockZ()
-					))
-			);
-		}
-		
-		@Override
-		public Set<String> getRequirements() {
-			return requirements;
-		}
-		
-		@Override
-		public Set<Permission> getPermissions() {
-			return permissions;
-		}
-
-		@Override
-		public int getBuyCost() {
-			return buyCost;
-		}
-
-		@Override
-		public int getSellCost() {
-			return sellCost;
-		}
-
-		@Override
-		public int getUnlockCost() {
-			return unlockCost;
-		}
-
-		@Override
-		public SetApplier getOnBuy() {
-			return onBuy;
-		}
-
-		@Override
-		public SetApplier getOnSell() {
-			return onSell;
-		}
-
-		@Override
-		public SetApplier getOnUnlock() {
-			return onUnlock;
-		}
-		
-	}
-	
-	/**
-	 * Reason for making the player wait in the waiting room.
-	 */
-	protected enum WaitReason {
-		NO_WAIT, MORE_PLAYERS, START_DELAY, RESPAWN_DELAY, ROUND, GAME_ENDS
-	}
-	
-	/**
-	 * Represents the waiting room which can hold players currently not in-game
-	 * and spawn them into the game.
-	 */
-	protected class WaitingRoom {
-		
-		/**
-		 * 
-		 */
-		private static final String WAITING_ROOM = "waiting_room";
-
-		/**
-		 * 
-		 */
-		private static final String LOCKING = "locking";
-
-		/**
-		 * 
-		 */
-		private static final String START_DELAY = "start_delay";
-
-		/**
-		 * 
-		 */
-		private static final String RESPAWN_DELAY = "respawn_delay";
-
-		/**
-		 * 
-		 */
-		private static final String MIN_PLAYERS = "min_players";
-
-		protected final List<Integer> displayTimes = Arrays.asList(
-				1, 2, 3, 4, 5, 10, 15, 30, 60, 90, 120, 180, 240, 300, 600).stream()
-				.map(i -> i * 20).collect(Collectors.toList());
-		
-		protected final Game game;
-		protected final int minPlayers;
-		protected final int respawnDelay;
-		protected final int startDelay;
-		protected final boolean locking;
-		protected final Location location;
-
-		protected List<InGamePlayer> waitingPlayers = new ArrayList<>();
-		protected WaitReason reason = WaitReason.NO_WAIT;
-		protected int currentWaitingTime;
-		protected BukkitRunnable ticker;
-		protected boolean locked = false;
-		
-		public WaitingRoom(Game game) throws LoadingException {
-			this.game = game;
-			minPlayers = loader.loadPositiveInt(MIN_PLAYERS, 1);
-			respawnDelay = loader.loadNonNegativeInt(RESPAWN_DELAY, 0);
-			startDelay = loader.loadNonNegativeInt(START_DELAY, 0);
-			locking = loader.loadBoolean(LOCKING, false);
-			location = arena.getLocationSet(loader.loadString(WAITING_ROOM)).getSingle();
-			ticker = new BukkitRunnable() {
-				public void run() {
-					tick();
-				};
-			};
-			ticker.runTaskTimer(Flier.getInstance(), 1, 1);
-			currentWaitingTime = -1; // lower than 0 means the waiting room is idle
-		}
-		
-		/**
-		 * @return whenever the waiting room is locked for new players
-		 */
-		public boolean isLocked() {
-			return locked;
-		}
-		
-		/**
-		 * Adds this player to the waiting room.
-		 * 
-		 * @param player the player to add
-		 * @return the type of waiting the player experiences
-		 */
-		public WaitReason addPlayer(InGamePlayer player) {
-			if (waitingPlayers.contains(player)) {
-				throw new IllegalStateException("Cannot add player to the waiting room twice!");
-			}
-			waitingPlayers.add(player);
-			// if the game has ended just move the player
-			if (reason == WaitReason.GAME_ENDS) {
-				player.getPlayer().teleport(location);
-				return WaitReason.GAME_ENDS;
-			}
-			if (!running) {
-				// the game hasn't started yet
-				if (waitingPlayers.size() >= minPlayers) {
-					// minimum player amount has been reached
-					if (startDelay == 0) {
-						// no start delay, start immediately
-						reason = WaitReason.NO_WAIT;
-					} else {
-						// start delay should be applied
-						if (currentWaitingTime <= 0) {
-							// create start delay
-							currentWaitingTime = startDelay;
-						}
-						reason = WaitReason.START_DELAY;
-					} 
-				} else {
-					// not enough players yet
-					reason = WaitReason.MORE_PLAYERS;
-				}
-			} else {
-				// the game has already started
-				if (rounds && !roundFinished) {
-					// the round still in progress
-					reason = WaitReason.ROUND;
-					currentWaitingTime = respawnDelay;
-				} else if (respawnDelay == 0) {
-					// no respawn delay, start immediately
-					reason = WaitReason.NO_WAIT; // players teleported, no need to put them in the waiting room
-				} else {
-					if (currentWaitingTime <= 0) {
-						// create respawn delay
-						currentWaitingTime = respawnDelay;
-					}
-					reason = WaitReason.RESPAWN_DELAY;
-				}
-			}
-			// after the player has been added to the list and waiting time was set
-			// we need to teleport them to the waiting room or immediately to the game
-			if (reason == WaitReason.NO_WAIT) {
-				startPlayers();
-			} else {
-				player.getPlayer().teleport(location);
-			}
-			return reason;
-		}
-		
-		/**
-		 * Removes the player from the waiting room. It does not teleport him in
-		 * any way.
-		 * 
-		 * @param player the player to remove
-		 */
-		public void removePlayer(InGamePlayer player) {
-			// it's assumed the teleporting of the player was already done
-			waitingPlayers.remove(player);
-		}
-		
-		/**
-		 * Starts the game for all waiting players.
-		 */
-		public void startPlayers() {
-			if (!running) {
-				// start the game in case it's not running
-				start();
-			} else {
-				// run the regular respawn routine
-				for (InGamePlayer player : waitingPlayers) {
-					handleRespawn(player);
-				}
-			}
-			waitingPlayers.clear();
-			roundFinished = false;
-		}
-		
-		/**
-		 * Called every tick so waiting room can decrease the counters.
-		 */
-		public void tick() {
-			boolean shouldCountdown = reason != WaitReason.GAME_ENDS && (!running || !rounds || roundFinished);
-			if (shouldCountdown) {
-				// start the game if the waiting time is exactly 0
-				// lower means the game was already started and the waiting room is idle
-				if (currentWaitingTime == 0) {
-					startPlayers();
-				} else {
-					// display countdown on specific seconds
-					if (displayTimes.contains(currentWaitingTime)) {
-						if (reason == WaitReason.RESPAWN_DELAY ||
-								reason == WaitReason.START_DELAY ||
-								reason == WaitReason.ROUND) {
-							waitingPlayers.forEach(
-									data -> LangManager.sendMessage(data, "countdown",
-											(double) currentWaitingTime / 20.0));
-						}
-					}
-				}
-				currentWaitingTime--;
-			}
-		}
-		
 	}
 	
 	/**
@@ -764,18 +443,15 @@ public abstract class DefaultGame implements Listener, Game {
 		for (Bonus bonus : bonuses) {
 			bonus.start();
 		}
-		for (InGamePlayer player : dataMap.values()) {
-			handleRespawn(player);
-		}
 		if (waitingRoom.locking) {
 			waitingRoom.locked = true;
 		}
 		// game started, fire an event
-		if (lobby.isOpen()) {
-			FlierGameStartEvent event = new FlierGameStartEvent(this);
-			Bukkit.getPluginManager().callEvent(event);
-		}
+		FlierGameStartEvent event = new FlierGameStartEvent(this);
+		Bukkit.getPluginManager().callEvent(event);
 	}
+	
+	protected abstract Set<InGamePlayer> getPlayersForRespawn(Set<InGamePlayer> players);
 
 	@Override
 	public void stop(GameEndCause cause) {
@@ -1035,6 +711,11 @@ public abstract class DefaultGame implements Listener, Game {
 	@Override
 	public int getTimeLeft() {
 		return timeLeft;
+	}
+	
+	@Override
+	public boolean hasRounds() {
+		return rounds;
 	}
 	
 	@EventHandler(priority=EventPriority.HIGH)
