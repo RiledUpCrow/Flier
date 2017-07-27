@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>pl.betoncraft</groupId>
 	<artifactId>Flier</artifactId>
-	<version>0.7.0</version>
+	<version>0.6.2</version>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
@@ -124,7 +124,7 @@
 		<dependency>
 			<groupId>pl.betoncraft</groupId>
 			<artifactId>BetonDB</artifactId>
-			<version>0.1.0</version>
+			<version>0.2.0</version>
 		</dependency>
 	</dependencies>
 </project>

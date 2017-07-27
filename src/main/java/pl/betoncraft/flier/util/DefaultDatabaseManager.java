@@ -58,12 +58,12 @@ public class DefaultDatabaseManager implements DatabaseManager {
 
 		// prepare required stuff
 		ConfigurationSection dbSection = Flier.getInstance().getConfig().getConfigurationSection("database");
-		String prefix = dbSection.getString("prefix", "flier_");
+//		String prefix = dbSection.getString("prefix", "flier_");
 		boolean mysql = dbSection.getBoolean("mysql");
 
 		// connect to the database
 		if (mysql) {
-			db = new MySQL(prefix,
+			db = new MySQL(
 					dbSection.getString("host"),
 					dbSection.getString("port"),
 					dbSection.getString("base"),
@@ -81,10 +81,6 @@ public class DefaultDatabaseManager implements DatabaseManager {
 			Logger logger = Flier.getInstance().getLogger();
 			logger.warning("Could not connect to " + (mysql ? "MySQL" : "SQLite") + " database: " + e.getMessage());
 			return;
-		} catch (ClassNotFoundException e) {
-			Logger logger = Flier.getInstance().getLogger();
-			logger.warning((mysql ? "MySQL" : "SQLite") + " is not supported!");
-			return;
 		}
 
 		// load queries
@@ -100,7 +96,7 @@ public class DefaultDatabaseManager implements DatabaseManager {
 			for (String key : mysqlQueries.getKeys(false)) {
 				db.registerStatement(key, mysqlQueries.getString(key), sqliteQueries.getString(key));
 			}
-		} catch (SQLException | ClassNotFoundException e) {
+		} catch (SQLException e) {
 			// error in SQL syntax
 			e.printStackTrace();
 		}
