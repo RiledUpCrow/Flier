@@ -36,22 +36,22 @@ This script is meant to automate the release process and provide a consistent wa
 
 The plugin is thoroughly documented in the `docs` directory. All files are written in Markdown. When adding new features they should be immediately documented there. The order of the files in the build script is as follows:
 
-* [Home](docs\Home.md)
-* [Installation](docs\Installation.md)
-* [Commands](docs\Commands.md)
-* [Integrations](docs\Integrations.md)
-* [Lobby](docs\Lobby.md)
-* [Arena](docs\Arena.md)
-* [Game](docs\Game.md)
-* [ItemSet](docs\ItemSet.md)
-* [Item](docs\Item.md)
-* [Engine](docs\Engine.md)
-* [Wings](docs\Wings.md)
-* [Action](docs\Action.md)
-* [Activator](docs\Activator.md)
-* [Bonus](docs\Bonus.md)
-* [Modifications](docs\Modifications.md)
-* [Effects](docs\Effects.md)
+* [Home](docs/Home.md)
+* [Installation](docs/Installation.md)
+* [Commands](docs/Commands.md)
+* [Integrations](docs/Integrations.md)
+* [Lobby](docs/Lobby.md)
+* [Arena](docs/Arena.md)
+* [Game](docs/Game.md)
+* [ItemSet](docs/ItemSet.md)
+* [Item](docs/Item.md)
+* [Engine](docs/Engine.md)
+* [Wings](docs/Wings.md)
+* [Action](docs/Action.md)
+* [Activator](docs/Activator.md)
+* [Bonus](docs/Bonus.md)
+* [Modifications](docs/Modifications.md)
+* [Effects](docs/Effects.md)
 
 ## API
 
