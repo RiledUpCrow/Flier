@@ -31,9 +31,10 @@ import org.bukkit.event.Listener;
 import pl.betoncraft.betonquest.BetonQuest;
 import pl.betoncraft.betonquest.ConditionID;
 import pl.betoncraft.betonquest.Instruction;
-import pl.betoncraft.betonquest.InstructionParseException;
+import pl.betoncraft.betonquest.exceptions.InstructionParseException;
 import pl.betoncraft.betonquest.api.Objective;
 import pl.betoncraft.betonquest.config.Config;
+import pl.betoncraft.betonquest.exceptions.QuestRuntimeException;
 import pl.betoncraft.betonquest.utils.PlayerConverter;
 import pl.betoncraft.flier.api.Flier;
 import pl.betoncraft.flier.event.FlierPlayerHitEvent;
@@ -63,7 +64,7 @@ public class FlierHitObjective extends Objective implements Listener {
 	}
 	
 	@EventHandler
-	public void onKill(FlierPlayerHitEvent event) {
+	public void onKill(FlierPlayerHitEvent event) throws QuestRuntimeException {
 		event.setSwitched(false);
 		String victim = PlayerConverter.getID(event.getPlayer().getPlayer());
 		String killer = PlayerConverter.getID(event.getOther().getPlayer());
@@ -84,7 +85,8 @@ public class FlierHitObjective extends Objective implements Listener {
 			if (data.getLeft() <= 0) {
 				completeObjective(killer);
 			} else if (notify) {
-				Config.sendMessage(killer, "players_to_kill", new String[] { String.valueOf(data.getLeft()) });
+				Config.sendNotify(instruction.getPackage().getName(), killer, "players_to_kill",
+						new String[]{String.valueOf(data.getLeft())}, "players_to_kill,info");
 			}
 		}
 	}
@@ -92,6 +94,11 @@ public class FlierHitObjective extends Objective implements Listener {
 	@Override
 	public String getDefaultDataInstruction() {
 		return String.valueOf(amount);
+	}
+
+	@Override
+	public String getProperty(String s, String s1) {
+		return null;
 	}
 
 	@Override

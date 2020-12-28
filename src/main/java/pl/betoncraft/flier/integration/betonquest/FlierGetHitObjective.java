@@ -30,7 +30,7 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 
 import pl.betoncraft.betonquest.Instruction;
-import pl.betoncraft.betonquest.InstructionParseException;
+import pl.betoncraft.betonquest.exceptions.InstructionParseException;
 import pl.betoncraft.betonquest.api.Objective;
 import pl.betoncraft.betonquest.utils.PlayerConverter;
 import pl.betoncraft.flier.api.Flier;
@@ -61,6 +61,11 @@ public class FlierGetHitObjective extends Objective implements Listener {
 	@Override
 	public String getDefaultDataInstruction() {
 		return "";
+	}
+
+	@Override
+	public String getProperty(String s, String s1) {
+		return null;
 	}
 
 	@Override

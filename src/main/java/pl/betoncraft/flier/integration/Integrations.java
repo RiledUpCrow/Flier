@@ -39,7 +39,6 @@ import pl.betoncraft.flier.integration.betonquest.JoinGameObjective;
 import pl.betoncraft.flier.integration.betonquest.JoinLobbyObjective;
 import pl.betoncraft.flier.integration.betonquest.LobbyCondition;
 import pl.betoncraft.flier.integration.betonquest.UsableItemObjective;
-import pl.betoncraft.flier.integration.placeholderapi.FlierPlaceholder;
 
 /**
  * Loads all possible integrations.
@@ -67,7 +66,6 @@ public class Integrations {
 			flier.getLogger().info("Hooked into BetonQuest!");
 		}
 		if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
-			new FlierPlaceholder(flier, "flier").hook();
 			flier.getLogger().info("Hooked into PlaceholderAPI!");
 		}
 	}
