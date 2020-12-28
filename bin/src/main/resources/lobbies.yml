@@ -1,0 +1,21 @@
+### Lobbies
+#
+# Lobby manages players, their classes and Games they play.
+# This example is commented out so it doesn't load automatically. Edit it before removing comments.
+# (comments are lines which start with `#` character)
+# A list of all Lobby types and their configurations can be found in the documentation.
+#
+
+#default:
+#  name: '$custom.defLobby'
+#  type: physicalLobby            # type of the Lobby
+#  join:                          # list of "join" blocks
+#  - 100;200;300;world            # **EDIT THIS BEFORE USING!**
+#  spawn: 100;200;300;world;0;0   # spawn location of the Lobby, **EDIT THIS BEFORE USING!**
+#  start:                         # list of start blocks
+#    default: 100;200;300;world   # "start" block for default game, **EDIT THIS BEFORE USING!**
+#  leave: 100;200;300;world       # "leave" block, **EDIT THIS BEFORE USING!**
+#  games:                         # list of games in this Lobby
+#  - default
+#  arenas:                        # list of arenas this lobby can use to launch games
+#  - default

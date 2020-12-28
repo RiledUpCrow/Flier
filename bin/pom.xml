@@ -41,53 +41,90 @@
 				<artifactId>maven-jar-plugin</artifactId>
 				<version>2.4</version>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-shade-plugin</artifactId>
+				<version>2.4.3</version>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>shade</goal>
+						</goals>
+						<configuration>
+							<artifactSet>
+								<includes>
+									<include>org.bstats:*</include>
+									<include>pl.betoncraft:BetonDB</include>
+								</includes>
+							</artifactSet>
+							<relocations>
+								<relocation>
+									<pattern>org.bstats</pattern>
+									<shadedPattern>pl.betoncraft.flier.bstats</shadedPattern>
+								</relocation>
+								<relocation>
+									<pattern>pl.betoncraft.betondb</pattern>
+									<shadedPattern>pl.betoncraft.flier.database</shadedPattern>
+								</relocation>
+							</relocations>
+							<minimizeJar>${minimize}</minimizeJar>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
 	<repositories>
 		<repository>
-			<id>spigotmc-repo</id>
-			<url>https://hub.spigotmc.org/nexus/content/groups/public/</url>
+			<id>spigot-api</id>
+			<url>https://hub.spigotmc.org/nexus/content/repositories/snapshots</url>
 		</repository>
 		<repository>
-		    <id>jitpack.io</id>
-		    <url>https://jitpack.io</url>
+			<id>betonquest-repo</id>
+			<url>http://betonquest.betoncraft.pl/mvn</url>
 		</repository>
 		<repository>
-		    <id>placeholderapi</id>
-            <url>https://repo.extendedclip.com/content/repositories/placeholderapi/</url>
+			<id>bstats-repo</id>
+			<url>http://repo.bstats.org/content/repositories/releases/</url>
 		</repository>
-		<repository>
-	        <id>betonquest-repo</id>
-	        <url>https://betonquest.org/nexus/repository/betonquest/</url>
-	    </repository>
 	</repositories>
 	<dependencies>
 		<dependency>
 			<groupId>org.spigotmc</groupId>
 			<artifactId>spigot-api</artifactId>
-			<version>1.12.2-R0.1-SNAPSHOT</version>
+			<version>1.12-R0.1-SNAPSHOT</version>
 			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.github.Co0sh</groupId>
-			<artifactId>BetonLangAPI</artifactId>
-			<version>v1.1.0</version>
-		</dependency>
-		<dependency>
-			<groupId>com.github.connorlinfoot</groupId>
-			<artifactId>BountifulAPI</artifactId>
-			<version>master-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>pl.betoncraft</groupId>
-        	<artifactId>betonquest</artifactId>
-			<version>1.12.0-SNAPSHOT</version>
+			<artifactId>BetonLangAPI</artifactId>
+			<version>1.1.1</version>
+		</dependency>
+		<dependency>
+			<groupId>com.connorlinfoot</groupId>
+			<artifactId>BountifulAPI</artifactId>
+			<version>1.6.1</version>
+		</dependency>
+		<dependency>
+			<groupId>pl.betoncraft.betonquest</groupId>
+			<artifactId>BetonQuest</artifactId>
+			<version>1.9</version>
 		</dependency>
 		<dependency>
 			<groupId>me.clip</groupId>
-			<artifactId>placeholderapi</artifactId>
-			<version>2.10.9</version>
-			<scope>provided</scope>
+			<artifactId>PlaceholderAPI</artifactId>
+			<version>2.5.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.bstats</groupId>
+			<artifactId>bstats-bukkit</artifactId>
+			<version>1.1</version>
+		</dependency>
+		<dependency>
+			<groupId>pl.betoncraft</groupId>
+			<artifactId>BetonDB</artifactId>
+			<version>0.2.0</version>
 		</dependency>
 	</dependencies>
 </project>

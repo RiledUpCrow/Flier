@@ -1,0 +1,189 @@
+### Actions
+#
+# Actions represent some events that can happen, for example shooting a gun or healing someone.
+# Here are some example Actions for you to use and modify.
+# A list of all Action types and their configurations can be found in the documentation.
+#
+
+balancedShot:
+  type: particleGun         # type of the Action
+  particle: smoke normal    # particle used as a bullet
+  amount: 10                # particle settings
+  offset: 0.1               #
+  speed: 0.01               #
+  burst_amount: 10          # amount of bullets in a burst
+  burst_ticks: 20           # length of the burst
+  spread: 0.005             # precision of bullets (0 means straight shots)
+  projectile_speed: 7.5     # speed of bullets
+  range: 192                # range of bullets in blocks
+  friendly_fire: true       # whenever it can damage friendly players
+  suicidal: false           # whenever it can damage the shooter
+  attack_usages:            # list of usages on hit
+    midair:                 # what happens if hit is in the air
+      where: air
+      actions:
+      - balancedWing        # wing damage
+      - wingsOff            # and taking wings off
+    on_the_ground:          # what happens if hit is on the ground
+      where: ground
+      actions:
+      - lowPhysical         # physical damage
+balancedWing:
+  type: wingsHealth
+  amount: -1000             # damage to wings
+lowPhysical:
+  type: health
+  amount: -6                # damage to player's health
+wingsOff:
+  type: wingsOff            # wings are taken off
+strongShot:
+  type: particleGun
+  particle: flame
+  amount: 10
+  offset: 0.1
+  speed: 0.01
+  burst_amount: 15
+  burst_ticks: 1
+  spread: 0.033
+  projectile_speed: 7.5
+  range: 128
+  friendly_fire: true
+  suicidal: false
+  attack_usages:
+    midair:
+      where: air
+      actions:
+      - strongWing
+      - wingsOff
+    on_the_ground:
+      where: ground
+      actions:
+      - lowPhysical
+strongWing:
+  type: wingsHealth
+  amount: -900
+fastShot:
+  type: particleGun
+  particle: crit magic
+  amount: 10
+  offset: 0.1
+  speed: 0.01
+  burst_amount: 1
+  burst_ticks: 1
+  projectile_speed: 15
+  range: 256
+  friendly_fire: true
+  suicidal: false
+  attack_usages:
+    midair:
+      where: air
+      actions:
+      - fastWing
+    on_the_ground:
+      where: ground
+      actions:
+      - highPhysical
+fastWing:
+  type: wingsHealth
+  amount: -2800
+highPhysical:
+  type: health
+  amount: -18
+gunShot:
+  type: projectileGun
+  entity: snowball
+  burst_amount: 1
+  burst_ticks: 1
+  projectile_speed: 5
+  friendly_fire: true
+  suicidal: false
+  attack_usages:
+    midair:
+      where: air
+      actions:
+      - gunWing
+    on_the_ground:
+      where: ground
+      actions:
+      - lowPhysical
+gunWing:
+  type: wingsHealth
+  amount: -1000
+selfdestruct:
+  type: suicide
+missile:
+  type: homingMissile
+  entity: arrow
+  search_range: 64
+  search_radius: 0.1
+  speed: 2.75
+  lifetime: 1200
+  maneuverability: 0.75
+  friendly_fire: true
+  suicidal: true
+  attack_usages:
+    midair:
+      where: air
+      actions:
+      - wingsOff
+      - highPhysical
+    on_the_ground:
+      where: ground
+      actions:
+      - highPhysical
+launch:
+  type: launcher
+  speed: 2
+bomb:
+  type: bomb
+  power: 12
+  suicidal: true
+  friendly_fire: true
+  exploding: true
+  fuse: 60
+  attack_usages:
+    midair:
+      where: air
+      actions:
+      - wingsOff
+      - highPhysical
+    on_the_ground:
+      where: ground
+      actions:
+      - highPhysical
+giveMoney:
+  money: 10
+  type: money
+repair:
+  type: wingsHealth
+  amount: 1
+target:
+  type: targetCompass
+  target: hostile
+fixAll:
+  type: wingsHealth
+  amount: 5000
+refuel:
+  type: fuel
+  amount: 5000
+refill_fast:
+  type: itemSet
+  item_set: fast
+  add_type: fill
+  conflict_action: skip
+refill_balanced:
+  type: itemSet
+  item_set: balanced
+  add_type: fill
+  conflict_action: skip
+refill_strong:
+  type: itemSet
+  item_set: strong
+  add_type: fill
+  conflict_action: skip
+consumeAmmo:
+  type: consume
+  item: ammo
+heal:
+  type: health
+  amount: 0.5

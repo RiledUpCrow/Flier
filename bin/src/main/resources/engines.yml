@@ -1,0 +1,48 @@
+### Engines
+#
+# Engines are Items which allow players to accelerate while flying.
+# Here are some example Engines for you to use and modify.
+# A list of all Engine types and their configurations can be found in the documentation.
+#
+
+balancedEngine:
+  type: multiplyingEngine                    # type of the Engine
+  material: sugar cane                       # material of the item
+  name: '$custom.balancedEngine'             # name of the item, as in messages.yml
+  lore:                                      # lore (text under item's name)
+  - '$custom.balancedEngineDesc'             # you don't have to use these pointers
+  - '$custom.engineUse'                      # you can simply put text here
+  max_speed: 1.5                             # maximum speed of this Engine (see docs)
+  min_speed: 0.75                            # minimum speed of this Engine (see docs)
+  acceleration: 0.025                        # acceleration power
+  max_fuel: 750                              # maximum fuel amount
+  consumption: 2                             # fuel consumption per tick
+  regeneration: 1                            # fuel regeneration per tick
+fastEngine:
+  type: multiplyingEngine
+  material: feather
+  name: '$custom.fastEngine'
+  lore:
+  - '$custom.fastEngineDesc1'
+  - '$custom.fastEngineDesc2'
+  - '$custom.engineUse'
+  max_speed: 2.5
+  min_speed: 0.5
+  acceleration: 0.0125
+  max_fuel: 500
+  consumption: 2.5
+  regeneration: 1.5
+strongEngine:
+  type: multiplyingEngine
+  material: wheat
+  name: '$custom.strongEngine'
+  lore:
+  - '$custom.strongEngineDesc1'
+  - '$custom.strongEngineDesc2'
+  - '$custom.engineUse'
+  max_speed: 1
+  min_speed: 1
+  acceleration: 0.05
+  max_fuel: 1500
+  consumption: 2
+  regeneration: 1

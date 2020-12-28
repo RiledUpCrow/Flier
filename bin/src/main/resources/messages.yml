@@ -1,0 +1,291 @@
+en:
+  no_permission: "&cYou don't have permission to do this."
+  no_money_unlock: "&cNot enough money to unlock this."
+  no_money_buy: "&cNot enough money to buy this."
+  cant_use: "&cYou can't use this right now."
+  unlocked: "&aUnlocked!"
+  unlock_other: "&cYou need to unlock other buttons first."
+  items_added: "&aItems added!"
+  items_refilled: "&aItems refilled!"
+  items_removed: "&aItems removed!"
+  items_replaced: "&aItems replaced!"
+  cant_sell: "&cYou can't sell more of these items!"
+  item_limit: "&cYou have reached a limit!"
+  item_conflict: "&cYou already have another item in this category!"
+  cant_do: "&cYou can't do this."
+  suicide: "{1}&f commited suicide..."
+  hit: "&eYou managed to hit {1}&e!"
+  get_hit: "&cYou were hit by {1}&c!"
+  hit_weapon: "&eYou managed to hit {1}&e with {2}&e!"
+  get_hit_weapon: "&cYou were hit by {1}&c with {2}&c!"
+  killed: "{1}&f was killed by {2}&f!"
+  shot_down: "{1}&f was shot down by {2}&f!"
+  more_players: "&2The game will start after {1} more players join."
+  no_waiting: "&2Respawned!"
+  respawn_delay: "&2Respawning in {1} seconds."
+  start_delay: "&2Game starting in {1} seconds."
+  round_delay: "&2The game will start when the round is finished."
+  unequal_teams: "&2Team sizes are not equal, you need to wait for the next respawn."
+  countdown: "&2== Start in {1} seconds =="
+  win: "You win!"
+  lose: "You lose!"
+  team_win: "&a** Team {1} wins! **"
+  player_win: "&a** {1} wins! **"
+  game_ends: "&b=== &eThe game ends! &a==="
+  no_such_game: "&cThere is no such game."
+  game_joined: "&aGame {1} joined!"
+  game_created: "&aGame {1} created!"
+  game_left: "&aGame {1} left!"
+  lobby_joined: "&aYou joined {1} lobby!"
+  lobby_left: "&aYou left {1} lobby!"
+  games_full: "&cAll games are currently full."
+  altitude: "A: {color}{altitude}m"
+  ammo: "M: {color}{current}/{max}"
+  fuel: "F: {color}{fuel}%%"
+  health: "H: {color}{health}%%"
+  money: "C: {color}${money}"
+  speed: "S: {color}{speed}~"
+  reload: "R: {color}{status}"
+  time: "T: {color}{min}:{s}"
+  your_score: "&2Score: &e{score}"
+  best_score: "&2Best: &c{score}"
+  actionbar_ammo: "&f[{1}&f]"
+  ammo_char: "■"
+  game_open: "Open"
+  game_closed: "Closed"
+  wrong_use: "&cWrong use of a command. Correct syntax:"
+  available_arguments: "&cAvailable arguments:"
+  no_such_object: "&cNo such {1}: &4{2}"
+  object_lobby: "lobby"
+  object_action: "action"
+  object_button: "button"
+  available_names: "&aAvailable names: {1}"
+  console_only: "&cThis command must be used by the console."
+  player_only: "&cThis command must be used by a player."
+  player_offline: "&c{1} is offline."
+  you_not_in_lobby: "&cYou are not in a lobby."
+  player_not_in_lobby: "&c{1} is not in a lobby."
+  item_desc_1: "Force a player to choose an item."
+  item_desc_2: "Choose an item or force specified player to choose an item."
+  item_desc_3: "Choose an item."
+  coordinator_desc: "Toggles the Coordinator."
+  coordinator_disabled: "Coordinator disabled!"
+  coordinator_enabled: "Coordinator enabled!"
+  join_lobby_desc_1: "Force a player to join the lobby."
+  join_lobby_desc_2: "Join a lobby or force specified player to join the lobby."
+  join_lobby_desc_3: "Join a lobby."
+  leave_lobby_desc_1: "Force the player to leave the lobby."
+  leave_lobby_desc_2: "Leave the lobby or force the player to leave the lobby."
+  leave_lobby_desc_3: "Leave the lobby."
+  lobby_desc: "Contains lobby-related commands."
+  money_desc: "Sets player's money in the game."
+  not_in_game: "&c{1} is not in any game."
+  money_set: "&a{1} has now {2} money."
+  money_integer: "Money amount must be an integer."
+  reload_desc: "Reloads the plugin."
+  reloaded: "&aReloaded!"
+  start_game_desc_1: "Force a player to start a game."
+  start_game_desc_2: "Start a game or force specified player to start game."
+  start_game_desc_3: "Start a game."
+  custom:
+    defArena: Main Map
+    defGame: Team DeathMatch
+    defLobby: Main
+    blue: Blue
+    red: Red
+    fast: Fast
+    balanced: Balanced
+    strong: Strong
+    machineGun: '&4Machine Gun'
+    machineGunDesc: '&bContinous burst with decent damage.'
+    disable: '&bDisables wings.'
+    shoot: '&aLeft click to shoot, right click to reload.'
+    shotgun: '&4Shotgun'
+    shotgunDesc: '&bMulti-bullet single burst with low damage.'
+    sniper: '&4Sniper Rifle'
+    sniperDesc: '&bShort, high-precision bursts with high damage.'
+    gun: '&4Gun'
+    gunDesc: '&bCan shoot from the ground.'
+    rocket: '&eRocket'
+    rocketDesc: '&bTracks players. Disables wings. High damage.'
+    rocketUse: '&aLeft click to launch.'
+    radar: '&aRadar'
+    radarDesc: '&bShows nearby hostiles.'
+    killUse: '&aLeft click to self destruct.'
+    leaveUse: '&aRight click to leave the game.'
+    launcher: '&5Launcher'
+    launcherDesc: '&bLaunches you in the direction you''re looking.'
+    launcherUse: '&aLeft click to use.'
+    repair: '&dEmergency Wings'
+    repairDesc: '&bRestores destroyed wings.'
+    repairUse: '&aLeft click to use.'
+    bomb: '&cBomb'
+    bombDesc: '&bDrops a bomb.'
+    bombUse: '&aLeft click to use.'
+    ammunition: '&0Ammo clip'
+    ammunitionDesc: '&bAllows reloading.'
+    balancedEngine: '&2Balanced Engine'
+    balancedEngineDesc: '&bMedium speed, acceleration and fuel.'
+    fastEngine: '&2Fast Engine'
+    fastEngineDesc1: '&bHigh maximum speed and fuel regeneration.'
+    fastEngineDesc2: '&bLow acceleration and fuel reserves.'
+    strongEngine: '&2Strong Engine'
+    strongEngineDesc1: '&bLow speed and fuel regeneration.'
+    strongEngineDesc2: '&bHigh acceleration and fuel reserves.'
+    engineUse: '&aHold shift to accelerate.'
+    balancedWings: '&3Balanced Wings'
+    balancedWingsDesc1: '&bDefault Elytra fight.'
+    balancedWingsDesc2: '&bMedium durability.'
+    fastWings: '&3Light Wings'
+    fastWingsDesc1: '&bFast wings with strong lifting force.'
+    fastWingsDesc2: '&bQuite fragile.'
+    strongWings: '&3Heavy Wings'
+    strongWingsDesc1: '&bSlow, heavy wings.'
+    strongWingsDesc2: '&bVery sturdy.'
+    wingsUse: '&aPress space while falling to fly.'
+pl:
+  no_permission: "&cNie masz uprawnień aby tego użyć."
+  no_money_unlock: "&cNie masz pieniędzy aby to odblokować."
+  no_money_buy: "&cNie masz pieniędzy aby to kupić."
+  cant_use: "&cNie możesz teraz tego użyć."
+  unlocked: "&aOdblokowano!!"
+  unlock_other: "&cMusisz najpierw odblokować inne przyciski."
+  items_added: "&aPrzedmioty dodane!"
+  items_refilled: "&aPrzedmioty wypełnione!"
+  items_removed: "&aPrzedmioty zabrane!"
+  items_replaced: "&aPrzedmioty wymienione!"
+  cant_sell: "&cNie możesz sprzedać więcej tych przedmiotów!"
+  item_limit: "&cOsiągnięto limit!"
+  item_conflict: "&cMasz już inny przedmiot w tej kategorii!"
+  cant_do: "&cNie możesz tego zrobić."
+  suicide: "{1}&f popełnił samobójstwo..."
+  hit: "&eTrafiłeś {1}&e!"
+  get_hit: "&cZostałeś trafiony przez {1}&c!"
+  hit_weapon: "&eTrafiłeś {1}&e za pomocą {2}&e!"
+  get_hit_weapon: "&cZostałeś trafiony przez {1}&c za pomocą {2}&c!"
+  killed: "{1}&f został zabity przez {2}&f!"
+  shot_down: "{1}&f został zestrzelony przez {2}&f!"
+  more_players: "&2Gra rozpocznie się kiedy dołączy jeszcze {1} graczy."
+  no_waiting: "&2Respawn!"
+  respawn_delay: "&2Respawn za {1} sekund."
+  start_delay: "&2Gra rozpocznie się za {1} sekund."
+  round_delay: "&2Gra rozpocznie się po zakończeniu rundy."
+  unequal_teams: "&2Drużyny są nierówne, musisz poczekać na kolejny respawn."
+  countdown: "&2== Start za {1} sekund =="
+  win: "Wygrana!"
+  lose: "Przegrana!"
+  team_win: "&a** Drużyna {1} wygrywa! **"
+  player_win: "&a** {1} wygrywa! **"
+  game_ends: "&b=== &eKoniec gry! &a==="
+  no_such_game: "&cNie ma takiej gry."
+  game_joined: "&aDołączono do gry {1}."
+  game_created: "&aGra {1} utworzona."
+  game_left: "&aOpuszczono grę {1}!"
+  lobby_joined: "&aDołączono do lobby {1}!"
+  lobby_left: "&aOpuszczono lobby {1}!"
+  games_full: "&cWszystkie gry są obecnie pełne."
+  altitude: "W: {color}{altitude}m"
+  ammo: "A: {color}{current}/{max}"
+  fuel: "P: {color}{fuel}%%"
+  health: "Z: {color}{health}%%"
+  money: "K: {color}{money}zł"
+  speed: "S: {color}{speed}~"
+  reload: "R: {color}{status}"
+  time: "C: {color}{min}:{s}"
+  your_score: "&2Pkt: &e{score}"
+  best_score: "&2Top: &c{score}"
+  actionbar_ammo: "&f[{1}&f]"
+  ammo_char: "■"
+  game_open: "Otwarte"
+  game_closed: "Zamknięte"
+  wrong_use: "&cZłe użycie komendy. Poprawna składnia:"
+  available_arguments: "&cDostępne argumenty:"
+  no_such_object: "&cNie ma takiego {1}: &4{2}"
+  object_lobby: "lobby"
+  object_action: "typu"
+  object_button: "przycisku"
+  available_names: "&aDostępne nazwy: {1}"
+  console_only: "&cTa komenda musi być użyta z konsoli."
+  player_only: "&cTa komenda musi być użyta przez gracza."
+  player_offline: "&c{1} jest offline."
+  you_not_in_lobby: "&cNie jesteś w lobby."
+  player_not_in_lobby: "&c{1} nie jest w lobby."
+  item_desc_1: "Zmusza gracza do wybrania przedmiotu."
+  item_desc_2: "Wybiera przedmiot albo zmusza podanego gracza do wybrania przedmiotu."
+  item_desc_3: "Wybiera przedmiot."
+  coordinator_desc: "Przełącza koordynator."
+  coordinator_disabled: "Koordynator wyłączony!"
+  coordinator_enabled: "Koordynator włączony!"
+  join_lobby_desc_1: "Zmusza gracza do dołączenia do lobby."
+  join_lobby_desc_2: "Dołącza do lobby albo zmusza podanego gracza do dołączenia do lobby."
+  join_lobby_desc_3: "Dołącza do lobby."
+  leave_lobby_desc_1: "Zmusza gracza do wyjscia z lobby."
+  leave_lobby_desc_2: "Wychodzi z lobby albo zmusza podanego gracza do wyjścia z lobby."
+  leave_lobby_desc_3: "Wychodzi z lobby."
+  lobby_desc: "Zawiera komendy związane z lobby."
+  money_desc: "Ustawia ilość pieniędzy gracza."
+  not_in_game: "&c{1} nie jest w żadnej grze."
+  money_set: "&a{1} ma teraz {2} pieniędzy."
+  money_integer: "Ilość pieniędzy musi być liczbą naturalną."
+  reload_desc: "Przeładowuje plugin."
+  reloaded: "&aPrzeładowano!"
+  start_game_desc_1: "Zmusza gracza do rozpoczęcia gry."
+  start_game_desc_2: "Rozpoczyna grę albo zmusza podanego gracza do rozpoczęcia gry."
+  start_game_desc_3: "Rozpoczyna grę."
+  custom:
+    defArena: Mapa Główna
+    defGame: Drużynowa
+    defLobby: Główne
+    blue: Niebiescy
+    red: Czerwoni
+    fast: Szybki
+    balanced: Zbalansowany
+    strong: Silny
+    machineGun: '&4Karabin Maszynowy'
+    machineGunDesc: '&bCiągła seria z przyzwoitymi obrażeniami.'
+    disable: '&bBlokuje skrzydła.'
+    shoot: '&aKliknij lewym, aby strzelić; prawym, aby przeładować.'
+    shotgun: '&4Shotgun'
+    shotgunDesc: '&bWielopociskowe pojedyncze strzały z niskimi obrażeniami.'
+    sniper: '&4Karabin Snajperski'
+    sniperDesc: '&bKrótkie, precyzyjne serie z wysokimi obrażeniami.'
+    gun: '&4Pistolet'
+    gunDesc: '&bMoże strzelać z ziemi.'
+    rocket: '&eRakieta'
+    rocketDesc: '&bŚledzi graczy. Blokuje skrzydła. Duże obrażenia.'
+    rocketUse: '&aKliknij lewym, aby odpalić.'
+    radar: '&aRadar'
+    radarDesc: '&bPokazuje pobliskich przeciwników.'
+    killUse: '&aKliknij lewym, aby popełnić samobójstwo.'
+    leaveUse: '&aKliknij prawym, aby wyjść z gry.'
+    launcher: '&5Wyrzutnia'
+    launcherDesc: '&bWystrzeliwuje Cię w kierunku, w którym patrzysz.'
+    launcherUse: '&aKliknij lewym, aby użyć.'
+    repair: '&dZapasowe Skrzydła'
+    repairDesc: '&bPrzywraca zniszczone skrzydła.'
+    repairUse: '&aKliknij lewym, aby użyć.'
+    ammunition: '&0Magazynek amunicji'
+    ammunitionDesc: '&bPozwala przeładowywać broń.'
+    bomb: '&cBomba'
+    bombDesc: '&bZrzuca bombę.'
+    bombUse: '&aKliknij lewym, aby użyć.'
+    balancedEngine: '&2Zbalansowany silnik'
+    balancedEngineDesc: '&bŚrednia prędkość, przyspieszenie i paliwo.'
+    fastEngine: '&2Szybki silnik'
+    fastEngineDesc1: '&bWysoka prędkość i regeneracja paliwa.'
+    fastEngineDesc2: '&bNiskie przyspieszenie i rezerwa paliwa.'
+    strongEngine: '&2Mocny silnik'
+    strongEngineDesc1: '&bNiska prędkość i regeneracja paliwa.'
+    strongEngineDesc2: '&bWysokie przyspieszenie i rezerwa paliwa.'
+    engineUse: '&aPrzytrzymaj shift aby przyspieszyć.'
+    balancedWings: '&3Zbalansowane Skrzydła'
+    balancedWingsDesc1: '&bDomyślny lot Elytrą.'
+    balancedWingsDesc2: '&bŚrednia wytrzymałość.'
+    fastWings: '&3Lekkie Skrzydła'
+    fastWingsDesc1: '&bSzybkie skrzydła z dużą siłą nośną.'
+    fastWingsDesc2: '&bDość kruche.'
+    strongWings: '&3Ciężkie Skrzydła'
+    strongWingsDesc1: '&bWolne, ciężkie skrzydła.'
+    strongWingsDesc2: '&bBardzo wytrzymałe.'
+    wingsUse: '&aWciśnij spację w trakcie spadania aby zacząć lecieć.'
+
