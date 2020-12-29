@@ -66,6 +66,7 @@ public class Integrations {
 			flier.getLogger().info("Hooked into BetonQuest!");
 		}
 		if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
+        	new PlaceholderAPI(flier).register();
 			flier.getLogger().info("Hooked into PlaceholderAPI!");
 		}
 	}
