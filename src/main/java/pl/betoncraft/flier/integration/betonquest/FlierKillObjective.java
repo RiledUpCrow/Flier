@@ -26,6 +26,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
+
 import pl.betoncraft.betonquest.BetonQuest;
 import pl.betoncraft.betonquest.ConditionID;
 import pl.betoncraft.betonquest.Instruction;
@@ -42,6 +43,7 @@ import pl.betoncraft.flier.event.FlierPlayerKillEvent;
  *
  * @author Jakub Sapalski
  */
+@SuppressWarnings("deprecation")
 public class FlierKillObjective extends Objective implements Listener {
 
     private int amount = 1;

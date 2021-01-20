@@ -31,9 +31,9 @@ import org.bukkit.event.Listener;
 import pl.betoncraft.betonquest.BetonQuest;
 import pl.betoncraft.betonquest.ConditionID;
 import pl.betoncraft.betonquest.Instruction;
-import pl.betoncraft.betonquest.exceptions.InstructionParseException;
 import pl.betoncraft.betonquest.api.Objective;
 import pl.betoncraft.betonquest.config.Config;
+import pl.betoncraft.betonquest.exceptions.InstructionParseException;
 import pl.betoncraft.betonquest.exceptions.QuestRuntimeException;
 import pl.betoncraft.betonquest.utils.PlayerConverter;
 import pl.betoncraft.flier.api.Flier;
@@ -44,6 +44,7 @@ import pl.betoncraft.flier.event.FlierPlayerHitEvent;
  *
  * @author Jakub Sapalski
  */
+@SuppressWarnings("deprecation")
 public class FlierHitObjective extends Objective implements Listener {
 
 	private int amount = 1;

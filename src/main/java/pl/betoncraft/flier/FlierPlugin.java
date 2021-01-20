@@ -25,13 +25,10 @@ package pl.betoncraft.flier;
 
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-
-import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Entity;
@@ -209,9 +206,6 @@ public class FlierPlugin extends JavaPlugin implements Flier {
 		
 		// schedule loading after all plugins are enabled
 		Bukkit.getScheduler().runTask(this, () -> reload());
-		
-		// start metrics
-		Metrics metrics = new Metrics(this,597);
 		
 		// database stuff
 		databaseManager = new DefaultDatabaseManager();
