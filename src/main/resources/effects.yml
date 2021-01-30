@@ -65,7 +65,7 @@ spawn_particle_red:
 spawn_sound:
   type: publicSound
   event_type: spawn
-  sound: block note pling
+  sound: block_note_block_pling
   volume: 10
 sheep_sound:
   type: privateSound
