@@ -1,9 +1,10 @@
 name: Flier
 main: pl.betoncraft.flier.FlierPlugin
 description: Elytra air combat minigame for Spigot
-authors: [Co0sh]
+authors: [Co0sh, Elikill58, averyanalex]
 version: ${project.version}
 softdepend: [Multiverse-Core, BetonLangAPI, BountifulAPI, BetonQuest, PlaceholderAPI]
+
 commands:
   flier:
     description: Main Flier command.
