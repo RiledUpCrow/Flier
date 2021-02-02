@@ -43,7 +43,7 @@ public class EngineCondition extends Condition {
 	private Flier flier;
 
 	public EngineCondition(Instruction instruction) throws InstructionParseException {
-		super(instruction);
+		super(instruction, true);
 		flier = Flier.getInstance();
 	}
 

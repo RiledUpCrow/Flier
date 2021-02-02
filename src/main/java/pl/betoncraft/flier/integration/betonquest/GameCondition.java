@@ -43,7 +43,7 @@ public class GameCondition extends Condition {
     private Flier flier;
 
     public GameCondition(Instruction instruction) throws InstructionParseException {
-        super(instruction);
+        super(instruction, true);
         game = instruction.next();
         flier = Flier.getInstance();
     }

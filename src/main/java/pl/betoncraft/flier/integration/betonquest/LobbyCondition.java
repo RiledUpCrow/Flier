@@ -43,7 +43,7 @@ public class LobbyCondition extends Condition {
     private Flier flier;
 
     public LobbyCondition(Instruction instruction) throws InstructionParseException {
-        super(instruction);
+        super(instruction, true);
         lobby = instruction.next();
         flier = Flier.getInstance();
     }
