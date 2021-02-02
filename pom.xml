@@ -47,11 +47,15 @@
 				<version>3.1.0</version>
 				<!-- Do not include the <configuration>...</configuration> part if you are using Sponge! -->
 				<configuration>
+					<artifactSet>
+						<includes>
+							<include>org.bstats:*</include>
+						</includes>
+					</artifactSet>
 					<relocations>
 						<relocation>
 							<pattern>org.bstats</pattern>
-							<!-- Replace this with your package! -->
-							<shadedPattern>your.package</shadedPattern>
+							<shadedPattern>pl.betoncraft.flier.libs.org.bstats</shadedPattern>
 						</relocation>
 					</relocations>
 				</configuration>

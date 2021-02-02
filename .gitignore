@@ -6,3 +6,5 @@
 
 *.html
 /dependency-reduced-pom.xml
+
+.idea
