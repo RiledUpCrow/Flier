@@ -88,8 +88,8 @@
             <url>https://repo.extendedclip.com/content/repositories/placeholderapi/</url>
 		</repository>
 		<repository>
-	        <id>betonquest-repo</id>
-	        <url>https://betonquest.org/nexus/repository/betonquest/</url>
+	        <id>eliapp-repo</id>
+	        <url>http://repo.eliapp.fr:8080/repository/internal/</url>
 	    </repository>
 	</repositories>
 	<dependencies>
