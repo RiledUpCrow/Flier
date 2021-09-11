@@ -4,8 +4,8 @@
     <mirrors>
         <mirror>
             <id>repo-eliapp-http-unblocker</id>
-            <mirrorOf>repo-eliapp-blocked-http-repository</mirrorOf>
-            <name>Eliapp</name>
+            <mirrorOf>eliapp-repo</mirrorOf>
+            <name></name>
             <url>http://repo.eliapp.fr:8080</url>
             <blocked>false</blocked>
         </mirror>
