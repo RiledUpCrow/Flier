@@ -44,7 +44,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-shade-plugin</artifactId>
-				<version>3.1.0</version>
+				<version>3.2.4</version>
 				<!-- Do not include the <configuration>...</configuration> part if you are using Sponge! -->
 				<configuration>
 					<artifactSet>
