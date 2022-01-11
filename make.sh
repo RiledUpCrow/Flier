@@ -29,7 +29,7 @@ fi
 echo Compiling plugin...
 echo Flier.zip >> src/main/resources/version.txt
 
-mvn clean package
+mvn clean package --batch-mode
 if [ $? -eq 0 ]
 then
   echo "Successfully compiled"

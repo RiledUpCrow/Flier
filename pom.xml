@@ -89,7 +89,7 @@
 		</repository>
 		<repository>
 	        <id>eliapp-repo</id>
-	        <url>http://repo.eliapp.fr:8080/repository/internal/</url>
+	        <url>https://repo.eliapp.fr:8081/repository/internal/</url>
 	    </repository>
 	</repositories>
 	<dependencies>

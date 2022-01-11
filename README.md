@@ -1,3 +1,6 @@
+![Build](https://github.com/Elikill58/Flier/actions/workflows/build.yaml/badge.svg)
+![Dependencies](https://img.shields.io/librariesio/github/Elikill58/Flier)
+
 # Flier
 
 Flier is a Spigot minigame plugin. It lets players fly with engine-powered Elytras and shoot each other. It doesn't allow Minecraft's regular PvP mechanics, instead featuring a wide array of custom gun-like weapons, rockets and bombs.
