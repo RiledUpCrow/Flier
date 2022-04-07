@@ -77,7 +77,7 @@ fi
 
 
 echo Zipping source code...
-git archive -o target/SourceCode.zip HEAD src pom.xml LICENSE
+git archive -o target/SourceCode.zip HEAD src pom.xml
 if [ $? -eq 0 ]
 then
   echo "Source code zipped"
