@@ -87,10 +87,8 @@ else
 fi
 
 echo Bundling files...
-echo changelog.txt >> target/ChangeLog.txt
-echo LICENSE >> target/License.txt
 cd target
-7z a Flier Flier.jar Documentation.pdf SourceCode.zip ChangeLog.txt License.txt
+7z a Flier Flier.jar Documentation.pdf
 
 if [ $? -eq 0 ]
 then
@@ -100,7 +98,7 @@ else
   exit 1
 fi
 
-rm Documentation.pdf SourceCode.zip ChangeLog.txt License.txt
+rm Documentation.pdf
 cd ..
 
 echo Flier package created!

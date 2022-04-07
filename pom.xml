@@ -14,7 +14,7 @@
 				<directory>${basedir}</directory>
 				<filtering>true</filtering>
 				<includes>
-					<include>LICENSE</include>
+					<include>LICENSE.md</include>
 				</includes>
 			</resource>
 			<resource>
