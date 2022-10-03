@@ -23,6 +23,7 @@
  */
 package pl.betoncraft.flier.api.core;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -66,6 +67,10 @@ public interface CommandArgument {
 	 * @return the list of Permissions which enable using this Argument
 	 */
 	public Permission getPermission();
+	
+	public default List<CommandArgument> getSubCommand() {
+		return new ArrayList<>();
+	}
 	
 	/**
 	 * The user of an Argument.

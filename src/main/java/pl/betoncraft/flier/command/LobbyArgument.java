@@ -75,6 +75,11 @@ public class LobbyArgument implements CommandArgument {
 	public String getDescription(CommandSender sender) {
 		return LangManager.getMessage(sender, "lobby_desc");
 	}
+	
+	@Override
+	public List<CommandArgument> getSubCommand() {
+		return arguments;
+	}
 
 	@Override
 	public String getHelp(CommandSender sender) {

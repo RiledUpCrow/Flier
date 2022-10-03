@@ -27,10 +27,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabCompleter;
 
 import pl.betoncraft.flier.api.core.CommandArgument;
 
@@ -39,7 +41,7 @@ import pl.betoncraft.flier.api.core.CommandArgument;
  *
  * @author Jakub Sapalski
  */
-public class FlierCommand implements CommandExecutor {
+public class FlierCommand implements CommandExecutor, TabCompleter {
 	
 	private List<CommandArgument> arguments = new ArrayList<>();
 	
@@ -64,6 +66,24 @@ public class FlierCommand implements CommandExecutor {
 			return true;
 		}
 		return false;
+	}
+
+	@Override
+	public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
+		String prefix = args[args.length - 1].toLowerCase(Locale.ROOT);
+		List<String> list = new ArrayList<>();
+		for(CommandArgument cmd : arguments) {
+			if(args.length == 1) {
+				if(cmd.getName().startsWith(prefix) || prefix.isEmpty())
+					list.add(cmd.getName());
+			} else if(args.length == 2) {
+				for(CommandArgument subCmd : cmd.getSubCommand()) {
+					if(subCmd.getName().startsWith(prefix) || prefix.isEmpty())
+						list.add(subCmd.getName());
+				}
+			}
+		}
+		return list.isEmpty() ? null : list;
 	}
 
 }
