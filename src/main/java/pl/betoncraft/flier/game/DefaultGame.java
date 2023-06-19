@@ -285,6 +285,7 @@ public abstract class DefaultGame implements Listener, Game {
 			runTaskTimer(Flier.getInstance(), 1, 1);
 		}
 
+		@SuppressWarnings("deprecation")
 		@Override
 		public void run() {
 			if (maxTime != 0 && --timeLeft == 0) {

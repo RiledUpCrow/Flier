@@ -2,6 +2,9 @@
 /.settings/
 /.classpath
 /.project
+/bin
 
 *.html
 /dependency-reduced-pom.xml
+
+.idea

@@ -18,3 +18,9 @@ NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
 LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+Copyright (c) 2022 Elikill58 - New maintainer.
+
+Find all contributors [here](https://github.com/Elikill58/Flier).
+
+I asked for full authorization, but Jakub Sapalski (also known as Co0sh) don't reply.

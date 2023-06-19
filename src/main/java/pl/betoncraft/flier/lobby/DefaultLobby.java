@@ -76,6 +76,7 @@ import pl.betoncraft.flier.util.ValueLoader;
  *
  * @author Jakub Sapalski
  */
+@SuppressWarnings("deprecation")
 public abstract class DefaultLobby implements Lobby, Listener {
 	
 	protected ValueLoader loader;

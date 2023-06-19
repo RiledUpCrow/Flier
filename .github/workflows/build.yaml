@@ -1,0 +1,26 @@
+name: Build 🔨
+on: 
+  push:
+    branches-ignore:
+      - 'dependabot/**'
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    name: Build
+    steps:
+      - name: Checkout git repo
+        uses: actions/checkout@v2
+
+      - name: Install required applications
+        run: sudo apt-get install pandoc wkhtmltopdf -y --no-install-recommends
+
+      - name: Build
+        run: ./make.sh
+
+      - uses: actions/upload-artifact@v2
+        name: Upload Artifact
+        with:
+          name: Flier.7z
+          path: target/Flier.7z

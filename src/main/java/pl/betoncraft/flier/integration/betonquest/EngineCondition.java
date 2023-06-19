@@ -26,8 +26,8 @@ package pl.betoncraft.flier.integration.betonquest;
 import java.util.UUID;
 
 import pl.betoncraft.betonquest.Instruction;
-import pl.betoncraft.betonquest.InstructionParseException;
-import pl.betoncraft.betonquest.QuestRuntimeException;
+import pl.betoncraft.betonquest.exceptions.InstructionParseException;
+import pl.betoncraft.betonquest.exceptions.QuestRuntimeException;
 import pl.betoncraft.betonquest.api.Condition;
 import pl.betoncraft.betonquest.utils.PlayerConverter;
 import pl.betoncraft.flier.api.Flier;
@@ -39,16 +39,17 @@ import pl.betoncraft.flier.api.core.InGamePlayer;
  * @author Jakub Sapalski
  */
 public class EngineCondition extends Condition {
-	
+
 	private Flier flier;
 
 	public EngineCondition(Instruction instruction) throws InstructionParseException {
-		super(instruction);
+		super(instruction, true);
 		flier = Flier.getInstance();
 	}
 
+
 	@Override
-	public boolean check(String playerID) throws QuestRuntimeException {
+	public Boolean execute(String playerID) throws QuestRuntimeException {
 		UUID uuid = PlayerConverter.getPlayer(playerID).getUniqueId();
 		InGamePlayer player = flier.getPlayers().get(uuid);
 		return player != null && player.isAccelerating();

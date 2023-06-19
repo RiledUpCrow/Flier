@@ -186,7 +186,7 @@ radar:
       actions:
       - selfdestruct
 launcher:
-  material: firework
+  material: firework_rocket
   name: '$custom.launcher'
   lore:
   - '$custom.launcherDesc'
@@ -203,7 +203,7 @@ launcher:
       actions:
       - launch
 repair:
-  material: water lily
+  material: lily_pad
   name: '$custom.repair'
   lore:
   - '$custom.repairDesc'
